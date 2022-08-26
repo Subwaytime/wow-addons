@@ -1,0 +1,172 @@
+9.2.25 - 17th August 2022
+- Updated for game version 9.2.7.
+- Updated sounds to game version 9.2.7.45114.
+
+9.2.23 - 3rd August 2022
+- Updated sounds to game version 9.2.5.44908.
+
+9.2.22 - 27th July 2022
+- Updated sounds to game version 9.2.5.44730.
+
+9.2.18 - 6th July 2022
+- Pressing W and S to traverse the listing will now show more tracks per page.
+- Updated sounds to game version 9.2.5.44325.
+
+9.2.17 - 29th June 2022
+- Updated sounds to game version 9.2.5.44061.
+
+9.2.16 - 22nd June 2022
+- In the game key bindings menu, you can now set a keybind to toggle Leatrix Sounds.
+- Updated sounds to game version 9.2.5.44061.
+
+9.2.14 - 8th June 2022
+- Updated sounds to game version 9.2.5.44061.
+
+9.2.13 - 1st June 2022
+- Updated for game version 9.2.5.
+- Updated sounds to game version 9.2.5.43971.
+
+9.2.10 - 12th May 2022
+- Updated sounds to game version 9.2.0.43345.
+
+9.2.08 - 27th April 2022
+- Updated sounds to game version 9.2.0.43340.
+
+9.2.07 - 20th April 2022
+- Updated sounds to game version 9.2.0.43206.
+
+9.2.06 - 13th April 2022
+- Updated sounds to game version 9.2.0.43114.
+
+9.2.04 - 30th March 2022
+- Updated sounds to game version 9.2.0.42979.
+
+9.2.03 - 23rd March 2022
+- Updated sounds to game version 9.2.0.42698.
+
+9.2.02 - 9th March 2022
+- Updated sounds to game version 9.2.0.42614.
+
+9.2.01 - 2nd March 2022
+- Updated sounds to game version 9.2.0.42538.
+
+9.2.00 - 23rd February 2022
+- Updated for game version 9.2.0.
+- Updated sounds to game version 9.2.0.42423.
+
+9.1.41 - 28th January 2022
+- Uploaded again to address CurseForge issue.
+
+9.1.40 - 26th January 2022
+- Updated sounds to game version 9.1.5.42010.
+
+9.1.38 - 13th January 2022
+- Updated sounds to game version 9.1.5.41793.
+
+9.1.31 - 16th December 2021
+- Updated sounds to game version 9.1.5.41488.
+
+9.1.28 - 8th December 2021
+- Updated sounds to game version 9.1.5.41359.
+
+9.1.24 - 24th November 2021
+- Updated sounds to game version 9.1.5.41079.
+
+9.1.23 - 17th November 2021
+- Updated sounds to game version 9.1.5.41031.
+
+9.1.22 - 10th November 2021
+- Updated sounds to game version 9.1.5.40966.
+
+9.1.21 - 30th October 2021
+- Updated for game version 9.1.5.
+- Updated sounds to game version 9.1.5.40871.
+
+9.1.20 - 29th October 2021
+- Replaced packager to fix CurseForge App issue.
+
+9.1.18 - 28th October 2021
+- Updated sounds to game version 9.1.0.40725.
+
+9.1.16 - 21st October 2021
+- Updated sounds to game version 9.1.0.40593.
+
+9.1.13 - 13th October 2021
+- Updated sounds to game version 9.1.0.40443.
+
+9.1.10 - 16th September 2021
+- Updated sounds to game version 9.1.0.40120.
+
+9.1.06 - 22nd August 2021
+- Updated sounds to game version 9.1.0.39804.
+
+9.1.04 - 5th August 2021
+- Updated sounds to game version 9.1.0.39653.
+
+9.1.03 = 22nd July 2021
+- Updated sounds to game version 9.1.0.39427.
+
+9.1.02 - 13th July 2021
+- Updated sounds to game version 9.1.0.39335.
+
+9.1.01 - 7th July 2021
+- Updated sounds to game version 9.1.0.39318.
+
+9.1.00 - 30th June 2021
+- Updated for game version 9.1.
+- Updated sounds to game version 9.1.0.39226.
+
+9.0.28 - 13th May 2021
+- Updated sounds to game version 9.0.5.38556.
+
+9.0.27 - 4th May 2021
+- Added a niche ability to search Leatrix_Sounds_Files.lua or Leatrix_Sounds_Kits.lua for multiple sound file IDs or sound kit IDs using Notepad++.  To use it, hold control, shift and right-click a few sound files or sound kits in LTS (one or the other, not both).  You will get a search pattern in the chat editbox that you can paste into a Notepad++ regular expression search (use Search > Mark with Bookmark line checked so that you can do Search > Bookmark > Copy Bookmarked Lines afterwards).
+
+9.0.25 - 21st April 2021
+- If dialog sound is disabled, it will now only be enabled if you play a sound kit.  Playing a sound file will no longer enable dialog sound if it's disabled.
+- The source file versions (ListFile, SoundKit, SoundKitName) are now shown in the help button tooltip.
+
+9.0.22 - 1st April 2021
+- Updated sounds to game version 9.0.5.38134.
+
+9.0.21 - 25th March 2021
+- Updated sounds to game version 9.0.5.37988.
+
+9.0.20 - 17th March 2021
+- Updated sounds to game version 9.0.5.37899.
+
+9.0.19 - 10th March 2021
+- Updated for World of Warcraft 9.0.5.
+- Updated sounds to game version 9.0.5.37864.
+
+9.0.15 - 9th February 2021
+- Updated sounds to game version 9.0.2.37474.
+
+9.0.14 - 22nd January 2021
+- Updated sounds to game version 9.0.2.37176.
+
+9.0.13 - 6th January 2021
+- Updated sounds to game version 9.0.2.36949.
+
+9.0.12 - 18th December 2020
+- Updated sounds to game version 9.0.2.36839.
+
+9.0.11 - 9th December 2020
+- Source code is now on GitHub (github.com/leatrix).
+
+9.0.08 - 18th November 2020
+- Updated for World of Warcraft 9.0.2.
+- Updated sounds to game version 9.0.2.36665.
+
+9.0.06 - 11th November 2020
+- Updated sounds to game version 9.0.1.36492.
+
+9.0.05 - 4th November 2020
+- The hotkey for replacing the currently selected track is now "E" (was SPACE) and the hotkey for stopping playback is now "Q" (was LCTRL).
+- When the chat editbox is activated (for instance when you shift/right-click a track), all hotkeys will be disabled until the chat editbox is deactivated.
+
+9.0.01 - 28th October 2020
+- Updated sounds to game version 9.0.1.36372.
+
+9.0.00 - 12th October 2020
+- Updated for World of Warcraft patch 9.0 (Shadowlands).
