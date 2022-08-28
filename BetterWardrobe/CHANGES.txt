@@ -1,0 +1,13 @@
+tag 68428ba743724e4af9340932652630765a40024f 3.15.3
+Author:	SLOKnightfall <SLOKnightfall@gmail.com>
+Date:	Sun Jun 5 14:33:18 2022 -0700
+
+-Bugfixes
+
+commit 04b9bc1b9c6312c4f599e865cbd8f4b76b412526
+Author: SLOKnightfall <SLOKnightfall@gmail.com>
+Date:   Sun Jun 5 14:32:03 2022 -0700
+
+    Fixed login error if there are substitutions  Issue #269
+    Fixed errors when trying to right click on an item.
+

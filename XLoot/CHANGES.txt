@@ -1,0 +1,10 @@
+lightweight tag 40acc05a7b3bef28cce9573d04dba662582d29cd 9.2.5-3
+Author:	Xuerian <xuerian@gmail.com>
+Date:	Thu Apr 21 15:22:21 2022 -0400
+
+commit 40acc05a7b3bef28cce9573d04dba662582d29cd
+Author: Xuerian <xuerian@gmail.com>
+Date:   Thu Apr 21 15:22:21 2022 -0400
+
+    Monitor: Add offset and spacing options
+
