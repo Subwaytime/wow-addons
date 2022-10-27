@@ -27,6 +27,7 @@ db('Gamepad/Index/Icons', {
 		Circle   = 'PS_R_CIRCLE';
 		Triangle = 'PS_R_TRIANGLE';
 		Back     = 'PS_C_BACK';
+		Back2    = 'PS_C_BACK2';
 		Share    = 'PS_C_SHARE';
 		System   = 'PS_C_SYSTEM';
 		Options  = 'PS_C_OPTIONS';
@@ -56,5 +57,6 @@ db('Gamepad/Index/Icons', {
 db('Gamepad/Index/Splash', {
 	['PlayStation 4'] = 'DS4';
 	['PlayStation 5'] = 'DS5';
+	['Steam Deck'] = 'Deck';
 	['Xbox'] = 'Xbox';
 })

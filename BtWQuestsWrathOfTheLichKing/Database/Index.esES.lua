@@ -723,7 +723,7 @@ local i = {
         tooltip = "quest:11652",
     },
     {
-        name = L["DEHTA"],
+        name = "DEHTA",
         type = "chain",
         link = "btwquests:chain:30105",
         path = "Wrath of the Lich King > Tundra Boreal",

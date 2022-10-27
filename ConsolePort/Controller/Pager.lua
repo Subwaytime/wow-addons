@@ -37,7 +37,7 @@ function Pager:GetDefaultPageCondition()
 		----------------------------------
 		'vehicleui', 'possessbar', 'overridebar', 'shapeshift',
 		'bar:2', 'bar:3', 'bar:4', 'bar:5', 'bar:6',
-		'bonusbar:1', 'bonusbar:2', 'bonusbar:3', 'bonusbar:4'
+		'bonusbar:1', 'bonusbar:2', 'bonusbar:3', 'bonusbar:4', 'bonusbar:5'
 		----------------------------------
 	}) do cond = cond .. conditionFormat:format(macroCondition, i) count = i end
 	-- append the list for the default bar (1) when none of the conditions apply.
@@ -89,13 +89,15 @@ function Pager:GetPageResponse()
 end
 
 function Pager:GetCurrentPage()
-	return loadstring(format('local newstate; %s; return newstate;', self:GetPageResponse()))()
+	return loadstring(format('local newstate = %d; %s; return newstate;',
+		tonumber(SecureCmdOptionParse(self:GetPageCondition())) or 1,
+		self:GetPageResponse()))()
 end
 
 function Pager:OnDataLoaded()
 	local driver, response = self:GetPageCondition(), self:GetPageResponse()
 	response = response .. self:GetHeaderResponse()
-	return self:SetConditionAndResponse(driver, response)
+	self:SetConditionAndResponse(driver, response)
 end
 
 ---------------------------------------------------------------

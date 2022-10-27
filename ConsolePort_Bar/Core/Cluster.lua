@@ -108,30 +108,32 @@ local adjustTextures = {
 }
 ---------------------------------------------------------------
 local hotkeyConfig = { -- {anchor point}, modifier ID
-	['SHIFT-'] = {{{'CENTER', 0, 0}, {20, 20}, 'M1'}},
-	['CTRL-'] = {{{'CENTER', 0, 0}, {20, 20}, 'M2'}},
-	['CTRL-SHIFT-'] = {{{'CENTER', -4, 0}, {20, 20}, 'M1'}, {{'CENTER', 4, 0}, {20, 20}, 'M2'}},
+	['']            = {{{'TOP',     0, 12}, {32, 32}, {18, 18}, nil }},
+	['SHIFT-']      = {{{'CENTER',  0,  0}, {20, 20}, {14, 14}, 'M1'}},
+	['CTRL-']       = {{{'CENTER',  0,  0}, {20, 20}, {14, 14}, 'M2'}},
+	['CTRL-SHIFT-'] = {{{'CENTER', -4,  0}, {20, 20}, {14, 14}, 'M1'},
+	                   {{'CENTER',  4,  0}, {20, 20}, {14, 14}, 'M2'}},
 }
 
 ---------------------------------------------------------------
 local buttonTextures = {
 	[nomod] = {
-		normal = TEX_PATH:format([[Button\BigNormal]]),
-		pushed = TEX_PATH:format([[Button\BigHilite]]),
-		hilite = TEX_PATH:format([[Button\BigHilite]]),
-		checkd = TEX_PATH:format([[Button\BigHilite]]),
-		border = TEX_PATH:format([[Button\BigHilite]]),
+		normal      = TEX_PATH:format([[Button\BigNormal]]),
+		pushed      = TEX_PATH:format([[Button\BigHilite]]),
+		hilite      = TEX_PATH:format([[Button\BigHilite]]),
+		checkd      = TEX_PATH:format([[Button\BigHilite]]),
+		border      = TEX_PATH:format([[Button\BigHilite]]),
 		new_action  = TEX_PATH:format([[Button\BigHilite]]),
 		cool_swipe  = TEX_PATH:format([[Cooldown\Swipe]]),
 		cool_edge   = TEX_PATH:format([[Cooldown\Edge]]),
 		cool_bling  = TEX_PATH:format([[Cooldown\Bling]]),
 	},
 	['SHIFT-'] = {
-		normal = TEX_PATH:format([[Button\M1]]),
-		pushed = TEX_PATH:format([[Button\M1]]),
-		border = TEX_PATH:format([[Button\M1]]),
-		hilite = TEX_PATH:format([[Button\M1Hilite]]),
-		checkd = TEX_PATH:format([[Button\M1Hilite]]),
+		normal      = TEX_PATH:format([[Button\M1]]),
+		pushed      = TEX_PATH:format([[Button\M1]]),
+		border      = TEX_PATH:format([[Button\M1]]),
+		hilite      = TEX_PATH:format([[Button\M1Hilite]]),
+		checkd      = TEX_PATH:format([[Button\M1Hilite]]),
 		new_action  = TEX_PATH:format([[Button\M1Hilite]]),
 		cool_swipe  = TEX_PATH:format([[Cooldown\SwipeSmall]]),
 	--  cool_edge   = TEX_PATH:format([[Cooldown\Edge]]),
@@ -139,22 +141,22 @@ local buttonTextures = {
 		cool_bling  = TEX_PATH:format([[Cooldown\Bling]]),
 	},
 	['CTRL-'] = {
-		normal = TEX_PATH:format([[Button\M1]]),
-		pushed = TEX_PATH:format([[Button\M1]]),
-		border = TEX_PATH:format([[Button\M1]]),
-		hilite = TEX_PATH:format([[Button\M1Hilite]]),
-		checkd = TEX_PATH:format([[Button\M1Hilite]]),
+		normal      = TEX_PATH:format([[Button\M1]]),
+		pushed      = TEX_PATH:format([[Button\M1]]),
+		border      = TEX_PATH:format([[Button\M1]]),
+		hilite      = TEX_PATH:format([[Button\M1Hilite]]),
+		checkd      = TEX_PATH:format([[Button\M1Hilite]]),
 		new_action  = TEX_PATH:format([[Button\M1Hilite]]),
 		cool_swipe  = TEX_PATH:format([[Cooldown\SwipeSmall]]),
 	--  cool_edge   = TEX_PATH:format([[Cooldown\Edge]]),
 		cool_bling  = TEX_PATH:format([[Cooldown\Bling]]),
 	},
 	['CTRL-SHIFT-'] = {
-		normal = TEX_PATH:format([[Button\M3]]),
-		pushed = TEX_PATH:format([[Button\M3]]),
-		border = TEX_PATH:format([[Button\M3]]),
-		hilite = TEX_PATH:format([[Button\M3Hilite]]),
-		checkd = TEX_PATH:format([[Button\M3Hilite]]),
+		normal      = TEX_PATH:format([[Button\M3]]),
+		pushed      = TEX_PATH:format([[Button\M3]]),
+		border      = TEX_PATH:format([[Button\M3]]),
+		hilite      = TEX_PATH:format([[Button\M3Hilite]]),
+		checkd      = TEX_PATH:format([[Button\M3Hilite]]),
 		new_action  = TEX_PATH:format([[Button\M3Hilite]]),
 		cool_swipe  = TEX_PATH:format([[Cooldown\SwipeSmall]]),
 	--  cool_edge   = TEX_PATH:format([[Cooldown\Edge]]),
@@ -184,17 +186,17 @@ local config = {
 -- Acts upon the cluster of buttons as a unified entitiy.
 
 function Cluster:Show()
-	for _, button in pairs(self.Buttons) do
+	for _, button in pairs(self) do
 		button:Show()
 	end
-	self[nomod].shadow:Show()
+	self[nomod].Shadow:Show()
 end
 
 function Cluster:Hide()
-	for _, button in pairs(self.Buttons) do
+	for _, button in pairs(self) do
 		button:Hide()
 	end
-	self[nomod].shadow:Hide()
+	self[nomod].Shadow:Hide()
 end
 
 function Cluster:SetPoint(...)
@@ -208,13 +210,13 @@ end
 
 function Cluster:SetSize(new)
 	local main = self[nomod]
-	for mod, button in pairs(self.Buttons) do
+	for mod, button in pairs(self) do
 		local b, t, o -- button size, texture size, offset value
 		if mod == '' then -- if nomod, handle separately
 			b = new -- 64
 			t = new
 			o = new * ( 82 / size )
-			button.shadow:SetSize(o, o)
+			button.Shadow:SetSize(o, o)
 		else -- calculate size for modifier buttons to maintain correct ratio
 			b = new * ( smallSize / size )
 			t = new * ( tSize / size ) * (mod == 'CTRL-SHIFT-' and .9 or 1)
@@ -239,7 +241,7 @@ function Cluster:SetSize(new)
 end
 
 function Cluster:UpdateOrientation(orientation)
-	for mod, button in pairs(self.Buttons) do
+	for mod, button in pairs(self) do
 		if not button.isMainButton then
 			button:ClearAllPoints()
 			button:Hide()
@@ -265,12 +267,12 @@ function Cluster:SetSwipeColor(r, g, b, a)
 end
 
 function Cluster:ToggleIcon(enabled)
-	self[nomod].hotkey:SetShown(enabled)
+	self[nomod].Hotkey:SetShown(enabled)
 end
 
 function Cluster:ToggleModifiers(enabled)
-	for mod, button in pairs(self.Buttons) do
-		local hotkey1, hotkey2 = button.hotkey1, button.hotkey2
+	for mod, button in pairs(self) do
+		local hotkey1, hotkey2 = button.Hotkey1, button.Hotkey2;
 		if hotkey1 then hotkey1:SetShown(enabled) end
 		if hotkey2 then hotkey2:SetShown(enabled) end
 	end
@@ -284,7 +286,7 @@ function Cluster:SetClassicBorders(enabled)
 end
 
 function Cluster:SetBorderColor(r, g, b, a)
-	for mod, button in pairs(self.Buttons) do
+	for mod, button in pairs(self) do
 		button.NormalTexture:SetVertexColor(r, g, b, a)
 	end
 end
@@ -310,8 +312,61 @@ function Cluster:SetRebindButton()
 end
 
 ---------------------------------------------------------------
--- Cluster piece configuration
+-- Hotkeys
 ---------------------------------------------------------------
+local Hotkey = {};
+
+function Hotkey:OnLoad(id, modConfig)
+	self:SetPoint(unpack(modConfig[1]))
+	self.iconID    = id;
+	self.iconSize  = modConfig[2];
+	self.atlasSize = modConfig[3];
+	self.controlID = modConfig[4];
+	return self;
+end
+
+function Hotkey:SetTexture(...)
+	self.texture:SetTexture(...)
+end
+
+function Hotkey:SetAtlas(...)
+	self.texture:SetAtlas(...)
+end
+
+function Hotkey:OnUpdateHotkeyCallback()
+	db.Gamepad.SetIconToTexture(self, self.iconID, 32, self.iconSize, self.atlasSize)
+end
+
+function Hotkey:OnUpdateModifierHotkeyCallback()
+	self.iconID = db.UIHandle:GetUIControlBinding(self.controlID)
+	self:OnUpdateHotkeyCallback()
+end
+
+local function CreateModifierHotkeyFrame(self, modConfig)
+	local frame = Mixin(CreateFrame('Frame', nil, self, 'CPUIActionButtonTextureOverlayTemplate'), Hotkey)
+		:OnLoad(nil, modConfig)
+	db:RegisterCallback('OnIconsChanged', Hotkey.OnUpdateModifierHotkeyCallback, frame)
+	return frame;
+end
+
+local function CreateMainHotkeyFrame(self, id)
+	local frame = Mixin(CreateFrame('Frame', nil, self, 'CPUIActionButtonMainHotkeyTemplate'), Hotkey)
+		:OnLoad(id, hotkeyConfig[''][1])
+	db:RegisterCallback('OnIconsChanged', Hotkey.OnUpdateHotkeyCallback, frame)
+	return frame;
+end
+
+---------------------------------------------------------------
+-- Factory
+---------------------------------------------------------------
+local function CreateMainShadowFrame(self)
+	-- Create this as a separate frame so that drop shadow doesn't overlay modifiers
+	-- NOTE: shadow is child of bar, not of button
+	local shadow = CreateFrame('Frame', nil, env.bar, 'CPUIActionButtonMainShadowTemplate')
+	shadow:SetPoint('CENTER', self, 'CENTER', 0, -6)
+	return shadow
+end
+
 local function CreateButton(parent, id, name, modifier, size, texSize, config)
 	local button = acb:CreateButton(id, name, parent, config)
 
@@ -333,11 +388,29 @@ local function CreateButton(parent, id, name, modifier, size, texSize, config)
 	button.cooldown:SetBlingTexture(textures.cool_bling)
 	button.cooldown.text = button.cooldown:GetRegions()
 
-	-- Small buttons should not have drop shadow and smaller CD font
-	if modifier ~= '' then
+	if modifier == '' then -- This is the main large button
+		button:SetFrameLevel(4)
+		button:SetAlpha(1)
+		button.isMainButton = true;
+
+		button.Hotkey = CreateMainHotkeyFrame(button, id)
+		button.Shadow = CreateMainShadowFrame(button)
+		button.Hotkey:OnUpdateHotkeyCallback()
+	else
+		-- Small buttons should have smaller CD font and no drop shadow
 		local file, height, flags = button.cooldown.text:GetFont()
 		button.cooldown.text:SetFont(file, height * 0.75, flags)
 		button:ToggleShadow(false)
+
+		-- Add modifier icons
+		if hotkeyConfig[modifier] then
+			for i, modHotkey in pairs(hotkeyConfig[modifier]) do
+				local hotkey = CreateModifierHotkeyFrame(button, modHotkey)
+				hotkey:OnUpdateModifierHotkeyCallback()
+				hotkey:SetAlpha(0.75)
+				button['hotkey'..i] = hotkey
+			end
+		end
 	end
 
 	if textures.cool_edge then
@@ -360,24 +433,6 @@ local function CreateButton(parent, id, name, modifier, size, texSize, config)
 	return button
 end
 
-local function CreateModifierHotkeyFrame(self, num)
-	return CreateFrame('Frame', '$parent_HOTKEY'..( num or '' ), self, 'CPUIActionButtonTextureOverlayTemplate')
-end
-
-local function CreateMainHotkeyFrame(self, id)
-	local hotkey = CreateFrame('Frame', nil, self, 'CPUIActionButtonMainHotkeyTemplate')
-	hotkey.texture:SetTexture(db('Icons/32/'..id))
-	return hotkey
-end
-
-local function CreateMainShadowFrame(self)
-	-- create this as a separate frame so that drop shadow doesn't overlay modifiers
-	-- note: shadow is child of bar, not of button
-	local shadow = CreateFrame('Frame', nil, env.bar, 'CPUIActionButtonMainShadowTemplate')
-	shadow:SetPoint('CENTER', self, 'CENTER', 0, -6)
-	return shadow
-end
-
 ---------------------------------------------------------------
 -- External handle
 ---------------------------------------------------------------
@@ -386,10 +441,10 @@ function HANDLE:Get(id)
 end
 
 function HANDLE:Create(parent, id)
-	local cluster = { Buttons = {} };
+	local cluster = CPAPI.Proxy({}, Cluster);
 
 	for mod, info in pairs(mods) do
-		local name = 'CPB_' .. (id) .. (mod == '' and mod or ('_' .. (mod:sub(1, #mod -1))))
+		local name = ('CPB_%s_%s'):format(id, mod):gsub('-', '_'):gsub('_$', '')
 		local bSize, tSize = unpack(info.size)
 		local button = CreateButton(parent, id..mod, name, mod, bSize, tSize, mod == '' and config)
 		button.plainID = id
@@ -399,34 +454,11 @@ function HANDLE:Create(parent, id)
 		button:SetAttribute('modifier', mod)
 		-- store button in the cluster
 		cluster[mod] = button
-		cluster.Buttons[mod] = button
-		-- for modifiers only
-		if hotkeyConfig[mod] then
-			for i, modHotkey in pairs(hotkeyConfig[mod]) do
-				local hotkey = CreateModifierHotkeyFrame(button, i)
-				local iconID = db.UIHandle:GetUIControlBinding(modHotkey[3])
-				hotkey:SetPoint(unpack(modHotkey[1]))
-				hotkey:SetSize(unpack(modHotkey[2]))
-				hotkey.texture:SetTexture(iconID and db('Icons/32/'..iconID))
-				hotkey:SetAlpha(0.75)
-				button['hotkey'..i] = hotkey
-			end
-		end
 	end
 
-	local main = cluster[nomod]
-	main.isMainButton = true
-
-	main:SetFrameLevel(4)
-	main:SetAlpha(1)
-	main.hotkey = CreateMainHotkeyFrame(main, id)
-	main.shadow = CreateMainShadowFrame(main)
-	db.Alpha.FadeIn(main, 1, 0, 1)
-
-	Mixin(cluster, Cluster)
+	db.Alpha.FadeIn(cluster[nomod], 1, 0, 1)
 
 	Registry[id] = cluster;
-
 	return cluster;
 end
 
@@ -441,13 +473,19 @@ function HANDLE:UpdateAllBindings(bindings)
 	end
 end
 
-function HANDLE:UpdateAllHotkeys()
-	-- TODO!
+local function GetClusterTextureForButtonID(buttonID)
+	local texture = db('Icons/64/'..buttonID)
+	if texture then
+		return GenerateClosure(function(set, texture, obj)
+			set(obj, texture)
+		end, CPAPI.SetTextureOrAtlas, {texture, db.Gamepad.UseAtlasIcons})
+	end
+	return [[Interface\AddOns\ConsolePortBar\Textures\Icons\Unbound]]
 end
 
 function HANDLE:SetEligbleForRebind(button, modifier, main)
 	local emulation = db.Console:GetEmulationForButton(button.plainID)
-	local texture = db('Icons/64/'..button.plainID) or [[Interface\AddOns\ConsolePortBar\Textures\Icons\Unbound]]
+	local texture = GetClusterTextureForButtonID(button.plainID)
 	if emulation then
 		return 'custom', {
 			texture = texture;
@@ -475,9 +513,7 @@ function HANDLE:SetXMLBinding(button, modifier, binding)
 	return 'custom', {
 		text = text,
 		tooltip = tooltip or _G['BINDING_NAME_'..binding] or binding,
-		texture = texture or env:GetBindingIcon(binding) or
-			db('Icons/64/'..button.plainID) or
-			[[Interface\AddOns\ConsolePortBar\Textures\Icons\Unbound]],
+		texture = texture or env:GetBindingIcon(binding) or GetClusterTextureForButtonID(button.plainID),
 		func = function() end,
 	}
 end
@@ -492,7 +528,7 @@ function HANDLE:RefreshBinding(binding, cluster, button, modifier, main)
 	local stateType, stateID;
 	if actionID then
 		stateType, stateID = self:SetActionBinding(button, modifier, actionID, main)
-	elseif binding then
+	elseif binding and binding:len() > 0 then
 		stateType, stateID = self:SetXMLBinding(button, modifier, binding)
 	else
 		stateType, stateID = self:SetEligbleForRebind(button, modifier, main)
@@ -511,14 +547,14 @@ function HANDLE:UpdateClusterBindings(cluster, bindings)
 	local main = cluster[nomod];
 
 	if bindings then
-		for modifier, button in pairs(cluster.Buttons) do
+		for modifier, button in pairs(cluster) do
 			local modifierAlt = 'ALT-'..modifier;
 			local binding, bindingAlt = bindings[modifier], bindings[modifierAlt]
 			self:RefreshBinding(binding, cluster, button, modifier, main)
 			self:RefreshBinding(bindingAlt, cluster, button, modifierAlt, main)
 		end
 	else
-		for modifier, button in pairs(cluster.Buttons) do
+		for modifier, button in pairs(cluster) do
 			self:SetEligbleForRebind(button, modifier)
 		end
 	end

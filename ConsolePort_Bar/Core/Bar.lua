@@ -51,9 +51,11 @@ end, Bar)
 -- Global movement
 ---------------------------------------------------------------
 function Bar:ToggleMovable(enableMouseDrag, enableMouseWheel)
-	self:RegisterForDrag(enableMouseDrag and 'LeftButton')
-	self:EnableMouse(enableMouseDrag)
-	self:EnableMouseWheel(enableMouseWheel)
+	if enableMouseDrag then
+		self:RegisterForDrag('LeftButton')
+	end
+	self:EnableMouse(not not enableMouseDrag)
+	self:EnableMouseWheel(not not enableMouseWheel)
 end
 
 -- Override bindings
@@ -193,20 +195,19 @@ function Bar:OnLoad(cfg, benign)
 	-- Rainbow sine wave color script, cuz shiny
 	env:SetRainbowScript(cfg.rainbow)
 
-	-- Tint RGB for background textures	
+	-- Tint RGB for background textures and LED
+	SetCVar('GamePadFactionColor', 0)
 	if cfg.tintRGB then
-		self.BG:SetGradientAlpha(env:GetColorGradient(unpack(cfg.tintRGB)))
-		self.BottomLine:SetVertexColor(unpack(cfg.tintRGB))
+		env:SetTintColor(unpack(cfg.tintRGB))
 	else
-		self.BG:SetGradientAlpha(env:GetColorGradient(r, g, b))
-		self.BottomLine:SetVertexColor(r, g, b, 1)
+		env:SetTintColor(r, g, b, 1)
 	end
 
 	-- Show 'the eye'
 	self.Eye:SetShown(cfg.eye)
 
 	-- Lock/unlock pet ring
-	self.Pet:RegisterForDrag(not cfg.lockpet and 'LeftButton')
+	self.Pet:RegisterForDrag(not cfg.lockpet and 'LeftButton' or '')
 	if cfg.disablepetfade then
 		self.Pet:FadeIn()
 	else
@@ -275,7 +276,7 @@ function Bar:OnLoad(cfg, benign)
 
 	-- Don't run this when updating simple cvars
 	if not benign then
-		Clusters:UpdateAllBindings(db.Gamepad:GetBindings())
+		Clusters:UpdateAllBindings(db.Gamepad:GetBindings(true))
 		self:UpdateOverrides()
 		-- states have been reparsed, set back to current state
 		self:Execute([[
@@ -324,18 +325,7 @@ for name, script in pairs({
 		control:ChildUpdate('state', newstate)
 		cursor:RunAttribute('ActionPageChanged')
 	]],
-	['_onstate-page'] = [[
-		if HasVehicleActionBar and HasVehicleActionBar() then
-			newstate = GetVehicleBarIndex()
-		elseif HasOverrideActionBar and HasOverrideActionBar() then
-			newstate = GetOverrideBarIndex()
-		elseif HasTempShapeshiftActionBar() then
-			newstate = GetTempShapeshiftBarIndex()
-		elseif GetBonusBarOffset() > 0 then
-			newstate = GetBonusBarOffset()+6
-		else
-			newstate = GetActionBarPage()
-		end
+	['_onstate-page'] = env.db.Pager:GetPageResponse() .. [[
 		self:SetAttribute('actionpage', newstate)
 		control:ChildUpdate('actionpage', newstate)
 	]],

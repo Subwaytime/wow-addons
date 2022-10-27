@@ -1,0 +1,18 @@
+tag 25df4a17a56933db991f62d72e9f8a24784e265b 1.0.17
+Author:	Kyle Buller <bullerk@gmail.com>
+Date:	Tue Oct 4 20:08:39 2022 -0500
+
+Tagging as 1.0.17
+
+commit 3bbc2a9f6f3ee4f7c9f806c5dbdc88e446d0ecec
+Author: Kyle Buller <bullerk@gmail.com>
+Date:   Tue Oct 4 19:43:49 2022 -0500
+
+    Get it running on beta: no filtering, just sets
+
+commit 4eeb94b0d61fc3bb8da36e54e09fb081cbc6b045
+Author: Kyle Buller <bullerk@gmail.com>
+Date:   Mon Oct 3 19:38:05 2022 -0500
+
+    Prevent error on hover if entry id is invalid
+

@@ -1,16 +1,14 @@
 -- Consts
 local MOTION_SICKNESS_CHARACTER_CENTERED = MOTION_SICKNESS_CHARACTER_CENTERED or 'Keep Character Centered';
 local MOTION_SICKNESS_REDUCE_CAMERA_MOTION = MOTION_SICKNESS_REDUCE_CAMERA_MOTION or 'Reduce Camera Motion';
-local unpack, __, db = unpack, ...; __ = 1; local Console = {};
-setfenv(__, setmetatable(db('Data'), {__index = _G}));
+local unpack, _, db = unpack, ...; local Console = {}; db('Data')();
 ------------------------------------------------------------------------------------------------------------
 -- Blizzard console variables
 ------------------------------------------------------------------------------------------------------------
 db:Register('Console', setmetatable({
 	--------------------------------------------------------------------------------------------------------
-	-- Emulation:
-	--------------------------------------------------------------------------------------------------------
 	Emulation = {
+	--------------------------------------------------------------------------------------------------------
 		{	cvar = 'GamePadEmulateShift';
 			type = Button;
 			name = 'Emulate Shift';
@@ -29,12 +27,6 @@ db:Register('Console', setmetatable({
 			desc = 'Button that emulates the Alt key.';
 			note = 'Only recommended for super users.';
 		};
-		{	cvar = 'GamePadEmulateEsc';
-			type = Button;
-			name = 'Emulate Esc';
-			desc = 'Button that emulates the Esc key.';
-			note = 'This key can be replaced by binding Toggle Game Menu. This emulation is not necessary with ConsolePort.';
-		};
 		{	cvar = 'GamePadCursorLeftClick';
 			type = Button;
 			name = KEY_BUTTON1;
@@ -47,17 +39,16 @@ db:Register('Console', setmetatable({
 			desc = 'Button that emulates Right Click while controlling the mouse cursor.';
 			note = 'Used for interacting with the world, at a center-fixed position.';
 		};
+		{	cvar = 'GamePadEmulateTapWindowMs';
+			type = Number(350, 25);
+			name = 'Emulated Modifier Tap Window';
+			desc = 'Buttons emulating modifiers will instead trigger bindings when pressed and released within the time span.';
+			note = 'Expressed in milliseconds. Pressing any combination of modifier and button will cancel the effect.';
+		};
 	};
 	--------------------------------------------------------------------------------------------------------
-	-- Cursor:
-	--------------------------------------------------------------------------------------------------------
 	Cursor = {
-		{	cvar = 'GamePadCursorForTargeting';
-			type = Bool(true);
-			name = 'Use Cursor for Spell Targeting';
-			desc = 'Use free-roaming mouse cursor for spell targeting.';
-			note = 'Defaults to target position when using ground-target spells.';
-		};
+	--------------------------------------------------------------------------------------------------------
 		{	cvar = 'GamePadCursorAutoDisableJump';
 			type = Bool(true);
 			name = 'Hide Cursor on Jump';
@@ -91,9 +82,8 @@ db:Register('Console', setmetatable({
 		};
 	};
 	--------------------------------------------------------------------------------------------------------
-	-- Controls:
-	--------------------------------------------------------------------------------------------------------
 	Controls = {
+	--------------------------------------------------------------------------------------------------------
 		{	cvar = 'GamePadAnalogMovement';
 			type = Bool(true);
 			name = 'Analog Movement';
@@ -108,32 +98,24 @@ db:Register('Console', setmetatable({
 		};
 		{	cvar = 'GamePadFaceMovementMaxAngleCombat';
 			type = Range(115, 5, 0, 180);
-			name = 'Face Movement Max Angle (In Combat)';
+			name = 'Face Movement Max Angle (Combat)';
 			desc = 'Controls when your character transitions from strafing to facing your movement stick angle in combat. Expressed in degrees, from looking straight forward.';
 			note = 'When set to zero, always face your movement stick.\nWhen set to max, never face your movement stick.';
+		};
+		{	cvar = 'GamePadRunThreshold';
+			type = Range(0.5, 0.1, 0, 1);
+			name = 'Run / Walk Threshold';
+			desc = 'Amount of stick movement before transitioning from walk to run.';
 		};
 		{	cvar = 'GamePadTurnWithCamera';
 			type = Select(2, 2):SetRawOptions({[0] = NEVER, [1] = 'In Combat', [2] = ALWAYS});
 			name = 'Turn Character With Camera';
 			desc = 'Turn your character facing when you turn your camera angle.';
 		};
-		{	cvar = 'GamePadCameraYawSpeed';
-			type = Range(1, 0.25, -2.0, 2.0);
-			name = 'Camera Yaw Speed';
-			desc = 'Yaw speed of camera - turning left/right.';
-			note = 'Choose a negative value to invert the axis.';
-		};
-		{	cvar = 'GamePadCameraPitchSpeed';
-			type = Range(1, 0.25, -2.0, 2.0);
-			name = 'Camera Pitch Speed';
-			desc = 'Pitch speed of camera - moving up/down.';
-			note = 'Choose a negative value to invert the axis.';
-		};
 	};
 	--------------------------------------------------------------------------------------------------------
-	-- Camera:
-	--------------------------------------------------------------------------------------------------------
 	Camera = {
+	--------------------------------------------------------------------------------------------------------
 		{	cvar = 'CameraKeepCharacterCentered';
 			type = Bool(true);
 			name = MOTION_SICKNESS_CHARACTER_CENTERED;
@@ -162,13 +144,11 @@ db:Register('Console', setmetatable({
 			desc = 'Auto-adjusts your camera, allowing you to control movement with a single stick.';
 			note = ('|T%s:128:128:0|t'):format([[Interface\AddOns\ConsolePort_Config\Assets\jose.blp]]);
 		};
-		CPAPI.IsRetailVersion and
 		{	cvar = 'CameraFollowGamepadAdjustDelay';
 			type = Number(1, 0.25);
 			name = 'FOAS Adjust Delay';
 			desc = 'Delay before starting to adjust angle when camera control is idle, in seconds.';
 		};
-		CPAPI.IsRetailVersion and
 		{	cvar = 'CameraFollowGamepadAdjustEaseIn';
 			type = Number(1, 0.25);
 			name = 'FOAS Adjust Ease In';
@@ -188,11 +168,66 @@ db:Register('Console', setmetatable({
 			desc = 'Maximum Pitch adjust for the camera "look" feature.';
 			note = 'Camera Look is a temporary turn of the camera based on the current analog input.';
 		};
+		{	cvar = 'GamePadCameraYawSpeed';
+			type = Range(1, 0.25, -4.0, 4.0);
+			name = 'Camera Yaw Speed';
+			desc = 'Yaw speed of camera - turning left/right.';
+			note = 'Choose a negative value to invert the axis.';
+		};
+		{	cvar = 'GamePadCameraPitchSpeed';
+			type = Range(1, 0.25, -4.0, 4.0);
+			name = 'Camera Pitch Speed';
+			desc = 'Pitch speed of camera - moving up/down.';
+			note = 'Choose a negative value to invert the axis.';
+		};
 	};
 	--------------------------------------------------------------------------------------------------------
-	-- Touchpad:
+	-- Interact (NYI)
+	--------------------------------------------------------------------------------------------------------
+	System = {
+	--------------------------------------------------------------------------------------------------------
+		{	cvar = 'synchronizeSettings';
+			type = Bool(true);
+			name = 'Synchronize Settings';
+			desc = 'Whether client settings should be saved to the server.';
+			note = 'Master setting for Synchronize Bindings, Synchronize Config and Synchronize Macros.';
+		};
+		{	cvar = 'synchronizeBindings';
+			type = Bool(true);
+			name = 'Synchronize Bindings';
+			desc = 'Whether client keybindings should be saved to the server.';
+		};
+		{	cvar = 'synchronizeConfig';
+			type = Bool(true);
+			name = 'Synchronize Config';
+			desc = 'Whether to save character- and account-scoped variables to the server.';
+		};
+		{	cvar = 'synchronizeMacros';
+			type = Bool(true);
+			name = 'Synchronize Macros';
+			desc = 'Whether client macros should be saved to the server.';
+		};
+		{	cvar = 'GamePadUseWinRTForXbox';
+			type = Bool(true);
+			name = 'Use WinRT Gamepad Mapping (Xbox)';
+			desc = 'Uses a Microsoft API to map Xbox controllers to the game.';
+			note = 'Disable if you are experiencing movement and binding issues.';
+		};
+		{	cvar = 'GamePadEmulateEsc';
+			type = Button;
+			name = 'Emulate Esc';
+			desc = 'Button that emulates the Esc key.';
+			note = 'This key can be replaced by binding Toggle Game Menu. This emulation is not necessary with ConsolePort.';
+		};
+		{	cvar = 'GamePadOverlapMouseMs';
+			type = Number(2000, 100);
+			name = 'Combined Input Overlap Time';
+			desc = 'Duration after using gamepad and mouse at the same time before switching to just one or the other, in milliseconds.';
+		};
+	};
 	--------------------------------------------------------------------------------------------------------
 	Touchpad = {
+	--------------------------------------------------------------------------------------------------------
 		{	cvar = 'GamePadTouchCursorEnable';
 			type = Bool(false);
 			name = 'Enable Touchpad Cursor';

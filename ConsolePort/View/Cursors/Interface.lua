@@ -7,13 +7,13 @@
 -- Leverages Controller\UINode.lua for interface scans.
 
 local _, db = ...;
-local Cursor, Node, Input, Stack, Scroll, Fade, Intellisense = 
+local Cursor, Node, Input, Stack, Scroll, Fade, Hooks = 
 	CPAPI.EventHandler(ConsolePortCursor),
 	ConsolePortNode,
 	ConsolePortInputHandler,
 	ConsolePortUIStackHandler,
 	CreateFrame('Frame'),
-	db.Alpha.Fader, db.Intellisense;
+	db.Alpha.Fader, db.Hooks;
 
 db:Register('Cursor', Cursor)
 Cursor.InCombat = InCombatLockdown;
@@ -40,15 +40,21 @@ end
 function Cursor:PLAYER_REGEN_ENABLED()
 	-- time lock this in case it fires more than once
 	if not self.timeLock and self.showAfterCombat then
-		self.timeLock = true
-		C_Timer.After(db('UIleaveCombatDelay'), function()
-			Fade.In(self, 0.2, self:GetAlpha(), 1)
-			if not self:InCombat() and self:IsShown() then
-				self:SetBasicControls()
-				self:Refresh()
+		self.timeLock = true;
+		if not self.onEnableCallback then
+			self.onEnableCallback = function()
+				Fade.In(self, 0.2, self:GetAlpha(), 1)
+				if not self:InCombat() and self:IsShown() then
+					self:SetBasicControls()
+					self:Refresh()
+				end
 			end
-			self.timeLock = nil
-			self.showAfterCombat = nil
+		end
+		C_Timer.After(db('UIleaveCombatDelay'), function()
+			self.onEnableCallback()
+			self.timeLock = nil;
+			self.showAfterCombat = nil;
+			self.onEnableCallback = nil;
 		end)
 	-- in case the cursor is showing and waiting to hide OOC
 	elseif self:IsShown() and not self.showAfterCombat then
@@ -160,13 +166,26 @@ function Cursor:SetCurrentNode(node, assertNotMouse)
 	end
 	local object = node and Node.ScanLocal(node)[1]
 	if object and (not assertNotMouse or IsGamePadFreelookEnabled()) then
-		self:SetBasicControls()
-		self:SetFlashNextNode()
-		self:SetCurrent(object)
-		self:SelectAndPosition(self:GetSelectParams(object, true, true))
-		self:Chime()
+		self:SetOnEnableCallback(function(self, object)
+			self:SetBasicControls()
+			self:SetFlashNextNode()
+			self:SetCurrent(object)
+			self:SelectAndPosition(self:GetSelectParams(object, true, true))
+			self:Chime()
+		end, object)
 		return true;
 	end
+end
+
+function Cursor:SetOnEnableCallback(callback, ...)
+	local inCombat, disabled = self:IsObstructed()
+	if disabled then
+		return
+	end
+	if not inCombat then
+		return callback(self, ...)
+	end
+	self.onEnableCallback = GenerateClosure(callback, self, ...)
 end
 
 function Cursor:OnUpdate(elapsed)
@@ -327,7 +346,7 @@ function Cursor:Input(caller, isDown, key)
 			target, changed = self:Navigate(key)
 		end
 	elseif ( key == db('Settings/UICursorSpecial') ) then
-		return Intellisense:ProcessInterfaceCursorEvent(key, isDown, self:GetCurrentNode())
+		return Hooks:ProcessInterfaceCursorEvent(key, isDown, self:GetCurrentNode())
 	end
 	if ( target ) then
 		return self:SelectAndPosition(self:GetSelectParams(target, isDown))
@@ -412,24 +431,30 @@ end
 do local SafeOnEnter, SafeOnLeave, SafeExecute = {}, {}, ExecuteFrameScript
 
 	-------[[  OnEnter  ]]-------
-	SafeOnEnter[ActionButton1:GetScript('OnEnter')] = function(self)
-		ActionButton_SetTooltip(self)
+	local ActionButtonOnEnter = ActionButton1 and ActionButton1:GetScript('OnEnter')
+	if ActionButtonOnEnter then
+		SafeOnEnter[ActionButtonOnEnter] = function(self)
+			ActionButton_SetTooltip(self)
+		end
 	end
-	SafeOnEnter[SpellButton1:GetScript('OnEnter')] = function(self)
-		-- spellbook buttons push updates to the action bar controller in order to draw highlights
-		-- on actionbuttons that holds the spell in question. this taints the action bar controller.
-		local slot = SpellBook_GetSpellBookSlot(self)
-		GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
-		if ( GameTooltip:SetSpellBookItem(slot, SpellBookFrame.bookType) ) then
-			self.UpdateTooltip = SafeOnEnter[SpellButton1:GetScript('OnEnter')]
-		else
-			self.UpdateTooltip = nil
+	local SpellButtonOnEnter = SpellButton1 and SpellButton1:GetScript('OnEnter')
+	if SpellButtonOnEnter then
+		SafeOnEnter[SpellButtonOnEnter] = function(self)
+			-- spellbook buttons push updates to the action bar controller in order to draw highlights
+			-- on actionbuttons that holds the spell in question. this taints the action bar controller.
+			local slot = SpellBook_GetSpellBookSlot(self)
+			GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
+			if ( GameTooltip:SetSpellBookItem(slot, SpellBookFrame.bookType) ) then
+				self.UpdateTooltip = SafeOnEnter[SpellButton1:GetScript('OnEnter')]
+			else
+				self.UpdateTooltip = nil
+			end
+			
+			if ( self.SpellHighlightTexture and self.SpellHighlightTexture:IsShown() ) then
+				GameTooltip:AddLine(SPELLBOOK_SPELL_NOT_ON_ACTION_BAR, LIGHTBLUE_FONT_COLOR.r, LIGHTBLUE_FONT_COLOR.g, LIGHTBLUE_FONT_COLOR.b)
+			end
+			GameTooltip:Show()
 		end
-		
-		if ( self.SpellHighlightTexture and self.SpellHighlightTexture:IsShown() ) then
-			GameTooltip:AddLine(SPELLBOOK_SPELL_NOT_ON_ACTION_BAR, LIGHTBLUE_FONT_COLOR.r, LIGHTBLUE_FONT_COLOR.g, LIGHTBLUE_FONT_COLOR.b)
-		end
-		GameTooltip:Show()
 	end
 	if QuestMapLogTitleButton_OnEnter then
 		SafeOnEnter[QuestMapLogTitleButton_OnEnter] = function(self)
@@ -448,8 +473,10 @@ do local SafeOnEnter, SafeOnLeave, SafeExecute = {}, {}, ExecuteFrameScript
 		end
 	end
 	-------[[  OnLeave  ]]-------
-	SafeOnLeave[SpellButton_OnLeave] = function(self)
-		GameTooltip:Hide()
+	if SpellButton_OnLeave then
+		SafeOnLeave[SpellButton_OnLeave] = function(self)
+			GameTooltip:Hide()
+		end
 	end
 	---------------------------------------------------------------
 	-- Allow access to these tables for plugins and addons on demand.
@@ -467,15 +494,19 @@ do local SafeOnEnter, SafeOnLeave, SafeExecute = {}, {}, ExecuteFrameScript
 		end
 	end
 
+	local function IsDisabledButton(node)
+		return node:IsObjectType('Button') and not (node:IsEnabled() or node:GetMotionScriptsWhileDisabled())
+	end
+
 	function Cursor:OnLeaveNode(node)
-		if node then
-			Intellisense:OnNodeLeave()
+		if node and not IsDisabledButton(node) then
+			Hooks:OnNodeLeave()
 			TriggerScript(node, 'OnLeave', SafeOnLeave)
 		end
 	end
 
 	function Cursor:OnEnterNode(node)
-		if node then
+		if node and not IsDisabledButton(node) then
 			TriggerScript(node, 'OnEnter', SafeOnEnter)
 		end
 	end
@@ -612,16 +643,24 @@ do	local f, path = format, 'Gamepad/Active/Icons/%s-64';
 		Slider   = mod;
 	}, function() return left end)
 	-- remove texture evaluator so cursor refreshes on next movement
-	local function resetTexture(self) self.textureEvaluator = nil; end
+	local function resetTexture(self)
+		self.textureEvaluator = nil;
+		self.useAtlasIcons = db('useAtlasIcons')
+	end
 	db:RegisterCallback('Gamepad/Active', resetTexture, Cursor)
 	db:RegisterCallback('Settings/UIpointerDefaultIcon', resetTexture, Cursor)
+	db:RegisterCallback('Settings/useAtlasIcons', resetTexture, Cursor)
 end
 
 function Cursor:SetTexture(texture)
 	local object = texture or self:GetCurrentObjectType()
 	local evaluator = self.Textures[object]
 	if ( evaluator ~= self.textureEvaluator ) then
-		self.Display.Button:SetTexture(evaluator())
+		if self.useAtlasIcons then
+			self.Display.Button:SetAtlas(evaluator())
+		else
+			self.Display.Button:SetTexture(evaluator())
+		end
 	end
 	self.textureEvaluator = evaluator;
 end

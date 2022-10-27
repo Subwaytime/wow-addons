@@ -11,10 +11,14 @@ local Utility = Mixin(CPAPI.EventHandler(ConsolePortUtilityToggle, {
 }), CPAPI.AdvancedSecureMixin)
 local Button = CreateFromMixins(CPActionButton);
 ---------------------------------------------------------------
-local DEFAULT_SET, EXTRA_ACTION_ID = 1, ExtraActionButton1 and ExtraActionButton1.action or 169;
+local DEFAULT_SET, EXTRA_ACTION_ID = 1, CPAPI.ExtraActionButtonID;
 ---------------------------------------------------------------
 Utility.Data = {[DEFAULT_SET] = {}};
-Utility:Execute([[DATA = newtable()]])
+Utility:Execute(([[
+	DATA = newtable()
+	TYPE = '%s';
+]]):format(CPAPI.ActionTypeRelease))
+---------------------------------------------------------------
 db:Register('Utility', Utility)
 db:Save('Utility/Data', 'ConsolePortUtility')
 
@@ -58,9 +62,14 @@ Utility:CreateEnvironment({
 		if not RING or not index then
 			return self:CallMethod('ClearInstantly')
 		end
+
+		self:CallMethod('OnSelection', true)
 		for attribute, value in pairs(RING[index]) do
-			self:SetAttribute(attribute, value)
+			local convertedAttribute = (attribute == 'type') and TYPE or attribute;
+			self:SetAttribute(convertedAttribute, value)
+			self:CallMethod('OnSelectionAttributeAdded', convertedAttribute, value)
 		end
+		self:CallMethod('OnSelection', false)
 	]];
 	GetRingSetFromButton = ([[
 		local button = ...;
@@ -100,8 +109,21 @@ Utility:CreateEnvironment({
 ---------------------------------------------------------------
 -- Trigger script
 ---------------------------------------------------------------
-Utility:Wrap('PreClick', [[
-	self:SetAttribute('type', nil)
+Utility:SetAttribute('pressAndHoldAction', true)
+Utility:Wrap('PreClick', ([[
+	local stickySelect = self:GetAttribute('stickySelect')
+
+	if stickySelect then
+		if down then
+			self:SetAttribute('backup', self:GetAttribute('TYPE'))
+			self:SetAttribute('TYPE', nil)
+		else
+			self:SetAttribute('TYPE', self:GetAttribute('backup'))
+			self:SetAttribute('backup', nil)
+		end
+	else
+		self:SetAttribute('TYPE', nil)
+	end
 
 	if down then
 		local set = self::GetRingSetFromButton(button)
@@ -114,7 +136,7 @@ Utility:Wrap('PreClick', [[
 		self:ClearBindings()
 		self:Hide()
 	end
-]])
+]]):gsub('TYPE', CPAPI.ActionTypeRelease))
 
 
 ---------------------------------------------------------------
@@ -156,6 +178,7 @@ function Utility:OnDataLoaded()
 	self:OnAutoAssignedChanged()
 	self:OnRemoveButtonChanged()
 	self:OnAxisInversionChanged()
+	self:OnStickySelectChanged()
 	if CPAPI.IsRetailVersion then
 		self.FocusOverlay.BgRunes:SetAtlas('heartofazeroth-orb-activated')
 	else
@@ -182,10 +205,17 @@ function Utility:OnPrimaryStickChanged()
 	self:SetIntercept({sticks[1]})
 end
 
+function Utility:OnStickySelectChanged()
+	self:SetAttribute('stickySelect', db('radialStickySelect'))
+	self:SetAttribute(CPAPI.ActionTypeRelease, nil)
+	self:SetAttribute('backup', nil)
+end
+
 db:RegisterSafeCallback('Settings/autoExtra', Utility.OnAutoAssignedChanged, Utility)
 db:RegisterSafeCallback('Settings/radialCosineDelta', Utility.OnAxisInversionChanged, Utility)
 db:RegisterSafeCallback('Settings/radialRemoveButton', Utility.OnRemoveButtonChanged, Utility)
 db:RegisterSafeCallback('Settings/radialPrimaryStick', Utility.OnPrimaryStickChanged, Utility)
+db:RegisterSafeCallback('Settings/radialStickySelect', Utility.OnStickySelectChanged, Utility)
 
 ---------------------------------------------------------------
 -- Widget handling
@@ -298,6 +328,19 @@ function Utility:GetTooltipUsePrompt()
 	if useButton and device then
 		return device:GetTooltipButtonPrompt(useButton, USE, 64)
 	end
+end
+
+function Utility:OnSelection(running)
+	if running then
+		self.ReportData = {};
+	else
+		db:TriggerEvent('OnUtilityRingSelectionChanged', self.ReportData)
+		self.ReportData = nil;
+	end
+end
+
+function Utility:OnSelectionAttributeAdded(attribute, value)
+	self.ReportData[attribute] = value;
 end
 
 ---------------------------------------------------------------
@@ -724,7 +767,7 @@ function Utility:ToggleInventoryQuestItems(hideAnnouncement)
 	end
 
 	CPAPI.IteratePlayerInventory(function(item)
-		local link = select(7, GetContainerItemInfo(item:GetBagAndSlot()))
+		local link = CPAPI.GetContainerItemInfo(item:GetBagAndSlot()).hyperlink;
 		local isQuestItem = link and select(6, GetItemInfoInstant(link)) == LE_ITEM_CLASS_QUESTITEM;
 		if isQuestItem and IsUsableItem(link) and not exists[getItemID(link)] then
 			local info = self.SecureHandlerMap.item(link)

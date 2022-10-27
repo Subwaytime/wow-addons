@@ -12,7 +12,7 @@ local MAJOR_VERSION = 'CPActionButton';
 local MINOR_VERSION = 1;
 
 if not LibStub then error(MAJOR_VERSION .. ' requires LibStub.') end
-local lib, oldversion = LibStub:NewLibrary(MAJOR_VERSION, MINOR_VERSION)
+local lib = LibStub:NewLibrary(MAJOR_VERSION, MINOR_VERSION)
 if not lib then return end
 
 local _, db = ...;
@@ -21,6 +21,8 @@ local _, db = ...;
 local type, error, tostring, tonumber, assert, select = type, error, tostring, tonumber, assert, select
 local setmetatable, wipe, unpack, pairs, next = setmetatable, wipe, unpack, pairs, next
 local str_match, format, tinsert, tremove = string.match, format, tinsert, tremove
+
+local WoW10 = select(4, GetBuildInfo()) >= 100000
 
 -- Libs
 local LBG = LibStub('CPButtonGlow');
@@ -75,7 +77,7 @@ local ButtonRegistry, ActiveButtons, ActionButtons, NonActionButtons = lib.butto
 -- Local functions
 local Update, UpdateButtonState, UpdateUsable, UpdateCount, UpdateCooldown, UpdateTooltip, UpdateNewAction, UpdatePage
 local StartFlash, StopFlash, UpdateFlash, UpdateRangeTimer, UpdateOverlayGlow
-local UpdateFlyout, ShowGrid, HideGrid, SetupSecureSnippets, WrapOnClick
+local ShowGrid, HideGrid, SetupSecureSnippets, WrapOnClick
 local ShowOverlayGlow, HideOverlayGlow
 local EndChargeCooldown
 
@@ -110,13 +112,18 @@ end
 function lib:InitButton(button, id, header)
 	button = setmetatable(button, Generic_MT)
 	button:RegisterForDrag('LeftButton', 'RightButton')
-	button:RegisterForClicks('AnyDown')
 
 	-- Frame Scripts
 	button:HookScript('OnEnter', Generic.OnEnter)
 	button:HookScript('OnLeave', Generic.OnLeave)
 	button:HookScript('PreClick', Generic.PreClick)
 	button:HookScript('PostClick', Generic.PostClick)
+
+	if WoW10 then
+		button:RegisterForClicks('AnyDown', 'AnyUp')
+	else
+		button:RegisterForClicks('AnyDown')
+	end
 
 	button.id = id
 	button.header = header or button:GetParent()
@@ -167,6 +174,32 @@ function SetupSecureSnippets(button)
 		self:SetID((type == 'action' and _type(action) == 'number' and action <= 12 and action) or 0)
 		if self:GetID() > 0 then
 			self:CallMethod('ButtonContentsChanged', state, type, action + ((self:GetAttribute('actionpage') - 1) * 12))
+		end
+		if IsPressHoldReleaseSpell then
+			local pressAndHold = false
+			if type == "action" then
+				self:SetAttribute("typerelease", "actionrelease")
+				local actionType, id = GetActionInfo(action)
+				if actionType == "spell" then
+					pressAndHold = IsPressHoldReleaseSpell(id)
+				elseif actionType == "macro" then
+					-- GetMacroSpell is not in the restricted environment
+					--[=[
+						local spellID = GetMacroSpell(id)
+						if spellID then
+							pressAndHold = IsPressHoldReleaseSpell(spellID)
+						end
+					]=]
+				end
+			elseif type == "spell" then
+				self:SetAttribute("typerelease", nil)
+				-- XXX: while we can query this attribute, there is no corresponding action to release a spell button, only "actionrelease" exists
+				pressAndHold = IsPressHoldReleaseSpell(action)
+			else
+				self:SetAttribute("typerelease", nil)
+			end
+
+			self:SetAttribute("pressAndHoldAction", pressAndHold)
 		end
 		local onStateChanged = self:GetAttribute('OnStateChanged')
 		if onStateChanged then
@@ -255,7 +288,10 @@ function SetupSecureSnippets(button)
 		if not kind or not value then return false end
 		local state = self:GetAttribute('state')
 		local buttonType, buttonAction = self:GetAttribute('type'), nil
-		if buttonType == 'custom' then return false end
+		if buttonType == 'custom' then
+			self:CallMethod('OnReceiveDragCustom', ...)
+			return false
+		end
 		-- action buttons can do their magic themself
 		-- for all other buttons, we'll need to update the content now
 		if buttonType ~= 'action' and buttonType ~= 'pet' then
@@ -460,6 +496,10 @@ function Generic:UpdateAlpha()
 	UpdateCooldown(self)
 end
 
+function Generic:OnReceiveDragCustom(...)
+	--print('test', ...)
+end
+
 -----------------------------------------------------------
 --- frame scripts
 
@@ -632,6 +672,7 @@ function InitializeEventHandler()
 		'LOSS_OF_CONTROL_ADDED',
 		'LOSS_OF_CONTROL_UPDATE',
 
+		'PET_BAR_HIDEGRID',
 		'PET_BAR_UPDATE',
 		'PET_BAR_UPDATE_COOLDOWN',
 
@@ -690,7 +731,7 @@ function OnEvent(_, event, arg1, ...)
 		ForAllButtons(Update)
 	elseif event == 'ACTIONBAR_SHOWGRID' then
 		ShowGrid()
-	elseif event == 'ACTIONBAR_HIDEGRID' then
+	elseif event == 'ACTIONBAR_HIDEGRID' or event == 'PET_BAR_HIDEGRID' then
 		HideGrid()
 	elseif event == 'PLAYER_TARGET_CHANGED' then
 		UpdateRangeTimer()
@@ -886,6 +927,7 @@ end
 --- button management
 
 function Generic:SetClicks(mouseover)
+	if WoW10 then return end
 	if mouseover then
 		self:RegisterForClicks('AnyUp')
 	else
@@ -959,6 +1001,26 @@ function Generic:UpdateAction(force)
 		self._state_action = action
 		Update(self)
 	end
+end
+
+
+
+function Generic:UpdateFlyout()
+	self.FlyoutBorder:Hide()
+	if self._state_type == 'action' then
+		-- based on ActionButton_UpdateFlyout in ActionButton.lua
+		local actionType = GetActionInfo(self._state_action)
+		if actionType == 'flyout' then
+			
+			--self.FlyoutArrow:Show()
+			--self.FlyoutArrow:ClearAllPoints()
+			
+			--self.FlyoutArrow:SetPoint('CENTER', 0, self.isMainButton and -20 or -10)
+			--SetClampedTextureRotation(self.FlyoutArrow, 180)
+			return
+		end
+	end
+	--self.FlyoutArrow:Hide()
 end
 
 function Update(self)
@@ -1037,8 +1099,8 @@ function Update(self)
 		self:SetIcon(texture)
 	end
 
+	self:UpdateFlyout()
 	UpdateCount(self)
-	UpdateFlyout(self)
 	UpdateOverlayGlow(self)
 	UpdateNewAction(self)
 
@@ -1291,29 +1353,17 @@ function UpdateNewAction(self)
 end
 
 -- Hook UpdateFlyout so we can use the blizzy templates
-hooksecurefunc('ActionButton_UpdateFlyout', function(self, ...)
-	if ButtonRegistry[self] then
-		UpdateFlyout(self)
-	end
-end)
-
-function UpdateFlyout(self)
-	self.FlyoutBorder:Hide()
-	self.FlyoutBorderShadow:Hide()
-	if self._state_type == 'action' then
-		-- based on ActionButton_UpdateFlyout in ActionButton.lua
-		local actionType = GetActionInfo(self._state_action)
-		if actionType == 'flyout' then
-
-			self.FlyoutArrow:Show()
-			self.FlyoutArrow:ClearAllPoints()
-			
-			self.FlyoutArrow:SetPoint('CENTER', 0, self.isMainButton and -20 or -10)
-			SetClampedTextureRotation(self.FlyoutArrow, 180)
-			return
+do local function UpdateFlyoutHook(self, ...)
+		if ButtonRegistry[self] then
+			self:UpdateFlyout()
 		end
 	end
-	self.FlyoutArrow:Hide()
+
+	if ActionButton_UpdateFlyOut then
+		hooksecurefunc('ActionButton_UpdateFlyout', UpdateFlyoutHook)
+	elseif ActionBarActionButtonMixin and ActionBarActionButtonMixin.UpdateFlyout then
+		hooksecurefunc(ActionBarActionButtonMixin, 'UpdateFlyout', UpdateFlyoutHook)
+	end
 end
 
 function UpdateRangeTimer()

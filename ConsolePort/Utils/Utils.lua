@@ -204,18 +204,19 @@ end
 -- Colors
 ---------------------------------------------------------------
 CPAPI.WebColors = {
-	WARRIOR     =  '221411';
+	DEATHKNIGHT =  '05131c';
+	DEMONHUNTER =  '141c0d';
+	DRUID       =  '0f1a16';
+	EVOKER      =  '2d1420';
 	HUNTER      =  '061510';
 	MAGE        =  '140e1a';
-	ROGUE       =  '0d0c12';
-	PRIEST      =  '171b27';
-	WARLOCK     =  '1c0905';
-	PALADIN     =  '140613';
-	DRUID       =  '0f1a16';
-	SHAMAN      =  '01000e';
 	MONK        =  '0e1003';
-	DEMONHUNTER =  '141c0d';
-	DEATHKNIGHT =  '05131c';
+	PALADIN     =  '140613';
+	PRIEST      =  '171b27';
+	ROGUE       =  '0d0c12';
+	SHAMAN      =  '01000e';
+	WARLOCK     =  '1c0905';
+	WARRIOR     =  '221411';
 };
 
 function CPAPI.GetWebColor(classFile, addAlpha)
@@ -397,5 +398,20 @@ function CPAPI.SetAtlas(object, atlas, useAtlasSize, flipHoriz, flipVert)
 		object:SetHorizTile(tilesHorizontally)
 		object:SetVertTile(tilesVertically)
 		return true;
+	end
+end
+
+function CPAPI.SetTextureOrAtlas(object, info, sizeTexture, sizeAtlas)
+	local textureOrAtlas, isAtlas, useAtlasSize = unpack(info)
+	if isAtlas then
+		object:SetAtlas(textureOrAtlas, useAtlasSize)
+		if sizeAtlas then
+			object:SetSize(unpack(sizeAtlas))
+		end
+		return 
+	end
+	object:SetTexture(textureOrAtlas)
+	if sizeTexture then
+		object:SetSize(unpack(sizeTexture))
 	end
 end

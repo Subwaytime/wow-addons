@@ -4,6 +4,7 @@ local Selector, Fade, FlyoutButtonMixin = CPAPI.EventHandler(ConsolePortSpellFly
 
 Selector:SetFrameRef('flyout', SpellFlyout)
 Selector:Execute('this = self; that = self:GetFrameRef("flyout"); BUTTONS = newtable()')
+Selector:SetAttribute('pressAndHoldAction', true)
 Selector:SetAttribute('ClearAndHide', [[
 	self:CallMethod('ClearInstantly')
 	self:SetAttribute('type', nil)
@@ -29,16 +30,16 @@ Selector:WrapScript(SpellFlyout, 'OnHide', [[
 	self:SetAlpha(1)
 ]])
 
-Selector:WrapScript(Selector, 'PreClick', [[
+Selector:WrapScript(Selector, 'PreClick', ([[
 	local index = self:RunAttribute('GetIndex')
 	local button = index and BUTTONS[index]
 	if button then
-		self:SetAttribute('type', 'macro')
+		self:SetAttribute('%s', 'macro')
 		self:SetAttribute('macrotext', '/click '..button:GetName())
 	else
 		self:RunAttribute('ClearAndHide')
 	end
-]])
+]]):format(CPAPI.ActionTypeRelease))
 
 function Selector:SPELL_FLYOUT_UPDATE(...)
 --	print(GetTime(), ...)
@@ -157,6 +158,7 @@ hooksecurefunc(SpellFlyout, 'Toggle', function(flyout, flyoutID, _, _, _, isActi
 	local self = Selector; self:ReleaseAll();
 	if not flyout:IsShown() then return end
 
+	-- BUG: Flyout sometimes clicks the wrong button
 	local active, offSpec, _, _, numSlots, isKnown = {}, specID and (specID ~= 0), GetFlyoutInfo(flyoutID)
 	for i=1, numSlots do
 		local spellID, overrideSpellID, isKnown, spellName, slotSpecID = GetFlyoutSlotInfo(flyoutID, i)

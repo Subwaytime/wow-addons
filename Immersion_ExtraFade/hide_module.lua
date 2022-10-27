@@ -125,21 +125,25 @@ local defaultHiddenFrames = {
   ["BuffFrame"] = true,
   ["DebuffFrame"] = true,
 }
+
+
+
+-- TODO: Make it work with bartender again.
 if Bartender4 then
-  defaultHiddenFrames["BT4Bar1"] = true
-  defaultHiddenFrames["BT4Bar2"] = true
-  defaultHiddenFrames["BT4Bar3"] = true
-  defaultHiddenFrames["BT4Bar4"] = true
-  defaultHiddenFrames["BT4Bar5"] = true
-  defaultHiddenFrames["BT4Bar6"] = true
-  defaultHiddenFrames["BT4Bar7"] = true
-  defaultHiddenFrames["BT4Bar8"] = true
-  defaultHiddenFrames["BT4Bar9"] = true
-  defaultHiddenFrames["BT4Bar10"] = true
-  defaultHiddenFrames["BT4BarBagBar"] = true
-  defaultHiddenFrames["BT4BarMicroMenu"] = true
-  defaultHiddenFrames["BT4BarStanceBar"] = true
-  defaultHiddenFrames["BT4BarPetBar"] = true
+  -- defaultHiddenFrames["BT4Bar1"] = true
+  -- defaultHiddenFrames["BT4Bar2"] = true
+  -- defaultHiddenFrames["BT4Bar3"] = true
+  -- defaultHiddenFrames["BT4Bar4"] = true
+  -- defaultHiddenFrames["BT4Bar5"] = true
+  -- defaultHiddenFrames["BT4Bar6"] = true
+  -- defaultHiddenFrames["BT4Bar7"] = true
+  -- defaultHiddenFrames["BT4Bar8"] = true
+  -- defaultHiddenFrames["BT4Bar9"] = true
+  -- defaultHiddenFrames["BT4Bar10"] = true
+  -- defaultHiddenFrames["BT4BarBagBar"] = true
+  -- defaultHiddenFrames["BT4BarMicroMenu"] = true
+  -- defaultHiddenFrames["BT4BarStanceBar"] = true
+  -- defaultHiddenFrames["BT4BarPetBar"] = true
 else
   defaultHiddenFrames["ExtraActionBarFrame"] = true
   defaultHiddenFrames["MainMenuBarArtFrame"] = true
@@ -284,9 +288,9 @@ end
 
 
 if Bartender4 then
-  hooksecurefunc(Bartender4:GetModule("StatusTrackingBar"), "OnEnable", function()
-    SetMouseOverFading(BT4StatusBarTrackingManager)
-  end)
+  -- hooksecurefunc(Bartender4:GetModule("StatusTrackingBar"), "OnEnable", function()
+    -- SetMouseOverFading(BT4StatusBarTrackingManager)
+  -- end)
 else
   hooksecurefunc(StatusTrackingBarManager, "AddBarFromTemplate", SetMouseOverFading)
 end
@@ -927,44 +931,50 @@ for i = 1, 4, 1 do
 end
 
 
+
+
+
+-- TODO: Adopt new UI!
+
+
 -- Unlike party member frames, the raid member frames are not there from the start.
 -- So we have to do the onShow hook, when new ones arrive.
-hooksecurefunc("CompactRaidFrameContainer_AddUnitFrame", function(_, unit, frameType)
+-- hooksecurefunc("CompactRaidFrameContainer_AddUnitFrame", function(_, unit, frameType)
 
-  for i = 1, 40, 1 do
+  -- for i = 1, 40, 1 do
 
-    -- Only look at those, which we have not hooked yet.
-    if _G["CompactRaidFrame" .. i .. "Background"] and not _G["CompactRaidFrame" .. i .. "Background"].ludius_hooked then
+    -- -- Only look at those, which we have not hooked yet.
+    -- if _G["CompactRaidFrame" .. i .. "Background"] and not _G["CompactRaidFrame" .. i .. "Background"].ludius_hooked then
 
-      -- If it is a new frame and the UI is currently hidden, we may have to also hide the new frame.
-      if Addon.uiHiddenTime ~= 0 and currentConfig.keepPartyRaidFrame == false then
-        FadeOutFrame(_G["CompactRaidFrame" .. i .. "Background"], 0, true, currentConfig.UIParentAlpha)
-        FadeOutFrame(_G["CompactRaidFrame" .. i .. "HorizTopBorder"], 0, true, currentConfig.UIParentAlpha)
-        FadeOutFrame(_G["CompactRaidFrame" .. i .. "HorizBottomBorder"], 0, true, currentConfig.UIParentAlpha)
-        FadeOutFrame(_G["CompactRaidFrame" .. i .. "VertLeftBorder"], 0, true, currentConfig.UIParentAlpha)
-        FadeOutFrame(_G["CompactRaidFrame" .. i .. "VertRightBorder"], 0, true, currentConfig.UIParentAlpha)
-        FadeOutFrame(_G["CompactRaidFrame" .. i .. "SelectionHighlight"], 0, true, currentConfig.UIParentAlpha)
-      end
+      -- -- If it is a new frame and the UI is currently hidden, we may have to also hide the new frame.
+      -- if Addon.uiHiddenTime ~= 0 and currentConfig.keepPartyRaidFrame == false then
+        -- FadeOutFrame(_G["CompactRaidFrame" .. i .. "Background"], 0, true, currentConfig.UIParentAlpha)
+        -- FadeOutFrame(_G["CompactRaidFrame" .. i .. "HorizTopBorder"], 0, true, currentConfig.UIParentAlpha)
+        -- FadeOutFrame(_G["CompactRaidFrame" .. i .. "HorizBottomBorder"], 0, true, currentConfig.UIParentAlpha)
+        -- FadeOutFrame(_G["CompactRaidFrame" .. i .. "VertLeftBorder"], 0, true, currentConfig.UIParentAlpha)
+        -- FadeOutFrame(_G["CompactRaidFrame" .. i .. "VertRightBorder"], 0, true, currentConfig.UIParentAlpha)
+        -- FadeOutFrame(_G["CompactRaidFrame" .. i .. "SelectionHighlight"], 0, true, currentConfig.UIParentAlpha)
+      -- end
 
-      -- Do the hook.
-      _G["CompactRaidFrame" .. i]:HookScript("OnShow", function()
+      -- -- Do the hook.
+      -- _G["CompactRaidFrame" .. i]:HookScript("OnShow", function()
 
-        if Addon.uiHiddenTime ~= 0 and currentConfig.keepPartyRaidFrame == false then
-          FadeOutFrame(_G["CompactRaidFrame" .. i .. "Background"], 0, true, currentConfig.UIParentAlpha)
-          FadeOutFrame(_G["CompactRaidFrame" .. i .. "HorizTopBorder"], 0, true, currentConfig.UIParentAlpha)
-          FadeOutFrame(_G["CompactRaidFrame" .. i .. "HorizBottomBorder"], 0, true, currentConfig.UIParentAlpha)
-          FadeOutFrame(_G["CompactRaidFrame" .. i .. "VertLeftBorder"], 0, true, currentConfig.UIParentAlpha)
-          FadeOutFrame(_G["CompactRaidFrame" .. i .. "VertRightBorder"], 0, true, currentConfig.UIParentAlpha)
-          FadeOutFrame(_G["CompactRaidFrame" .. i .. "SelectionHighlight"], 0, true, currentConfig.UIParentAlpha)
-        end
-      end)
+        -- if Addon.uiHiddenTime ~= 0 and currentConfig.keepPartyRaidFrame == false then
+          -- FadeOutFrame(_G["CompactRaidFrame" .. i .. "Background"], 0, true, currentConfig.UIParentAlpha)
+          -- FadeOutFrame(_G["CompactRaidFrame" .. i .. "HorizTopBorder"], 0, true, currentConfig.UIParentAlpha)
+          -- FadeOutFrame(_G["CompactRaidFrame" .. i .. "HorizBottomBorder"], 0, true, currentConfig.UIParentAlpha)
+          -- FadeOutFrame(_G["CompactRaidFrame" .. i .. "VertLeftBorder"], 0, true, currentConfig.UIParentAlpha)
+          -- FadeOutFrame(_G["CompactRaidFrame" .. i .. "VertRightBorder"], 0, true, currentConfig.UIParentAlpha)
+          -- FadeOutFrame(_G["CompactRaidFrame" .. i .. "SelectionHighlight"], 0, true, currentConfig.UIParentAlpha)
+        -- end
+      -- end)
 
-      -- Remember that you hooked it.
-      _G["CompactRaidFrame" .. i .. "Background"].ludius_hooked = true
+      -- -- Remember that you hooked it.
+      -- _G["CompactRaidFrame" .. i .. "Background"].ludius_hooked = true
 
-    end
-  end
-end)
+    -- end
+  -- end
+-- end)
 
 
 

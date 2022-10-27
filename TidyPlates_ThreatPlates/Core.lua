@@ -63,7 +63,7 @@ local function CalculateSynchedNameplateSize()
   return width, height
 end
 
-if Addon.IS_CLASSIC or Addon.IS_TBC_CLASSIC then
+if Addon.WOW_USES_CLASSIC_NAMEPLATES then
   Addon.SetBaseNamePlateSize = function(self)
     local db = self.db.profile
 
@@ -77,6 +77,8 @@ if Addon.IS_CLASSIC or Addon.IS_TBC_CLASSIC then
       C_NamePlate.SetNamePlateFriendlySize(128, 32)
       C_NamePlate.SetNamePlateEnemySize(128, 32)
     end
+
+    Addon:ConfigClickableArea(false)
   end
 else
   local function SetNameplatesToDefaultSize()
@@ -100,25 +102,6 @@ else
       width, height = CalculateSynchedNameplateSize()
       C_NamePlate.SetNamePlateFriendlySize(width, height)
     end
-    -- In dungeons or raids, friendly nameplates are always Blizzard nameplates.
-    -- if self.IsInPvEInstance then
-    --   if CVars:GetAsBool("nameplateShowOnlyNames") then
-    --     C_NamePlate.SetNamePlateFriendlySize(0.1, 0.1)
-    --   elseif NamePlateDriverFrame:IsUsingLargerNamePlateStyle() then
-    --     C_NamePlate.SetNamePlateFriendlySize(154, 64)
-    --   else
-    --     C_NamePlate.SetNamePlateFriendlySize(110, 45)
-    --   end
-    -- elseif db.ShowFriendlyBlizzardNameplates then
-    --   if NamePlateDriverFrame:IsUsingLargerNamePlateStyle() then
-    --     C_NamePlate.SetNamePlateFriendlySize(154, 64)
-    --   else
-    --     C_NamePlate.SetNamePlateFriendlySize(110, 45)
-    --   end
-    -- else
-    --   width, height = CalculateSynchedNameplateSize()
-    --   C_NamePlate.SetNamePlateFriendlySize(width, height)
-    -- end
 
     if db.ShowEnemyBlizzardNameplates then
       SetNameplatesToDefaultSize()
@@ -128,13 +111,13 @@ else
       end
       C_NamePlate.SetNamePlateEnemySize(width, height)
     end
-  end
   
-  Addon:ConfigClickableArea(false)
+    Addon:ConfigClickableArea(false)
 
-  -- For personal nameplate:
-  --local clampedZeroBasedScale = Saturate(zeroBasedScale)
-  --C_NamePlate_SetNamePlateSelfSize(baseWidth * horizontalScale * Lerp(1.1, 1.0, clampedZeroBasedScale), baseHeight)
+    -- For personal nameplate:
+    --local clampedZeroBasedScale = Saturate(zeroBasedScale)
+    --C_NamePlate_SetNamePlateSelfSize(baseWidth * horizontalScale * Lerp(1.1, 1.0, clampedZeroBasedScale), baseHeight)
+  end
 end
 
 ---------------------------------------------------------------------------------------------------
@@ -167,7 +150,7 @@ local EVENTS = {
   --"PLAYER_TALENT_UPDATE"
 
   "PLAYER_ENTERING_WORLD",
-  "PLAYER_LOGIN",
+  --"PLAYER_LOGIN",
   --"PLAYER_LOGOUT",
   "PLAYER_REGEN_ENABLED",
   "PLAYER_REGEN_DISABLED",
@@ -303,7 +286,7 @@ function Addon:CheckForFirstStartUp()
   if not Addon.db.char.welcome then
     Addon.db.char.welcome = true
 
-    if not Addon.IS_CLASSIC and not Addon.IS_TBC_CLASSIC then
+    if not Addon.IS_CLASSIC and not Addon.IS_TBC_CLASSIC and not Addon.IS_WRATH_CLASSIC then
       local Welcome = L["|cff89f559Welcome to |r|cff89f559Threat Plates!\nThis is your first time using Threat Plates and you are a(n):\n|r|cff"]..t.HCC[Addon.PlayerClass]..Addon:SpecName().." "..UnitClass("player").."|r|cff89F559.|r\n"
 
       -- initialize roles for all available specs (level > 10) or set to default (dps/healing)
@@ -422,7 +405,7 @@ function TidyPlatesThreat:OnEnable()
   Addon:CheckForFirstStartUp()
   Addon:CheckForIncompatibleAddons()
 
-  if not (Addon.IS_CLASSIC or Addon.IS_TBC_CLASSIC) then
+  if not Addon.WOW_USES_CLASSIC_NAMEPLATES then
     CVars:OverwriteBoolProtected("nameplateResourceOnTarget", Addon.db.profile.PersonalNameplate.ShowResourceOnTarget)
   end
 
@@ -525,7 +508,7 @@ function TidyPlatesThreat:PLAYER_ENTERING_WORLD()
   -- SetCVar("ShowClassColorInNameplate", 1)
 
   local db = Addon.db.profile.questWidget
-  if not (Addon.IS_CLASSIC or Addon.IS_TBC_CLASSIC) then
+  if not (Addon.IS_CLASSIC or Addon.IS_TBC_CLASSIC or Addon.IS_WRATH_CLASSIC) then
     if db.ON or db.ShowInHeadlineView then
       CVars:Set("showQuestTrackingTooltips", 1)
     else
@@ -585,11 +568,8 @@ end
 --function TidyPlatesThreat:PLAYER_LEAVING_WORLD()
 --end
 
-function TidyPlatesThreat:PLAYER_LOGIN(...)
-  if Addon.db.char.welcome then
-    Addon.Logging.Info(L["|cff89f559Threat Plates:|r Welcome back |cff"]..t.HCC[Addon.PlayerClass]..UnitName("player").."|r!!")
-  end
-end
+-- function TidyPlatesThreat:PLAYER_LOGIN(...)
+-- end
 
 --function TidyPlatesThreat:PLAYER_LOGOUT(...)
 --end

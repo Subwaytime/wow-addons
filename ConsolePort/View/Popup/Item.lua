@@ -9,9 +9,6 @@ local ItemMenuButtonMixin, ItemMenu = {}, db:Register('ItemMenu', CPAPI.EventHan
 	'PLAYER_REGEN_DISABLED';
 }))
 ---------------------------------------------------------------
-local INDEX_BAGS_COUNT = 2
-local INDEX_BAGS_NOVAL = 9
----------------------------------------------------------------
 local INDEX_INFO_ILINK = 2
 local INDEX_INFO_ITEMQ = 3
 local INDEX_INFO_STACK = 8
@@ -174,12 +171,14 @@ end
 ---------------------------------------------------------------
 -- Tooltip hacks
 ---------------------------------------------------------------
-function ItemMenu.Tooltip:GetTooltipStrings(index)
+local Tooltip = ItemMenu.Tooltip;
+
+function Tooltip:GetTooltipStrings(index)
 	local name = self:GetName()
 	return _G[name .. 'TextLeft' .. index], _G[name .. 'TextRight' .. index]
 end
 
-function ItemMenu.Tooltip:Readjust()
+function Tooltip:Readjust()
 	self.NineSlice:Hide()
 	self:SetWidth(340)
 	self:GetTooltipStrings(1):Hide()
@@ -195,12 +194,23 @@ function ItemMenu.Tooltip:Readjust()
 	self:GetParent():FixSize()
 end
 
-function ItemMenu.Tooltip:OnUpdate(elapsed)
+function Tooltip:OnUpdate(elapsed)
 	self.tooltipUpdate = self.tooltipUpdate + elapsed
 	if self.tooltipUpdate > 0.25 then
 		self:Readjust()
 		self.tooltipUpdate = 0
 	end
+end
+
+Tooltip.tooltipUpdate = 0
+Tooltip:HookScript('OnUpdate', Tooltip.OnUpdate)
+if TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall then
+	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tooltip)
+		if not (tooltip == Tooltip) then return end
+		Tooltip:Readjust()
+	end)
+else
+	Tooltip:HookScript('OnTooltipSetItem', Tooltip.Readjust)
 end
 
 function ItemMenu:SetTooltip()
@@ -215,10 +225,6 @@ end
 function ItemMenu:ClearTooltip()
 	self.Tooltip:Hide()
 end
-
-ItemMenu.Tooltip.tooltipUpdate = 0
-ItemMenu.Tooltip:HookScript('OnUpdate', ItemMenu.Tooltip.OnUpdate)
-ItemMenu.Tooltip:HookScript('OnTooltipSetItem', ItemMenu.Tooltip.Readjust)
 
 ---------------------------------------------------------------
 -- API
@@ -236,7 +242,7 @@ function ItemMenu:GetQuality()
 end
 
 function ItemMenu:GetCount()
-	return select(INDEX_BAGS_COUNT, GetContainerItemInfo(self:GetBagAndSlot()))
+	return CPAPI.GetContainerItemInfo(self:GetBagAndSlot()).stackCount;
 end
 
 function ItemMenu:GetStackCount()
@@ -248,7 +254,7 @@ function ItemMenu:GetInventoryLocation()
 end
 
 function ItemMenu:HasNoValue()
-	return select(INDEX_BAGS_NOVAL, GetContainerItemInfo(self:GetBagAndSlot()))
+	return CPAPI.GetContainerItemInfo(self:GetBagAndSlot()).hasNoValue;
 end
 
 function ItemMenu:IsSplittableItem()
@@ -271,12 +277,12 @@ end
 -- Commands
 ---------------------------------------------------------------
 function ItemMenu:Pickup()
-	PickupContainerItem(self:GetBagAndSlot())
+	CPAPI.PickupContainerItem(self:GetBagAndSlot())
 	self:Hide()
 end
 
 function ItemMenu:Delete()
-	PickupContainerItem(self:GetBagAndSlot())
+	CPAPI.PickupContainerItem(self:GetBagAndSlot())
 	local link, quality, hasSpellID = self:GetLink(), self:GetQuality(), self:GetSpellID();
 	self:Hide()
 	-- show confirm popup for good+ and usable items
@@ -289,7 +295,7 @@ end
 
 function ItemMenu:Equip(slot)
 	if self:IsEquippableItem() then
-		PickupContainerItem(self:GetBagAndSlot())
+		CPAPI.PickupContainerItem(self:GetBagAndSlot())
 		EquipCursorItem(slot or self:GetInventoryType())
 	end
 	self:Hide()

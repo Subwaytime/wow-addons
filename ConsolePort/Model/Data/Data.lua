@@ -1,21 +1,56 @@
 local DataAPI, _, db = CPAPI.CreateEventHandler({'Frame', '$parentDataHandler', ConsolePort}), ...;
 local copy = db.table.copy;
-local DEFAULT_DATA;
 
 function DataAPI:OnDataLoaded()
-	DEFAULT_DATA = db('Variables')
-	local settings = setmetatable(ConsolePortSettings or {}, {
-		__index = function(self, key)
-			local var = DEFAULT_DATA[key]
-			if var then
-				return var[1]:Get()
-			end
-		end;
-	})
+	self.Defaults = {};
+	self:OnVariablesChanged(db.Variables)
+	self:UpdateDataSource()
+end
+
+function DataAPI:UpdateDataSource()
+	local settings, saveAsID;
+
+	if not ConsolePortSettings then
+		ConsolePortSettings = {};
+	end
+
+	if ConsolePortCharacterSettings then
+		saveAsID = 'ConsolePortCharacterSettings';
+		settings = CPAPI.Proxy(ConsolePortCharacterSettings,
+			CPAPI.Proxy(ConsolePortSettings, self.Defaults)
+		);
+	else
+		saveAsID = 'ConsolePortSettings';
+		settings = CPAPI.Proxy(ConsolePortSettings, self.Defaults)
+	end
+
 	db:Register('Settings', settings, true)
 	db:Default(settings)
-	db:Save('Settings', 'ConsolePortSettings')
+	db:Save('Settings', saveAsID)
 end
+
+function DataAPI:OnToggleCharacterSettings(enabled)
+	local overrides = ConsolePortCharacterSettings;
+	ConsolePortCharacterSettings = enabled and {} or nil;
+	self:UpdateDataSource()
+	-- Since data source was switched, dispatch to update callbacks
+	db('Settings/useCharacterSettings', enabled)
+	if overrides then
+		-- Trigger updates for all the variables that had overrides
+		for id in pairs(overrides) do
+			db('Settings/'..id, db(id))
+		end
+	end
+end
+
+function DataAPI:OnVariablesChanged(variables)
+	for varID, data in pairs(variables) do
+		self.Defaults[varID] = data[1]:Get();
+	end
+end
+
+db:RegisterCallback('OnVariablesChanged', DataAPI.OnVariablesChanged, DataAPI)
+db:RegisterCallback('OnToggleCharacterSettings', DataAPI.OnToggleCharacterSettings, DataAPI)
 
 ---------------------------------------------------------------
 -- Fields
@@ -24,9 +59,7 @@ local Field = setmetatable({}, {
 	__index = function(self, k)
 		local typeCheck = k:gsub('^Is(%w+)$', '%1');
 		if typeCheck then
-			return function()
-				return self:IsType(typeCheck)
-			end
+			return GenerateClosure(self.IsType, self, typeCheck)
 		end
 		return nop;
 	end;
@@ -87,7 +120,7 @@ end
 local Button = Field():SetType('Button');
 ---------------------------------------------------------------
 function Button:Set(val, force)
-	if force or IsBindingForGamePad(val) then
+	if force or (val and IsBindingForGamePad(val)) then
 		if self:IsModifierAllowed() then
 			return Field.Set(self, CPAPI.CreateKeyChord(val))
 		end
@@ -182,6 +215,19 @@ function Number:GetSigned()
 end
 
 ---------------------------------------------------------------
+local Pseudokey = Button():SetType('Pseudokey');
+---------------------------------------------------------------
+function Pseudokey:Set(val, force)
+	if (force or val) then
+		if self:IsModifierAllowed() then
+			return Field.Set(self, CPAPI.CreateKeyChord(val))
+		end
+		return Field.Set(self, val)
+	end
+	return self;
+end
+
+---------------------------------------------------------------
 local Range = Number():SetType('Range');
 ---------------------------------------------------------------
 function Range:GetMinMax()
@@ -226,9 +272,12 @@ function Select:SetRawOptions(options)
 end
 
 ---------------------------------------------------------------
--- Data interface
+-- Data interface (call obj to enter data definition env)
 ---------------------------------------------------------------
-local Data = db:Register('Data', {});
+local Data = db:Register('Data', setmetatable({}, {
+	__call = function(self) setfenv(2, self) end;
+	__index = _G;
+}));
 
 function Data.Button(val, allowModifiers)
 	return Button():SetAllowModifiers(allowModifiers):Set(val)
@@ -244,6 +293,10 @@ end
 
 function Data.Number(val, step, signed)
 	return Number():SetStep(step):SetSigned(signed):Set(val)
+end
+
+function Data.Pseudokey(val, allowModifiers)
+	return Pseudokey():SetAllowModifiers(allowModifiers):Set(val)
 end
 
 function Data.Range(val, step, min, max)

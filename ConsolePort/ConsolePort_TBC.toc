@@ -1,7 +1,7 @@
 ## Interface: 20504
 ## Title: Console Port
 ## Notes: Game controller addon
-## Version: 2.4.0
+## Version: 2.5.5
 
 ## Author: Sebastian Lindfors
 ## X-Website: https://github.com/seblindfors/ConsolePort
@@ -11,7 +11,7 @@
 ## X-Wago-ID: LvNAYjNo
 
 ## SavedVariables: ConsolePortSettings, ConsolePortDevices, ConsolePortUIStack, ConsolePortShared
-## SavedVariablesPerCharacter: ConsolePortUtility
+## SavedVariablesPerCharacter: ConsolePortCharacterSettings, ConsolePortUtility
 
 
 Libs\__manifest.xml
@@ -25,4 +25,3 @@ Widget\__manifest.xml
 View\__manifest.xml
 
 API.lua
-Upgrade.lua

@@ -26,9 +26,11 @@ function Interact:OnDataLoaded()
 	ClearOverrideBindings(self)
 	UnregisterStateDriver(self, 'override')
 	
+	local isEnabled = false;
 	if IsBindingForGamePad(button) then
 		RegisterStateDriver(self, 'override', condition)
 		self:Execute([[self:RunAttribute('OnBindingsChanged')]])
+		isEnabled = true;
 	end
 end
 

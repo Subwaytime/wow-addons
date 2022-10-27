@@ -1,7 +1,4 @@
-# 10.4.2 (2022-08-19)
+# 11.0.2 (2022-10-27)
 
-* Threat values will no longer be hidden for custom style nameplates.
-* Fixed a Lua error with aura trigger for custom styles that could occur when the nameplate style was reset after a triggering aura expired.
-* Fixed some bugs with logging messages and verbose mode.
-* Updated TOC version for Patch 9.2.7.
-* Updated localizations.
+* Fixed a bug that occurred when the target transparency for a nameplate was greater than 100% or less than 0% as the Dragonflight API is more strict with valid transparency values [Issue #571, Comment #6532, #6536].
+* Fixed a bug that occurred when a Rogue has seven combo points (after picking talents Deeper Stratagem and Devious Stratagem) [Comment #6529].

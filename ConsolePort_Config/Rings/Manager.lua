@@ -31,13 +31,13 @@ To use, hold the selected binding down, tilt your stick in the direction of the 
 
 The default ring, or the |CFF00FF00Utility Ring|r, has special properties to alleviate questing and world interaction, and is not static. It will automatically add and remove items as necessary.
 
-If you want to create a ring to use in your rotation and not just for utility, it's highly recommended to not use the default ring for this purpose.
+If you want to create a ring to use in your rotation and not just for utility, it's highly recommended to use a custom ring for this purpose.
 ]]):trim())
 
 local RING_EMPTY_DESC = L[[You do not have any abilities in this ring yet.]]
 
 
-local EXTRA_ACTION_ID = ExtraActionButton1 and ExtraActionButton1.action or 169;
+local EXTRA_ACTION_ID = CPAPI.ExtraActionButtonID;
 local GET_SPELLID_IDX = 7;
 ---------------------------------------------------------------
 -- Helpers
@@ -588,13 +588,15 @@ function RingsManager:OnFirstShow()
 							_Size = {260, 50};
 							_Hide = true;
 							_OnShow = function(self)
-								env.Config:PauseCatcher()
-								self:EnableGamePadButton(true)
+								env.Config:CatchAll(function(self, ...)
+									if TrySetBinding(...) then
+										self:GetParent():Hide()
+									end
+								end, self)
 								self.timeUntilCancel = 5;
 							end;
 							_OnHide = function(self)
-								env.Config:ResumeCatcher()
-								self:EnableGamePadButton(false)
+								env.Config:SetDefaultClosures()
 								self.timeUntilCancel = 5;
 							end;
 							_OnUpdate = function(self, elapsed)
@@ -602,11 +604,6 @@ function RingsManager:OnFirstShow()
 								self:SetText(('%s (%d)'):format(CANCEL, ceil(self.timeUntilCancel)))
 								if self.timeUntilCancel <= 0 then
 									self.timeUntilCancel = 5;
-									self:GetParent():Hide()
-								end
-							end;
-							_OnGamePadButtonUp = function(self, ...)
-								if TrySetBinding(...) then
 									self:GetParent():Hide()
 								end
 							end;

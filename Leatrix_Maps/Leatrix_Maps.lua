@@ -1,6 +1,6 @@
 ﻿
 	----------------------------------------------------------------------
-	-- 	Leatrix Maps 9.2.25 (17th August 2022)
+	-- 	Leatrix Maps 10.0.01 (27th October 2022)
 	----------------------------------------------------------------------
 
 	-- 10:Func, 20:Comm, 30:Evnt, 40:Panl
@@ -12,7 +12,7 @@
 	local LeaMapsLC, LeaMapsCB, LeaConfigList = {}, {}, {}
 
 	-- Version
-	LeaMapsLC["AddonVer"] = "9.2.25"
+	LeaMapsLC["AddonVer"] = "10.0.01"
 
 	-- Get locale table
 	local void, Leatrix_Maps = ...
@@ -21,16 +21,16 @@
 	-- Check Wow version is valid
 	do
 		local gameversion, gamebuild, gamedate, gametocversion = GetBuildInfo()
-		if gametocversion and gametocversion < 90000 then
+		if gametocversion and gametocversion < 100000 then
 			-- Game client is Wow Classic
 			C_Timer.After(2, function()
-				print(L["LEATRIX MAPS: WRONG VERSION INSTALLED!"])
+				print(L["LEATRIX MAPS: THIS RELEASE IS FOR DRAGONFLIGHT ONLY!"])
 			end)
 			return
 		end
 	end
 
-	-- Set bindings translations
+	-- Set bindings translations (block taint in 10.0.2 when closing keybindings panel)
 	_G.BINDING_NAME_LEATRIX_MAPS_GLOBAL_TOGGLE = L["Toggle panel"]
 
 	----------------------------------------------------------------------
@@ -114,7 +114,7 @@
 
 		-- Load Battlefield addon
 		if not IsAddOnLoaded("Blizzard_BattlefieldMap") then
-			RunScript('UIParentLoadAddOn("Blizzard_BattlefieldMap")')
+			UIParentLoadAddOn("Blizzard_BattlefieldMap")
 		end
 
 		-- Get player faction
@@ -134,7 +134,7 @@
 		-- Scale the map
 		----------------------------------------------------------------------
 
-		if LeaMapsLC["ScaleWorldMap"] == "On" then
+		if LeaMapsLC["ScaleWorldMap"] == "On" and LeaMapsLC["UseDefaultMap"] == "Off" then
 
 			-- Replace function to account for frame scale
 			WorldMapFrame.ScrollContainer.GetCursorPosition = function(f)
@@ -218,7 +218,7 @@
 		if LeaMapsLC["EnhanceBattleMap"] == "On" then
 
 			-- Show teammates
-			RunScript('BattlefieldMapOptions.showPlayers = true')
+			BattlefieldMapOptions.showPlayers = true
 
 			-- Create configuraton panel
 			local battleFrame = LeaMapsLC:CreatePanel("Enhance battlefield map", "battleFrame")
@@ -297,10 +297,10 @@
 			-- Toggle battlefield map frame with configuration panel
 			battleFrame:HookScript("OnShow", function()
 				if BattlefieldMapFrame:IsShown() then LeaMapsLC.BFMapWasShown = true else LeaMapsLC.BFMapWasShown = false end
-				RunScript('BattlefieldMapFrame:Show()')
+				BattlefieldMapFrame:Show()
 			end)
 			battleFrame:HookScript("OnHide", function()
-				if not LeaMapsLC.BFMapWasShown then RunScript('BattlefieldMapFrame:Hide()') end
+				if not LeaMapsLC.BFMapWasShown then BattlefieldMapFrame:Hide() end
 			end)
 
 			----------------------------------------------------------------------
@@ -544,7 +544,7 @@
 			local function DoMapOpacity()
 				LeaMapsCB["BattleMapOpacity"].f:SetFormattedText("%.0f%%", LeaMapsLC["BattleMapOpacity"] * 100)
 				BattlefieldMapOptions.opacity = 1 - LeaMapsLC["BattleMapOpacity"]
-				RunScript('BattlefieldMapFrame:RefreshAlpha()')
+				BattlefieldMapFrame:RefreshAlpha()
 			end
 
 			-- Set opacity when slider is changed and on startup
@@ -1242,7 +1242,6 @@
 
 			-- Hide border frame elements
 			WorldMapFrame.BorderFrame.NineSlice:Hide()
-			WorldMapFrame.BorderFrame.TitleBg:Hide()
 			WorldMapFrame.BorderFrame.InsetBorderTop:Hide()
 			WorldMapFrame.NavBar:Hide()
 			WorldMapFrame.TitleCanvasSpacerFrame:Hide()
@@ -1905,8 +1904,6 @@
 
 			-- Minimap button click function
 			local function MiniBtnClickFunc(arg1)
-				-- Prevent options panel from showing if Blizzard options panel is showing
-				if InterfaceOptionsFrame:IsShown() or VideoOptionsFrame:IsShown() or ChatConfigFrame:IsShown() then return end
 				-- No modifier key toggles the options panel
 				if LeaMapsLC:IsMapsShowing() then
 					LeaMapsLC["PageF"]:Hide()
@@ -1948,6 +1945,15 @@
 			-- Set LibDBIcon when option is clicked and on startup
 			LeaMapsCB["ShowMinimapIcon"]:HookScript("OnClick", SetLibDBIconFunc)
 			SetLibDBIconFunc()
+
+			-- Add Leatrix Maps to addon compartment frame (not used for the time being)
+			--[[AddonCompartmentFrame:RegisterAddon({
+				text = L["Leatrix Maps"],
+				icon = "Interface\\HELPFRAME\\HelpIcon-Bug",
+				func = function(self, void, void, void, btn)
+					MiniBtnClickFunc(btn)
+				end,
+			})]]
 
 		end
 
@@ -2044,7 +2050,10 @@
 			pTex:SetAlpha(0.2)
 			pTex:SetTexCoord(0, 1, 1, 0)
 
-			InterfaceOptions_AddCategory(interPanel)
+			-- LeaMapsLC.DF: Block taint in 10.0.02 when closing keybindings panel
+			expTitle:SetText("Dragonflight")
+			local category = Settings.RegisterCanvasLayoutCategory(interPanel, "Leatrix Maps")
+			Settings.RegisterAddOnCategory(category)
 
 		end
 
@@ -2109,8 +2118,8 @@
 		Side.t:SetAllPoints()
 		Side.t:SetColorTexture(0.05, 0.05, 0.05, 0.9)
 
-		-- Add a close Button
-		Side.c = CreateFrame("Button", nil, Side, "UIPanelCloseButton")
+		-- Add a close Button (LeaMapsLC: Custom template)
+		Side.c = CreateFrame("Button", nil, Side, "LeaMapsUIPanelCloseButtonNoScripts")
 		Side.c:SetSize(30, 30)
 		Side.c:SetPoint("TOPRIGHT", 0, 0)
 		Side.c:SetScript("OnClick", function() Side:Hide() end)
@@ -2234,7 +2243,6 @@
 
 	-- Show tooltips for checkboxes
 	function LeaMapsLC:TipSee()
-		if not self:IsEnabled() then return end
 		GameTooltip:SetOwner(self, "ANCHOR_NONE")
 		local parent = self:GetParent()
 		local pscale = parent:GetEffectiveScale()
@@ -2251,7 +2259,6 @@
 
 	-- Show tooltips for configuration buttons and dropdown menus
 	function LeaMapsLC:ShowTooltip()
-		if not self:IsEnabled() then return end
 		GameTooltip:SetOwner(self, "ANCHOR_NONE")
 		local parent = LeaMapsLC["PageF"]
 		local pscale = parent:GetEffectiveScale()
@@ -2318,6 +2325,10 @@
 		LeaMapsLC:LockOption("UnlockMap", "UnlockMapBtn", true)					-- Unlock map frame
 		LeaMapsLC:LockOption("ShowCoords", "ShowCoordsBtn", false)				-- Show coordinates
 		LeaMapsLC:LockOption("EnhanceBattleMap", "EnhanceBattleMapBtn", true) 	-- Enhance battlefield map
+		-- Ensure locked but enabled options remain locked
+		if LeaMapsLC["UseDefaultMap"] == "On" then
+			LeaMapsCB["UnlockMapBtn"]:Disable()
+		end
 	end
 
 	-- Create a standard button
@@ -2600,10 +2611,11 @@
 	stopRelBtn.f:SetText(L["Your UI needs to be reloaded."])
 	stopRelBtn:Hide(); stopRelBtn:Show()
 
-	-- Add close Button
-	local stopFrameClose = CreateFrame("Button", nil, stopFrame, "UIPanelCloseButton")
+	-- Add close Button (LeaMapsLC:Custom template)
+	local stopFrameClose = CreateFrame("Button", nil, stopFrame, "LeaMapsUIPanelCloseButtonNoScripts")
 	stopFrameClose:SetSize(30, 30)
 	stopFrameClose:SetPoint("TOPRIGHT", 0, 0)
+	stopFrameClose:SetScript("OnClick", function() stopFrame:Hide() end)
 
 	----------------------------------------------------------------------
 	-- L20: Commands
@@ -2763,8 +2775,6 @@
 				return
 			end
 		else
-			-- Prevent options panel from showing if a game options panel is showing
-			if InterfaceOptionsFrame:IsShown() or VideoOptionsFrame:IsShown() or ChatConfigFrame:IsShown() then return end
 			-- Prevent options panel from showing if Blizzard Store is showing
 			if StoreFrame and StoreFrame:GetAttribute("isshown") then return end
 			-- Toggle the options panel if game options panel is not showing
@@ -2783,9 +2793,6 @@
 	SlashCmdList["Leatrix_Maps"] = function(self)
 		-- Run slash command function
 		SlashFunc(self)
-		-- Redirect tainted variables
-		RunScript('ACTIVE_CHAT_EDIT_BOX = ACTIVE_CHAT_EDIT_BOX')
-		RunScript('LAST_ACTIVE_CHAT_EDIT_BOX = LAST_ACTIVE_CHAT_EDIT_BOX')
 	end
 
 	----------------------------------------------------------------------
@@ -2868,6 +2875,18 @@
 			if not LeaMapsDB["minimapPos"] then
 				LeaMapsDB["minimapPos"] = 204
 			end
+
+			-- Lock options currently not compatible with Dragonflight (LeaMapsLC.DF)
+			local function LockDF(option, reason)
+				LeaMapsLC[option] = "Off"
+				LeaMapsDB[option] = "Off"
+				LeaMapsLC:LockItem(LeaMapsCB[option], true)
+				if reason then
+					LeaMapsCB[option].tiptext = LeaMapsCB[option].tiptext .. "|n|n|cff00AAFF" .. L[reason]
+				end
+			end
+
+			-- LockDF("IncreaseZoom", "Cannot use this in Dragonflight.") -- Increase zoom level (block taint: open map with M, close map with M, open edit mode, close edit mode)
 
 		elseif event == "PLAYER_LOGIN" then
 			-- Run main function
@@ -3024,10 +3043,11 @@
 	reloadb.f:SetText(L["Your UI needs to be reloaded."])
 	reloadb.f:Hide()
 
-	-- Add close Button
-	local CloseB = CreateFrame("Button", nil, PageF, "UIPanelCloseButton")
+	-- Add close Button (LeaMapsLC: Custom template)
+	local CloseB = CreateFrame("Button", nil, PageF, "LeaMapsUIPanelCloseButtonNoScripts")
 	CloseB:SetSize(30, 30)
 	CloseB:SetPoint("TOPRIGHT", 0, 0)
+	CloseB:SetScript("OnClick", function() PageF:Hide() end)
 
 	-- Add content
 	LeaMapsLC:MakeTx(PageF, "Appearance", 16, -72)

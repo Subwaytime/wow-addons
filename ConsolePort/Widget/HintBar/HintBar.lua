@@ -40,7 +40,7 @@ function CPHintMixin:GetText()
 end
 
 function CPHintMixin:SetData(icon, text)
-	self.Icon:SetTexture(icon and db('Icons/64/'..icon))
+	db.Gamepad.SetIconToTexture(self.Icon, icon)
 	self.Text:SetText(text)
 	self:SetWidth(self.Text:GetStringWidth() + 64)
 	self:UpdateParentWidth()

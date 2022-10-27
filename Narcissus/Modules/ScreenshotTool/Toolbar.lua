@@ -3,6 +3,9 @@ local _, addon = ...
 local EXPANDED_BAR_LEFT_OFFSET = 68;    --Constant
 local COLLAPSED_BAR_LEFT_OFFSET = -120; --Variable
 
+local IsTrackingPets = addon.TransitionAPI.IsTrackingPets;
+local SetTrackingPets = addon.TransitionAPI.SetTrackingPets;
+
 local outSine = addon.EasingFunctions.outSine;
 
 
@@ -105,6 +108,7 @@ local CVAR_GRAPHICS_VALUES = {
 	["graphicsDepthEffects"] = 4,
 	--["graphicsLightingQuality"] = 3,
 	["lightMode"] = 2,
+    ["ffxAntiAliasingMode"] = 2,    --FXAA High
 	["MSAAQuality"] = 4,	--4 is invalid. But used for backup
 	["shadowrt"] = -1,		--invalid
 }
@@ -141,8 +145,8 @@ local CVAR_CAMERA_VALUES = {
 }
 
 
-local SetCVar = SetCVar;
-local GetCVar = GetCVar;
+local SetCVar = (C_CVar and C_CVar.SetCVar) or SetCVar;
+local GetCVar = (C_CVar and C_CVar.GetCVar) or GetCVar;
 local ConsoleExec = ConsoleExec;
 
 local CVarUtil = {};
@@ -186,12 +190,11 @@ function CVarUtil:RestoreAll()
 end
 
 function CVarUtil:SaveTrackingStatus()
-	local _;
-	_, _, self.isTrackingBattlePet = GetTrackingInfo(1);
+	self.isTrackingBattlePet = IsTrackingPets();
 end
 
 function CVarUtil:SetTrackingStatus(state)
-	SetTracking(1, state);
+	SetTrackingPets(state);
 end
 
 function CVarUtil:RestoreTrackingStatus()
@@ -210,6 +213,7 @@ end
 
 
 function CVarUtil:SetHideTextStatus(state)
+    --causes "Interface action failed" when used in combat programmatically, still functioning, no workaround
     if state then
         if not self:IsCVarChanged("HideTexts") then
             CVarUtil:Backup(CVAR_UNIT_NAME_VALUES, CVAR_UNIT_NAME_BACKUP);
@@ -221,7 +225,7 @@ function CVarUtil:SetHideTextStatus(state)
     else
         if self:IsCVarChanged("HideTexts") then
             CVarUtil:RestoreTrackingStatus();
-            CVarUtil:Restore(CVAR_UNIT_NAME_BACKUP);	--causes "Interface action failed" when used in combat programmatically, still functioning, no workaround
+            CVarUtil:Restore(CVAR_UNIT_NAME_BACKUP);
             self:MarkCVarChanged("HideTexts", false)
         end
     end
@@ -513,7 +517,9 @@ local function PitchSlider_OnValueChanged(self, value, userInput)
 
 
     if userInput then
-        if not IsValueZero(value) then
+        if IsValueZero(value) then
+            SetCVar("test_cameraDynamicPitch", 0);
+        else
             SetCVar("test_cameraDynamicPitch", 1);
         end
         SetCVar("test_cameraDynamicPitchBaseFovPad", value);
@@ -1037,6 +1043,7 @@ function NarciScreenshotToolbarMixin:OnHide()
     self:UnregisterEvent("PLAYER_CAMPING");
     self:UnregisterEvent("SCREENSHOT_STARTED");
     self:FadeOut(true);
+    self:UseLowerLevel(false);
 end
 
 function NarciScreenshotToolbarMixin:OnEvent(event, ...)
@@ -1174,17 +1181,7 @@ function NarciRayTracingToggleMixin:OnLeave()
 end
 
 function NarciRayTracingToggleMixin:OnLoad()
-	local validity;
-	if Advanced_RTShadowQualityDropDown then
-		validity = true;
-	end
-	local info = { GetToolTipInfo(1, 4, "shadowrt", 0, 1, 2, 3) };
-	for i = 1, #info do
-		if info[i] ~= 0 then
-			validity = validity and false;
-			break;
-		end
-	end
+	local validity = addon.TransitionAPI.IsRTXSupported();
 
     self:OnLeave();
 
@@ -1200,6 +1197,23 @@ function NarciRayTracingToggleMixin:OnLoad()
 	self.OnLoad = nil;
 end
 
+
+
+do
+    local SettingFunctions = addon.SettingFunctions;
+
+    function SettingFunctions.UseEscapeKeyForExit(state, db)
+        if state == nil then
+            state = db["UseEscapeButton"];
+        end
+
+        if state then
+            MainFrame.KeyListener.escapeKey = "ESCAPE";
+        else
+            MainFrame.KeyListener.escapeKey = "HELLOWORLD";
+        end
+    end
+end
 --[[
 --Doolly Zoom:
 --d = width / (2*math.tan(0.5 * fov))    --fov ~ degree

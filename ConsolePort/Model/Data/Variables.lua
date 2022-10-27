@@ -1,18 +1,23 @@
 -- Consts
-local STICK_SELECT = {'Movement', 'Camera'};
+local STICK_SELECT = {'Movement', 'Camera', 'Gyro'};
 local MODID_SELECT = {'SHIFT', 'CTRL', 'ALT'};
 local MODID_EXTEND = {'SHIFT', 'CTRL', 'ALT', 'CTRL-SHIFT', 'ALT-SHIFT', 'ALT-CTRL'};
 local ADVANCED_OPT = RED_FONT_COLOR:WrapTextInColorCode(ADVANCED_OPTIONS);
 local INTERACT_OPT = UNIT_FRAME_DROPDOWN_SUBSECTION_TITLE_INTERACT;
 
-local unpack, __, db = unpack, ...; __ = 1;
-setfenv(__, setmetatable(db('Data'), {__index = _G}));
+local unpack, _, db = unpack, ...; db('Data')();
 ------------------------------------------------------------------------------------------------------------
 -- Default cvar data (global)
 ------------------------------------------------------------------------------------------------------------
 db:Register('Variables', {
 	showAdvancedSettings = {Bool(false);
-		name = 'Show Advanced';
+		name = 'All Settings';
+		desc = 'Display all available settings.';
+		hide = true;
+	};
+	useCharacterSettings = {Bool(false);
+		name = 'Character Specific';
+		desc = 'Use character specific settings for this character.';
 		hide = true;
 	};
 	--------------------------------------------------------------------------------------------------------
@@ -61,26 +66,6 @@ db:Register('Variables', {
 		desc = 'Color of the crosshair.';
 	};
 	--------------------------------------------------------------------------------------------------------
-	-- Interact button:
-	--------------------------------------------------------------------------------------------------------
-	interactButton = {Button('PADRSHOULDER', true):Set('none', true);
-		head = INTERACT_OPT;
-		sort = 1;
-		name = 'Interact Button';
-		desc = 'Button or combination used to interact for a given condition. By default, interacts using centered cursor.';
-		note = 'Use a shoulder button combined with crosshair for smooth and precise interactions.';
-	};
-	interactCondition = {String('[vehicleui] nil; [@target,noharm][@target,noexists][@target,harm,dead] TURNORACTION; nil');
-		head = INTERACT_OPT;
-		sort = 2;
-		name = 'Interact Condition';
-		desc = 'Macro condition to enable the interact button override.';
-		note = 'Takes the format of...\n'
-			.. BLUE_FONT_COLOR:WrapTextInColorCode('[condition] bindingID; nil')
-			.. '\n...where each condition/binding is separated by a semicolon, and "nil" clears the override.';
-		advd = true;
-	};
-	--------------------------------------------------------------------------------------------------------
 	-- Mouse:
 	--------------------------------------------------------------------------------------------------------
 	mouseHandlingEnabled = {Bool(true);
@@ -94,8 +79,8 @@ db:Register('Variables', {
 	mouseFreeCursorReticle = {Bool(false);
 		head = MOUSE_LABEL;
 		sort = 2;
-		name = 'Free Cursor Reticle Targeting';
-		desc = 'Reticle targeting uses free cursor instead of center-fixed cursor.';
+		name = 'Cursor Reticle Targeting';
+		desc = 'Reticle targeting uses free cursor instead of staying center-fixed.';
 		note = 'Reticle targeting means anything you place on the ground.';
 	};
 	mouseHideCursorOnMovement = {Bool(false);
@@ -134,28 +119,34 @@ db:Register('Variables', {
 	--------------------------------------------------------------------------------------------------------
 	-- Radial:
 	--------------------------------------------------------------------------------------------------------
-	radialClearFocusTime = {Number(0.5, 0.025);
+	radialStickySelect = {Bool(false);
 		head = 'Radial Menus';
 		sort = 1;
-		name = 'Radial Focus Timeout';
+		name = 'Sticky Selection';
+		desc = 'Selecting an item on a ring will stick until another item is chosen.';
+	};
+	radialClearFocusTime = {Number(0.5, 0.025);
+		head = 'Radial Menus';
+		sort = 2;
+		name = 'Focus Timeout';
 		desc = 'Time to clear focus after intercepting stick input, in seconds.';
 	};
 	radialScale = {Number(1, 0.025, true);
 		head = 'Radial Menus';
-		sort = 2;
+		sort = 3;
 		name = 'Ring Scale';
 		desc = 'Scale of all radial menus, relative to UI scale.';
 		advd = true;
 	};
 	radialActionDeadzone = {Range(0.5, 0.05, 0, 1);
 		head = 'Radial Menus';
-		sort = 3;
-		name = 'Radial Deadzone';
-		desc = 'Deadzone for simple pie menus.';
+		sort = 4;
+		name = 'Deadzone';
+		desc = 'Deadzone for simple point-to-select rings.';
 	};
 	radialCosineDelta = {Delta(1);
 		head = 'Radial Menus';
-		sort = 5;
+		sort = 6;
 		name = 'Axis Interpretation';
 		desc = 'Correlation between stick position and pie selection.';
 		note = '+ Normal\n- Inverted';
@@ -163,16 +154,25 @@ db:Register('Variables', {
 	};
 	radialPrimaryStick = {Select('Movement', unpack(STICK_SELECT));
 		head = 'Radial Menus';
-		sort = 6;
+		sort = 7;
 		name = 'Primary Stick';
 		desc = 'Stick to use for main radial actions.';
 		note = 'Make sure your choice does not conflict with your bindings.';
 	};
 	radialRemoveButton = {Button('PADRSHOULDER');
 		head = 'Radial Menus';
-		sort = 8;
+		sort = 9;
 		name = 'Remove Button';
-		desc = 'Button used to remove a selected item from an editable pie menu.';
+		desc = 'Button used to remove a selected item from an editable ring.';
+	};
+	--------------------------------------------------------------------------------------------------------
+	-- Radial:
+	--------------------------------------------------------------------------------------------------------
+	keyboardEnable = {Bool(false);
+		head = 'Radial Keyboard';
+		sort = 1;
+		name = 'Enable';
+		desc = 'Enables a radial on-screen keyboard that can be used to type messages.';
 	};
 	--------------------------------------------------------------------------------------------------------
 	-- Raid cursor:
@@ -341,7 +341,7 @@ db:Register('Variables', {
 		desc = 'Vertical offset of the hotkey prompt position, in pixels.';
 		advd = true;
 	};
-	unitHotkeyPool = {String('player$;party%d$;raid%d+$');
+	unitHotkeyPool = {String('party%d$;raid%d+$;player$');
 		head = 'Unit Hotkeys';
 		sort = 6;
 		name = 'Unit Pool';
@@ -363,20 +363,6 @@ db:Register('Variables', {
 		sort = 2;
 		name = 'Automatically Sell Junk';
 		desc = 'Automatically sell junk when interacting with a merchant.';
-	};
-	showAbilityBriefing = {Bool(true);
-		head = ACCESSIBILITY_LABEL;
-		sort = 3;
-		name = 'Show Ability Briefings';
-		desc = 'Displays a briefing for newly acquired abilities.';
-		note = 'Requires ConsolePort World.';
-	};
-	mouseFollowOnStickMounted = {Bool(false);
-		head = ACCESSIBILITY_LABEL;
-		sort = 4;
-		name = 'Follow On Stick While Mounted';
-		desc = 'Sets your camera to "follow on a stick" when you are mounted.';
-		note = 'Enable Settings > Camera > Follow On A Stick instead of this option if this is your preferred permanent camera style.';
 	};
 	UIscale = {Number(1, 0.025, true);
 		head = ACCESSIBILITY_LABEL;
@@ -423,6 +409,54 @@ db:Register('Variables', {
 		sort = 5;
 		name = 'Disable Hotkey Rendering';
 		desc = 'Disables customization to hotkeys on regular action bar.';
+		advd = true;
+	};
+	useAtlasIcons = CPAPI.IsRetailVersion and {Bool(true);
+		head = KEY_BINDINGS_MAC;
+		sort = 6;
+		name = 'Use Default Hotkey Icons';
+		desc = 'Uses the default hotkey icons instead of the custom icons provided by ConsolePort.';
+		note = 'Requires reload.';
+	};
+	emulatePADPADDLE1 = {Pseudokey('none');
+		head = KEY_BINDINGS_MAC;
+		sort = 7;
+		name = 'Emulate '..(KEY_PADPADDLE1 or 'Paddle 1');
+		desc = 'Keyboard button to emulate the paddle 1 button.';
+	};
+	emulatePADPADDLE2 = {Pseudokey('none');
+		head = KEY_BINDINGS_MAC;
+		sort = 8;
+		name = 'Emulate '..(KEY_PADPADDLE2 or 'Paddle 2');
+		desc = 'Keyboard button to emulate the paddle 2 button.';
+	};
+	emulatePADPADDLE3 = {Pseudokey('none');
+		head = KEY_BINDINGS_MAC;
+		sort = 9;
+		name = 'Emulate '..(KEY_PADPADDLE3 or 'Paddle 3');
+		desc = 'Keyboard button to emulate the paddle 3 button.';
+	};
+	emulatePADPADDLE4 = {Pseudokey('none');
+		head = KEY_BINDINGS_MAC;
+		sort = 10;
+		name = 'Emulate '..(KEY_PADPADDLE4 or 'Paddle 4');
+		desc = 'Keyboard button to emulate the paddle 4 button.';
+	};
+	interactButton = {Button('PAD1', true):Set('none', true);
+		head = KEY_BINDINGS_MAC;
+		sort = 11;
+		name = 'Click Override Button';
+		desc = 'Button or combination used to click when a given condition applies, but act as a normal binding otherwise.';
+		note = 'Use a shoulder button combined with crosshair for smooth and precise interactions. The click is performed at crosshair or cursor location.';
+	};
+	interactCondition = {String('[vehicleui] nil; [@target,noharm][@target,noexists][@target,harm,dead] TURNORACTION; nil');
+		head = KEY_BINDINGS_MAC;
+		sort = 12;
+		name = 'Click Override Condition';
+		desc = 'Macro condition to enable the click override button. The default condition clicks right mouse button when there is no enemy target.';
+		note = 'Takes the format of...\n'
+			.. BLUE_FONT_COLOR:WrapTextInColorCode('[condition] bindingID; nil')
+			.. '\n...where each condition/binding is separated by a semicolon, and "nil" clears the override.';
 		advd = true;
 	};
 	--------------------------------------------------------------------------------------------------------

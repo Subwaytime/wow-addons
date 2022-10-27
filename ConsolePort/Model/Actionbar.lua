@@ -1,10 +1,14 @@
 local _, db = ...; local ActionBarAPI = {
 	Binding = {};
 	Action = {
-		['3'] = 'MULTIACTIONBAR3BUTTON%d';
-		['4'] = 'MULTIACTIONBAR4BUTTON%d';
-		['5'] = 'MULTIACTIONBAR2BUTTON%d';
-		['6'] = 'MULTIACTIONBAR1BUTTON%d';
+		['3']   = 'MULTIACTIONBAR3BUTTON%d';
+		['4']   = 'MULTIACTIONBAR4BUTTON%d';
+		['5']   = 'MULTIACTIONBAR2BUTTON%d';
+		['6']   = 'MULTIACTIONBAR1BUTTON%d';
+		['12']  = 'MULTIACTIONBAR5BUTTON%d';
+		['13']  = 'MULTIACTIONBAR6BUTTON%d';
+		['14']  = 'MULTIACTIONBAR7BUTTON%d';
+		Default = 'ActionButton%d';
 		Default = 'ACTIONBUTTON%d';
 		Abnormal = {
 			[133] = 'ACTIONBUTTON1';
@@ -13,14 +17,17 @@ local _, db = ...; local ActionBarAPI = {
 			[136] = 'ACTIONBUTTON4';
 			[137] = 'ACTIONBUTTON5';
 			[138] = 'ACTIONBUTTON6';
-			[169] = 'EXTRAACTIONBUTTON1';
+			[CPAPI.ExtraActionButtonID] = 'EXTRAACTIONBUTTON1';
 		};
 	};
 	Widget = {
-		['3'] = 'MultiBarRightButton%d';
-		['4'] = 'MultiBarLeftButton%d';
-		['5'] = 'MultiBarBottomRightButton%d';
-		['6'] = 'MultiBarBottomLeftButton%d';
+		['3']   = 'MultiBarRightButton%d';
+		['4']   = 'MultiBarLeftButton%d';
+		['5']   = 'MultiBarBottomRightButton%d';
+		['6']   = 'MultiBarBottomLeftButton%d';
+		['12']  = 'MultBar5Button%d';
+		['13']  = 'MultBar6Button%d';
+		['14']  = 'MultBar7Button%d';
 		Default = 'ActionButton%d';
 		Abnormal = {
 			[133] = 'OverrideActionBarButton1';
@@ -29,7 +36,7 @@ local _, db = ...; local ActionBarAPI = {
 			[136] = 'OverrideActionBarButton4';
 			[137] = 'OverrideActionBarButton5';
 			[138] = 'OverrideActionBarButton6';
-			[169] = 'ExtraActionButton1';
+			[CPAPI.ExtraActionButtonID] = 'ExtraActionButton1';
 		};
 	};
 	Lookup = {
@@ -75,7 +82,7 @@ end)
 -- Blizzard's own system does not use the attribute by default,
 -- instead resorting to table keys/:GetID() to determine correct action.
 -- Assigning the attribute manually unifies default UI with addons.
-for i=169, 1, -1 do
+for i=CPAPI.ExtraActionButtonID, 1, -1 do
 	local button = ActionBarAPI.Widget[i]
 	if button then
 		ActionBarAPI.Binding[ActionBarAPI.Action[i]] = i

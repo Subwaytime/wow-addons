@@ -29,7 +29,7 @@ local _G =_G
 -- Wrapper functions for WoW Classic
 ---------------------------------------------------------------------------------------------------
 
-if Addon.IS_CLASSIC or Addon.IS_TBC_CLASSIC then
+if Addon.IS_CLASSIC or Addon.IS_TBC_CLASSIC or Addon.IS_WRATH_CLASSIC then
   UnitIsBattlePet = function(...) return false end
 end
 
@@ -239,7 +239,7 @@ function Addon.UnitStyle_NameDependent(unit)
     end
   end
 
-  if not plate_style and UnitCreatureType(unit.unitid) == Addon.TotemCreatureType then
+  if not plate_style and UnitCreatureType(unit.unitid) == Addon.TotemCreatureType and UnitPlayerControlled(unit.unitid) then
     -- Check for player totems and ignore NPC totems
     local totem_id = TOTEMS[unit.name]
     if totem_id then

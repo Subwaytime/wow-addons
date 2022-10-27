@@ -1,3 +1,97 @@
+10.0.01 - 27th October 2022
+- For 'Enhance minimap' ('Interface'), there is a new setting to hide the addon menu (the compartment menu).  It's enabled by default.  The minimum cluster scale is now 50% (was 100%).
+- For the time being, the addon will not register with the minimap compartment menu.
+- Fixed an issue with 'Hide keybind text' and 'Hide macro text' ('Text') which caused them to not apply to bars 6, 7 and 8.
+
+10.0.00 - 24th October 2022
+- Welcome to Dragonflight!
+- Added a new option 'Manage vehicle' ('Frames') which will allow you to move and scale the vehicle seat indicator frame.
+- Added Dragonflight cinematic (movie and cinematic audio).
+- For 'Sell junk automatically' ('Automation'), white items entered in the exclusions editbox will be sold automatically.  Junk items entered in the editbox will not be sold automatically (as before).
+- For 'Mute game sounds' ('System'), you can now mute broom mount sounds.
+- The 'More font sizes' option ('Chat') has been replaced by 'Set chat font size'.
+- The 'Manage frames', 'Manage buffs', 'Manage power bar', 'Manage focus', 'Hide gryphons', 'Hide bags and micro', 'Set field of view' and 'Save profession filters' options have all been removed as they are now included in the game.
+- The 'Show character addons' option ('System') has been removed due to issues with the game code.
+- Having ElvUI installed will no longer uncheck conflicting option checkboxes.  Conflicting option checkboxes will still be locked but they won't be unchecked.  So if a conflicting option checkbox was checked before installing ElvUI or before enabling a conflicting ElvUI module, it will still be checked after disabling ElvUI or disabling the conflicting ElvUI module.
+- Removed Shadowlands legacy code.  This release is not compatible with Shadowlands.
+
+9.2.45 - 19th October 2022
+- Dragonflight: For 'Enhance tooltip' ('Interface'), all of the tooltip settings work again except show target (this will be fixed later).
+- Dragonflight: Updated 'Sell junk automatically' ('Automation') for 10.0.2.46144.
+
+9.2.44 - 17th October 2022
+- Dragonflight: For 'Enhance tooltip' ('Interface'), tooltip color coding, guild ranks, colored backdrops and target will not currently be applied due to issues with the game code.
+- Dragonflight: Leatrix Plus entries in the game keybindings menu do not currently have labels due to issues with the game code.  The keybindings themselves will work though.
+- Dragonflight: Opening the game keybindings menu and closing it may cause a Lua error to be shown due to issues with the game code.  If so, you should reload your UI.
+- Dragonflight: There is no entry for Leatrix Plus in the game addons menu due to issues with the game code.
+
+9.2.43 - 17th October 2022
+- Dragonflight: Fixed 'Unclamp chat frame' ('Chat').
+- Dragonflight: For 'Enhance minimap' square minimap, fixed the Dragon Isles Summary minimap button position.
+
+9.2.42 - 16th October 2022
+- You can now assign a keybind for /mountspecial in the game key bindings menu.  The 'Easy mount special' option has been removed.
+- For 'Show minimap icon', some of the modified clicks have changed.  Read the option tooltip for more details.
+- For 'Mute game sounds' ('System'), you can now make Pierre quieter.
+- Dragonflight: Updated 'Hide talking frame' ('Frames') for 10.0.2.46157.
+- Dragonflight: Updated 'Enhance tooltip' ('Interface') for 10.0.2.45969.
+- Dragonflight: Updated 'Show cooldowns' ('Interface').
+- Dragonflight: Removed the temporary vendoring fix that was added in 9.2.40.
+- Dragonflight: Fixed a minor issue with 'Enhance minimap' ('Interface') which caused other addon minimap buttons to be positioned incorrectly when using the square minimap.
+- Dragonflight: Fixed a rare Lua error with 'Automate quests' ('Automation').
+
+9.2.40 - 2nd October 2022
+- Dragonflight: Added a temporary fix for the vendoring bug with game version 10.0.2.45779.  This bug is nothing to do with Leatrix Plus but it's difficult to play without being able to vendor anything.  This fix will only run with game version 10.0.2.45779 (since Blizzard will likely fix it anyway in the next update).
+
+9.2.39 - 1st October 2022
+- Dragonflight: Fixed the Lua error with 'Sell junk automatically' ('Automation').
+
+9.2.38 - 29th September 2022
+- Dragonflight: Updated for 10.0.2.45779 (Sep 25 2022) (100002).
+- Dragonflight: Fixed 'Show wowhead links' not showing in the world map frame.
+- Dragonflight: Fixed the Lua error caused by changes to Dragonflight code.
+
+9.2.37 - 28th September 2022
+- Added a new option 'Block shared quests' ('Social').  If enabled, shared quests will be automatically declined unless the player sharing the quest is a friend.
+- Dragonflight: The 'Show player chain' option ('Interface') is now available.
+- Dragonflight: The 'Enhance dressup' zoom speed setting now affects the character frame model as well as the dressing room model.
+
+9.2.36 - 22nd September 2022
+- Dragonflight: Updated for game version 10.0.2.45698 (Sep 20 2022) (100002).
+- Dragonflight: Updated 'Class cololored frames' ('Frames').
+- Dragonflight: Fixed Lua errors due to game code changes.
+
+9.2.35 - 21st September 2022
+- Added a new option 'Restore chat messages' ('Chat').  If enabled, you can reload your UI without losing your recent chat messages.
+- For 'Show ready timer' ('Interface'), Dungeon Finder timer bars from other addons which use the standard status bar frame type (such as BigWigs) will now be hidden so they don't conflict.
+- Dragonflight: For 'Enhance tooltip' ('Interface'), there is no longer an overlay anchor.  Use Edit Mode to position the tooltip.
+- Dragonflight: Leatrix Plus is now listed in the minimap addon menu and the game options panel.
+
+9.2.34 - 14 September 2022
+- Dragonflight: Added a new option 'Set chat font size' ('Chat').  If enabled, you will be able to set the chat font size.  This also applies to the guild and communities chat frame and the GM chat frame.  Enabling this option will prevent you from using the default UI to set the chat font size.  This is a Dragonflight compatible replacement for the 'More font sizes' option from Shadowlands.
+
+9.2.33 - 11th September 2022
+- For 'Enhance tooltip' ('Interface'), if you use the setting to hide tooltips for world units during combat, you can now specify whether holding shift should override that setting or not.  Also updated locale code.
+
+9.2.31 - 8th September 2022
+- Dragonflight: Updated for 10.0.0.45480 (PTR).
+- Dragonflight: You should always use the latest Leatrix Plus alpha release until Dragonflight is launched.  In CurseForge App, right-click Leatrix Plus in your Retail PTR addons listing and set the release type to alpha.
+
+9.2.28 - 7th September 2022
+- Updated for Dragonflight Beta.  A few options are currently locked out (read the blue text in the locked option tooltips for more information).
+- For 'Automate quests' ('Automation'), fixed an issue which caused Darkmoon Faire quests to not be automated.
+- Dragonflight: You should always use the latest Leatrix Plus alpha release while Dragonflight is in beta.
+
+9.2.27 - 31st August 2022
+- Added a new option called 'Manage timer' ('Frames').  The 'Manage frames' option no longer includes the timer bar.
+- Added a new option 'Manage durability' ('Frames').  If enabled, you can move and scale the armored man durability frame.
+- For 'Enhance minimap' ('Interface'), added a new setting that will allow you to adjust the minimap cluster scale without it affecting the minimap scale.
+- Tweaks to ElvUI locks.
+
+9.2.26 - 24th August 2022
+- The 'Hide action button text' option ('Text') is now two options - 'Hide keybind text' and 'Hide macro text'.
+- If you use ElvUI, Leatrix Plus options which are not compatible with specific ElvUI modules will now be disabled and locked while those ElvUI modules are enabled.  The option tooltip will tell you which ElvUI module is causing the Leatrix Plus option to be disabled.  Disabling the relevant ElvUI module will make the Leatrix Plus setting available again.
+
 9.2.25 - 17th August 2022
 - Updated for game version 9.2.7.
 - Fixed a minor issue with 'Show cooldowns' ('Interface') which caused buff spell IDs to show in debuff tooltips.

@@ -6,47 +6,49 @@ env.libs = { acb = LibStub('CPActionButton') };
 --------------------------------------------------------
 local r, g, b = CPAPI.NormalizeColor(CPAPI.GetClassColor())
 --------------------------------------------------------
-local defaultIcons
-do  local custom = [[Interface\AddOns\ConsolePort_Bar\Textures\Icons\%s]]
+local defaultIcons do
+	local custom = [[Interface\AddOns\ConsolePort_Bar\Textures\Icons\%s]]
 	local client = [[Interface\Icons\%s]]
 	local isRetail = CPAPI.IsRetailVersion;
 	defaultIcons = {
-	----------------------------
-	JUMP = custom:format('Jump'),
-	TOGGLERUN = custom:format('Run'),
-	OPENALLBAGS = custom:format('Bags'),
-	TOGGLEGAMEMENU = custom:format('Menu'),
-	TOGGLEWORLDMAP = custom:format('Map'),
-	----------------------------
-	TARGETNEARESTENEMY = custom:format('Target'),
-	TARGETPREVIOUSENEMY = custom:format('Target'),
-	TARGETSCANENEMY = custom:format('Target'),
-	TARGETNEARESTFRIEND = custom:format('Target'),
-	TARGETPREVIOUSFRIEND = custom:format('Target'),
-	TARGETNEARESTENEMYPLAYER = custom:format('Target'),
-	TARGETPREVIOUSENEMYPLAYER = custom:format('Target'),
-	TARGETNEARESTFRIENDPLAYER = custom:format('Target'),
-	TARGETPREVIOUSFRIENDPLAYER = custom:format('Target'),
-	----------------------------
-	TARGETPARTYMEMBER1 = isRetail and client:format('Achievement_PVP_A_01'),
-	TARGETPARTYMEMBER2 = isRetail and client:format('Achievement_PVP_A_02'),
-	TARGETPARTYMEMBER3 = isRetail and client:format('Achievement_PVP_A_03'),
-	TARGETPARTYMEMBER4 = isRetail and client:format('Achievement_PVP_A_04'),
-	TARGETSELF = isRetail and client:format('Achievement_PVP_A_05'),
-	TARGETPET = client:format('Spell_Hunter_AspectOfTheHawk'),
-	----------------------------
-	ATTACKTARGET = client:format('Ability_SteelMelee'),
-	STARTATTACK  = client:format('Ability_SteelMelee'),
-	PETATTACK    = client:format('ABILITY_HUNTER_INVIGERATION'),
-	FOCUSTARGET  = client:format('Ability_Hunter_MasterMarksman'),
-	----------------------------
-	['CLICK ConsolePortFocusButton:LeftButton']      = client:format('VAS_RaceChange'),
-	['CLICK ConsolePortEasyMotionButton:LeftButton'] = custom:format('Group'),
-	['CLICK ConsolePortRaidCursorToggle:LeftButton'] = custom:format('Group'),
-	['CLICK ConsolePortRaidCursorFocus:LeftButton']  = custom:format('Group'),
-	['CLICK ConsolePortRaidCursorTarget:LeftButton'] = custom:format('Group'),
-	['CLICK ConsolePortUtilityToggle:LeftButton']    = custom:format('Ring'),
-	----------------------------
+		----------------------------
+		JUMP = custom:format('Jump'),
+		TOGGLERUN = custom:format('Run'),
+		OPENALLBAGS = custom:format('Bags'),
+		TOGGLEGAMEMENU = custom:format('Menu'),
+		TOGGLEWORLDMAP = custom:format('Map'),
+		----------------------------
+		INTERACTTARGET = custom:format('Target'),
+		----------------------------
+		TARGETNEARESTENEMY = custom:format('Target'),
+		TARGETPREVIOUSENEMY = custom:format('Target'),
+		TARGETSCANENEMY = custom:format('Target'),
+		TARGETNEARESTFRIEND = custom:format('Target'),
+		TARGETPREVIOUSFRIEND = custom:format('Target'),
+		TARGETNEARESTENEMYPLAYER = custom:format('Target'),
+		TARGETPREVIOUSENEMYPLAYER = custom:format('Target'),
+		TARGETNEARESTFRIENDPLAYER = custom:format('Target'),
+		TARGETPREVIOUSFRIENDPLAYER = custom:format('Target'),
+		----------------------------
+		TARGETPARTYMEMBER1 = isRetail and client:format('Achievement_PVP_A_01'),
+		TARGETPARTYMEMBER2 = isRetail and client:format('Achievement_PVP_A_02'),
+		TARGETPARTYMEMBER3 = isRetail and client:format('Achievement_PVP_A_03'),
+		TARGETPARTYMEMBER4 = isRetail and client:format('Achievement_PVP_A_04'),
+		TARGETSELF = isRetail and client:format('Achievement_PVP_A_05'),
+		TARGETPET = client:format('Spell_Hunter_AspectOfTheHawk'),
+		----------------------------
+		ATTACKTARGET = client:format('Ability_SteelMelee'),
+		STARTATTACK  = client:format('Ability_SteelMelee'),
+		PETATTACK    = client:format('ABILITY_HUNTER_INVIGERATION'),
+		FOCUSTARGET  = client:format('Ability_Hunter_MasterMarksman'),
+		----------------------------
+		['CLICK ConsolePortFocusButton:LeftButton']      = client:format('VAS_RaceChange'),
+		['CLICK ConsolePortEasyMotionButton:LeftButton'] = custom:format('Group'),
+		['CLICK ConsolePortRaidCursorToggle:LeftButton'] = custom:format('Group'),
+		['CLICK ConsolePortRaidCursorFocus:LeftButton']  = custom:format('Group'),
+		['CLICK ConsolePortRaidCursorTarget:LeftButton'] = custom:format('Group'),
+		['CLICK ConsolePortUtilityToggle:LeftButton']    = custom:format('Ring'),
+		----------------------------
 	}
 end
 --------------------------------------------------------
@@ -421,36 +423,44 @@ function env:GetColorSettings() return {
 	};
 } end
 
-function env:SetRainbowScript(on) 
-	local f = env.bar
+function env:SetRainbowScript(on)
 	if on then
-		local reg, pairs = env.libs.registry, pairs
-		local __cb, __bg, __bl, __wb = CastingBarFrame, f.BG, f.BottomLine, f.WatchBarContainer
 		local t, i, p, c, w, m = 0, 0, 0, 128, 127, 180
-		local hz = (math.pi*2) / m
-		local r, g, b
-		f:SetScript('OnUpdate', function(self, e)
-			t = t + e
+		local hz = (math.pi*2) / m;
+		local r, g, b;
+		return self.bar:SetScript('OnUpdate', function(_, e)
+			t = t + e;
 			if t > 0.1 then
-				i = i + 1
-				r = (math.sin((hz * i) + 0 + p) * w + c) / 255
-				g = (math.sin((hz * i) + 2 + p) * w + c) / 255
-				b = (math.sin((hz * i) + 4 + p) * w + c) / 255
+				i = i + 1;
+				r = (math.sin((hz * i) + 0 + p) * w + c) / 255;
+				g = (math.sin((hz * i) + 2 + p) * w + c) / 255;
+				b = (math.sin((hz * i) + 4 + p) * w + c) / 255;
 				if i > m then
-					i = i - m
+					i = i - m;
 				end
-				__cb:SetStatusBarColor(r, g, b)
-				__wb:SetMainBarColor(r, g, b)
-				__bg:SetGradientAlpha(env:GetColorGradient(r, g, b))
-				__bl:SetVertexColor(r, g, b)
-				for _, rap in pairs(reg) do
-					rap:SetSwipeColor(r, g, b, 1)
-				end
-				t = 0
+				t = 0;
+				self:SetTintColor(r, g, b, 1)
 			end
 		end)
-	else
-		f:SetScript('OnUpdate', nil)
+	end
+	self.bar:SetScript('OnUpdate', nil)
+end
+
+function env:SetTintColor(r, g, b, a) a = a or 1;
+	local color = CreateColor(r, g, b, a)
+	local bar, castBar = env.bar, CastingBarFrame;
+	local buttons = env.libs.registry;
+	if castBar then
+		castBar:SetStatusBarColor(r, g, b)
+	end
+	bar.WatchBarContainer:SetMainBarColor(r, g, b)
+	CPAPI.SetGradient(bar.BG, self:GetColorGradient(r, g, b))
+	bar.BottomLine:SetVertexColor(r, g, b, a)
+	for _, button in pairs(buttons) do
+		button:SetSwipeColor(r, g, b, a)
+	end
+	if C_GamePad.SetLedColor then
+		C_GamePad.SetLedColor(color)
 	end
 end
 

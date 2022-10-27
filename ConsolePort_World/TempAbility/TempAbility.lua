@@ -9,7 +9,7 @@ local TempAbility = Mixin(CPAPI.EventHandler(ConsolePortTempAbilityFrame, {
 	CPAPI.IsRetailVersion and 'UPDATE_EXTRA_ACTIONBAR';
 }), CPFocusPoolMixin)
 
-local EXTRA_AID, VEHICLE_AID = 169, 133;
+local EXTRA_AID, VEHICLE_AID = CPAPI.ExtraActionButtonID, 133;
 
 ---------------------------------------------------------------
 -- Shown ability mixin
@@ -216,3 +216,16 @@ function TempAbility:UpdateItems()
 	self:AdjustHeight()
 	Fader.Toggle(self, 0.1, true)
 end
+
+---------------------------------------------------------------
+-- Add to config
+---------------------------------------------------------------
+ConsolePort:AddVariables({
+	showAbilityBriefing = {db.Data.Bool(true);
+		head = ACCESSIBILITY_LABEL;
+		sort = 3;
+		name = 'Show Ability Briefings';
+		desc = 'Displays a briefing for newly acquired abilities.';
+		note = 'Requires ConsolePort World.';
+	};
+})

@@ -9,7 +9,6 @@ local _, db = ...;
 local Mouse = db:Register('Mouse', CPAPI.CreateEventHandler({'Frame', '$parentMouseHandler', ConsolePort}, {
 	'ACTIONBAR_HIDEGRID';
 	'ACTIONBAR_SHOWGRID';
-	'CURRENT_SPELL_CAST_CHANGED';
 	'GOSSIP_SHOW';
 	'LOOT_OPENED';
 	'PLAYER_STARTED_MOVING';
@@ -83,6 +82,7 @@ end
 local CVar_Camera = db.Data.Cvar('GamePadTurnWithCamera')
 local CVar_Follow = db.Data.Cvar('CameraFollowOnStick')
 local CVar_Sticks = db.Data.Cvar('GamePadCursorAutoDisableSticks')
+local CVar_Target = db.Data.Cvar('GamePadCursorForTargeting')
 local CVar_Center = db.Data.Cvar('GamePadCursorCentering')
 local CVar_LClick = db.Data.Cvar('GamePadCursorLeftClick')
 local CVar_RClick = db.Data.Cvar('GamePadCursorRightClick')
@@ -185,14 +185,6 @@ function Mouse:PLAYER_STARTED_MOVING()
 	if db('mouseHideCursorOnMovement') and self:ShouldClearCursorOnMovement() then
 		self:SetCameraControl()
 	end
-end
-
-function Mouse:PLAYER_MOUNT_DISPLAY_CHANGED()
-	local isMounted = IsMounted()
-	if (isMounted ~= self.mountedState) then
-		CVar_Follow:Set(isMounted and 1 or 0)
-		self.mountedState = isMounted;
-	end 
 end
 
 do local function OnModifierUpdate(self, elapsed)
@@ -374,23 +366,23 @@ function Mouse:OnVariableChanged()
 		self:UnregisterEvent('MODIFIER_STATE_CHANGED')
 	end
 
-	if db('mouseFollowOnStickMounted') then
-		self.mountedState = nil;
-		self:RegisterEvent('PLAYER_MOUNT_DISPLAY_CHANGED')
-		self:PLAYER_MOUNT_DISPLAY_CHANGED()
+	local useCursorReticleTargeting = db('mouseFreeCursorReticle')
+	if useCursorReticleTargeting then
+		self:RegisterEvent('CURRENT_SPELL_CAST_CHANGED')
 	else
-		self:UnregisterEvent('PLAYER_MOUNT_DISPLAY_CHANGED')
+		self:UnregisterEvent('CURRENT_SPELL_CAST_CHANGED')
 	end
+	CVar_Target:Set(useCursorReticleTargeting)
 end
 
 db:RegisterCallback('Settings/mouseHandlingEnabled', Mouse.SetEnabled, Mouse)
 ---------------------------------------------------------------
 -- Variables
 ---------------------------------------------------------------
-db:RegisterCallbacks(Mouse.OnVariableChanged, Mouse, 
-	'Settings/mouseFollowOnStickMounted',
+db:RegisterCallbacks(Mouse.OnVariableChanged, Mouse,
 	'Settings/doubleTapModifier',
-	'Settings/doubleTapTimeout'
+	'Settings/doubleTapTimeout',
+	'Settings/mouseFreeCursorReticle'
 );
 ---------------------------------------------------------------
 Mouse:SetScript('OnGamePadButtonDown', Mouse.OnGamePadButtonDown)

@@ -1,0 +1,22 @@
+lightweight tag 2d5b51744a73d90571c4135dffb70cb6f5b9cf46 0.6.3
+Author:	nezroy <nezroy@gmail.com>
+Date:	Tue Oct 25 09:46:21 2022 -0600
+
+commit 2d5b51744a73d90571c4135dffb70cb6f5b9cf46
+Author: nezroy <nezroy@gmail.com>
+Date:   Tue Oct 25 09:46:21 2022 -0600
+
+    Updates for wotlk and retail pre-patch
+
+commit 58133dcc94fcee5cd93d419ef2efd64a83f80160
+Author: nezroy <nezroy@gmail.com>
+Date:   Thu Jun 9 19:27:02 2022 -0600
+
+    Add Torghast level picker
+
+commit 50acba37ed20fb21189b1acdeaf4136ea4161bfe
+Author: nezroy <nezroy@gmail.com>
+Date:   Thu Jun 9 11:45:35 2022 -0600
+
+    Total refactor
+

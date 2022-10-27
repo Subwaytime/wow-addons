@@ -1,4 +1,4 @@
-## Interface: 90205
+## Interface: 100000
 ## Title: Console Port |cff69ccf0Action Bar|r
 ## Notes: Action bar module
 ## RequiredDeps: ConsolePort
@@ -29,3 +29,4 @@ Components\MenuBar.lua
 Components\WatchBars.xml
 Components\ActionbarPlacer.lua
 Components\BindHelper.lua
+Components\Movers.lua

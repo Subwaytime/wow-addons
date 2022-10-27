@@ -177,13 +177,6 @@ ThreatPlates.SPEC_ROLES = {
   WARRIOR			= { false, false, true },
 }
 
---if not Addon.IS_CLASSIC and not Addon.IS_TBC_CLASSIC then
---  ThreatPlates.SPEC_ROLES.DEATHKNIGHT = { true, false, false }
---  ThreatPlates.SPEC_ROLES.DEMONHUNTER = { false, true }
---  ThreatPlates.SPEC_ROLES.DRUID 			= { false, false, true, false }
---  ThreatPlates.SPEC_ROLES.MONK 				= { true, false, false }
---end
-
 ThreatPlates.FontStyle = {
   NONE = L["None"],
   OUTLINE = L["Outline"],
@@ -251,47 +244,107 @@ ThreatPlates.NAME_ABBREVIATION = {
 -- Totem data - define it one time for the whole addon
 -------------------------------------------------------------------------------
 
-local TOTEM_DATA_RETAIL = {
-  -- Baseline Totems
-  { SpellID = 192058, ID = "B1", GroupColor = "8A2BE2"},		-- Capacitor Totem (ex-Lightning Surge Totem, baseline since 8.0.1)
+  -- { SpellID = 8166,   ID = "T4", GroupColor = "b8d1ff", Icon = "spell_nature_poisoncleansingtotem" }, -- Poison Cleansing Totem
+  -- { SpellID = 25908,  ID = "T5", GroupColor = "b8d1ff", Icon = "ability_shaman_tranquilmindtotem" },	 -- Tranquil Air Totem
+  -- { SpellID = 381930, ID = "T6", GroupColor = "b8d1ff", Icon = "spell_nature_manaregentotem" },	     -- Mana Spring Totem
+  -- { SpellID = 383017, ID = "T8", GroupColor = "b8d1ff", Icon = "ability_shaman_stoneskintotem" },	 -- Stoneskin Totem
+  -- { SpellID = 192222, ID = "E1", GroupColor = "2b76ff", Icon = "spell_shaman_spewlava" }, 	  -- Liquid Magma Totem
+  -- { SpellID = 8512,   ID = "H1", GroupColor = "ffb31f", Icon = "spell_nature_windfury" },	  -- Windfury Totem
+  -- { SpellID = 157153, ID = "R1", GroupColor = "4c9900", Icon = "ability_shaman_condensationtotem" },		-- Cloudburst Totem
+  -- { SpellID = 51485,  ID = "R2", GroupColor = "4c9900", Icon = "spell_nature_stranglevines" },		-- Earthgrab Totem
+  -- { SpellID = 198838, ID = "R3", GroupColor = "4c9900", Icon = "spell_nature_stoneskintotem" },		-- Earthen Wall Totem
+  -- { SpellID = 108280, ID = "R4", GroupColor = "4c9900", Icon = "ability_shaman_healingtide" },		-- Healing Tide Totem
+  -- { SpellID = 98008,  ID = "R5", GroupColor = "4c9900", Icon = "spell_shaman_spiritlink" },		-- Spirit Link Totem
+  -- { SpellID = 207399, ID = "R6", GroupColor = "4c9900", Icon = "spell_nature_reincarnation" },		-- Ancestral Protection Totem
+  -- { SpellID = 16191,  ID = "R7", GroupColor = "4c9900", Icon = "ability_shaman_manatidetotem" }, -- Mana Tide Totem
+  -- --{ SpellID = 343182, ID = "W4", GroupColor = "b8d1ff", Icon = "ability_shaman_manatidetotem" }, -- Mana Tide Totem
+  
+  -- { SpellID = 204331, ID = "P1", GroupColor = "8a2be2", Icon = "spell_nature_wrathofair_totem" },	-- Counterstrike Totem
+  -- { SpellID = 204330, ID = "P2", GroupColor = "8a2be2", Icon = "spell_fire_totemofwrath" },	      -- Skyfury Totem
+  -- { SpellID = 204336, ID = "P4", GroupColor = "8a2be2", Icon = "spell_nature_groundingtotem" },	  -- Grounding Totem
+  -- { SpellID = 355580, ID = "P5", GroupColor = "8a2be2", Icon = "spell_shaman_stormtotem"},	      -- Static Field Totem
+  
+  local TOTEM_DATA_RETAIL = {
+    -- Baseline Totems
+    { SpellID = 2484,   ID = "B1", GroupColor = "8b4513", Icon = "spell_nature_strengthofearthtotem02" },   -- Earthbind Totem
+  
+    -- Totems from talents
+    { SpellID = 8143,   ID = "T1", GroupColor = "b8d1ff", Icon = "spell_nature_tremortotem" },	  -- Tremor Totem
+    { SpellID = 192058, ID = "T2", GroupColor = "b8d1ff", Icon = "spell_nature_brilliance" },		-- Capacitor Totem
+    { SpellID = 192077, ID = "T3", GroupColor = "b8d1ff", Icon = "ability_shaman_windwalktotem" },		-- Wind Rush Totem
+    { SpellID = 8166,   ID = "T4", GroupColor = "b8d1ff", Icon = "spell_nature_poisoncleansingtotem" }, -- Poison Cleansing Totem
+    { SpellID = 25908,  ID = "T5", GroupColor = "b8d1ff", Icon = "ability_shaman_tranquilmindtotem" },	 -- Tranquil Air Totem
+    { SpellID = 381930, ID = "T6", GroupColor = "b8d1ff", Icon = "spell_nature_manaregentotem" },	     -- Mana Spring Totem
+    { SpellID = 5394,	  ID = "T7", GroupColor = "b8d1ff", Icon = "inv_spear_04" },		-- Healing Stream Totem
+    { SpellID = 383017, ID = "T8", GroupColor = "b8d1ff", Icon = "ability_shaman_stoneskintotem" },	 -- Stoneskin Totem
+    -- Elemental
+    { SpellID = 192222, ID = "E1", GroupColor = "2b76ff", Icon = "spell_shaman_spewlava" }, 	  -- Liquid Magma Totem
+    -- Enhancement
+    { SpellID = 8512,   ID = "H1", GroupColor = "ffb31f", Icon = "spell_nature_windfury" },	  -- Windfury Totem
+    -- Restoration
+    { SpellID = 157153, ID = "R1", GroupColor = "4c9900", Icon = "ability_shaman_condensationtotem" },		-- Cloudburst Totem
+    { SpellID = 51485,  ID = "R2", GroupColor = "4c9900", Icon = "spell_nature_stranglevines" },		-- Earthgrab Totem
+    { SpellID = 198838, ID = "R3", GroupColor = "4c9900", Icon = "spell_nature_stoneskintotem" },		-- Earthen Wall Totem
+    { SpellID = 108280, ID = "R4", GroupColor = "4c9900", Icon = "ability_shaman_healingtide" },		-- Healing Tide Totem
+    { SpellID = 98008,  ID = "R5", GroupColor = "4c9900", Icon = "spell_shaman_spiritlink" },		-- Spirit Link Totem
+    { SpellID = 207399, ID = "R6", GroupColor = "4c9900", Icon = "spell_nature_reincarnation" },		-- Ancestral Protection Totem
+    { SpellID = 16191,  ID = "R7", GroupColor = "4c9900", Icon = "ability_shaman_manatidetotem" }, -- Mana Tide Totem
+    --{ SpellID = 343182, ID = "W4", GroupColor = "b8d1ff", Icon = "ability_shaman_manatidetotem" }, -- Mana Tide Totem
+    
+    -- Totems from PVP talents
+    { SpellID = 204331, ID = "P1", GroupColor = "8a2be2", Icon = "spell_nature_wrathofair_totem" },	-- Counterstrike Totem
+    { SpellID = 204330, ID = "P2", GroupColor = "8a2be2", Icon = "spell_fire_totemofwrath" },	      -- Skyfury Totem
+    { SpellID = 204336, ID = "P4", GroupColor = "8a2be2", Icon = "spell_nature_groundingtotem" },	  -- Grounding Totem
+    { SpellID = 355580, ID = "P5", GroupColor = "8a2be2", Icon = "spell_shaman_stormtotem"},	      -- Static Field Totem
+  
+    -- Totems from other sources
+    { SpellID = 324386, ID = "O1", GroupColor = "00ffff", Icon = "ability_bastion_shaman" },	  -- Vesper Totem (Kyrian Covenant)
+    --{ SpellID = 196932, ID = "N6", GroupColor = "4c9900"},		-- Voodoo Totem (removed in patch 8.0.1)
+  
+    -- Totems from Totem Mastery
+    --{ SpellID = 202188, ID = "M1", GroupColor = "b8d1ff"}, 	  -- Resonance Totem
+    --{ SpellID = 210651, ID = "M2", GroupColor = "b8d1ff"},		-- Storm Totem
+    --{ SpellID = 210657, ID = "M3", GroupColor = "b8d1ff"},		-- Ember Totem
+    --{ SpellID = 210660, ID = "M4", GroupColor = "b8d1ff"},		-- Tailwind Totem
+  
+    --{ SpellID = 160161, ID = "S4", GroupColor = "ffb31f"}, 	  -- Earthquake Totem
+  }
 
-  -- Fire totems
-  { SpellID = 192222, ID = "F1", GroupColor = "ff8f8f"}, 	  -- Liquid Magma Totem
-
+local TOTEM_DATA_WRATH_CLASSIC = {
   -- Earth Totems
-  { SpellID = 8143,   ID = "E1", GroupColor = "8B4513"},	  -- Tremor Totem (added in pacth 8.0.1, TP v9.0.9)
+  { SpellID = 8075,   ID = "E1", GroupColor = "8B4513", Ranks = 8, Icon ="spell_nature_earthbindtotem", },	 -- Strength of Earth Totem
+  { SpellID = 8071,   ID = "E2", GroupColor = "8B4513", Ranks = 10, Icon ="spell_nature_stoneskintotem" },	 -- Stoneskin Totem
+  { SpellID = 5730,   ID = "E3", GroupColor = "8B4513", Ranks = 10, Icon ="spell_nature_stoneclawtotem" },	 -- Stoneclaw Totem
+  { SpellID = 2484,    ID = "E4", GroupColor = "8B4513", Icon ="spell_nature_strengthofearthtotem02" },      -- Earthbind Totem
+  { SpellID = 8143,    ID = "E5", GroupColor = "8B4513", Icon ="spell_nature_tremortotem" },	               -- Tremor Totem
+  { SpellID = 2062,    ID = "E6", GroupColor = "8B4513", Icon ="spell_nature_earthelemental_totem" },	       -- Earth Elemental Totem
 
-  -- Totems from spezialization
-  { SpellID = 98008,  ID = "S1", GroupColor = "ffb31f"},		-- Spirit Link Totem
-  { SpellID = 5394,	  ID = "S2", GroupColor = "ffb31f"},		-- Healing Stream Totem
-  { SpellID = 108280, ID = "S3", GroupColor = "ffb31f"},		-- Healing Tide Totem
-  { SpellID = 160161, ID = "S4", GroupColor = "ffb31f"}, 	  -- Earthquake Totem
-  { SpellID = 2484,   ID = "S5",	GroupColor = "ffb31f"},   -- Earthbind Totem (added patch 7.2, TP v8.4.0)
-  { SpellID = 8512,   ID = "S6", GroupColor = "ffb31f", Icon = "spell_nature_windfury" },	  -- Windfury Totem (re-added with 9.0.1)
+  -- Fire Totems
+  { SpellID = 3599, ID = "F1", GroupColor = "ff8f8f", Ranks = 10, Icon ="spell_fire_searingtotem", }, 	    -- Searing Totem
+  { SpellID = 8181, ID = "F2", GroupColor = "ff8f8f", Ranks = 6, Icon ="spell_frostresistancetotem_01" },   -- Frost Resistance Totem
+  -- { SpellID = 1535, ID = "F3", GroupColor = "ff8f8f", Ranks = 7, Icon ="spell_fire_sealoffire" }, 	      -- Fire Nova Totem
+  { SpellID = 8190, ID = "F4", GroupColor = "ff8f8f", Ranks = 7, Icon ="spell_fire_selfdestruct" }, 	      -- Magma Totem
+  { SpellID = 8227, ID = "F5", GroupColor = "ff8f8f", Ranks = 8, Icon ="spell_nature_guardianward" }, 	    -- Flametongue Totem
+  { SpellID = 2894, ID = "F6", GroupColor = "ff8f8f", Icon ="spell_fire_elemental_totem" }, 	              -- Fire Elemental Totem
+  { SpellID = 30706, ID = "F7", GroupColor = "ff8f8f", Ranks = 4, Icon ="spell_fire_totemofwrath" }, 	      -- Totem of Wrath
 
-  -- Totems from Totem Mastery
-  { SpellID = 202188, ID = "M1", GroupColor = "b8d1ff"}, 	  -- Resonance Totem
-  { SpellID = 210651, ID = "M2", GroupColor = "b8d1ff"},		-- Storm Totem
-  { SpellID = 210657, ID = "M3", GroupColor = "b8d1ff"},		-- Ember Totem
-  { SpellID = 210660, ID = "M4", GroupColor = "b8d1ff"},		-- Tailwind Totem
+  -- Air Totems
+  -- { SpellID = 8835,  ID = "A1", GroupColor = "ffb31f", Ranks = 3, Icon ="spell_nature_invisibilitytotem" },	 -- Grace of Air Totem
+  { SpellID = 10595,  ID = "A2", GroupColor = "ffb31f", Ranks = 6, Icon ="spell_nature_natureresistancetotem" }, -- Nature Resistance Totem
+  -- { SpellID = 15107,  ID = "A3", GroupColor = "ffb31f", Ranks = 4, Icon ="spell_nature_earthbind" },		       -- Windwall Totem
+  { SpellID = 8512,  ID = "A4", GroupColor = "ffb31f", Ranks = 5, Icon ="spell_nature_windfury" },	           	 -- Windfury Totem
+  { SpellID = 8177,   ID = "A5", GroupColor = "ffb31f", Icon ="spell_nature_groundingtotem" },          		     -- Grounding Totem
+  { SpellID = 6495,   ID = "A6", GroupColor = "ffb31f", Icon ="spell_nature_removecurse" },		                   -- Sentry Totem
+  -- { SpellID = 25908,  ID = "A7", GroupColor = "ffb31f", Icon ="spell_nature_brilliance" },		                 -- Tranquil Air Totem
+  { SpellID = 3738,  ID = "A8", GroupColor = "ffb31f", Icon ="spell_nature_slowingtotem" },		                   -- Wrath of Air Totem
 
-  -- Totems from talents
-  { SpellID = 157153, ID = "N1", GroupColor = "4c9900"},		-- Cloudburst Totem
-  { SpellID = 51485,  ID = "N2", GroupColor = "4c9900"},		-- Earthgrab Totem
-  { SpellID = 207399, ID = "N4", GroupColor = "4c9900"},		-- Ancestral Protection Totem
-  { SpellID = 192077, ID = "N5", GroupColor = "4c9900"},		-- Wind Rush Totem
-  { SpellID = 198838, ID = "N7", GroupColor = "4c9900"},		-- Earthen Wall Totem
-
-  -- Totems from PVP talents
-  { SpellID = 204331, ID = "P1", GroupColor = "2b76ff"},	  -- Counterstrike Totem
-  { SpellID = 204330, ID = "P2", GroupColor = "2b76ff"},	  -- Skyfury Totem
-  { SpellID = 204336, ID = "P4", GroupColor = "2b76ff"},	  -- Grounding Totem
-  { SpellID = 355580, ID = "P5", GroupColor = "2b76ff", Icon = "spell_shaman_stormtotem"},	  -- Static Field Totem
-
-  -- Totems from other sources
-  { SpellID = 324386, ID = "O1", GroupColor = "00FFFF", Icon = "ability_bastion_shaman" },	  -- Vesper Totem (Kyrian Covenant)
-
-  --{ SpellID = 196932, ID = "N6", GroupColor = "4c9900"},		-- Voodoo Totem (removed in patch 8.0.1)
+  -- Water Totems
+  { SpellID = 5394,  ID = "W1", GroupColor = "b8d1ff", Ranks = 9, Icon ="inv_spear_04" },		              -- Healing Stream Totem
+  { SpellID = 5675,  ID = "W2", GroupColor = "b8d1ff", Ranks = 8, Icon ="spell_nature_manaregentotem" },	-- Mana Spring Totem
+  { SpellID = 8184,  ID = "W3", GroupColor = "b8d1ff", Ranks = 6, Icon ="spell_fireresistancetotem_01" },	-- Fire Resistance Totem
+  { SpellID = 16190,  ID = "W4", GroupColor = "b8d1ff", Icon ="spell_frost_summonwaterelemental" },		    -- Mana Tide Totem
+  { SpellID = 8170,   ID = "W5", GroupColor = "b8d1ff", Icon ="spell_nature_diseasecleansingtotem" },		  -- Cleansing Totem
+  -- { SpellID = 8166,   ID = "W6", GroupColor = "b8d1ff", Icon ="spell_nature_poisoncleansingtotem" },   -- Poison Cleansing Totem
 }
 
 local TOTEM_DATA_BC_CLASSIC = {
@@ -364,8 +417,9 @@ local TOTEM_DATA_CLASSIC = {
   { SpellID = 8166,   ID = "W6", GroupColor = "b8d1ff", },        		  -- Poison Cleansing Totem
 }
 
-Addon.Data.Totems = (Addon.IS_CLASSIC and TOTEM_DATA_CLASSIC) or (Addon.IS_TBC_CLASSIC and TOTEM_DATA_BC_CLASSIC) or TOTEM_DATA_RETAIL
-local TOTEM_RANKS_CLASSIC = { " II", " III", " IV", " V", " VI", " VII", " VIII", " IX" }
+Addon.Data.Totems = (Addon.IS_CLASSIC and TOTEM_DATA_CLASSIC) or (Addon.IS_TBC_CLASSIC and TOTEM_DATA_BC_CLASSIC) or
+                    (Addon.IS_WRATH_CLASSIC and TOTEM_DATA_WRATH_CLASSIC) or TOTEM_DATA_RETAIL
+local TOTEM_RANKS_CLASSIC = { " II", " III", " IV", " V", " VI", " VII", " VIII", " IX", " X" }
 
 function Addon:InitializeTotemInformation()
   for _, totem_data in ipairs(Addon.Data.Totems) do
@@ -373,7 +427,6 @@ function Addon:InitializeTotemInformation()
     if name then
       totem_data.Name = name
       totem_data.Color = RGB(HEX2RGB(totem_data.GroupColor))
-      totem_data.SortKey = totem_data.ID:sub(1, 1) .. name
       totem_data.Style = "normal"
       totem_data.ShowNameplate = true
       totem_data.ShowHPColor = true
@@ -384,7 +437,7 @@ function Addon:InitializeTotemInformation()
       Addon.TOTEMS[name] = totem_data.ID
 
       -- Add totem ranks for WoW Classic
-      if Addon.IS_CLASSIC or Addon.IS_TBC_CLASSIC then
+      if Addon.IS_CLASSIC or Addon.IS_TBC_CLASSIC or Addon.IS_WRATH_CLASSIC then
         for rank = 1, (totem_data.Ranks or 1) - 1  do
           Addon.TOTEMS[name .. TOTEM_RANKS_CLASSIC[rank]] = totem_data.ID
         end
@@ -1214,7 +1267,15 @@ ThreatPlates.DEFAULT_SETTINGS = {
       y_hv = -20,
       Specialization = "DRUID",
       ColorBySpec = {
-        DEATHKNIGHT = {
+        DEATHKNIGHT = Addon.IS_WRATH_CLASSIC and {
+          [1] = RGB(255, 0, 0),
+          [2] = RGB(255, 0, 0),
+          [3] = RGB(0, 255, 255),
+          [4] = RGB(0, 255, 255),
+          [5] = RGB(0, 127, 0),
+          [6] = RGB(0, 127, 0),
+          DeathRune = RGB(204, 25, 255),
+        } or {
           [1] = RGB(255, 0, 255),
           [2] = RGB(255, 0, 255),
           [3] = RGB(255, 0, 255),
@@ -1256,7 +1317,8 @@ ThreatPlates.DEFAULT_SETTINGS = {
           [3] = RGB(0, 255, 0),
           [4] = RGB(255, 105, 0),
           [5] = RGB(255, 0, 0),
-          [6] = RGB(255, 0, 0),
+          [6] = RGB(127, 0, 255),
+          [7] = RGB(127, 0, 255),
           Animacharge = RGB(0, 221, 225),
         },
         WARLOCK = {

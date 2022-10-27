@@ -20,6 +20,7 @@
 
 		[15] =  --[[Badlands]] {
 			{"Dungeon", 41.7, 11.6, L["Uldaman"], L["Dungeon"], 239},
+			{"Dungeon", 41.0, 10.3, L["Uldaman: Legacy of Tyr"], L["Dungeon"], 1197},
 		},
 
 		[16] =  --[[Uldaman]] {
@@ -342,12 +343,15 @@
 
 		[114] =  --[[Borean Tundra]] {
 			{"Dungeon", 27.6, 26.6, L["The Nexus"], L["The Nexus"] .. ", " .. L["The Oculus"] .. ",|n" .. L["The Eye of Eternity"], 281},
+			{"PortalN", 78.9, 53.7, L["Boat to"] .. " " .. L["Moa'ki Harbor"] .. ", " .. L["Dragonblight"]},
 		},
 
 		[115] =  --[[Dragonblight]] {
 			{"Raid", 59.6, 51.1, L["Wyrmrest Temple"], L["The Ruby Sanctum"] .. ", " .. L["The Obsidian Sanctum"], 761},
 			{"Raid", 87.4, 51.1, L["Naxxramas"], L["Raid"], 754},
 			{"Dungeon", 26.2, 49.6, L["Azjol-Nerub"], L["Azjol-Nerub"] .. ", " .. L["The Old Kingdom"], 272},
+			{"PortalN", 49.6, 78.4, L["Boat to"] .. " " .. L["Kamagua"] .. ", " .. L["Howling Fjord"]},
+			{"PortalN", 47.9, 78.7, L["Boat to"] .. " " .. L["Unu'pe"] .. ", " .. L["Borean Tundra"]},
 		},
 
 		[116] =  --[[Grizzly Hills]] {
@@ -356,6 +360,7 @@
 
 		[117] =  --[[Howling Fjord]] {
 			{"Dungeon", 57.3, 46.8, L["Utgarde Keep"], L["Utgarde Keep"] .. ", " .. L["Utgarde Pinnacle"], 285},
+			{"PortalN", 23.5, 57.8, L["Boat to"] .. " " .. L["Moa'ki Harbor"] .. ", " .. L["Dragonblight"]},
 		},
 
 		[118] =  --[[Icecrown]] {
@@ -728,6 +733,30 @@
 			{"TaxiN", 34.9, 45.7, L["Exile's Hollow"], L["Sanctuary"]},
 			{"TaxiN", 61.9, 58.9, L["Synthesis Forge"], L["Pet Crafting"]},
 			{"TaxiN", 68.5, 30.2, L["Protoform Repository"], L["Mount Crafting"]},
+		},
+
+		----------------------------------------------------------------------
+		--	Dragonflight
+		----------------------------------------------------------------------
+
+		[2022] =  --[[The Waking Shores]] {
+			{"Dungeon", 25.5, 56.9, L["Neltharus"], L["Dungeon"], 1199},
+			{"Dungeon", 60.2, 75.6, L["Ruby Life Pools"], L["Dungeon"], 1202},
+		},
+
+		[2023] =  --[[Ohn'ahran Plains]] {
+			{"Dungeon", 61.5, 42.6, L["The Nokhud Offensive"], L["Dungeon"], 1198}, -- Unconfirmed
+		},
+
+		[2024] =  --[[The Azure Span]] {
+			{"Dungeon", 38.9, 64.8, L["The Azure Vault"], L["Dungeon"], 1203},
+			{"Dungeon", 11.5, 48.9, L["Brackenhide Hollow"], L["Dungeon"], 1196},
+		},
+
+		[2025] =  --[[Thaldraszus]] {
+			{"Dungeon", 58.3, 42.3, L["Algeth'ar Academy"], L["Dungeon"], 1201},
+			{"Dungeon", 59.4, 60.8, L["Halls of Infusion"], L["Dungeon"], 1204},
+			{"Raid", 73.0, 55.7, L["Vault of the Incarnates"], L["Raid"], 1200},
 		},
 
 	}

@@ -1,6 +1,6 @@
-## Interface: 90207
+## Interface: 100000
 ## Title: BtWQuests
-## Version: 2.17.0
+## Version: 2.22.0
 ## Notes: 
 ## Author: Breen
 ## SavedVariables: BtWQuests_Characters BtWQuests_AccountSettings

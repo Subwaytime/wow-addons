@@ -37,6 +37,11 @@ local RemoveColorString = NarciAPI.RemoveColorString;
 local GetCachedItemTooltipTextByLine = NarciAPI.GetCachedItemTooltipTextByLine;
 local GetItemTempEnchantRequirement = NarciAPI.GetItemTempEnchantRequirement;
 local GetSocketTypes = GetSocketTypes;
+local C_Item = C_Item;
+
+local GetContainerItemLink = (C_Container and C_Container.GetContainerItemLink) or GetContainerItemLink;    --Dragonflight
+local GetInventoryItemLink = GetInventoryItemLink;
+
 
 local pow = math.pow;
 local floor = math.floor;
@@ -105,7 +110,7 @@ local function SetButtonCrystallic(button, ...)
     button:SetCrystallicData(...);
 end
 
-SetButtonData = SetButtonEnchant;
+local SetButtonData = SetButtonEnchant;
 
 
 local ViewUpdator = {};
@@ -113,6 +118,7 @@ ViewUpdator.buttons = {};
 ViewUpdator.b = 0;
 
 function ViewUpdator:WipeButtonData()
+    self.b = 0;
     for _, button in pairs(self.buttons) do
         button:WipeData();
     end
@@ -240,13 +246,12 @@ function NarciEquipmentListFilterButtonMixin:OnShow()
         self:UpdateState();
     end
     self.FlyUp:Play();
-    self.Label.FadeIn:Play();
 end
 
 function NarciEquipmentListFilterButtonMixin:OnClick()
     NarcissusDB.OnlyShowOwnedUpgradeItem = not NarcissusDB.OnlyShowOwnedUpgradeItem;
     self:UpdateState();
-    MainFrame:UpdateCurrentList();
+    MainFrame:UpdateCurrentList(true);
     ItemButtonHighlight:Hide();
     Tooltip:Hide();
     MainFrame.ItemList:ClearActionButtons();
@@ -631,6 +636,7 @@ function NarciEquipmentOptionMixin:Init()
     end);
     self.ItemList:SetOnResetFunc(function()
         ViewUpdator:WipeButtonData();
+        self.ItemList:SetOffset(0);
         ViewUpdator:UpdateVisibleArea(0, true);
     end);
     self.ItemList:SetOnScrollStartedFunc(function()
@@ -643,6 +649,7 @@ function NarciEquipmentOptionMixin:Init()
             Tooltip:AnchorToButton(focusedButton);
         end
     end);
+    self.ItemList:SetUpdateInterval(0.05);
 
     self.ItemList:SetScript("OnMouseUp", addon.RightClickToReturnHome);
     self.ItemList.ActionBlocker:SetScript("OnMouseUp", addon.RightClickToReturnHome);
@@ -780,9 +787,6 @@ function NarciEquipmentOptionMixin:UpdateCurrentList(resetScroll)
         self:AnimateSize(240, BUTTON_HEIGHT * 4, 0.25);
     end
     self.ItemList.NoItemText:SetShown(numItems == 0);
-    if resetScroll then
-        self.ItemList:SetOffset(0);
-    end
     self.ItemList:Reset();
 end
 
@@ -1090,20 +1094,6 @@ local function ShouldAnchorToBlizzard()
     return NarcissusDB.GemManager and (not Narci_Character:IsShown()) and (not MainFrame:IsShown() or MainFrame.isNarcissusUI)
 end
 
-hooksecurefunc("SocketInventoryItem", function(slot)
-    MainFrame:SetItemPosition(slot);
-    if ShouldAnchorToBlizzard() then
-        MainFrame:SetGemListForBlizzardUI(slot);
-    end
-end)
-
-hooksecurefunc("SocketContainerItem", function(bag, slot)
-    MainFrame:SetItemPosition(bag, slot);
-    if ShouldAnchorToBlizzard() then
-        MainFrame:SetGemListForBlizzardUI(bag, slot);
-    end
-end)
-
 
 
 ----For GamePad----
@@ -1138,3 +1128,24 @@ function NarciEquipmentOptionItemListMixin:ClearActionButtons()
     NarciEquipmentEnchantActionButton:Clear();
     self.GemActionButton:Clear();
 end
+
+
+
+
+local function SocketInventoryItem_Callback(slot)
+    MainFrame:SetItemPosition(slot);
+    if ShouldAnchorToBlizzard() then
+        MainFrame:SetGemListForBlizzardUI(slot);
+    end
+end
+
+addon.TransitionAPI.HookSocketInventoryItem(SocketInventoryItem_Callback);
+
+local function SocketContainerItem_Callback(bag, slot)
+    MainFrame:SetItemPosition(bag, slot);
+    if ShouldAnchorToBlizzard() then
+        MainFrame:SetGemListForBlizzardUI(bag, slot);
+    end
+end
+
+addon.TransitionAPI.HookSocketContainerItem(SocketContainerItem_Callback);

@@ -14,12 +14,9 @@ function BindingsManager:OnActiveDeviceChanged(device)
 end
 
 function BindingsManager:Validate()
-	if not self.snapshot then
-		return true -- panel was never opened
-	end
-	if not db.table.compare(self.snapshot, db.Gamepad:GetBindings()) then
-		self.snapshot = nil;
-		return false, self.SaveBindings;
+	if self.snapshot and not db.table.compare(self.snapshot, db.Gamepad:GetBindings()) then
+		self:WipeSnapshot()
+		return false, self.SaveBindings, self.ResetBindingsOnClose;
 	end
 	return true
 end
@@ -39,6 +36,15 @@ function BindingsManager:SaveBindings()
 		CPAPI.Log('Your gamepad bindings have been saved.')
 	end
 	return set, self:SnapshotBindings();
+end
+
+function BindingsManager:ResetBindings()
+	self:LoadBindings(GetCurrentBindingSet())
+end
+
+function BindingsManager:ResetBindingsOnClose()
+	self:ResetBindings()
+	self:WipeSnapshot()
 end
 
 function BindingsManager:SnapshotBindings()
@@ -116,7 +122,7 @@ function BindingsManager:OnFirstShow()
 				_OnLoad = function(self)
 					local r, g, b = CPAPI.GetWebColor(CPAPI.GetClassFile()):GetRGB()
 					self:SetBackdropBorderColor(0.15, 0.15, 0.15, 1)
-					self.Center:SetGradientAlpha('HORIZONTAL', r*2, g*2, b*2, 1, r/1.25, g/1.25, b/1.25, 1)
+					CPAPI.SetGradient(self.Center, 'HORIZONTAL', r*2, g*2, b*2, 1, r/1.25, g/1.25, b/1.25, 1)
 					local normal = self:GetNormalTexture()
 					local hilite = self:GetHighlightTexture()
 					normal:ClearAllPoints()
@@ -270,7 +276,7 @@ function BindingsManager:OnFirstShow()
 								self:OnChecked(self:GetChecked())
 							end;
 							OnAccept = function()
-								env.Bindings:LoadBindings(GetCurrentBindingSet())
+								env.Bindings:ResetBindings()
 							end;
 						})
 					end;
@@ -406,14 +412,16 @@ function BindingsManager:OnFirstShow()
 						_Size = {260, 50};
 						_Hide = true;
 						_OnShow = function(self)
-							env.Config:PauseCatcher()
-							self:EnableGamePadButton(true)
+							env.Config:CatchAll(function(self, ...)
+								if self:GetParent():GetParent():OnButtonCaught(...) then
+									self:Hide()
+								end
+							end, self)
 							self:GetParent().Change:Hide()
 							self.timeUntilCancel = 5;
 						end;
 						_OnHide = function(self)
-							env.Config:ResumeCatcher()
-							self:EnableGamePadButton(false)
+							env.Config:SetDefaultClosures()
 							self:GetParent().Change:Show()
 							self:GetParent().Help:SetDefaultHelp()
 							self.timeUntilCancel = 5;
@@ -423,11 +431,6 @@ function BindingsManager:OnFirstShow()
 							self:SetText(('%s (%d)'):format(CANCEL, ceil(self.timeUntilCancel)))
 							if self.timeUntilCancel <= 0 then
 								self.timeUntilCancel = 5;
-								self:Hide()
-							end
-						end;
-						_OnGamePadButtonUp = function(self, ...)
-							if self:GetParent():GetParent():OnButtonCaught(...) then
 								self:Hide()
 							end
 						end;

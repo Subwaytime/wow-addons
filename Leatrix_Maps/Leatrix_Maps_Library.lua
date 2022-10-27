@@ -8,6 +8,9 @@
 -- 14: LibDBIcon: (?s)-- LibDBIconStart\R?\K.*?(?=-- LibDBIconEnd)
 -- 15: Dropdown menu taint fixes
 
+local LeaMapsLC = {}
+local gameversion, gamebuild, gamedate, gametocversion = GetBuildInfo()
+
 ----------------------------------------------------------------------
 -- L11: LibDBIcon: LibStub
 ----------------------------------------------------------------------
@@ -889,7 +892,7 @@ LeaLibDBIcon()
 -- L15: Dropdown menu taint fixes
 ----------------------------------------------------------------------
 
-do
+if LeaMapsNotUsingThisRightNowInDragonflight then
 
 	-- UIDropDownMenu displayMode taints dropdown initialization
 	-- https://www.townlong-yak.com/bugs/Kjq4hm-DisplayModeTaint

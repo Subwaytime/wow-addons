@@ -1,5 +1,5 @@
-## Interface: 90205
-## Version: 1.15.2
+## Interface: 100000
+## Version: @project-version@
 ## Title: Immersion ExtraFade
 ## Author: LudiusMaximus
 ## Notes: Improves Immersion's UI fading while talking to NPCs.

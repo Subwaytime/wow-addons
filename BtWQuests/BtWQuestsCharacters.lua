@@ -18,6 +18,15 @@ local IsQuestFlaggedCompleted = C_QuestLog and C_QuestLog.IsQuestFlaggedComplete
 
 local BtWQuestsCharactersMap = {} -- Map from name-realm to Character Mixin
 
+local ClassMap = {}
+for classID=1,GetNumClasses() do
+    local info = C_CreatureInfo.GetClassInfo(classID)
+    if info then
+        ClassMap[info.classFile] = info
+        ClassMap[info.classID] = info
+    end
+end
+
 BtWQuestsCharactersCharacterMixin = {}
 function BtWQuestsCharactersCharacterMixin:IsPartySync()
     return false
@@ -48,7 +57,7 @@ function BtWQuestsCharactersCharacterMixin:GetClass()
     return self.t.class
 end
 function BtWQuestsCharactersCharacterMixin:GetClassString()
-    return BTWQUESTS_CLASS_STRINGS[self.t.class]
+    return ClassMap[self.t.class].classFile
 end
 function BtWQuestsCharactersCharacterMixin:GetLevel()
     return self.t.level
@@ -489,8 +498,13 @@ function BtWQuestsCharactersPlayerMixin:GetSex()
 end
 if C_TradeSkillUI then
     function BtWQuestsCharactersPlayerMixin:GetSkillInfo(skillID)
-        local _, level, maxLevel = C_TradeSkillUI.GetTradeSkillLineInfoByID(skillID)
-        return level, maxLevel
+        if C_TradeSkillUI.GetProfessionInfoBySkillLineID then
+            local result = C_TradeSkillUI.GetProfessionInfoBySkillLineID(skillID)
+            return result and result.skillLevel or 0, result and result.maxSkillLevel or 0
+        else
+            local _, level, maxLevel = C_TradeSkillUI.GetTradeSkillLineInfoByID(skillID)
+            return level, maxLevel
+        end
     end
 end
 function BtWQuestsCharactersPlayerMixin:GetFactionInfoByID(faction)
@@ -555,25 +569,27 @@ local itemXpCache = {};
 local gemXpByID = {
     [153714] = 0.05,
 };
-xpTooltip:SetScript("OnTooltipSetItem", function (self)
-    local itemName, itemLink = self:GetItem();
-
-    for i=1,15 do
-        local text = _G[self:GetName().."TextLeft"..i];
-        if text and text:IsShown() then
-            local text = text:GetText();
-            local percent = string.match(text, "^Equip: Experience gained is increased by ([%d]+)%%.$");
-            if not percent then
-                percent = string.match(text, "^Equip: Experience gained from killing monsters and completing quests increased by ([%d]+)%%.$");
-            end
-
-            if percent then
-                itemXpCache[itemLink] = tonumber(percent) * 0.01;
-                break
+if not TooltipDataProcessor or not TooltipDataProcessor.AddTooltipPostCall then
+    xpTooltip:SetScript("OnTooltipSetItem", function (self)
+        local itemName, itemLink = self:GetItem();
+    
+        for i=1,15 do
+            local text = _G[self:GetName().."TextLeft"..i];
+            if text and text:IsShown() then
+                local text = text:GetText();
+                local percent = string.match(text, "^Equip: Experience gained is increased by ([%d]+)%%.$");
+                if not percent then
+                    percent = string.match(text, "^Equip: Experience gained from killing monsters and completing quests increased by ([%d]+)%%.$");
+                end
+    
+                if percent then
+                    itemXpCache[itemLink] = tonumber(percent) * 0.01;
+                    break
+                end
             end
         end
-    end
-end)
+    end)
+end
 local function PlayerXPModifier()
     local modifier = 0;
     if GetItemGem then
@@ -944,7 +960,13 @@ local function GetSkills(tbl)
     wipe(tbl);
     local skillIDs = C_TradeSkillUI.GetAllProfessionTradeSkillLines()
     for _,skillID in ipairs(skillIDs) do
-        local _, level, maxLevel = C_TradeSkillUI.GetTradeSkillLineInfoByID(skillID)
+        local _, level, maxLevel
+        if C_TradeSkillUI.GetProfessionInfoBySkillLineID then
+            local result = C_TradeSkillUI.GetProfessionInfoBySkillLineID(skillID)
+            level, maxLevel = result and result.skillLevel or 0, result and result.maxSkillLevel or 0
+        else
+            _, level, maxLevel = C_TradeSkillUI.GetTradeSkillLineInfoByID(skillID)
+        end
         if level ~= 0 then
             local data = temp[skillID] or {};
             if data[1] ~= nil then

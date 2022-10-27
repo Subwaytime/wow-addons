@@ -3,7 +3,7 @@ local _, db = ...; CPAPI = {};
 -- General 
 ---------------------------------------------------------------
 -- return true or nil (nil for dynamic table insertions)
-CPAPI.IsClassicVersion    = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC or nil;
+CPAPI.IsClassicVersion    = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC or nil;
 CPAPI.IsRetailVersion     = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE or nil;
 CPAPI.IsClassicEraVersion = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC or nil;
 
@@ -67,6 +67,15 @@ function CPAPI.GetAverageItemLevel(...)
 	end
 	return MAX_PLAYER_LEVEL
 end
+
+---------------------------------------------------------------
+-- Action button info
+---------------------------------------------------------------
+CPAPI.ExtraActionButtonID = ExtraActionButton1 and ExtraActionButton1.action or
+	CPAPI.IsRetailVersion and 217 or 169;
+
+CPAPI.ActionTypeRelease = CPAPI.IsRetailVersion and 'typerelease' or 'type';
+CPAPI.ActionTypePress   = 'type';
 
 ---------------------------------------------------------------
 -- Internal wrappers
@@ -144,14 +153,39 @@ CPAPI.OpenStackSplitFrame = OpenStackSplitFrame or function(...)
 	return StackSplitFrame:OpenStackSplitFrame(...)
 end
 
+CPAPI.GetContainerItemInfo = function(...)
+	if C_Container and C_Container.GetContainerItemInfo then
+		return C_Container.GetContainerItemInfo(...) or {};
+	end
+	local icon, itemCount, locked, quality, readable, lootable, itemLink, isFiltered, noValue, itemID, isBound
+		= GetContainerItemInfo(...)
+	return {
+		hasLoot = lootable;
+		hasNoValue = noValue;
+		hyperlink = itemLink;
+		iconFileID = icon;
+		isBound = isBound;
+		isFiltered = isFiltered;
+		isLocked = locked;
+		isReadable = readable;
+		itemID = itemID;
+		quality = quality;
+		stackCount = itemCount;
+	}
+end
+
 ---------------------------------------------------------------
 -- Classic API wrappers
 ---------------------------------------------------------------
+do
 local function nopz() return 0  end;
 local function nopt() return {} end;
 
 CPAPI.GetActiveZoneAbilities = C_ZoneAbility and C_ZoneAbility.GetActiveAbilities or nopt;
 CPAPI.GetBonusBarIndexForSlot = C_ActionBar.GetBonusBarIndexForSlot or nop;
+CPAPI.GetContainerItemQuestInfo = C_Container and C_Container.GetContainerItemQuestInfo or GetContainerItemQuestInfo;
+CPAPI.GetContainerNumFreeSlots = C_Container and C_Container.GetContainerNumFreeSlots or GetContainerNumFreeSlots;
+CPAPI.GetContainerNumSlots = C_Container and C_Container.GetContainerNumSlots or GetContainerNumSlots;
 CPAPI.GetFriendshipReputation = GetFriendshipReputation or nop;
 CPAPI.GetMountFromSpell = C_MountJournal and C_MountJournal.GetMountFromSpell or nop;
 CPAPI.GetMountInfoByID = C_MountJournal and C_MountJournal.GetMountInfoByID or nop;
@@ -163,4 +197,16 @@ CPAPI.IsPartyLFG = IsPartyLFG or nop;
 CPAPI.IsSpellOverlayed = IsSpellOverlayed or nop;
 CPAPI.IsXPUserDisabled = IsXPUserDisabled or nop;
 CPAPI.LeaveParty = C_PartyInfo and C_PartyInfo.LeaveParty or LeaveParty;
+CPAPI.PickupContainerItem = C_Container and C_Container.PickupContainerItem or PickupContainerItem;
 CPAPI.PutActionInSlot = C_ActionBar and C_ActionBar.PutActionInSlot or PlaceAction;
+CPAPI.UseContainerItem = C_Container and C_Container.UseContainerItem or UseContainerItem;
+
+end
+
+---------------------------------------------------------------
+-- Widget wrappers
+---------------------------------------------------------------
+
+function CPAPI.SetGradient(...)
+	return LibStub('Carpenter'):SetGradient(...)
+end

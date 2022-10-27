@@ -11,7 +11,7 @@ function Device:OnClick()
 	device:ApplyPresetVars()
 	db('Cursor'):SetCurrentNode(env.Splash.Wizard.Child.Continue, true)
 	CPAPI.Popup('ConsolePort_Reset_Keybindings', {
-		text = CONFIRM_RESET_KEYBINDINGS;
+		text = ('%s\n\n%s'):format(CONFIRM_RESET_KEYBINDINGS, L'This only affects gamepad bindings.');
 		button1 = OKAY;
 		button2 = CANCEL;
 		timeout = 0;
@@ -110,7 +110,7 @@ function Devices:UpdateDevices()
 	for i, device in ipairs(usableDevices) do
 		device:SetSiblings(usableDevices)
 		if (i % DEVICE_PER_ROW == 1) then
-			device:SetPoint('TOPLEFT', 0, containerHeight)
+			device:SetPoint('TOPLEFT', 0, -containerHeight)
 		else
 			if (i % DEVICE_PER_ROW == 0) then
 				containerHeight = containerHeight + DEVICE_HEIGHT + FIXED_OFFSET;
