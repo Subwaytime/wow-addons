@@ -1,28 +1,10 @@
-lightweight tag e0974bd4e7d65130b16e78fca07eb90dea257612 4.0.10-release
-Author:	GitHub <noreply@github.com>
-Date:	Wed Oct 19 19:44:56 2022 +0100
+lightweight tag 388439776e653b8fc650636835b914a888e6cefa 4.0.15-release
+Author:	pereira-a <pereirasmandre@gmail.com>
+Date:	Mon Oct 31 13:52:00 2022 +0000
 
-commit e0974bd4e7d65130b16e78fca07eb90dea257612
+commit 388439776e653b8fc650636835b914a888e6cefa
 Author: pereira-a <pereirasmandre@gmail.com>
-Date:   Wed Oct 19 19:44:56 2022 +0100
+Date:   Mon Oct 31 13:52:00 2022 +0000
 
-    update addon version
-
-commit 6a118c004bf884283f26648221cefcfad5bfa8c0
-Author: Gerrit Alex <admin@gerritalex.de>
-Date:   Wed Oct 19 01:24:13 2022 +0200
-
-    update toc to 10.0
-
-commit 6a118c004bf884283f26648221cefcfad5bfa8c0
-Author: Gerrit Alex <admin@gerritalex.de>
-Date:   Wed Oct 19 01:24:13 2022 +0200
-
-    update toc to 10.0
-
-commit 0de72b37a5ce9c2f0a3c1fece183042d34ae372f
-Author: Gerrit Alex <admin@gerritalex.de>
-Date:   Wed Oct 19 01:20:11 2022 +0200
-
-    remove Anchor.relativeFrom
+    change icon drag location formula
 

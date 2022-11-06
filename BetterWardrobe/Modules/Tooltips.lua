@@ -8,7 +8,6 @@ local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local LAT = LibStub("LibArmorToken-1.0")
 local LAI = LibStub("LibAppropriateItems-1.0")
 
-local IsDressableItem = IsDressableItem
 local GetScreenWidth = GetScreenWidth
 local GetScreenHeight = GetScreenHeight
 
@@ -70,12 +69,18 @@ function addon.Init:BuildTooltips()
 		self:Hide()
 	end)
 
+--Change in DF
+	--TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(self)
+		--local _, itemLink = self:GetItem()
+		--tooltip:ShowTooltip(itemLink)
+	--end)
+	--GameTooltip:HookScript("OnHide", tooltip.HideItem)
+
 	GameTooltip:HookScript("OnTooltipSetItem", function(self)
 		local _, itemLink = self:GetItem()
 		tooltip:ShowTooltip(itemLink)
 	end)
 	GameTooltip:HookScript("OnHide", tooltip.HideItem)
-
 
 	-- hacks for tooltip where GameTooltip:GetItem() returns a broken link
 	hooksecurefunc(GameTooltip, "SetQuestItem", function(self, itemType, index)
@@ -96,11 +101,10 @@ function addon.Init:BuildTooltips()
 	-- end)
 
 
-	hooksecurefunc(GameTooltip, "SetRecipeReagentItem", function(self, recipeID, reagentIndex)
-		tooltip:ShowTooltip(C_TradeSkillUI.GetRecipeReagentItemLink(recipeID, reagentIndex))
-		GameTooltip:Show()
-	end)
-
+	--hooksecurefunc(GameTooltip, "SetRecipeReagentItem", function(self, recipeID, reagentIndex)
+		--tooltip:ShowTooltip(C_TradeSkillUI.GetRecipeReagentItemLink(recipeID, reagentIndex))
+		--GameTooltip:Show()
+	--end)
 
 
 
@@ -238,7 +242,7 @@ function tooltip:ShowTooltip(itemLink)
 	if not itemLink or self.ShowTooltips then return end
 
 	local itemID, _, _, slot = GetItemInfoInstant(itemLink)
-	local dressable = itemID and IsDressableItem(itemID)
+	local dressable = itemID and C_Item.IsDressableItemByID(itemID)
 	local token = LAT:ItemIsToken(itemID)
 
 	--No need to update tooltips if item is not token or a mog
@@ -374,7 +378,7 @@ function tooltip:ShowTooltip(itemLink)
 				shownSetNames[setInfo.name] = true
 
 				if addon.Profile.ShowDetailedListTooltips then
-					local sources = C_TransmogSets.GetSetSources(setID)
+					local sources = addon.GetSetSources(setID)
 					for sourceID, collected in pairs(sources) do
 						local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
 						if collected and not addon.Profile.ShowMissingDetailedListTooltips then
@@ -437,7 +441,7 @@ function tooltip:ShowTooltip(itemLink)
 end
 
 function tooltip:ShowPreview(itemLink)
-   if not itemLink or not  IsDressableItem(itemLink) then 
+   if not itemLink or not  C_Item.IsDressableItemByID(itemLink) then 
 			self:Hide()
 			return 
 		end
@@ -446,9 +450,9 @@ function tooltip:ShowPreview(itemLink)
 	if self.item ~= itemLink then
 		self.item = itemLink
 		local slot = select(9, GetItemInfo(itemID))
-		------if (not addon.Profile.TooltipPreview_MogOnly or select(3, C_Transmog.GetItemInfo(itemID))) and addon.Globals.tooltip_slots[slot] and IsDressableItem(itemLink) then
+		------if (not addon.Profile.TooltipPreview_MogOnly or select(3, C_Transmog.GetItemInfo(itemID))) and addon.Globals.tooltip_slots[slot] and C_Item.IsDressableItemByID(itemLink) then
 
-		if addon.Globals.tooltip_slots[slot] and IsDressableItem(itemLink) then
+		if addon.Globals.tooltip_slots[slot] and C_Item.IsDressableItemByID(itemLink) then
 			local cameraID, itemCamera
 			if addon.Profile.TooltipPreview_ZoomItem or addon.Profile.TooltipPreview_ZoomWeapon then
 				cameraID, itemCamera = addon.Camera:GetCameraID(itemLink, addon.Profile.TooltipPreview_CustomModel and addon.Profile.TooltipPreview_CustomRace, addon.Profile.TooltipPreview_CustomModel and addon.Profile.TooltipPreview_CustomGender)

@@ -1,14 +1,26 @@
+--[[
+Created by Slothpala 
+--]]
 HealthBarColor = LibStub("AceAddon-3.0"):NewAddon("HealthBarColor", "AceConsole-3.0", "AceEvent-3.0")
 local AC = LibStub("AceConfig-3.0")
 local ACD = LibStub("AceConfigDialog-3.0")
+local media = LibStub("LibSharedMedia-3.0")
+HealthBarColor:SetDefaultModuleLibraries("AceConsole-3.0", "AceEvent-3.0")
+HealthBarColor:SetDefaultModuleState(false)
 local ULx,ULy,LLx,LLy,URx,URy,LRx,LRy = TargetFrame.TargetFrameContainer.Portrait:GetTexCoord()
 local useclassIcons = false
+local reactionColor = {
+    enemy = {r=1,g=0,b=0}, --enemy
+    neutral = {r=1,g=1,b=0}, --neutral
+    friendly ={r=0,g=1,b=0}, --friendly
+}
 
 local defaults = {
     profile = {
         Player = {
             classcolor = true,
             color =  {r = 0, g = 0, b = 0},
+            unitreaction = false,
         },
         Target = {
             classcolor = false,
@@ -43,7 +55,12 @@ local defaults = {
             color =  {r = 0, g = 0.9, b = 0.3},
         },
         ClassIcons = {
-            useclassicons = true,
+            useclassicons = false,
+            unitreaction = false,
+        },
+        Textures = {
+            custom = false,
+            statusbar = "Solid",
         },
     },
 }
@@ -52,7 +69,15 @@ local options = {
     name = "HealthBarColor",
     handler = HealthBarColor,
     type = "group",
+    childGroups = "tab",
     args = {
+        ColorSettings = {
+            order = 1,
+            name = "Color Settings",
+            type = "group",
+            args = {
+        
+            
         Player = {
             order = 1,
             name = "Player Frame",
@@ -89,6 +114,7 @@ local options = {
                     get = "GetClassColor",
                     set = "SetClassColor",
                     disabled = false,
+                    width = 0.8,
                 },
                 targetsclasscolor = {
                     order = 1,
@@ -112,6 +138,7 @@ local options = {
                     get = "GetColor",
                     set = "SetColor",
                     hidden = true,
+                    width = 0.6,
                 },
             },
         },
@@ -128,6 +155,7 @@ local options = {
                     get = "GetClassColor",
                     set = "SetClassColor",
                     disabled = false,
+                    width = 0.8,
                 },
                 targetsclasscolor = {
                     order = 1,
@@ -151,6 +179,7 @@ local options = {
                     get = "GetColor",
                     set = "SetColor",
                     hidden = true,
+                    width = 0.6,
                 },
             },
         },
@@ -167,6 +196,7 @@ local options = {
                     get = "GetClassColor",
                     set = "SetClassColor",
                     disabled = false,
+                    width = 0.8,
                 },
                 targetsclasscolor = {
                     order = 1,
@@ -190,6 +220,7 @@ local options = {
                     get = "GetColor",
                     set = "SetColor",
                     hidden = true,
+                    width = 0.6,
                 },
             },
         },
@@ -206,6 +237,7 @@ local options = {
                     get = "GetClassColor",
                     set = "SetClassColor",
                     disabled = false,
+                    width = 0.8,
                 },
                 targetsclasscolor = {
                     order = 1,
@@ -229,6 +261,7 @@ local options = {
                     get = "GetColor",
                     set = "SetColor",
                     hidden = true,
+                    width = 0.6,
                 },
             },
         },
@@ -280,26 +313,65 @@ local options = {
         },
         ClassIcons = {
             order = 0,
-            name = "Class Icons",
+            name = "Config",
             desc = "ignores your profile and is account wide",
             type = "group",
             inline = true,
             args = {
                 useclassicons = {
-                    name = "use class icons instead of portraits",
-                    desc = "This will reload your UI",
+                    order = 1,
+                    name = "Class Icons",
+                    desc = "Use Class Icons Instead of Portraits. This will reload your UI",
                     type = "execute",
-                    width = 1.7,
+                    width = 1,
                     confirm = true,
                     func = function() HealthBarColor:ClassIconsProfile(true); ReloadUI() end,
                 },
                 dontuseclassicons = {
-                    name = "use portraits instead of class icons",
-                    desc = "This will reload your UI",
+                    order = 2,
+                    name = "Use Portraits",
+                    desc = "Use Portraits. This will reload your UI",
                     type = "execute",
-                    width = 1.7,
+                    width = 1,
                     confirm = true,
                     func = function() HealthBarColor:ClassIconsProfile(false); ReloadUI() end,
+                },
+                unitreaction = {
+                    order = 3,
+                    name = "NPC color based on hostility",
+                    desc = "this will ignore your custom color settings and override them based on units reaction to you e.g hostile = red",
+                    type = "toggle",
+                    get = "GetReaction",
+                    set = "SetReaction",
+                    disabled = false,
+                },
+            },
+        },
+            
+        },
+        },
+        Textures = {
+            order = 2,
+            name = "Textures",
+            type = "group",
+            args = {
+                custom = {
+                    order = 1,
+                    name = "Use custom texture",
+                    desc = "if you uncheck this /reload to get back to the original texture",
+                    type = "toggle",
+                    get = "Get",
+                    set = "Set",
+                },
+                statusbar = {
+                    order = 2,
+                    type = "select",
+                    dialogControl = "LSM30_Statusbar", 
+                    name = 'Health Bar Texture', 
+                    values = media:HashTable("statusbar"), 
+                    get = "Get",
+                    set = "Set",
+                    disabled = function() return not HealthBarColor.db.profile.Textures.custom end,
                 },
             },
         },
@@ -335,6 +407,14 @@ function HealthBarColor:LoadConfig()
     if self.db.profile.ClassIcons.useclassicons then
         useclassIcons = true
     end
+    if self.db.profile.Textures.custom then
+        HealthBarColor:EnableModule("Textures")
+        local Textures = HealthBarColor:GetModule("Textures")
+        Textures:ApplyAll()
+        if IsAddOnLoaded("BiggerHealthBar") then
+            PlayerFrameHealthBar:SetStatusBarTexture(media:Fetch("statusbar", HealthBarColor.db.profile.Textures.statusbar)) 
+        end
+    end
 end
 function HealthBarColor:ClassIconsProfile(bool)
     if bool then self.db.profile.ClassIcons.useclassicons = true
@@ -363,9 +443,9 @@ end
 function HealthBarColor:GetClassColor(info)
     HealthBarColor:LoadConfig()
     if self.db.profile[info[#info-1]].classcolor or self.db.profile[info[#info-1]].targetsclasscolor then
-        options.args[info[#info-1]].args.color.disabled = true
+        options.args.ColorSettings.args[info[#info-1]].args.color.disabled = true
     else
-        options.args[info[#info-1]].args.color.disabled = false
+        options.args.ColorSettings.args[info[#info-1]].args.color.disabled = false
     end
     return self.db.profile[info[#info-1]].classcolor
 end
@@ -381,16 +461,33 @@ end
 function HealthBarColor:GetTargetsClassColor(info)
     HealthBarColor:LoadConfig()
     if self.db.profile[info[#info-1]].targetsclasscolor then 
-        options.args[info[#info-1]].args.color.disabled = true
-        options.args[info[#info-1]].args.npccolor.hidden = false
-        options.args[info[#info-1]].args.classcolor.disabled = true
+        options.args.ColorSettings.args[info[#info-1]].args.color.disabled = true
+        options.args.ColorSettings.args[info[#info-1]].args.npccolor.hidden = false
+        options.args.ColorSettings.args[info[#info-1]].args.classcolor.disabled = true
     else 
-        options.args[info[#info-1]].args.color.disabled = false
-        options.args[info[#info-1]].args.npccolor.hidden = true
-        options.args[info[#info-1]].args.classcolor.disabled = false
+        options.args.ColorSettings.args[info[#info-1]].args.color.disabled = false
+        options.args.ColorSettings.args[info[#info-1]].args.npccolor.hidden = true
+        options.args.ColorSettings.args[info[#info-1]].args.classcolor.disabled = false
     end
     return self.db.profile[info[#info-1]].targetsclasscolor
 end
+--added stuff
+function HealthBarColor:GetReaction()
+    HealthBarColor:LoadConfig()
+    return self.db.profile.ClassIcons.unitreaction
+end
+function HealthBarColor:SetReaction(info, value)
+    self.db.profile.ClassIcons.unitreaction = value
+end
+--simple toggle check
+function HealthBarColor:Get(info)
+    HealthBarColor:LoadConfig()
+    return self.db.profile[info[#info-1]][info[#info]]
+end
+function HealthBarColor:Set(info, value)
+    self.db.profile[info[#info-1]][info[#info]] = value
+end
+
 
 
 --color functions
@@ -409,24 +506,61 @@ end
 --target
 function HealthBarColor:TargetColor()
     if self.db.profile.Target.targetsclasscolor then
-        HealthBarColor:TargetEvent()
         if UnitIsPlayer("target") then
-        local _, englishClass = UnitClass("target");
-        local r, g, b = GetClassColor(englishClass)
-        TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarDesaturated(true)
-        TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarColor(r, g, b)
+            local _, englishClass = UnitClass("target");
+            local r, g, b = GetClassColor(englishClass)
+            TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarDesaturated(true)
+            TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarColor(r, g, b)
+        elseif self.db.profile.ClassIcons.unitreaction then
+            local reaction = UnitReaction("player", "target");
+            local color = {r = 0,g = 0,b = 0} 
+            if reaction == 2 then 
+                color.r = reactionColor.enemy.r
+                color.g = reactionColor.enemy.g
+                color.b = reactionColor.enemy.b
+            elseif reaction == 4 then 
+                color.r = reactionColor.neutral.r
+                color.g = reactionColor.neutral.g
+                color.b = reactionColor.neutral.b
+            elseif reaction == 5 then 
+                color.r = reactionColor.friendly.r
+                color.g = reactionColor.friendly.g
+                color.b = reactionColor.friendly.b
+            end
+            TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarDesaturated(true)
+            TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarColor(color.r,color.g,color.b)
         else
-        TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarDesaturated(true)
-        TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarColor(self.db.profile.Target.npccolor.r, self.db.profile.Target.npccolor.g, self.db.profile.Target.npccolor.b)
+            TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarDesaturated(true)
+            TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarColor(self.db.profile.Target.npccolor.r, self.db.profile.Target.npccolor.g, self.db.profile.Target.npccolor.b)
         end
     elseif self.db.profile.Target.classcolor then
-        local _, englishClass = UnitClass("player");
-        local r, g, b = GetClassColor(englishClass)
-        TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarDesaturated(true)
-        TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarColor(r, g, b)
+            local _, englishClass = UnitClass("player");
+            local r, g, b = GetClassColor(englishClass)
+            TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarDesaturated(true)
+            TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarColor(r, g, b)
     else
-    TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarDesaturated(true)
-    TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarColor(self.db.profile.Target.color.r, self.db.profile.Target.color.g, self.db.profile.Target.color.b)
+        if self.db.profile.ClassIcons.unitreaction then
+            local reaction = UnitReaction("player", "target");
+            local color =  {r = 0,g = 0,b = 0} 
+            if reaction == 2 then 
+                color.r = reactionColor.enemy.r
+                color.g = reactionColor.enemy.g
+                color.b = reactionColor.enemy.b
+            elseif reaction == 4 then 
+                color.r = reactionColor.neutral.r
+                color.g = reactionColor.neutral.g
+                color.b = reactionColor.neutral.b
+            elseif reaction == 5 then 
+                color.r = reactionColor.friendly.r
+                color.g = reactionColor.friendly.g
+                color.b = reactionColor.friendly.b
+            end
+            TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarDesaturated(true)
+            TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarColor(color.r,color.g,color.b)
+        else
+            TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarDesaturated(true)
+            TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarColor(self.db.profile.Target.color.r, self.db.profile.Target.color.g, self.db.profile.Target.color.b)
+        end
     end
 end
 --target of target 
@@ -438,8 +572,28 @@ function HealthBarColor:TargetofTargetColor(unit)
         TargetFrameToT.HealthBar:SetStatusBarDesaturated(true)
         TargetFrameToT.HealthBar:SetStatusBarColor(r, g, b)
         else
-        TargetFrameToT.HealthBar:SetStatusBarDesaturated(true)
-        TargetFrameToT.HealthBar:SetStatusBarColor(self.db.profile.TargetOfTarget.npccolor.r, self.db.profile.TargetOfTarget.npccolor.g, self.db.profile.TargetOfTarget.npccolor.b)
+            if self.db.profile.ClassIcons.unitreaction then
+                local reaction = UnitReaction("player", "targettarget");
+                local color =  {r = 0,g = 0,b = 0} 
+                if reaction == 2 then 
+                    color.r = reactionColor.enemy.r
+                    color.g = reactionColor.enemy.g
+                    color.b = reactionColor.enemy.b
+                elseif reaction == 4 then 
+                    color.r = reactionColor.neutral.r
+                    color.g = reactionColor.neutral.g
+                    color.b = reactionColor.neutral.b
+                elseif reaction == 5 then 
+                    color.r = reactionColor.friendly.r
+                    color.g = reactionColor.friendly.g
+                    color.b = reactionColor.friendly.b
+                end
+                TargetFrameToT.HealthBar:SetStatusBarDesaturated(true)
+                TargetFrameToT.HealthBar:SetStatusBarColor(color.r,color.g,color.b)
+            else
+                TargetFrameToT.HealthBar:SetStatusBarDesaturated(true)
+                TargetFrameToT.HealthBar:SetStatusBarColor(self.db.profile.TargetOfTarget.npccolor.r, self.db.profile.TargetOfTarget.npccolor.g, self.db.profile.TargetOfTarget.npccolor.b)
+            end
         end
     elseif self.db.profile.TargetOfTarget.classcolor then
         local _, englishClass = UnitClass("player");
@@ -447,22 +601,61 @@ function HealthBarColor:TargetofTargetColor(unit)
         TargetFrameToT.HealthBar:SetStatusBarDesaturated(true)
         TargetFrameToT.HealthBar:SetStatusBarColor(r, g, b)
     else
-        TargetFrameToT.HealthBar:SetStatusBarDesaturated(true)
-        TargetFrameToT.HealthBar:SetStatusBarColor(self.db.profile.TargetOfTarget.color.r, self.db.profile.TargetOfTarget.color.g, self.db.profile.TargetOfTarget.color.b)
+        if self.db.profile.ClassIcons.unitreaction then
+            local reaction = UnitReaction("player", "targettarget");
+            local color =  {r = 0,g = 0,b = 0} 
+            if reaction == 2 then 
+                color.r = reactionColor.enemy.r
+                color.g = reactionColor.enemy.g
+                color.b = reactionColor.enemy.b
+            elseif reaction == 4 then 
+                color.r = reactionColor.neutral.r
+                color.g = reactionColor.neutral.g
+                color.b = reactionColor.neutral.b
+            elseif reaction == 5 then 
+                color.r = reactionColor.friendly.r
+                color.g = reactionColor.friendly.g
+                color.b = reactionColor.friendly.b
+            end
+            TargetFrameToT.HealthBar:SetStatusBarDesaturated(true)
+            TargetFrameToT.HealthBar:SetStatusBarColor(color.r,color.g,color.b)
+        else
+            TargetFrameToT.HealthBar:SetStatusBarDesaturated(true)
+            TargetFrameToT.HealthBar:SetStatusBarColor(self.db.profile.TargetOfTarget.color.r, self.db.profile.TargetOfTarget.color.g, self.db.profile.TargetOfTarget.color.b)
+        end
     end
 end
 --focus
 function HealthBarColor:FocusColor()
     if self.db.profile.Focus.targetsclasscolor then
-        HealthBarColor:FocusEvent()
         if UnitIsPlayer("focus") then
         local _, englishClass = UnitClass("focus");
         local r, g, b = GetClassColor(englishClass)
         FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarDesaturated(true)
         FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarColor(r, g, b)
         else
-        FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarDesaturated(true)
-        FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarColor(self.db.profile.Focus.npccolor.r, self.db.profile.Focus.npccolor.g, self.db.profile.Focus.npccolor.b)
+            if self.db.profile.ClassIcons.unitreaction then
+                local reaction = UnitReaction("player", "focus");
+                local color =  {r = 0,g = 0,b = 0} 
+                if reaction == 2 then 
+                    color.r = reactionColor.enemy.r
+                    color.g = reactionColor.enemy.g
+                    color.b = reactionColor.enemy.b
+                elseif reaction == 4 then 
+                    color.r = reactionColor.neutral.r
+                    color.g = reactionColor.neutral.g
+                    color.b = reactionColor.neutral.b
+                elseif reaction == 5 then 
+                    color.r = reactionColor.friendly.r
+                    color.g = reactionColor.friendly.g
+                    color.b = reactionColor.friendly.b
+                end
+                FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarDesaturated(true)
+                FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarColor(color.r,color.g,color.b)
+            else
+                FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarDesaturated(true)
+                FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarColor(self.db.profile.Focus.npccolor.r, self.db.profile.Focus.npccolor.g, self.db.profile.Focus.npccolor.b)
+            end
         end
     elseif self.db.profile.Focus.classcolor then
         local _, englishClass = UnitClass("player");
@@ -470,8 +663,28 @@ function HealthBarColor:FocusColor()
         FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarDesaturated(true)
         FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarColor(r, g, b)
     else
-    FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarDesaturated(true)
-    FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarColor(self.db.profile.Focus.color.r, self.db.profile.Focus.color.g, self.db.profile.Focus.color.b)
+        if self.db.profile.ClassIcons.unitreaction then
+            local reaction = UnitReaction("player", "focus");
+            local color =  {r = 0,g = 0,b = 0} 
+            if reaction == 2 then 
+                color.r = reactionColor.enemy.r
+                color.g = reactionColor.enemy.g
+                color.b = reactionColor.enemy.b
+            elseif reaction == 4 then 
+                color.r = reactionColor.neutral.r
+                color.g = reactionColor.neutral.g
+                color.b = reactionColor.neutral.b
+            elseif reaction == 5 then 
+                color.r = reactionColor.friendly.r
+                color.g = reactionColor.friendly.g
+                color.b = reactionColor.friendly.b
+            end
+            FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarDesaturated(true)
+            FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarColor(color.r,color.g,color.b)
+        else
+            FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarDesaturated(true)
+            FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar:SetStatusBarColor(self.db.profile.Focus.color.r, self.db.profile.Focus.color.g, self.db.profile.Focus.color.b)
+        end
     end
 end
 --focus's target
@@ -483,8 +696,28 @@ function HealthBarColor:TargetOfFocusColor(unit)
         FocusFrameToT.HealthBar:SetStatusBarDesaturated(true)
         FocusFrameToT.HealthBar:SetStatusBarColor(r, g, b)
         else
-        FocusFrameToT.HealthBar:SetStatusBarDesaturated(true)
-        FocusFrameToT.HealthBar:SetStatusBarColor(self.db.profile.TargetOfFocus.npccolor.r, self.db.profile.TargetOfFocus.npccolor.g, self.db.profile.TargetOfFocus.npccolor.b)
+            if self.db.profile.ClassIcons.unitreaction then
+                local reaction = UnitReaction("player", "focustarget");
+                local color =  {r = 0,g = 0,b = 0} 
+                if reaction == 2 then 
+                    color.r = reactionColor.enemy.r
+                    color.g = reactionColor.enemy.g
+                    color.b = reactionColor.enemy.b
+                elseif reaction == 4 then 
+                    color.r = reactionColor.neutral.r
+                    color.g = reactionColor.neutral.g
+                    color.b = reactionColor.neutral.b
+                elseif reaction == 5 then 
+                    color.r = reactionColor.friendly.r
+                    color.g = reactionColor.friendly.g
+                    color.b = reactionColor.friendly.b
+                end
+                FocusFrameToT.HealthBar:SetStatusBarDesaturated(true)
+                FocusFrameToT.HealthBar:SetStatusBarColor(color.r,color.g,color.b)
+            else
+                FocusFrameToT.HealthBar:SetStatusBarDesaturated(true)
+                FocusFrameToT.HealthBar:SetStatusBarColor(self.db.profile.TargetOfFocus.npccolor.r, self.db.profile.TargetOfFocus.npccolor.g, self.db.profile.TargetOfFocus.npccolor.b)
+            end
         end
     elseif self.db.profile.Focus.classcolor then
         local _, englishClass = UnitClass("player");
@@ -492,8 +725,28 @@ function HealthBarColor:TargetOfFocusColor(unit)
         FocusFrameToT.HealthBar:SetStatusBarDesaturated(true)
         FocusFrameToT.HealthBar:SetStatusBarColor(r, g, b)
     else
-        FocusFrameToT.HealthBar:SetStatusBarDesaturated(true)
-        FocusFrameToT.HealthBar:SetStatusBarColor(self.db.profile.TargetOfFocus.color.r, self.db.profile.TargetOfFocus.color.g, self.db.profile.TargetOfFocus.color.b)
+        if self.db.profile.ClassIcons.unitreaction then
+            local reaction = UnitReaction("player", "focustarget");
+            local color =  {r = 0,g = 0,b = 0} 
+            if reaction == 2 then 
+                color.r = reactionColor.enemy.r
+                color.g = reactionColor.enemy.g
+                color.b = reactionColor.enemy.b
+            elseif reaction == 4 then 
+                color.r = reactionColor.neutral.r
+                color.g = reactionColor.neutral.g
+                color.b = reactionColor.neutral.b
+            elseif reaction == 5 then 
+                color.r = reactionColor.friendly.r
+                color.g = reactionColor.friendly.g
+                color.b = reactionColor.friendly.b
+            end
+            FocusFrameToT.HealthBar:SetStatusBarDesaturated(true)
+            FocusFrameToT.HealthBar:SetStatusBarColor(color.r,color.g,color.b)
+        else
+            FocusFrameToT.HealthBar:SetStatusBarDesaturated(true)
+            FocusFrameToT.HealthBar:SetStatusBarColor(self.db.profile.TargetOfFocus.color.r, self.db.profile.TargetOfFocus.color.g, self.db.profile.TargetOfFocus.color.b)
+        end
     end
 end
 --bosses
@@ -538,15 +791,8 @@ function HealthBarColor:PetColor()
     end
 end
 --events
-function HealthBarColor:TargetEvent()
-    HealthBarColor:RegisterEvent("PLAYER_TARGET_CHANGED","TargetColor")
-end
-function HealthBarColor:FocusEvent()
-    HealthBarColor:RegisterEvent("PLAYER_FOCUS_CHANGED","FocusColor")
-end
-function HealthBarColor:UnitTargetEvent()
-    HealthBarColor:RegisterEvent("UNIT_TARGET","UnitTarget")
-end
+HealthBarColor:RegisterEvent("PLAYER_TARGET_CHANGED","TargetColor")
+HealthBarColor:RegisterEvent("PLAYER_FOCUS_CHANGED","FocusColor")
 --target target and portrait stuff
 hooksecurefunc("UnitFramePortrait_Update", function(self) 
     if self.unit == "targettarget" then 
@@ -570,3 +816,6 @@ hooksecurefunc("UnitFramePortrait_Update", function(self)
         end
     end
 end)
+
+
+

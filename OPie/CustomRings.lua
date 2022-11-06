@@ -1,5 +1,5 @@
-local RingKeeper, _, T = {}, ...
-local RK_RingDesc, RK_CollectionIDs, RK_Version, RK_Rev, EV, PC, SV = {}, {}, 2, 52, T.Evie, T.OPieCore
+local api, private, _, T = {}, {}, ...
+local RK_RingDesc, RK_CollectionIDs, RK_FluxRings, RK_Version, RK_Rev, EV, PC, SV = {}, {}, {}, 3, 53, T.Evie, T.OPieCore
 local unlocked, queue, RK_DeletedRings, RK_FlagStore, sharedCollection = false, {}, {}, {}, {}
 local MODERN = select(4,GetBuildInfo()) >= 8e4
 local CF_WRATH = not MODERN and select(4,GetBuildInfo()) >= 3e4
@@ -13,7 +13,7 @@ local RW = assert(T.ActionBook:compatible("Rewire", 1,10), "A compatible version
 local ORI = OPie.UI
 local CLASS, FULLNAME, FACTION
 
-local RK_ParseMacro, RK_QuantizeMacro do -- +RingKeeper:SetMountPreference(groundSpellID, airSpellID)
+local RK_ParseMacro, RK_QuantizeMacro, RK_SetMountPreference do
 	local castAlias = {["#show"]=0, ["#showtooltip"]=0} do
 		for n,v in ("CAST:1 USE:1 CASTSEQUENCE:2 CASTRANDOM:3 USERANDOM:3"):gmatch("(%a+):(%d+)") do
 			local v, idx, s = v+0, 1
@@ -93,13 +93,18 @@ local RK_ParseMacro, RK_QuantizeMacro do -- +RingKeeper:SetMountPreference(groun
 			end
 			return nil
 		end
-		function RingKeeper:SetMountPreference(groundSpellID, airSpellID)
+		function RK_SetMountPreference(groundSpellID, airSpellID)
 			if type(groundSpellID) == "number" then
 				gmPref = groundSpellID
+			elseif groundSpellID == false then
+				gmPref = nil
 			end
 			if type(airSpellID) == "number" then
 				fmPref = airSpellID
+			elseif airSpellID == false then
+				fmPref = nil
 			end
+			return gmPref, fmPref
 		end
 	end
 	local function replaceAlternatives(ctype, replaceFunc, args)
@@ -194,13 +199,29 @@ local RK_ParseMacro, RK_QuantizeMacro do -- +RingKeeper:SetMountPreference(groun
 					spells[sname:lower()] = sid
 				end
 			end
-			for spec=1,GetNumSpecializations() do
-				for tier=1, MAX_TALENT_TIERS do
-					for column=1, 3 do
-						tip:SetTalent(GetTalentInfoBySpecialization(spec, tier, column))
-						local name, id = tip:GetSpell()
-						if id and type(name) == "string" then
-							spells[name:lower()] = id
+			local cid = C_ClassTalents.GetActiveConfigID()
+			if not cid then
+				local spec = GetSpecializationInfo(GetSpecialization())
+				local cc = C_ClassTalents.GetConfigIDsBySpecID(spec)
+				cid = cc and cc[1]
+			end
+			local conf = cid and C_Traits.GetConfigInfo(cid)
+			local tree = conf and conf.treeIDs and conf.treeIDs[1]
+			local nodes = tree and C_Traits.GetTreeNodes(tree)
+			for i=1,nodes and #nodes or 0 do
+				local node = C_Traits.GetNodeInfo(cid, nodes[i])
+				for i=1,#node.entryIDs do
+					local entry = C_Traits.GetEntryInfo(cid, node.entryIDs[i])
+					local did = entry.definitionID
+					local def = C_Traits.GetDefinitionInfo(did)
+					local sid = def and def.spellID and not IsPassiveSpell(def.spellID) and def.spellID
+					if sid then
+						local name, name2 = GetSpellInfo(sid), def.overrideName
+						if name then
+							spells[name:lower()] = sid
+						end
+						if name2 and name2 ~= name then
+							spells[name2:lower()] = sid
 						end
 					end
 				end
@@ -540,6 +561,7 @@ local function copy(t, copies)
 	return into
 end
 
+local RK_SetRingDesc
 local function pullOptions(e, a, ...)
 	if a then return e[a], pullOptions(e, ...) end
 end
@@ -560,7 +582,7 @@ local function RK_SyncRing(name, force, tok)
 		wipe(sharedCollection)
 		changed, cid = true, AB:CreateActionSlot(nil, nil, "collection", sharedCollection)
 		RK_CollectionIDs[name], RK_CollectionIDs[cid] = cid, name
-		OneRingLib:SetRing(name, cid, desc)
+		OPie:SetRing(name, cid, desc)
 	end
 
 	local onOpenSlice, onOpenAction, onOpenToken = desc.onOpen
@@ -597,7 +619,7 @@ local function RK_SyncRing(name, force, tok)
 	collection['__openAction'], desc._onOpen = onOpenAction, onOpenAction
 	collection['__openToken'], desc._onOpenToken = onOpenToken, onOpenToken
 	AB:UpdateActionSlot(cid, collection)
-	OneRingLib:SetRing(name, cid, desc)
+	OPie:SetRing(name, cid, desc)
 end
 local function dropUnderscoreKeys(t)
 	for k in pairs(t) do
@@ -676,7 +698,7 @@ local function svInitializer(event, _name, sv)
 
 		unlocked = true
 		local deleted, flags, mousemap = SV.OPieDeletedRings or RK_DeletedRings, SV.OPieFlagStore or RK_FlagStore
-		mousemap, SV.OPieDeletedRings, SV.OPieFlagStore = {PRIMARY=OneRingLib:GetOption("PrimaryButton"), SECONDARY=OneRingLib:GetOption("SecondaryButton")}
+		mousemap, SV.OPieDeletedRings, SV.OPieFlagStore = {PRIMARY=PC:GetOption("PrimaryButton"), SECONDARY=PC:GetOption("SecondaryButton")}
 		for k,v in pairs(flags) do RK_FlagStore[k] = v end
 		
 		local storageVersion = flags.StoreVersion or (flags.FlushedDefaultColors and 1) or 0
@@ -687,7 +709,7 @@ local function svInitializer(event, _name, sv)
 		for k, v in pairs(queue) do
 			if v.hotkey then v.hotkey = v.hotkey:gsub("[^-; ]+", mousemap) end
 			if deleted[k] == nil and SV[k] == nil then
-				securecall(RingKeeper.SetRing, RingKeeper, k, v)
+				securecall(RK_SetRingDesc, k, v)
 				SV[k] = nil
 			elseif deleted[k] then
 				RK_DeletedRings[k] = true
@@ -706,7 +728,7 @@ local function svInitializer(event, _name, sv)
 					v.quarantineOnOpen, v.onOpen = v.onOpen, nil
 				end
 			end
-			securecall(RingKeeper.SetRing, RingKeeper, k, v)
+			securecall(RK_SetRingDesc, k, v)
 		end
 
 		collectgarbage("collect")
@@ -714,24 +736,21 @@ local function svInitializer(event, _name, sv)
 end
 local function ringIterator(isDeleted, k)
 	local nk, v = next(isDeleted and RK_DeletedRings or RK_RingDesc, k)
-	if nk and isDeleted then
+	if nk and RK_FluxRings[nk] then
+		return ringIterator(isDeleted, nk)
+	elseif nk and isDeleted then
 		return RK_IsRelevantRingDescription(queue[nk]) and nk or ringIterator(isDeleted, nk)
 	elseif nk then
 		return nk, v.name or nk, RK_CollectionIDs[nk] ~= nil, #v, v.internal, v.limit
 	end
 end
-
--- Public API
-function RingKeeper:GetVersion()
-	return RK_Version, RK_Rev
-end
-function RingKeeper:SetRing(name, desc)
-	assert(type(name) == "string" and (type(desc) == "table" or desc == false), "Syntax: RingKeeper:SetRing(name, descTable or false)", 2)
+function RK_SetRingDesc(name, desc)
+	assert(type(name) == "string" and (type(desc) == "table" or desc == false))
 	if not unlocked then
 		queue[name] = desc
 	elseif desc == false then
 		if RK_RingDesc[name] then
-			OneRingLib:SetRing(name, nil)
+			OPie:SetRing(name, nil)
 			if RK_CollectionIDs[name] then RK_CollectionIDs[RK_CollectionIDs[name]] = nil end
 			RK_DeletedRings[name], RK_RingDesc[name], RK_CollectionIDs[name], SV[name] = queue[name] and true or nil
 		end
@@ -740,48 +759,58 @@ function RingKeeper:SetRing(name, desc)
 		RK_SyncRing(name, true)
 	end
 end
-function RingKeeper:GetManagedRings()
-	return ringIterator, false, nil
+
+-- Public API
+function api:GetVersion()
+	return RK_Version, RK_Rev
 end
-function RingKeeper:GetDeletedRings()
-	return ringIterator, true, nil
-end
-function RingKeeper:GetRingDescription(name, serialize)
-	assert(type(name) == "string", 'Syntax: desc = RingKeeper:GetRingDescription("name"[, serialize])', 2)
-	local ring = RK_RingDesc[name] and copy(RK_RingDesc[name]) or false
-	return serialize and ring and RK_SerializeDescription(ring) or ring
-end
-function RingKeeper:GetRingInfo(name)
-	assert(type(name) == "string", 'Syntax: title, numSlices, isDefault, isOverriden = RingKeeper:GetRingInfo("name")', 2)
-	local ring = RK_RingDesc[name]
-	return ring and (ring.name or name), ring and #ring, not not queue[name], ring and ring.save
-end
-function RingKeeper:RestoreDefaults(name)
-	if name == nil then
-		for k, v in pairs(queue) do
-			if RK_IsRelevantRingDescription(v) then
-				self:SetRing(k, queue[k])
-			end
-		end
-	elseif queue[name] then
-		self:SetRing(name, queue[name])
-	end
-end
-function RingKeeper:GetDefaultDescription(name)
-	assert(type(name) == "string", 'Syntax: desc = RingKeeper:GetDefaultDescription("name")', 2)
-	return queue[name] and copy(queue[name]) or false
-end
-function RingKeeper:GenFreeRingName(base, t)
-	assert(type(base) == "string" and (t == nil or type(t) == "table"), 'Syntax: name = RingKeeper:GenFreeRingName("base"[, reservedNamesTable])', 2)
+function api:GenFreeRingName(base, reserved)
+	assert(type(base) == "string" and (reserved == nil or type(reserved) == "table"), 'Syntax: name = RK:GenFreeRingName("base"[, reservedNamesTable])', 2)
 	base = base:gsub("[^%a%d]", ""):sub(-10)
 	if base:match("^OPie") or not base:match("^%a") then base = "x" .. base end
 	local suffix, c = "", 1
-	while RK_RingDesc[base .. suffix] or SV[base .. suffix] or (t and t[base .. suffix] ~= nil) or OneRingLib:IsKnownRingName(base .. suffix) do
+	while RK_RingDesc[base .. suffix] or queue[base .. suffix] or SV[base .. suffix] or (reserved and reserved[base .. suffix] ~= nil) or OPie:IsKnownRingName(base .. suffix) do
 		suffix, c = math.random(2^c), c < 30 and (c + 1) or c
 	end
 	return base .. suffix
 end
-function RingKeeper:UnpackABAction(slice)
+function api:AddDefaultRing(name, desc)
+	assert(type(name) == "string" and type(desc) == "table", 'Syntax: RK:AddDefaultRing("name", descTable)', 2)
+	assert(queue[name] == nil and RK_RingDesc[name] == nil, 'A ring with this name already exists', 2)
+	queue[name] = copy(desc)
+	RK_SetRingDesc(name, queue[name])
+end
+function api:SetExternalRing(name, desc)
+	assert(type(name) == "string" and (type(desc) == "table" or desc == false), 'Syntax: RK:SetExternalRing("name", descTable or false)', 2)
+	assert(queue[name] == nil and (RK_RingDesc[name] == nil or RK_FluxRings[name]), "A ring with this name already exists and cannot be modified", 2)
+	RK_FluxRings[name] = true
+	RK_SetRingDesc(name, desc)
+end
+function api:SetMountPreference(groundSpellID, airSpellID)
+	assert((type(groundSpellID) == "number" or not groundSpellID) and
+	       type(airSpellID) == "number" or not airSpellID, 'Syntax: groundSpellID, airSpellID = RK:SetMountPreference(groundSpellID|false|nil, airSpellID|false|nil)', 2)
+	return RK_SetMountPreference(groundSpellID, airSpellID)
+end
+
+-- Private API: this just supports the configuration UI; no forward compatibility guarantees
+function private:GetManagedRings()
+	return ringIterator, false, nil
+end
+function private:GetRingDescription(name, serialize)
+	assert(type(name) == "string", 'Syntax: desc = RK:GetRingDescription("name"[, serialize])', 2)
+	local ring = RK_RingDesc[name] and copy(RK_RingDesc[name]) or false
+	return serialize and ring and RK_SerializeDescription(ring) or ring
+end
+function private:GetRingInfo(name)
+	assert(type(name) == "string", 'Syntax: title, numSlices, isDefault, isOverriden = RK:GetRingInfo("name")', 2)
+	local ring = RK_RingDesc[name]
+	return ring and (ring.name or name), ring and #ring, not not queue[name], ring and ring.save
+end
+function private:SetRing(name, desc)
+	assert(type(name) == "string" and (type(desc) == "table" or desc == false), "Syntax: RK:SetRing(name, descTable or false)", 2)
+	RK_SetRingDesc(name, desc)
+end
+function private:UnpackABAction(slice)
 	if type(slice) == "table" and slice[1] == "macrotext" and type(slice[2]) == "string" then
 		local pmt = RK_ParseMacro(slice[2])
 		return "macrotext", pmt == "" and slice[2] ~= "" and "#empty" or pmt, unpackABAction(slice, 3)
@@ -789,15 +818,11 @@ function RingKeeper:UnpackABAction(slice)
 		return unpackABAction(slice, 1)
 	end
 end
-function RingKeeper:IsRingSliceActive(ring, slice)
-	return RK_RingDesc[ring] and RK_RingDesc[ring][slice] and RK_RingDesc[ring][slice]._action and true or false
+function private:QuantizeMacro(macrotext)
+	return RK_QuantizeMacro(macrotext)
 end
-function RingKeeper:SoftSync(name)
-	assert(type(name) == "string", 'Syntax: RingKeeper:SoftSync("name")', 2)
-	securecall(RK_SyncRing, name)
-end
-function RingKeeper:GetRingSnapshot(name, bundleNested)
-	assert(type(name) == "string", 'Syntax: snapshot = RingKeeper:GetRingSnapshot("name"[, bundleNested])', 2)
+function private:GetRingSnapshot(name, bundleNested)
+	assert(type(name) == "string", 'Syntax: snapshot = RK:GetRingSnapshot("name"[, bundleNested])', 2)
 	if not RK_RingDesc[name] then return end
 	local props = copy(RK_RingDesc[name])
 	local q, m, haveMacroCache = {}, {}, false
@@ -825,8 +850,8 @@ function RingKeeper:GetRingSnapshot(name, bundleNested)
 	props._bundle = next(m) ~= nil and m or nil
 	return serialize(props)
 end
-function RingKeeper:GetSnapshotRing(snap)
-	assert(type(snap) == "string", 'Syntax: desc, bundle = RingKeeper:GetSnapshotRing("snapshot")', 2)
+function private:GetSnapshotRing(snap)
+	assert(type(snap) == "string", 'Syntax: desc, bundle = RK:GetSnapshotRing("snapshot")', 2)
 	if snap == "" then return end
 	local ok, root = pcall(unserialize, snap)
 	if not ok or type(root) ~= "table" then return end
@@ -858,9 +883,31 @@ function RingKeeper:GetSnapshotRing(snap)
 	until q[1] == nil
 	return root, bun
 end
-function RingKeeper:QuantizeMacro(macrotext)
-	return RK_QuantizeMacro(macrotext)
+function private:IsRingSliceActive(ring, slice)
+	return RK_RingDesc[ring] and RK_RingDesc[ring][slice] and RK_RingDesc[ring][slice]._action and true or false
+end
+function private:SoftSync(name)
+	assert(type(name) == "string", 'Syntax: RK:SoftSync("name")', 2)
+	securecall(RK_SyncRing, name)
+end
+function private:RestoreDefaults(name)
+	if name == nil then
+		for k, v in pairs(queue) do
+			if RK_IsRelevantRingDescription(v) then
+				self:SetRing(k, queue[k])
+			end
+		end
+	elseif queue[name] then
+		self:SetRing(name, queue[name])
+	end
+end
+function private:GetDefaultDescription(name)
+	assert(type(name) == "string", 'Syntax: desc = RK:GetDefaultDescription("name")', 2)
+	return queue[name] and copy(queue[name]) or false
+end
+function private:GetDeletedRings()
+	return ringIterator, true, nil
 end
 
-SV, OneRingLib.ext.RingKeeper = PC:RegisterPVar("RingKeeper", SV, svInitializer), RingKeeper
+SV, T.RingKeeper, OPie.CustomRings, private.pub = PC:RegisterPVar("RingKeeper", SV, svInitializer), private, api, api
 AB:AddObserver("internal.collection.preopen", abPreOpen)

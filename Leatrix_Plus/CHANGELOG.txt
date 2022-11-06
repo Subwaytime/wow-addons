@@ -1,3 +1,26 @@
+10.0.06 - 2nd November 2022
+- For 'Faster auto loot' ('System'), there is a new configuration panel that lets you enable or disable the NO QUALITY LOOT fix.
+- For 'Mute game sounds' ('System'), you can now mute the Fae Harp toy.
+- For 'Remove transforms' ('System'), you can now remove the Turkey transform (Pilgrim's Bounty) and the Spraybot transforms.
+- Fixed a Lua error with 'Hide chat buttons' ('Chat').  The tab glow bar has changed appearance slightly and no longer flashes.
+- Due to problems with Blizzard's code in Dragonflight, the 'Disable bag automation' option ('System') has been removed.
+- Due to problems with Blizzard's code in Dragonflight, the 'Disable sticky editbox' option ('Chat') has been removed.
+
+10.0.05 - 31st October 2022
+- The 'Faster auto loot' temporary fix now supports open loot window at mouse.
+
+10.0.04 - 30th October 2022
+- Fixed an issue with 'Restore chat messages' ('Chat') which may have caused a Lua error to show in BugSack when logging out.
+- Due to Blizzard's changes to the UI in Dragonflight, the 'Disable bag automation' option ('System') is unavailable for now.
+
+10.0.03 - 29th October 2022
+- The faster auto loot fix will no longer apply to ElvUI users.
+
+10.0.02 - 28th October 2022
+- Added a temporary fix for 'Faster auto loot' ('System') to prevent the game from spamming you with NO QUALITY LOOT messages.  This spamming issue is caused by the game code and is not caused by addons.  This fix will be removed if Blizzard removes the two lines of unnecessary game code that are the cause of the spamming.  As this fix is only temporary, open loot window at mouse is not supported.  Usually, faster looting is so quick that you won't even see a loot window.  But when you do, it will be anchored to the Edit Mode position.  You can change the position with Edit Mode if you wish.
+- Added a new option 'Hide rested sleep' ('Frames') which will allow you to hide the player frame rested sleep animation so your character no longer looks to be sleeping while banking, chatting, dancing, jumping, fishing, trading, crafting and using the auction house.
+- For 'Automate gossip' ('Automation'), gossip from Katy Stampwhistle (the toy and the npc) will now be skipped automatically.
+
 10.0.01 - 27th October 2022
 - For 'Enhance minimap' ('Interface'), there is a new setting to hide the addon menu (the compartment menu).  It's enabled by default.  The minimum cluster scale is now 50% (was 100%).
 - For the time being, the addon will not register with the minimap compartment menu.

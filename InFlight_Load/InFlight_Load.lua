@@ -72,7 +72,9 @@ if GetAddOnEnableState(UnitName("player"), "InFlight") == 2 then
 	}
 	end
 
-	-- support for flightpaths that are started by gossip options
+
+--[[
+-- support for flightpaths that are started by gossip options
 	hooksecurefunc("GossipTitleButton_OnClick", function(this, button)
 		if this.type ~= "Gossip" then
 			return
@@ -102,6 +104,7 @@ if GetAddOnEnableState(UnitName("player"), "InFlight") == 2 then
 			self:StartMiscFlight(source, destination)
 		end
 	end)
+	]]--
 
 	---------------------------------
 	function InFlight:SetupInFlight()

@@ -55,8 +55,9 @@ local matrix = CreateFrame("Frame", nil, summaryTab) do
 		end
 		self.elapsed = et
 		local ps = s + (g-s)*sin(257*et)
+		local a = (ps-14)/16
 		self.bg:SetSize(ps, ps)
-		self.text:SetAlpha((ps-14)/16)
+		self.text:SetAlpha(a < 0 and 0 or a > 1 and 1 or a)
 	end
 	local function MB_OnHide(self)
 		self:SetScript("OnUpdate", nil)
@@ -462,6 +463,7 @@ local accessButton = CreateFrame("CheckButton", nil, GarrisonMissionFrame) do
 	accessButton:SetPushedTexture("Interface/Buttons/UI-QuickSlot-Depress")
 	accessButton:SetHighlightTexture("Interface/Buttons/ButtonHilight-Square")
 	accessButton:SetCheckedTexture("Interface/Buttons/CheckButtonHilight")
+	accessButton:GetCheckedTexture():SetBlendMode("ADD")
 	accessButton:SetChecked(true)
 	accessButton:Hide()
 	local ico = accessButton:CreateTexture(nil, "ARTWORK")

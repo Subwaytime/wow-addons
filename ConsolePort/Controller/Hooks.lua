@@ -15,10 +15,11 @@ function Hooks:OnHintsFocus()
 end
 
 function Hooks:OnNodeLeave()
-	self.dressupItem = nil;
-	self.bagLocation = nil;
-	self.itemLocation = nil;
-	self.inventorySlotID = nil;
+	self.dressupItem,
+	self.bagLocation,
+	self.itemLocation,
+	self.inventorySlotID,
+	self.spellID = nil;
 end
 
 db:RegisterCallback('OnHintsFocus', Hooks.OnHintsFocus, Hooks)
@@ -31,6 +32,9 @@ function Hooks:ProcessInterfaceCursorEvent(button, down, node)
 			else
 				node:SetFocus()
 			end
+		elseif node and node.OnSpecialClick then
+			node:OnSpecialClick(button)
+			return true;
 		elseif self.inventorySlotID then
 			Hooknode.OnInventoryButtonModifiedClick(node, 'LeftButton')
 			return true;
@@ -41,6 +45,8 @@ function Hooks:ProcessInterfaceCursorEvent(button, down, node)
 			db.ItemMenu:SetItem(self.itemLocation:GetBagAndSlot())
 		elseif self.bagLocation then
 			PickupBagFromSlot(self.bagLocation)
+		elseif self.spellID then
+			db.SpellMenu:SetSpell(self.spellID)
 		elseif db.Utility:HasPendingAction() then
 			return db.Utility:PostPendingAction()
 		end
@@ -78,7 +84,7 @@ do  local IsWidget, GetID, GetParent, GetScript =
 		C_Widget.IsFrameWidget, UIParent.GetID, UIParent.GetParent, UIParent.GetScript;
 
 	local TryIdentifyContainerSlot = CPAPI.IsRetailVersion and function(node)
-		return node.UpdateTooltip == ContainerFrameItemButton_OnUpdate;
+		return node.GetSlotAndBagID;
 	end or function(node)
 		return node.UpdateTooltip == ContainerFrameItemButton_OnEnter;
 	end
@@ -89,7 +95,8 @@ do  local IsWidget, GetID, GetParent, GetScript =
 
 	function Hooks:GetItemLocationFromNode(node)
 		return IsWidget(node) and TryIdentifyContainerSlot(node) and
-			ItemLocation:CreateFromBagAndSlot(GetID(GetParent(node)), GetID(node)) or nil;
+			(CPAPI.IsRetailVersion and ItemLocation:CreateFromBagAndSlot(node:GetBagID(), node:GetID()) or
+			ItemLocation:CreateFromBagAndSlot(GetID(GetParent(node)), GetID(node))) or nil;
 	end
 
 	function Hooks:GetBagLocationFromNode(node)
@@ -111,6 +118,15 @@ end
 
 function Hooks:SetPendingItemMenu(tooltip, itemLocation)
 	self.itemLocation = itemLocation;
+	local prompt = self:GetSpecialActionPrompt(OPTIONS)
+	if prompt then
+		tooltip:AddLine(prompt)
+		tooltip:Show()
+	end
+end
+
+function Hooks:SetPendingSpellMenu(tooltip, spellID)
+	self.spellID = spellID;
 	local prompt = self:GetSpecialActionPrompt(OPTIONS)
 	if prompt then
 		tooltip:AddLine(prompt)
@@ -218,22 +234,19 @@ do -- Tooltip hooking
 	local function OnTooltipSetSpell(self)
 		local owner = self:GetOwner()
 		if not InCombatLockdown() and db.Cursor:IsCurrentNode(owner) then
+			if owner.OnSpecialClick then return end;
+			
 			local name, spellID = self:GetSpell()
 			if spellID and not IsPassiveSpell(spellID) then
-				local isKnown = IsSpellKnown(spellID)
+				local isKnown = IsSpellKnownOrOverridesKnown(spellID)
 				if not isKnown then
 					local mountID = CPAPI.GetMountFromSpell(spellID)
 					if mountID then
 						isKnown = (select(11, CPAPI.GetMountInfoByID(mountID)))
-						spellID = name;
 					end
 				end
 				if isKnown then
-					Hooks:SetPendingActionToUtilityRing(self, owner, {
-						type  = 'spell',
-						spell = spellID,
-						link  = GetSpellLink(spellID)
-					});
+					Hooks:SetPendingSpellMenu(self, spellID)
 				end
 			end
 		end

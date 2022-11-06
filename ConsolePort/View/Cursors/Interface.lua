@@ -444,11 +444,7 @@ do local SafeOnEnter, SafeOnLeave, SafeExecute = {}, {}, ExecuteFrameScript
 			-- on actionbuttons that holds the spell in question. this taints the action bar controller.
 			local slot = SpellBook_GetSpellBookSlot(self)
 			GameTooltip:SetOwner(self, 'ANCHOR_RIGHT')
-			if ( GameTooltip:SetSpellBookItem(slot, SpellBookFrame.bookType) ) then
-				self.UpdateTooltip = SafeOnEnter[SpellButton1:GetScript('OnEnter')]
-			else
-				self.UpdateTooltip = nil
-			end
+			GameTooltip:SetSpellBookItem(slot, SpellBookFrame.bookType)
 			
 			if ( self.SpellHighlightTexture and self.SpellHighlightTexture:IsShown() ) then
 				GameTooltip:AddLine(SPELLBOOK_SPELL_NOT_ON_ACTION_BAR, LIGHTBLUE_FONT_COLOR.r, LIGHTBLUE_FONT_COLOR.g, LIGHTBLUE_FONT_COLOR.b)
@@ -473,8 +469,9 @@ do local SafeOnEnter, SafeOnLeave, SafeExecute = {}, {}, ExecuteFrameScript
 		end
 	end
 	-------[[  OnLeave  ]]-------
-	if SpellButton_OnLeave then
-		SafeOnLeave[SpellButton_OnLeave] = function(self)
+	local SpellButtonOnLeave = SpellButton_OnLeave or SpellButton1 and SpellButton1:GetScript('OnLeave')
+	if SpellButtonOnLeave then
+		SafeOnLeave[SpellButtonOnLeave] = function(self)
 			GameTooltip:Hide()
 		end
 	end

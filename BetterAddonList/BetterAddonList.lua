@@ -1,23 +1,21 @@
 -- luacheck: globals BetterAddonListDB SLASH_BETTERADDONLIST1 SLASH_BETTERADDONLIST2 SLASH_BETTERADDONLIST3 SlashCmdList SLASH_RELOADUI1 SLASH_RELOADUI2
--- luacheck: globals StaticPopup_Show UIDropDownMenu_Initialize UIDropDownMenu_CreateInfo UIDropDownMenu_AddButton UIDropDownMenu_SetSelectedValue UIDROPDOWNMENU_MENU_VALUE
--- luacheck: globals FauxScrollFrame_Update SearchBoxTemplate_OnTextChanged IsAddonVersionCheckEnabled ResetAddOns AddonTooltip_BuildDeps
--- luacheck: globals AddonList AddonCharacterDropDown AddonCharacterDropDownButton AddonListForceLoad AddonListScrollFrame AddonList_Enable
--- luacheck: globals AddonList_SetSecurityIcon AddonList_SetStatus AddonList_Update AddonTooltip_Update ADDON_BUTTON_HEIGHT MAX_ADDONS_DISPLAYED SOUNDKIT
+-- luacheck: globals UIDropDownMenu_Initialize UIDropDownMenu_CreateInfo UIDropDownMenu_AddButton UIDropDownMenu_SetSelectedValue UIDROPDOWNMENU_MENU_VALUE
+-- luacheck: globals SearchBoxTemplate_OnTextChanged IsAddonVersionCheckEnabled ResetAddOns CreateDataProvider CreateIndexRangeDataProvider
+-- luacheck: globals AddonList AddonCharacterDropDown AddonCharacterDropDownButton AddonListForceLoad AddonList_Enable
+-- luacheck: globals AddonList_SetSecurityIcon AddonList_SetStatus AddonList_Update AddonTooltip_Update SOUNDKIT
 
 local ADDON_NAME, ns = ...
 BetterAddonListDB = BetterAddonListDB or {}
 
-local _G = _G
-local tconcat, After, NewTicker = table.concat, C_Timer.After, C_Timer.NewTicker
+local LibDialog = LibStub("LibDialog-1.0")
 
-local AddonList_Update = AddonList_Update
-local ADDON_BUTTON_HEIGHT = ADDON_BUTTON_HEIGHT
-local MAX_ADDONS_DISPLAYED = MAX_ADDONS_DISPLAYED
+local _G = _G
+local After, NewTicker = C_Timer.After, C_Timer.NewTicker
+
+local loadAddonText = GetLocale() == "ruRU" and "Загрузить" or _G.LOAD_ADDON
 local ADDON_DEPENDENCIES = ADDON_DEPENDENCIES
 
 local L = ns.L
-
-local wow_1000 = select(4, GetBuildInfo()) >= 100000
 
 local sets = nil
 local included = nil
@@ -54,8 +52,8 @@ addon:RegisterEvent("ADDON_LOADED")
 addon:RegisterEvent("PLAYER_LOGIN")
 addon:RegisterEvent("PLAYER_LOGOUT")
 
-function addon:ADDON_LOADED(name)
-	if name ~= ADDON_NAME then return end
+function addon:ADDON_LOADED(addon_name)
+	if addon_name ~= ADDON_NAME then return end
 	self:UnregisterEvent("ADDON_LOADED")
 
 	if not BetterAddonListDB.sets then
@@ -74,7 +72,7 @@ function addon:ADDON_LOADED(name)
 
 	character = UnitName("player")
 
-	--- From BlizzBugsSuck (https://mods.curse.com/addons/wow/blizzbugssuck):
+	--- From BlizzBugsSuck:
 	-- Fix glitchy-ness of EnableAddOn/DisableAddOn API, which affects the stability of the default
 	-- UI's addon management list (both in-game and glue), as well as any addon-management addons.
 	-- The problem is caused by broken defaulting logic used to merge AddOns.txt settings across
@@ -145,8 +143,8 @@ function addon:PLAYER_LOGIN()
 	mover:SetPoint("TOP", AddonList, "TOP", 0, 0)
 	mover:SetWidth(500)
 	mover:SetHeight(25)
-	mover:SetScript("OnMouseDown", function(self) AddonList:StartMoving() end)
-	mover:SetScript("OnMouseUp", function(self) AddonList:StopMovingOrSizing() end)
+	mover:SetScript("OnMouseDown", function() AddonList:StartMoving() end)
+	mover:SetScript("OnMouseUp", function() AddonList:StopMovingOrSizing() end)
 	AddonList:SetMovable(true)
 	AddonList:ClearAllPoints()
 	AddonList:SetPoint("CENTER")
@@ -164,19 +162,10 @@ function addon:PLAYER_LOGIN()
 	--UIPanelWindows["AddonList"].area = nil
 
 	-- default to showing the player profile
-	UIDropDownMenu_SetSelectedValue(AddonCharacterDropDown, character)
-
-	-- fix the "Load AddOn" text overflowing for some locales
-	local loadAddonText = GetLocale() == "ruRU" and "Загрузить" or LOAD_ADDON
-	local loadAddonSize = #loadAddonText > 12 and 120 or 100
-	for i=1, MAX_ADDONS_DISPLAYED do
-		local entry = _G["AddonListEntry"..i]
-		if entry then -- XXX beta
-			local button = entry.LoadAddonButton
-			button:SetText(loadAddonText)
-			button:SetWidth(loadAddonSize)
-		end
-	end
+	-- UIDropDownMenu_SetSelectedValue(AddonCharacterDropDown, character)
+	-- XXX try to avoid taint by doing this directly
+	AddonCharacterDropDown.selectedValue = character
+	AddonCharacterDropDown.Text:SetText(character)
 
 	SLASH_BETTERADDONLIST1 = "/addons"
 	SLASH_BETTERADDONLIST2 = "/acp" -- muscle memory ;[
@@ -240,124 +229,137 @@ function addon:Print(...)
 	print("|cff33ff99BetterAddonList|r:", tostringall(...))
 end
 
-StaticPopupDialogs["BETTER_ADDONLIST_SAVESET"] = {
-	text = L["Save the currently selected addons to %s?"],
-	button1 = YES,
-	button2 = CANCEL,
-	OnAccept = function(self) addon:SaveSet(self.data) end,
-	OnShow = function(self) CloseDropDownMenus(1) end,
-	OnHide = function(self) self.data = nil end,
-	timeout = 0,
-	hideOnEscape = 1,
-	whileDead = 1,
-	exclusive = 1,
-	preferredIndex = 3,
-}
+LibDialog:Register("BETTER_ADDONLIST_SAVESET", {
+	buttons = {
+		{ text = OKAY, on_click = function(self, data) addon:SaveSet(data) end, },
+		{ text = CANCEL, },
+	},
+	on_show = function(self, data)
+		self.text:SetFormattedText(L["Save the currently selected addons to %s?"], data)
+		CloseDropDownMenus(1)
+	end,
+	no_close_button = true,
+	hide_on_escape = true,
+	show_while_dead = true,
+})
 
-StaticPopupDialogs["BETTER_ADDONLIST_DELETESET"] = {
-	text = L["Delete set %s?"],
-	button1 = YES,
-	button2 = CANCEL,
-	OnAccept = function(self) addon:DeleteSet(self.data) end,
-	OnShow = function(self) CloseDropDownMenus(1) end,
-	OnHide = function(self) self.data = nil end,
-	timeout = 0,
-	hideOnEscape = 1,
-	whileDead = 1,
-	exclusive = 1,
-	preferredIndex = 3,
-}
+LibDialog:Register("BETTER_ADDONLIST_DELETESET", {
+	buttons = {
+		{ text = OKAY, on_click = function(self, data) addon:DeleteSet(data) end, },
+		{ text = CANCEL, },
+	},
+	on_show = function(self, data)
+		self.text:SetFormattedText(L["Delete set %s?"], data)
+		CloseDropDownMenus(1)
+	end,
+	no_close_button = true,
+	hide_on_escape = true,
+	show_while_dead = true,
+})
 
-StaticPopupDialogs["BETTER_ADDONLIST_NEWSET"] = {
+LibDialog:Register("BETTER_ADDONLIST_NEWSET", {
 	text = L["Enter the name for the new set"],
-	button1 = OKAY,
-	button2 = CANCEL,
-	OnAccept = function(self)
-		local name = self.editBox:GetText()
-		if sets[name] then
-			StaticPopup_Show("BETTER_ADDONLIST_ERROR_NAME", name, nil, {"BETTER_ADDONLIST_NEWSET"})
-			return
-		end
-		addon:SaveSet(name)
-	end,
-	EditBoxOnEnterPressed = function(self)
-		local name = self:GetParent().editBox:GetText():trim()
-		self:GetParent():Hide()
-		if sets[name] then
-			StaticPopup_Show("BETTER_ADDONLIST_ERROR_NAME", name, nil, {"BETTER_ADDONLIST_NEWSET"})
-			return
-		end
-		addon:SaveSet(name)
-	end,
-	EditBoxOnEscapePressed = function(self)
-		self:GetParent():Hide()
-	end,
-	OnShow = function(self)
-		CloseDropDownMenus(1)
-		self.editBox:SetFocus()
-	end,
-	OnHide = function(self)
-		self.editBox:SetText("")
-	end,
-	timeout = 0,
-	hideOnEscape = 1,
-	exclusive = 1,
-	whileDead = 1,
-	hasEditBox = 1,
-	preferredIndex = 3,
-}
+	buttons = {
+		{
+			text = OKAY,
+			on_click = function(self)
+				local text = self.editboxes[1]:GetText():trim()
+				LibDialog:Dismiss("BETTER_ADDONLIST_NEWSET")
+				if sets[text] then
+					LibDialog:Spawn("BETTER_ADDONLIST_ERROR_NAME", {text, "BETTER_ADDONLIST_NEWSET"})
+					return true
+				end
+				addon:SaveSet(text)
+			end,
+		},
+		{ text = CANCEL, },
+	},
+	editboxes = {
+		{
+			on_enter_pressed = function(editbox)
+				local text = editbox:GetText():trim()
+				LibDialog:Dismiss("BETTER_ADDONLIST_NEWSET")
+				if sets[text] then
+					LibDialog:Spawn("BETTER_ADDONLIST_ERROR_NAME", {text, "BETTER_ADDONLIST_NEWSET"})
+					return true
+				end
+				addon:SaveSet(text)
+			end,
+			on_escape_pressed = function()
+				LibDialog:Dismiss("BETTER_ADDONLIST_NEWSET")
+			end,
+			auto_focus = true,
+		},
+	},
+	on_show = function(self) CloseDropDownMenus(1) end,
+	no_close_button = true,
+	hide_on_escape = true,
+	show_while_dead = true,
+})
 
-StaticPopupDialogs["BETTER_ADDONLIST_RENAMESET"] = {
-	text = L["Enter the new name for %s"],
-	button1 = OKAY,
-	button2 = CANCEL,
-	OnAccept = function(self)
-		local text = self.editBox:GetText()
-		addon:RenameSet(self.data, text)
-	end,
-	EditBoxOnEnterPressed = function(self)
-		local dialog = self:GetParent()
-		local text = dialog.editBox:GetText()
-		addon:RenameSet(dialog.data, text)
-		dialog:Hide()
-	end,
-	EditBoxOnEscapePressed = function(self)
-		self:GetParent():Hide()
-	end,
-	OnShow = function(self)
+LibDialog:Register("BETTER_ADDONLIST_RENAMESET", {
+	buttons = {
+		{
+			text = OKAY,
+			on_click = function(self, data)
+				local text = self.editboxes[1]:GetText():trim()
+				LibDialog:Dismiss("BETTER_ADDONLIST_RENAMESET")
+				if sets[text] then
+					LibDialog:Spawn("BETTER_ADDONLIST_ERROR_NAME", {text, "BETTER_ADDONLIST_RENAMESET", data})
+					return true
+				end
+				addon:RenameSet(data, text)
+			end,
+		},
+		{ text = CANCEL, },
+	},
+	editboxes = {
+		{
+			on_enter_pressed = function(editbox, data)
+				local text = editbox:GetText():trim()
+				LibDialog:Dismiss("BETTER_ADDONLIST_RENAMESET")
+				if sets[text] then
+					LibDialog:Spawn("BETTER_ADDONLIST_ERROR_NAME", {text, "BETTER_ADDONLIST_RENAMESET", data})
+					return true
+				end
+				addon:RenameSet(data, text)
+			end,
+			on_escape_pressed = function()
+				LibDialog:Dismiss("BETTER_ADDONLIST_RENAMESET")
+			end,
+			auto_focus = true,
+		},
+	},
+	on_show = function(self, data)
+		self.text:SetFormattedText(L["Enter the new name for %s"], data)
 		CloseDropDownMenus(1)
-		self.editBox:SetFocus()
 	end,
-	OnHide = function(self)
-		self.editBox:SetText("")
-		self.data = nil
-	end,
-	timeout = 0,
-	hideOnEscape = 1,
-	exclusive = 1,
-	whileDead = 1,
-	hasEditBox = 1,
-	preferredIndex = 3,
-}
+	no_close_button = true,
+	hide_on_escape = true,
+	show_while_dead = true,
+})
 
-StaticPopupDialogs["BETTER_ADDONLIST_ERROR_NAME"] = {
-	text = L["There is already a set named \"%s\".\nPlease choose another name."],
-	button1 = OKAY,
-	button2 = CANCEL,
-	OnAccept = function(self)
-		local name, text = unpack(self.data)
-		StaticPopup_Show(name, text)
+LibDialog:Register("BETTER_ADDONLIST_ERROR_NAME", {
+	buttons = {
+		{
+			text = OKAY,
+			on_click = function(self, data)
+				LibDialog:Dismiss("BETTER_ADDONLIST_ERROR_NAME")
+				LibDialog:Spawn(data[2], data[3])
+				return true
+			end,
+		},
+		{ text = CANCEL, },
+	},
+	on_show = function(self, data)
+		self.text:SetFormattedText(L["There is already a set named \"%s\".\nPlease choose another name."], data[1])
 	end,
-	OnHide = function(self)
-		self.data = nil
-	end,
-	timeout = 0,
-	hideOnEscape = 1,
-	whileDead = 1,
-	exclusive = 1,
-	showAlert = 1,
-	preferredIndex = 3,
-}
+	icon = _G.STATICPOPUP_TEXTURE_ALERT,
+	-- cancels_on_spawn = { "BETTER_ADDONLIST_NEWSET", "BETTER_ADDONLIST_RENAMESET" },
+	no_close_button = true,
+	hide_on_escape = true,
+	show_while_dead = true,
+})
 
 -- sets menu
 do
@@ -419,7 +421,7 @@ do
 			info.notCheckable = 1
 
 			info.text = L["Create new set"]
-			info.func = function() StaticPopup_Show("BETTER_ADDONLIST_NEWSET") end
+			info.func = function() LibDialog:Spawn("BETTER_ADDONLIST_NEWSET") end
 			UIDropDownMenu_AddButton(info, level)
 
 			info.text = L["Reset"]
@@ -465,15 +467,15 @@ do
 			info.tooltipText = nil
 
 			info.text = L["Save"]
-			info.func = function() StaticPopup_Show("BETTER_ADDONLIST_SAVESET", CURRENT_SET, nil, CURRENT_SET) end
+			info.func = function() LibDialog:Spawn("BETTER_ADDONLIST_SAVESET", CURRENT_SET) end
 			UIDropDownMenu_AddButton(info, level)
 
 			info.text = L["Rename"]
-			info.func = function() StaticPopup_Show("BETTER_ADDONLIST_RENAMESET", CURRENT_SET, nil, CURRENT_SET) end
+			info.func = function() LibDialog:Spawn("BETTER_ADDONLIST_RENAMESET", CURRENT_SET) end
 			UIDropDownMenu_AddButton(info, level)
 
 			info.text = L["Delete"]
-			info.func = function() StaticPopup_Show("BETTER_ADDONLIST_DELETESET", CURRENT_SET, nil, CURRENT_SET) end
+			info.func = function() LibDialog:Spawn("BETTER_ADDONLIST_DELETESET", CURRENT_SET) end
 			UIDropDownMenu_AddButton(info, level)
 
 			UIDropDownMenu_AddButton(separator, level)
@@ -590,30 +592,6 @@ do
 		end
 	end
 
-	local lockIcons = {}
-	local memIcons = {}
-	for i=1, MAX_ADDONS_DISPLAYED do
-		local checkbox = _G["AddonListEntry"..i.."Enabled"]
-		if checkbox then -- XXX beta
-			local lock = CreateFrame("Button", nil, _G["AddonListEntry"..i], nil, i)
-			lock:SetSize(16, 16)
-			lock:SetPoint("CENTER", checkbox, "CENTER")
-			lock:SetNormalTexture([[Interface\Glues\CharacterSelect\Glues-AddOn-Icons]])
-			lock:GetNormalTexture():SetTexCoord(0, 16/64, 0, 1) -- AddonList_SetSecurityIcon
-			lock:SetScript("OnClick", OnClick)
-			lock:Hide()
-			lockIcons[i] = lock
-
-			checkbox:HookScript("OnClick", function(self, ...) OnClick(lock, ...) end)
-
-			local mem = CreateFrame("Button", nil, _G["AddonListEntry"..i], nil, i)
-			mem:SetSize(6, 32)
-			mem:SetPoint("RIGHT", checkbox, "LEFT", 1, 0)
-			mem:SetNormalTexture([[Interface\AddOns\BetterAddonList\textures\mem0]])
-			memIcons[i] = mem
-		end
-	end
-
 	local updater = CreateFrame("Frame", nil, AddonList)
 	updater:SetScript("OnShow", function(self)
 		UpdateAddOnMemoryUsage()
@@ -624,11 +602,6 @@ do
 	updater:SetScript("OnHide", function(self)
 		self.timer:Cancel()
 		self.timer = nil
-	end)
-
-	hooksecurefunc("AddonList_LoadAddOn", function(self)
-		UpdateAddOnMemoryUsage()
-		AddonList_Update()
 	end)
 
 	local function buildDeps(...)
@@ -657,7 +630,7 @@ do
 			GameTooltip:SetText(ADDON_BANNED_TOOLTIP)
 		else
 			local version = GetAddOnMetadata(index, "Version")
-			if version and version ~= "1.0.17" then
+			if version and version ~= "1.1.2" then
 				GameTooltip:AddDoubleLine(title or name, version)
 			else
 				GameTooltip:AddLine(title or name)
@@ -665,7 +638,7 @@ do
 			GameTooltip:AddLine(notes, 1.0, 1.0, 1.0)
 			GameTooltip:AddLine(buildDeps(GetAddOnDependencies(index)))
 
-			local memory = owner.memory
+			local memory = owner.memoryUsage
 			if memory then
 				local text = ""
 				if memory > 1000 then
@@ -680,125 +653,87 @@ do
 		GameTooltip:Show()
 	end
 
-	-- Update the panel my way
-	AddonList_Update = function()
-		if wow_1000 then return end -- XXX beta
+	local InitButton = function(entry, addonIndex)
+		local checkbox = entry.Enabled
+		local title = entry.Title
+		local status = entry.Status
 
-		if AddonList.searchList then
-			local numEntrys = #AddonList.searchList
-			for i=1, MAX_ADDONS_DISPLAYED do
-				local offset = AddonList.offset + i
-				local addonIndex = AddonList.searchList[offset]
-				local entry = _G["AddonListEntry"..i]
-				if offset > numEntrys then
-					entry:Hide()
-				else
-					-- aaaaand copy from AddonList_Update
-					local name, title, notes, loadable, reason, security = GetAddOnInfo(addonIndex)
-					local enabled = GetAddOnEnableState(character, addonIndex) > 0
+		local lockIcon = entry.Protected
+		if not lockIcon then
+			lockIcon = CreateFrame("Button", nil, entry, nil, addonIndex)
+			lockIcon:SetSize(16, 16)
+			lockIcon:SetPoint("CENTER", checkbox, "CENTER")
+			lockIcon:SetNormalTexture([[Interface\Glues\CharacterSelect\Glues-AddOn-Icons]])
+			lockIcon:GetNormalTexture():SetTexCoord(0, 16/64, 0, 1) -- AddonList_SetSecurityIcon
+			lockIcon:SetScript("OnClick", OnClick)
+			lockIcon:Hide()
+			entry.Protected = lockIcon
 
-					local checkbox = _G["AddonListEntry"..i.."Enabled"]
-					checkbox:SetChecked(enabled)
-
-					local titleString = _G["AddonListEntry"..i.."Title"]
-					if loadable or ( enabled and (reason == "DEP_DEMAND_LOADED" or reason == "DEMAND_LOADED") ) then
-						titleString:SetTextColor(1.0, 0.78, 0.0)
-					elseif enabled and reason ~= "DEP_DISABLED" then
-						titleString:SetTextColor(1.0, 0.1, 0.1)
-					else
-						titleString:SetTextColor(0.5, 0.5, 0.5)
-					end
-					titleString:SetText(title or name)
-
-					local securityIcon = _G["AddonListEntry"..i.."SecurityIcon"]
-					if security == "SECURE" then
-						AddonList_SetSecurityIcon(securityIcon, 1)
-					elseif security == "INSECURE" then
-						AddonList_SetSecurityIcon(securityIcon, 2)
-					elseif security == "BANNED" then
-						AddonList_SetSecurityIcon(securityIcon, 3)
-					end
-					_G["AddonListEntry"..i.."Security"].tooltip = _G["ADDON_"..security]
-
-					local statusString = _G["AddonListEntry"..i.."Status"]
-					statusString:SetText((not enabled and reason) and _G["ADDON_"..reason] or "")
-
-					if enabled ~= AddonList.startStatus[addonIndex] and reason ~= "DEP_DISABLED" then
-						if enabled then
-							local lod = IsAddOnLoadOnDemand(addonIndex) and not IsAddOnLoaded(addonIndex)
-							AddonList_SetStatus(entry, lod, false, not lod)
-						else
-							AddonList_SetStatus(entry, false, false, true)
-						end
-					else
-						AddonList_SetStatus(entry, false, true, false)
-					end
-
-					entry:SetID(addonIndex)
-					entry:Show()
-				end
-			end
-
-			FauxScrollFrame_Update(AddonListScrollFrame, numEntrys, MAX_ADDONS_DISPLAYED, ADDON_BUTTON_HEIGHT)
+			checkbox:HookScript("OnClick", function(self, ...) OnClick(lockIcon, ...) end)
 		end
 
-		local numAddons = GetNumAddOns()
-		for i=1, MAX_ADDONS_DISPLAYED do
-			local entry = _G["AddonListEntry"..i]
-			local checkbox = _G["AddonListEntry"..i.."Enabled"]
-			local title = _G["AddonListEntry"..i.."Title"]
-			local status = _G["AddonListEntry"..i.."Status"]
+		local memIcon = entry.Memory
+		if not memIcon then
+			memIcon = CreateFrame("Button", nil, entry, nil, addonIndex)
+			memIcon:SetSize(6, 32)
+			memIcon:SetPoint("RIGHT", checkbox, "LEFT", 1, 0)
+			memIcon:SetNormalTexture([[Interface\AddOns\BetterAddonList\textures\mem0]])
+			entry.Memory = memIcon
+		end
 
-			local lockIcon = lockIcons[i]
-			local memIcon = memIcons[i]
+		-- fix the "Load AddOn" text overflowing for some locales
+		local load = entry.LoadAddonButton
+		load:SetText(loadAddonText)
+		load:SetWidth(#loadAddonText > 12 and 120 or 100)
 
-			local addonIndex = entry:GetID()
-			if addonIndex > numAddons then
-				entry.memory = nil
-				memIcon:Hide()
-				lockIcon:Hide()
-				checkbox:Show()
+		local enabled = GetAddOnEnableState(character, addonIndex) > 0
+		if enabled then
+			local depsEnabled = CheckAddonDependencies(GetAddOnDependencies(addonIndex))
+			if not depsEnabled then
+				title:SetTextColor(1.0, 0.1, 0.1)
+				status:SetText(_G["ADDON_DEP_DISABLED"])
+			end
+			if IsAddOnLoadOnDemand(addonIndex) and not IsAddOnLoaded(addonIndex) and depsEnabled then
+				AddonList_SetStatus(entry, true, false, false)
+			end
+
+			local memory = GetAddOnMemoryUsage(addonIndex)
+			entry.memoryUsage = memory
+			local usage = memory / 8000 -- just needed some baseline
+			if usage > 0.8 then
+				memIcon:SetNormalTexture([[Interface\AddOns\BetterAddonList\textures\mem5]])
+			elseif usage > 0.6 then
+				memIcon:SetNormalTexture([[Interface\AddOns\BetterAddonList\textures\mem4]])
+			elseif usage > 0.4 then
+				memIcon:SetNormalTexture([[Interface\AddOns\BetterAddonList\textures\mem3]])
+			elseif usage > 0.2 then
+				memIcon:SetNormalTexture([[Interface\AddOns\BetterAddonList\textures\mem2]])
+			elseif usage > 0.1 then
+				memIcon:SetNormalTexture([[Interface\AddOns\BetterAddonList\textures\mem1]])
 			else
-				local enabled = GetAddOnEnableState(character, addonIndex) > 0
-				if enabled then
-					local depsEnabled = CheckAddonDependencies(GetAddOnDependencies(addonIndex))
-					if not depsEnabled then
-						title:SetTextColor(1.0, 0.1, 0.1)
-						status:SetText(_G["ADDON_DEP_DISABLED"])
-					end
-					if IsAddOnLoadOnDemand(addonIndex) and not IsAddOnLoaded(addonIndex) and depsEnabled then
-						AddonList_SetStatus(entry, true, false, false)
-					end
+				memIcon:SetNormalTexture([[Interface\AddOns\BetterAddonList\textures\mem0]])
+			end
+			memIcon:Show()
+		else
+			entry.memoryUsage = nil
+			memIcon:Hide()
+		end
 
-					local memory = GetAddOnMemoryUsage(addonIndex)
-					entry.memory = memory
-					local usage = memory/8000 -- just needed some baseline!
-					if usage > 0.8 then
-						memIcon:SetNormalTexture([[Interface\AddOns\BetterAddonList\textures\mem5]])
-					elseif usage > 0.6 then
-						memIcon:SetNormalTexture([[Interface\AddOns\BetterAddonList\textures\mem4]])
-					elseif usage > 0.4 then
-						memIcon:SetNormalTexture([[Interface\AddOns\BetterAddonList\textures\mem3]])
-					elseif usage > 0.2 then
-						memIcon:SetNormalTexture([[Interface\AddOns\BetterAddonList\textures\mem2]])
-					elseif usage > 0.1 then
-						memIcon:SetNormalTexture([[Interface\AddOns\BetterAddonList\textures\mem1]])
-					else
-						memIcon:SetNormalTexture([[Interface\AddOns\BetterAddonList\textures\mem0]])
-					end
-					memIcon:Show()
-				else
-					entry.memory = nil
-					memIcon:Hide()
-				end
+		local protected = IsAddonProtected(addonIndex)
+		lockIcon:SetShown(protected)
+		checkbox:SetShown(not protected)
+	end
+	hooksecurefunc("AddonList_InitButton", InitButton)
 
-				local protected = IsAddonProtected(addonIndex)
-				lockIcon:SetShown(protected)
-				checkbox:SetShown(not protected)
+	hooksecurefunc("AddonList_LoadAddOn", function(index)
+		UpdateAddOnMemoryUsage()
+		for _, frame in AddonList.ScrollBox:EnumerateFrames() do
+			if frame:GetID() == index then
+				InitButton(frame, index)
+				return
 			end
 		end
-	end
-	hooksecurefunc("AddonList_Update", AddonList_Update)
+	end)
 end
 
 -- search / filter
@@ -812,9 +747,6 @@ do
 		"LOD",
 		"PROTECTED",
 	}
-	for _, key in next, filters do
-		filterList[key] = false
-	end
 
 	local filterFunc = {
 		ENABLED = function(index) return GetAddOnEnableState(character, index) > 0 end,
@@ -831,37 +763,53 @@ do
 		return true
 	end
 
+	local fullList = CreateIndexRangeDataProvider(GetNumAddOns())
+	local searchList = CreateDataProvider()
+	AddonList.searchList = searchList
+
 	local strfind = string.find
-	local searchList = {}
 	local searchString = ""
 	local function OnTextChanged(self)
 		SearchBoxTemplate_OnTextChanged(self)
 		local oldText = searchString
 		searchString = self:GetText():lower():trim()
 
-		if searchString == "" and not next(filterList) then
-			AddonList.searchList = nil
-			_G.AddonList_Update()
-		elseif oldText ~= searchString or next(filterList) then
-			wipe(searchList)
+		searchList:Flush()
+		if (searchString ~= "" and oldText ~= searchString) or next(filterList) then
+			local list = {}
 			for i=1, GetNumAddOns() do
 				local name, title, notes = GetAddOnInfo(i)
 				if (searchString == "" or (strfind(name:lower(), searchString, nil, true) or (title and strfind(title:lower(), searchString, nil, true)))) and checkFilters(i) then
-					searchList[#searchList+1] = i
+					list[#list + 1] = i
 				end
 			end
-			AddonList.searchList = searchList
-			AddonList_Update()
+			if #list > 0 then
+				searchList:InsertTable(list)
+				AddonList.ScrollBox:SetDataProvider(searchList, true)
+				return
+			end
 		end
+		AddonList.ScrollBox:SetDataProvider(fullList, true)
 	end
 
-	if not wow_1000 then -- XXX beta
+	hooksecurefunc("AddonList_Update", function()
+		if not AddonList.searchList:IsEmpty() then
+			AddonList.ScrollBox:SetDataProvider(AddonList.searchList, true)
+		end
+	end)
+
+	AddonList:HookScript("OnHide", function(self)
+		wipe(self.filterList)
+		self.SearchBox:SetText("")
+		OnTextChanged(self.SearchBox)
+	end)
 
 	local editBox = CreateFrame("EditBox", "BetterAddonListSearchBox", AddonList, "SearchBoxTemplate")
 	editBox:SetPoint("TOPRIGHT", -107, -33) -- -107 w/filter, -11 w/o
 	editBox:SetSize(115, 20)
 	editBox:SetMaxLetters(40)
 	editBox:SetScript("OnTextChanged", OnTextChanged)
+	AddonList.SearchBox = editBox
 
 	local filterButton = CreateFrame("Button", "BetterAddonListFilterButton", AddonList, "UIMenuButtonStretchTemplate")
 	filterButton:SetPoint("LEFT", editBox, "RIGHT", 3, 0)
@@ -884,7 +832,7 @@ do
 			for _, key in ipairs(filters) do
 				info.text = L[("FILTER_%s"):format(key)]
 				info.func = function(_, _, _, checked)
-					filterList[key] = checked
+					filterList[key] = checked or nil
 					OnTextChanged(editBox)
 				end
 				info.checked = filterList[key]
@@ -926,7 +874,6 @@ do
 		ToggleDropDownMenu(1, nil, dropdown, self:GetName(), 74, 15)
 	end)
 
-	end -- XXX beta
 end
 
 function addon:EnableProtected()
@@ -945,18 +892,18 @@ function addon:EnableSet(name, done)
 	local set = sets[name]
 	if set and #set > 0 then
 		for i=1, GetNumAddOns() do
-			local name = GetAddOnInfo(i)
-			if tContains(set, name) then
+			local addon_name = GetAddOnInfo(i)
+			if tContains(set, addon_name) then
 				EnableAddOn(i, character)
 			end
 		end
 	end
 	if included[name] then
 		done = done or { [name] = true }
-		for set in next, included[name] do
-			if not done[set] then
-				done[set] = true
-				self:EnableSet(set, done)
+		for included_set in next, included[name] do
+			if not done[included_set] then
+				done[included_set] = true
+				self:EnableSet(included_set, done)
 			end
 		end
 	end
@@ -967,8 +914,8 @@ function addon:DisableSet(name)
 	local set = sets[name]
 	if set and #set > 0 then
 		for i=1, GetNumAddOns() do
-			local name = GetAddOnInfo(i)
-			if not IsAddonProtected(i) and tContains(set, name) then
+			local addon_name = GetAddOnInfo(i)
+			if not IsAddonProtected(i) and tContains(set, addon_name) then
 				DisableAddOn(i, character)
 			end
 		end
@@ -996,10 +943,7 @@ end
 
 function addon:RenameSet(name, newName)
 	if not sets[name] then return end
-	if sets[newName] then
-		StaticPopup_Show("BETTER_ADDONLIST_ERROR_NAME", newName, nil, {"BETTER_ADDONLIST_RENAMESET", name, nil, name})
-		return
-	end
+	if sets[newName] then return end
 
 	sets[newName] = CopyTable(sets[name])
 	sets[name] = nil

@@ -1,83 +1,15 @@
 local config, _, T, KR, PC = {}, ...
 local L, MODERN = T.L, select(4,GetBuildInfo()) >= 8e4
-OneRingLib.ext.config, KR, PC = config, T.ActionBook:compatible("Kindred",1,0), T.OPieCore
-local CreateEdge = T.ActionBook._CreateEdge
+T.config, KR, PC = config, T.ActionBook:compatible("Kindred",1,0), T.OPieCore
+local CreateEdge = T.CreateEdge
 
-function config.createPanel(name, parent)
-	local frame = CreateFrame("Frame", nil, UIParent)
-		frame.name, frame.parent = name, parent
-	frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLargeLeftTop")
-		frame.title:SetPoint("TOPLEFT", 16, -16)
-		frame.title:SetText(name)
-	frame.version = CreateFrame("Button", nil, frame)
-		frame.version:SetText(" ")
-		frame.version:SetNormalFontObject(GameFontHighlightSmallRight)
-		frame.version:GetFontString():ClearAllPoints()
-		frame.version:GetFontString():SetPoint("TOPRIGHT")
-		frame.version:SetPoint("TOPRIGHT", -16, -16)
-		frame.version:SetPushedTextOffset(0,0)
-		frame.version:SetSize(64, 12)
-		frame.version:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-	frame.desc = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmallLeftTop")
-		frame.desc:SetPoint("TOPLEFT", frame.title, "BOTTOMLEFT", 0, -8)
-		frame.desc:SetWidth(590)
-		
-	InterfaceOptions_AddCategory(frame)
-	frame:Hide()
-	return frame
+function config.createPanel(...)
+	return T.TenSettings:CreateOptionsPanel(...)
 end
 function config.open(panel)
-	InterfaceOptionsFrame_OpenToCategory(panel)
-	if not panel:IsVisible() then
-		-- Fails on first run as adding a category doesn't trigger a list update, but OTC does.
-		InterfaceOptionsFrame_OpenToCategory(panel)
-	end
-	
-	-- If the panel is offscreen in the AddOns list, both OTC calls above will fail;
-	-- in any case, we want all the children/sibling categories to be visible.
-	local cat, parent = INTERFACEOPTIONS_ADDONCATEGORIES, panel.parent or panel.name
-	local numVisiblePredecessors, parentPanel, lastRelatedPanel = 0
-	for i=1,#cat do
-		local e = cat[i]
-		if e.name == parent then
-			parentPanel, lastRelatedPanel = e, numVisiblePredecessors+1
-		elseif parentPanel then
-			if e.parent ~= parent then
-				break
-			end
-			lastRelatedPanel = lastRelatedPanel + 1
-		elseif not e.hidden then
-			numVisiblePredecessors = numVisiblePredecessors + 1
-		end
-	end
-	if lastRelatedPanel then
-		local buttons, ofsY = InterfaceOptionsFrameAddOns.buttons
-		if lastRelatedPanel - InterfaceOptionsFrameAddOnsList.offset > #buttons then
-			ofsY = (lastRelatedPanel - #buttons)*buttons[1]:GetHeight()
-			-- If the parent is collapsed, we might only be able to get it to show here
-			local _, maxY = InterfaceOptionsFrameAddOnsListScrollBar:GetMinMaxValues()
-			InterfaceOptionsFrameAddOnsListScrollBar:SetValue(math.min(ofsY, maxY))
-		end
-		-- If the parent is collapsed, expand it
-		for i=1,parentPanel and parentPanel.collapsed and #buttons or 0 do
-			if buttons[i].element == parentPanel then
-				InterfaceOptionsListButton_ToggleSubCategories(buttons[i])
-				break
-			end
-		end
-		if ofsY then
-			-- Set the proper scroll value, and force selection highlight to be updated
-			InterfaceOptionsFrameAddOnsListScrollBar:SetValue(ofsY)
-			InterfaceOptionsFrame_OpenToCategory(panel)
-		end
-	end
-	
-	if not panel:IsVisible() then
-		-- I give up.
-		InterfaceOptionsList_DisplayPanel(panel)
-	end
+	return panel:OpenPanel()
 end
-do -- ext.config.ui
+do -- config.ui
 	config.ui = {}
 	do -- multilineInput
 		local function onNavigate(self, _x,y, _w,h)
@@ -115,25 +47,7 @@ do -- ext.config.ui
 		end
 	end
 	function config.ui.lineInput(parent, common, width)
-		local input = CreateFrame("EditBox", nil, parent)
-		input:SetAutoFocus(nil) input:SetSize(width or 150, 20)
-		input:SetFontObject(ChatFontNormal)
-		input:SetScript("OnEscapePressed", input.ClearFocus)
-		local l, m, r = input:CreateTexture(nil, "BACKGROUND"), input:CreateTexture(nil, "BACKGROUND"), input:CreateTexture(nil, "BACKGROUND")
-		l:SetSize(common and 8 or 32, common and 20 or 32) l:SetPoint("LEFT", common and -5 or -10, 0)
-		l:SetTexture(common and "Interface\\Common\\Common-Input-Border" or "Interface\\ChatFrame\\UI-ChatInputBorder-Left2")
-		r:SetSize(common and 8 or 32, common and 20 or 32) r:SetPoint("RIGHT", common and 0 or 10, 0)
-		r:SetTexture(common and "Interface\\Common\\Common-Input-Border" or "Interface\\ChatFrame\\UI-ChatInputBorder-Right2")
-		m:SetHeight(common and 20 or 32) m:SetPoint("LEFT", l, "RIGHT") m:SetPoint("RIGHT", r, "LEFT")
-		m:SetTexture(common and "Interface\\Common\\Common-Input-Border" or "Interface\\ChatFrame\\UI-ChatInputBorder-Mid2")
-		if common then
-			l:SetTexCoord(0,1/16, 0,5/8)
-			r:SetTexCoord(15/16,1, 0,5/8)
-			m:SetTexCoord(1/16,15/16, 0,5/8)
-		else
-			m:SetHorizTile(true)
-		end
-		return input
+		return T.TenSettings:CreateLineInputBox(parent, common, width)
 	end
 	function config.ui.HideTooltip(self)
 		if GameTooltip:IsOwned(self) then
@@ -361,7 +275,7 @@ do -- ext.config.ui
 		config.ui.scrollingDropdown = sdAPI
 	end
 end
-do -- ext.config.bind
+do -- config.bind
 	local unbindMap, activeCaptureButton = {}
 	local alternateFrame = CreateFrame("Frame", nil, UIParent) do
 		CreateEdge(alternateFrame, { bgFile="Interface/ChatFrame/ChatFrameBackground", edgeFile="Interface/DialogFrame/UI-DialogBox-Border", tile=true, tileSize=32, edgeSize=32, insets={left=11, right=11, top=12, bottom=10}}, 0xd8000000)
@@ -556,7 +470,7 @@ do -- ext.config.bind
 		return btn
 	end
 end
-do -- ext.config.undo
+do -- config.undo
 	local undoStack, undo = {}, {}
 	config.undo = undo
 	function undo.unwind()
@@ -580,124 +494,18 @@ do -- ext.config.undo
 		table.wipe(undoStack)
 	end
 end
-do -- ext.config.overlay
-	local container, watcher, occupant = CreateFrame("Frame"), CreateFrame("Frame") do
-		container:EnableMouse(1) container:EnableKeyboard(1) container:Hide()
-		container:SetPropagateKeyboardInput(true)
-		container:SetScript("OnKeyDown", function(self, key)
-			if key == "ESCAPE" then self:Hide() end
-			self:SetPropagateKeyboardInput(key ~= "ESCAPE")
-		end)
-		container:SetScript("OnMouseWheel", function() end)
-		container.fader = container:CreateTexture(nil, "BACKGROUND")
-		container.fader:SetColorTexture(0,0,0, 0.40)
-		local corner = container:CreateTexture(nil, "ARTWORK")
-		corner:SetTexture("Interface\\DialogFrame\\UI-DialogBox-Corner")
-		corner:SetSize(30,30) corner:SetPoint("TOPRIGHT", -5, -6)
-		local close = CreateFrame("Button", nil, container, "UIPanelCloseButton")
-		close:SetPoint("TOPRIGHT", 0, -1)
-		close:SetScript("OnClick", function() container:Hide() end)
-		CreateEdge(container, {edgeFile="Interface\\DialogFrame\\UI-DialogBox-Border", edgeSize=32, bgFile="Interface\\FrameGeneral\\UI-Background-Rock", tile=true, tileSize=256, insets={left=10,right=10,top=10,bottom=10}}, 0x4c667f)
-		watcher:SetScript("OnHide", function()
-			if occupant then
-				container:Hide()
-				PlaySound(SOUNDKIT.IG_MAINMENU_CLOSE)
-				occupant:Hide()
-				occupant=nil
-			end
-		end)
-	end
+do -- config.overlay
 	function config.overlay(self, overlayFrame)
-		if occupant and occupant ~= overlayFrame then occupant:Hide() end
-		local cw, ch = overlayFrame:GetSize()
-		local w2, h2 = self:GetSize()
-		local w, h, isRefresh = cw + 24, ch + 24, occupant == overlayFrame
-		w2, h2, occupant = w2 > w and (w-w2)/2 or 0, h2 > h and (h-h2)/2 or 0
-		container:SetSize(w, h)
-		container:SetHitRectInsets(w2, w2, h2, h2)
-		container:SetParent(self)
-		container:SetPoint("CENTER")
-		container:SetFrameLevel(self:GetFrameLevel()+20)
-		container.fader:ClearAllPoints()
-		container.fader:SetPoint("TOPLEFT", self, "TOPLEFT", 2, -2)
-		container.fader:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -2, 2)
-		container:Show()
-		overlayFrame:ClearAllPoints()
-		overlayFrame:SetParent(container)
-		overlayFrame:SetPoint("CENTER")
-		overlayFrame:Show()
-		watcher:SetParent(overlayFrame)
-		watcher:Show()
-		CloseDropDownMenus()
-		if not isRefresh then PlaySound(SOUNDKIT.IG_MAINMENU_OPEN) end
-		occupant = overlayFrame
-	end
-	
-	local promptFrame = CreateFrame("Frame") do
-		promptFrame:SetSize(400, 130)
-		promptFrame.title = promptFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-		promptFrame.prompt = promptFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-		promptFrame.editBox = config.ui.lineInput(promptFrame, 300)
-		promptFrame.accept = CreateFrame("Button", nil, promptFrame, "UIPanelButtonTemplate")
-		promptFrame.cancel = CreateFrame("Button", nil, promptFrame, "UIPanelButtonTemplate")
-		promptFrame.detail = promptFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-		promptFrame.title:SetPoint("TOP", 0, -3)
-		promptFrame.prompt:SetPoint("TOP", promptFrame.title, "BOTTOM", 0, -8)
-		promptFrame.editBox:SetPoint("TOP", promptFrame.prompt, "BOTTOM", 0, -7)
-		promptFrame.detail:SetPoint("TOP", promptFrame.editBox, "BOTTOM", 0, -8)
-		promptFrame.prompt:SetWidth(380)
-		promptFrame.detail:SetWidth(380)
-				
-		promptFrame.cancel:SetScript("OnClick", function() promptFrame:Hide() end)
-		promptFrame.editBox:SetScript("OnTextChanged", function(self)
-			promptFrame.accept:SetEnabled(promptFrame.callback == nil or promptFrame.callback(self, self:GetText() or "", false, promptFrame:GetParent():GetParent()))
-		end)
-		promptFrame.accept:SetScript("OnClick", function()
-			local callback, text = promptFrame.callback, promptFrame.editBox:GetText() or ""
-			if callback == nil or callback(promptFrame.editBox, text, true, promptFrame:GetParent():GetParent()) then
-				promptFrame:Hide()
-			end
-		end)
-		promptFrame.editBox:SetScript("OnEnterPressed", function() promptFrame.accept:Click() end)
-		promptFrame.editBox:SetScript("OnEscapePressed", function() promptFrame.cancel:Click() end)
+		return T.TenSettings:ShowFrameOverlay(self, overlayFrame)
 	end
 	function config.prompt(frame, title, prompt, explainText, acceptText, callback, editBoxWidth, cancelText)
-		promptFrame.callback = callback
-		promptFrame.title:SetText(title or "")
-		promptFrame.prompt:SetText(prompt or "")
-		promptFrame.detail:SetText(explainText or "")
-		promptFrame.editBox:SetText("")
-		promptFrame:SetHeight(55 + math.max(20, promptFrame.prompt:GetStringHeight()) + (editBoxWidth ~= false and 30 or 0) + ((explainText or "") ~= "" and 20 or 0))
-		config.overlay(frame, promptFrame)
-		if editBoxWidth ~= false then
-			promptFrame.editBox:Show()
-			promptFrame.editBox:SetWidth((editBoxWidth or 0.50) * 380)
-			promptFrame.editBox:SetFocus()
-		else
-			promptFrame.editBox:Hide()
-		end
-		promptFrame.cancel:ClearAllPoints()
-		promptFrame.accept:ClearAllPoints()
-		if acceptText ~= false then
-			promptFrame.accept:SetText(acceptText or ACCEPT)
-			promptFrame.cancel:SetText(cancelText or CANCEL)
-			promptFrame.cancel:SetPoint("BOTTOMLEFT", promptFrame, "BOTTOM", 5, 0)
-			promptFrame.accept:SetPoint("BOTTOMRIGHT", promptFrame, "BOTTOM", -5, 0)
-			promptFrame.accept:Show()
-		else
-			promptFrame.accept:Hide()
-			promptFrame.cancel:SetText(cancelText or OKAY)
-			promptFrame.cancel:SetPoint("BOTTOM", 5, 0)
-		end
-		promptFrame.cancel:SetWidth(math.max(125, 15+promptFrame.cancel:GetFontString():GetStringWidth()))
-		promptFrame.accept:SetWidth(math.max(125, 15+promptFrame.accept:GetFontString():GetStringWidth()))
-		return promptFrame
+		return T.TenSettings:ShowPromptOverlay(frame, title, prompt, explainText, acceptText, callback, editBoxWidth, cancelText)
 	end
 	function config.alert(frame, title, message, dissmissText)
-		config.prompt(frame, title, message, nil, false, nil, false, dissmissText)
+		return T.TenSettings:ShowAlertOverlay(frame, title, message, dissmissText)
 	end
 end
-do -- ext.config.pulseDropdown
+do -- config.pulseDropdown
 	local function cloneTex(tex)
 		local l, sl = tex:GetDrawLayer()
 		local r = tex:GetParent():CreateTexture(nil, l, nil, sl+1)
@@ -738,11 +546,11 @@ do -- ext.config.pulseDropdown
 end
 
 function config.undo.saveProfile(noData)
-	local undo, name = config.undo, OneRingLib:GetCurrentProfile()
+	local undo, name = config.undo, OPie:GetCurrentProfile()
 	if noData then
-		undo.push("OPieLightProfile#" .. name, OneRingLib.SwitchProfile, OneRingLib, name)
+		undo.push("OPieLightProfile#" .. name, PC.SwitchProfile, PC, name)
 	elseif not undo.search("OPieProfile#" .. name) then
-		undo.push("OPieProfile#" .. name, OneRingLib.SwitchProfile, OneRingLib, name, (OneRingLib:ExportProfile(name)))
+		undo.push("OPieProfile#" .. name, PC.SwitchProfile, PC, name, (PC:ExportProfile(name)))
 	end
 end
 
@@ -763,10 +571,10 @@ local OPC_OptionSets = {
 		{"bool", "NoClose", caption=L"Leave open after use", depOn="ClickActivation", depValue=true, otherwise=false},
 		{"bool", "UseDefaultBindings", caption=L"Use default ring bindings"},
 		{"drop", "PadSupportMode", {"freelook", "cursor", "none", freelook=L"Camera analog stick", cursor=L"Virtual mouse cursor", none=L"None"}, caption=L"Controller interaction mode", hideFeature="GamePad"},
-		{"range", "IndicationOffsetX", -500, 500, 50, caption=L"Move rings right", suffix="(%d)"},
-		{"range", "IndicationOffsetY", -300, 300, 50, caption=L"Move rings down", suffix="(%d)"},
+		{"range", "IndicationOffsetX", -500, 500, 50, caption=L"Move rings right", valueFormat="%d"},
+		{"range", "IndicationOffsetY", -300, 300, 50, caption=L"Move rings down", valueFormat="%d"},
 		{"range", "MouseBucket", 5, 1, 1, caption=L"Scroll wheel sensitivity", stdLabels=true},
-		{"range", "RingScale", 0.1, 2, caption=L"Ring scale", suffix="(%0.1f)"},
+		{"range", "RingScale", 0.1, 2, caption=L"Ring scale", valueFormat="%0.1f"},
 	}, { L"Appearance",
 		{"bool", "GhostMIRings", caption=L"Nested rings"},
 		{"bool", "ShowKeys", caption=L"Per-slice bindings", depOn="SliceBinding", depValue=true, otherwise=false},
@@ -779,18 +587,12 @@ local OPC_OptionSets = {
 		{"bool", "MIScale", caption=L"Enlarge selected slice"},
 		{"bool", "MISpinOnHide", caption=L"Outward spiral on hide"},
 		{"bool", "XTPointerSnap", caption=L"Snap pointer to mouse cursor"},
-		{"range", "XTZoomTime", 0, 1, 0.1, caption=L"Zoom-in/out time", suffix=L"(%.1f sec)"},
+		{"range", "XTZoomTime", 0, 1, 0.1, caption=L"Zoom-in/out time", valueFormat=L"%.1f sec"},
 	}
 }
 
-local frame = config.createPanel("OPie")
-	frame.version:SetFormattedText("%s (%d.%d)", OneRingLib:GetVersion())
-	local c = 0
-	frame.version:SetScript("OnClick", function(self, button)
-		c = button ~= "RightButton" and (c + 1) % 64 or 0
-		local c = ITEM_QUALITY_COLORS[c > 0 and (c % 3 == 0 and 2 or c % 7 == 0 and 3 or c % 11 == 0 and 4) or 1]
-		self:GetFontString():SetTextColor(c.r, c.g, c.b)
-	end)
+local frame = config.createPanel("OPie", nil, {forceRootVersion=true})
+	frame.version:SetFormattedText("%s", OPie:GetVersion() or "")
 local OPC_Profile = CreateFrame("Frame", "OPC_Profile", frame, "UIDropDownMenuTemplate")
 	OPC_Profile:SetPoint("TOPLEFT", frame, 0, -75)
 	UIDropDownMenu_SetWidth(OPC_Profile, 200)
@@ -816,7 +618,7 @@ do -- Widget construction
 	end
 	local function dropInitialize(self)
 		local dda = OPC_WidgetControl[self][3]
-		local info = {func=dropSelect, arg2=self}
+		local info = {func=dropSelect, arg2=self, minWidth=self:GetWidth()-40}
 		for i=1,#dda do
 			local k = dda[i]
 			info.text, info.arg1, info.checked = dda[k], k, OPC_WidgetControl[self].cv == k
@@ -835,7 +637,7 @@ do -- Widget construction
 		self:SetPoint("TOPRIGHT", r, "TOPRIGHT", 0, y)
 	end
 	function build.bool(v, ofsY, halfpoint, rowHeight, rframe)
-		local b = CreateFrame("CheckButton", nil, frame, "InterfaceOptionsCheckButtonTemplate")
+		local b = T.TenSettings:CreateOptionsCheckButton(nil, frame)
 		b:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 		b:SetMotionScriptsWhileDisabled(true)
 		b.id, b.text, b.desc = v[2], b.Text, v
@@ -844,7 +646,7 @@ do -- Widget construction
 		hooksecurefunc(b, "SetEnabled", OnStateChange)
 		return b, ofsY - (halfpoint and rowHeight or 0), not halfpoint, halfpoint and 0 or 20
 	end
-	function build.range(v, ofsY, halfpoint, rowHeight, rframe)
+	function build.range9(v, ofsY, halfpoint, rowHeight, rframe)
 		if halfpoint then
 			ofsY = ofsY - rowHeight
 		end
@@ -869,12 +671,44 @@ do -- Widget construction
 		b:SetObeyStepOnDrag(true)
 		return b, ofsY - 20, false, 0
 	end
+	function build.range10(v, ofsY, halfpoint, rowHeight, rframe)
+		if halfpoint then
+			ofsY = ofsY - rowHeight
+		end
+		local b, t = CreateFrame("Frame", nil, frame, "MinimalSliderWithSteppersTemplate")
+		b:SetHeight(20)
+		b:SetPoint("TOPLEFT", rframe, "TOPLEFT", 296, ofsY-5)
+		b.Back:SetHitRectInsets(-4, -4, 0, 0)
+		b.Forward:SetHitRectInsets(-4, -4, 0, 0)
+		t = b.Back:CreateTexture(nil, "HIGHLIGHT")
+		t:SetPoint("CENTER")
+		t:SetAtlas("Minimal_SliderBar_Button_Left", true)
+		t:SetBlendMode("ADD")
+		t:SetVertexColor(1,0.75,0, 0.65)
+		t = b.Forward:CreateTexture(nil, "HIGHLIGHT")
+		t:SetPoint("CENTER")
+		t:SetAtlas("Minimal_SliderBar_Button_Right", true)
+		t:SetBlendMode("ADD")
+		t:SetVertexColor(1,0.75,0, 0.65)
+		local s = b.Slider
+		s.text = b.Labels[1]
+		s.text:SetFontObject(GameFontHighlight)
+		s.text:ClearAllPoints()
+		s.text:SetPoint("TOPLEFT", rframe, "TOPLEFT", 44, ofsY-9)
+		s.text:Show()
+		s:SetValueStep(v[5] or 0.1)
+		s:SetMinMaxValues(v[3] < v[4] and v[3] or -v[3], v[4] > v[3] and v[4] or -v[4])
+		s:SetObeyStepOnDrag(true)
+		s:SetScript("OnValueChanged", notifyChange)
+		s.id, s.desc = v[2], v
+		return s, ofsY - 22, false, 0
+	end
 	function build.drop(v, ofsY, halfpoint, rowHeight, rframe)
 		local f = CreateFrame("Frame", "OPC_Drop" .. v[2], frame, "UIDropDownMenuTemplate")
 		if halfpoint then ofsY = ofsY - rowHeight end
 		f:SetPoint("TOPLEFT", rframe, "TOPLEFT", 300, ofsY-4)
 		UIDropDownMenu_SetWidth(f, 210)
-		UIDropDownMenu_SetText(f, "Chicken-boom")
+		UIDropDownMenu_SetText(f, "Chicken-doom")
 		f.initialize, f.refresh = dropInitialize, dropSetValue
 		f.text = f:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 		f.text:SetPoint("TOPLEFT", rframe, "TOPLEFT", 44, ofsY-12.5)
@@ -890,6 +724,7 @@ do -- Widget construction
 		anchor_OnVisibilityChange(f)
 		return f
 	end
+	build.range, build.range10, build.range9 = build[MODERN and "range10" or "range9"]
 
 	local cY, halfpoint, rframe, rowHeight = MODERN and -100 or -90, false, frame
 	for _, v in ipairs(OPC_OptionSets) do
@@ -927,15 +762,15 @@ local OR_CurrentOptionsDomain
 local function OPC_UpdateControlReqs(v)
 	local enabled, disabledHint = true, nil
 	if v.depOn then
-		enabled = OneRingLib:GetOption(v.depOn, OR_CurrentOptionsDomain) == v.depValue
+		enabled = PC:GetOption(v.depOn, OR_CurrentOptionsDomain) == v.depValue
 	elseif v.depIndicatorFeature then
-		enabled = T.OPieUI:DoesIndicatorConstructorSupport(OneRingLib:GetOption("IndicatorFactory", OR_CurrentOptionsDomain), v.depIndicatorFeature)
+		enabled = T.OPieUI:DoesIndicatorConstructorSupport(PC:GetOption("IndicatorFactory", OR_CurrentOptionsDomain), v.depIndicatorFeature)
 		disabledHint = L"Not supported by selected appearance."
 	end
 	v.widget:SetEnabled(enabled)
 	-- It just so happens they're all checkboxes. This will explode when they are not.
 	if enabled then
-		v.widget:SetChecked(OneRingLib:GetOption(v[2], OR_CurrentOptionsDomain) or nil)
+		v.widget:SetChecked(PC:GetOption(v[2], OR_CurrentOptionsDomain) or nil)
 		v.widget.tooltipText = nil
 	else
 		v.widget:SetChecked(v.otherwise or nil)
@@ -951,12 +786,12 @@ function OPC_AlterOption(widget, option, newval, ...)
 		newval = -newval
 	end
 	config.undo.saveProfile()
-	OneRingLib:SetOption(option, newval, OR_CurrentOptionsDomain)
-	local setval = OneRingLib:GetOption(option, OR_CurrentOptionsDomain)
+	PC:SetOption(option, newval, OR_CurrentOptionsDomain)
+	local setval = PC:GetOption(option, OR_CurrentOptionsDomain)
 	if widget:IsObjectType("Slider") then
-		local text = widget.desc.caption
-		if widget.desc.suffix then
-			text = text .. " |cffffd500" .. widget.desc.suffix:format(setval) .. "|r"
+		local text, vf = widget.desc.caption, widget.desc.valueFormat
+		if vf then
+			text = text .. " |cffffd500(" .. vf:format(setval) .. ")|r"
 		end
 		widget.text:SetText(text)
 		OPC_BlockInput = true
@@ -984,7 +819,7 @@ end
 function OPC_OptionDomain:initialize()
 	local list = {false, [false]=L"Defaults for all rings"}
 	local ct = T.OPC_RingScopePrefixes
-	for key, name, scope in OneRingLib:IterateRings(IsAltKeyDown()) do
+	for key, name, scope in OPie:IterateRings(IsAltKeyDown()) do
 		local color = ct and ct[scope] or "|cffacd7e6"
 		list[#list+1], list[key] = key, (L"Ring: %s"):format(color .. (name or key) .. "|r")
 	end
@@ -992,14 +827,14 @@ function OPC_OptionDomain:initialize()
 end
 local function OPC_Profile_NewCallback(self, text, apply, frame)
 	local name = text:match("^%s*(.-)%s*$")
-	if name == "" or OneRingLib:ProfileExists(name) then
+	if name == "" or PC:ProfileExists(name) then
 		if apply then self.editBox:SetText("") end
 		return false
 	elseif apply then
 		config.undo.saveProfile(true)
-		OneRingLib:SwitchProfile(name, true)
+		PC:SwitchProfile(name, true)
 		if not config.undo.search("OPieProfile#" .. name) then
-			config.undo.push("OPieProfile#" .. name, OneRingLib.DeleteProfile, OneRingLib, name)
+			config.undo.push("OPieProfile#" .. name, PC.DeleteProfile, PC, name)
 		end
 		frame.refresh("profile")
 	end
@@ -1010,7 +845,7 @@ local function OPC_Profile_FormatName(ident)
 end
 function OPC_Profile:switch(arg1, frame)
 	config.undo.saveProfile(true)
-	OneRingLib:SwitchProfile(arg1)
+	PC:SwitchProfile(arg1)
 	frame.refresh("profile")
 end
 function OPC_Profile:new(_, frame)
@@ -1018,12 +853,12 @@ function OPC_Profile:new(_, frame)
 end
 function OPC_Profile:delete(_, frame)
 	config.undo.saveProfile()
-	OneRingLib:DeleteProfile(OneRingLib:GetCurrentProfile())
+	PC:DeleteProfile(OPie:GetCurrentProfile())
 	frame.refresh("profile")
 end
 function OPC_Profile:initialize()
 	local info = {func=OPC_Profile.switch, arg2=self:GetParent()}
-	for ident, isActive in OneRingLib.Profiles do
+	for ident, isActive in PC.Profiles do
 		info.text, info.arg1, info.checked = OPC_Profile_FormatName(ident), ident, isActive or nil
 		UIDropDownMenu_AddButton(info)
 	end
@@ -1031,7 +866,7 @@ function OPC_Profile:initialize()
 	UIDropDownMenu_AddButton(info)
 	info.text, info.disabled, info.minWidth, info.func = L"Create a new profile", false, self:GetWidth()-40, OPC_Profile.new
 	UIDropDownMenu_AddButton(info)
-	info.text, info.func = OneRingLib:GetCurrentProfile() ~= "default" and L"Delete current profile" or L"Restore default settings", OPC_Profile.delete
+	info.text, info.func = OPie:GetCurrentProfile() ~= "default" and L"Delete current profile" or L"Restore default settings", OPC_Profile.delete
 	UIDropDownMenu_AddButton(info)
 end
 function OPC_AppearanceFactory:formatText(key, outOfDate, name)
@@ -1050,12 +885,12 @@ function OPC_AppearanceFactory:formatText(key, outOfDate, name)
 	return name
 end
 function OPC_AppearanceFactory:text()
-	local key, own = OneRingLib:GetOption("IndicatorFactory", OR_CurrentOptionsDomain)
+	local key, own = PC:GetOption("IndicatorFactory", OR_CurrentOptionsDomain)
 	UIDropDownMenu_SetText(self, OR_CurrentOptionsDomain and own == nil and L"Use global setting" or self:formatText(key, false))
 end
 function OPC_AppearanceFactory:initialize()
 	local info = {func=self.set, minWidth=UIDROPDOWNMENU_OPEN_MENU:GetWidth()-40, tooltipOnButton=true}
-	local current, own = OneRingLib:GetOption("IndicatorFactory", OR_CurrentOptionsDomain)
+	local current, own = PC:GetOption("IndicatorFactory", OR_CurrentOptionsDomain)
 	for k, name, outOfDate in T.OPieUI:EnumerateRegisteredIndicatorConstructors() do
 		name = self:formatText(k, outOfDate, name)
 		if k == "_" then
@@ -1076,7 +911,7 @@ function OPC_AppearanceFactory:initialize()
 	end
 end
 function OPC_AppearanceFactory:set(key)
-	OneRingLib:SetOption("IndicatorFactory", key, OR_CurrentOptionsDomain)
+	PC:SetOption("IndicatorFactory", key, OR_CurrentOptionsDomain)
 	OPC_AppearanceFactory:text()
 	for _,set in ipairs(OPC_OptionSets) do for j=2,#set do local v = set[j]
 		if v.depIndicatorFeature then
@@ -1093,27 +928,28 @@ function frame.refresh()
 	end
 	local label = L"Defaults for all rings"
 	if OR_CurrentOptionsDomain then
-		local name, key = OneRingLib:GetRingInfo(OR_CurrentOptionsDomain)
+		local name, key = OPie:GetRingInfo(OR_CurrentOptionsDomain)
 		label = (L"Ring: %s"):format("|cffaaffff" .. (name or key) .."|r")
 	end
 	UIDropDownMenu_SetText(OPC_OptionDomain, label)
-	UIDropDownMenu_SetText(OPC_Profile, L"Profile" .. ": " .. OPC_Profile_FormatName(OneRingLib:GetCurrentProfile()))
+	UIDropDownMenu_SetText(OPC_Profile, L"Profile" .. ": " .. OPC_Profile_FormatName(OPie:GetCurrentProfile()))
 	OPC_AppearanceFactory:text()
 	OPC_AppearanceFactory:SetShown(T.OPieUI:HasMultipleIndicatorConstructors())
 	for _, set in pairs(OPC_OptionSets) do for j=2,#set do
 		local v, opttype, option = set[j], set[j][1], set[j][2]
 		if opttype == "range" then
-			v.widget:SetValue(OneRingLib:GetOption(option) * (v[3] < v[4] and 1 or -1))
+			v.widget:SetValue(PC:GetOption(option) * (v[3] < v[4] and 1 or -1))
 			local text = v.caption
-			if v.suffix then
-				text = text .. " |cffffd500" .. v.suffix:format(v.widget:GetValue()) .. "|r"
+			if v.valueFormat then
+				local vf = v.valueFormat:format(v.widget:GetValue())
+				text = text .. " |cffffd500(" .. vf .. ")|r"
 			end
 			v.widget.text:SetText(text)
 		elseif opttype == "bool" then
-			v.widget:SetChecked(OneRingLib:GetOption(option, OR_CurrentOptionsDomain) or nil)
+			v.widget:SetChecked(PC:GetOption(option, OR_CurrentOptionsDomain) or nil)
 			v.widget.text:SetText(v.caption)
 		elseif opttype == "drop" then
-			v.widget:refresh(OneRingLib:GetOption(option, OR_CurrentOptionsDomain) or nil)
+			v.widget:refresh(PC:GetOption(option, OR_CurrentOptionsDomain) or nil)
 		end
 		if v.depOn or v.depIndicatorFeature then
 			OPC_UpdateControlReqs(v)
@@ -1133,7 +969,7 @@ function frame.cancel()
 end
 function frame.default()
 	config.undo.saveProfile()
-	OneRingLib:ResetOptions(true)
+	PC:ResetOptions(true)
 	frame.refresh()
 end
 function frame.okay()

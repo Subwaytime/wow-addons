@@ -1,6 +1,7 @@
 # Immersion
 
-## [1.4.10](https://github.com/seblindfors/Immersion/tree/1.4.10) (2022-10-26)
-[Full Changelog](https://github.com/seblindfors/Immersion/compare/1.4.9...1.4.10) [Previous Releases](https://github.com/seblindfors/Immersion/releases)
+## [1.4.13](https://github.com/seblindfors/Immersion/tree/1.4.13) (2022-10-30)
+[Full Changelog](https://github.com/seblindfors/Immersion/compare/1.4.12...1.4.13) [Previous Releases](https://github.com/seblindfors/Immersion/releases)
 
-- Added support for closing on different interaction types  
+- Fix reputation bar breaking WotLK version  
+- Fix frame levels on title buttons  

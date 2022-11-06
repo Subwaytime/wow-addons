@@ -1,8 +1,9 @@
-local api, RK, conf, ORI, _, T = {}, OneRingLib.ext.RingKeeper, OneRingLib.ext.config, OPie.UI, ...
+local api, _, T = {}, ...
+local PC, RK, ORI, conf = T.OPieCore, T.RingKeeper, OPie.UI, T.config
 local L, MODERN = T.L, select(4,GetBuildInfo()) >= 8e4
 local AB = assert(T.ActionBook:compatible(2,23), "A compatible version of ActionBook is required")
 local gfxBase, EV = [[Interface\AddOns\OPie\gfx\]], T.Evie
-local CreateEdge = T.ActionBook._CreateEdge
+local CreateEdge = T.CreateEdge
 
 local FULLNAME, SHORTNAME do
 	function EV.PLAYER_LOGIN()
@@ -123,7 +124,6 @@ end
 local ringContainer, ringDetail, sliceDetail, newSlice, newRing
 local panel = conf.createPanel(L"Custom Rings", "OPie")
 	panel.desc:SetText(L"Customize OPie by modifying existing rings, or creating your own.")
-	panel.version:SetFormattedText("%d.%d", RK:GetVersion())
 local ringDropDown = CreateFrame("Frame", "RKC_RingSelectionDropDown", panel, "UIDropDownMenuTemplate")
 	ringDropDown:SetPoint("TOP", -70, -60)
 	UIDropDownMenu_SetWidth(ringDropDown, 260)
@@ -139,7 +139,7 @@ newRing = CreateFrame("Frame") do
 	local name, snap = conf.ui.lineInput(newRing, true, 240), conf.ui.lineInput(newRing, true, 240)
 	local nameLabel, snapLabel = newRing:CreateFontString(nil, "OVERLAY", "GameFontHighlight"), snap:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	local accept, cancel = CreateButton(newRing, 125), CreateButton(newRing, 125)
-	local importNested = CreateFrame("CheckButton", nil, newRing, "InterfaceOptionsCheckButtonTemplate")
+	local importNested = T.TenSettings:CreateOptionsCheckButton(nil, newRing)
 	local state = {selected=toggle1, buncount=0}
 	title:SetPoint("TOP", 0, -3)
 	toggle1:SetPoint("TOPLEFT", 20, -25)
@@ -283,7 +283,7 @@ ringContainer = CreateFrame("Frame", nil, panel) do
 	ringContainer:SetPoint("BOTTOM", panel, 0, 10)
 	ringContainer:SetPoint("LEFT", panel, 50, 0)
 	ringContainer:SetPoint("RIGHT", panel, -10, 0)
-	CreateEdge(ringContainer, {edgeFile="Interface/Tooltips/UI-Tooltip-Border", tile=true, edgeSize=8}, nil, 0x7f7f7f)
+	CreateEdge(ringContainer, {edgeFile="Interface/Tooltips/UI-Tooltip-Border", tile=true, edgeSize=14}, nil, 0x7f7f7f)
 	local function UpdateOnShow(self) self:SetScript("OnUpdate", nil) api.refreshDisplay() end
 	ringContainer:SetScript("OnHide", function(self) if self:IsShown() then self:SetScript("OnUpdate", UpdateOnShow) end end)
 	do -- up/down arrow buttons: ringContainer.prev and ringContainer.next
@@ -423,7 +423,7 @@ ringDetail = CreateFrame("Frame", nil, ringContainer) do
 	ringDetail.binding.label = ringDetail.scope:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	ringDetail.binding.label:SetPoint("TOPLEFT", ringDetail, "TOPLEFT", 10, -73)
 	ringDetail.binding.label:SetText(L"Binding:")
-	ringDetail.bindingQuarantine = CreateFrame("CheckButton", nil, ringDetail, "InterfaceOptionsCheckButtonTemplate")
+	ringDetail.bindingQuarantine = T.TenSettings:CreateOptionsCheckButton(nil, ringDetail)
 	ringDetail.bindingQuarantine:SetHitRectInsets(0,0,0,0)
 	ringDetail.bindingQuarantine:SetPoint("RIGHT", ringDetail.binding, "LEFT", 0, 0)
 	ringDetail.bindingQuarantine:SetScript("OnClick", function(self) PlayCheckboxSound(self) api.setRingProperty("hotkey", api.getRingProperty("quarantineBind")) end)
@@ -437,22 +437,22 @@ ringDetail = CreateFrame("Frame", nil, ringContainer) do
 	ringDetail.rotation.label = ringDetail.scope:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	ringDetail.rotation.label:SetPoint("TOPLEFT", ringDetail, "TOPLEFT", 10, -96)
 	ringDetail.rotation.label:SetText(L"Rotation:")
-	ringDetail.opportunistCA = CreateFrame("CheckButton", nil, ringDetail, "InterfaceOptionsCheckButtonTemplate")
+	ringDetail.opportunistCA = T.TenSettings:CreateOptionsCheckButton(nil, ringDetail)
 	ringDetail.opportunistCA:SetPoint("TOPLEFT", 266, -118)
 	ringDetail.opportunistCA:SetMotionScriptsWhileDisabled(1)
 	ringDetail.opportunistCA.Text:SetText(L"Pre-select a quick action slice")
 	ringDetail.opportunistCA:SetScript("OnEnter", conf.ui.ShowControlTooltip)
 	ringDetail.opportunistCA:SetScript("OnLeave", conf.ui.HideTooltip)
 	ringDetail.opportunistCA:SetScript("OnClick", function(self) PlayCheckboxSound(self) api.setRingProperty("noOpportunisticCA", (not self:GetChecked()) or nil) api.setRingProperty("noPersistentCA", (not self:GetChecked()) or nil) end)
-	ringDetail.hiddenRing = CreateFrame("CheckButton", nil, ringDetail, "InterfaceOptionsCheckButtonTemplate")
+	ringDetail.hiddenRing = T.TenSettings:CreateOptionsCheckButton(nil, ringDetail)
 	ringDetail.hiddenRing:SetPoint("TOPLEFT", ringDetail.opportunistCA, "BOTTOMLEFT", 0, 2)
 	ringDetail.hiddenRing.Text:SetText(L"Hide this ring")
 	ringDetail.hiddenRing:SetScript("OnClick", function(self) PlayCheckboxSound(self) api.setRingProperty("internal", self:GetChecked() and true or nil) end)
-	ringDetail.embedRing = CreateFrame("CheckButton", nil, ringDetail, "InterfaceOptionsCheckButtonTemplate")
+	ringDetail.embedRing = T.TenSettings:CreateOptionsCheckButton(nil, ringDetail)
 	ringDetail.embedRing:SetPoint("TOPLEFT", ringDetail.hiddenRing, "BOTTOMLEFT", 0, 2)
 	ringDetail.embedRing.Text:SetText(L"Embed into other rings by default")
 	ringDetail.embedRing:SetScript("OnClick", function(self) PlayCheckboxSound(self) api.setRingProperty("embed", self:GetChecked() and true or nil) end)
-	ringDetail.firstOnOpen = CreateFrame("CheckButton", nil, ringDetail, "InterfaceOptionsCheckButtonTemplate") do
+	ringDetail.firstOnOpen = T.TenSettings:CreateOptionsCheckButton(nil, ringDetail) do
 		local f = ringDetail.firstOnOpen
 		f:SetPoint("TOPLEFT", ringDetail.embedRing, "BOTTOMLEFT", 0, 2)
 		f:SetMotionScriptsWhileDisabled(1)
@@ -493,7 +493,7 @@ ringDetail = CreateFrame("Frame", nil, ringContainer) do
 	ringDetail.export:SetPoint("TOP", ringDetail.shareLabel2, "BOTTOM", 0, -4)
 	ringDetail.export:SetText(L"Share ring")
 	ringDetail.export:SetScript("OnClick", function(self) PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON) api.exportRing(self.nested:IsShown() and self.nested:GetChecked() and true) end)
-	ringDetail.export.nested = CreateFrame("CheckButton", nil, ringDetail.export, "InterfaceOptionsCheckButtonTemplate") do
+	ringDetail.export.nested = T.TenSettings:CreateOptionsCheckButton(nil, ringDetail.export) do
 		local f = ringDetail.export.nested
 		f:SetPoint("TOPLEFT", ringDetail.shareLabel2, "BOTTOMLEFT", -4, -1)
 		f.Text:SetText(L"Include nested rings")
@@ -761,7 +761,7 @@ sliceDetail = CreateFrame("Frame", nil, ringContainer) do
 			frame:Hide()
 		end
 	end
-	sliceDetail.fastClick = CreateFrame("CheckButton", nil, sliceDetail, "InterfaceOptionsCheckButtonTemplate") do
+	sliceDetail.fastClick = T.TenSettings:CreateOptionsCheckButton(nil, sliceDetail) do
 		local e = sliceDetail.fastClick
 		e:SetHitRectInsets(0, -200, 4, 4) e:SetMotionScriptsWhileDisabled(1)
 		e:SetPoint("TOPLEFT", 266, -oy)
@@ -844,6 +844,8 @@ sliceDetail = CreateFrame("Frame", nil, ringContainer) do
 	
 	do -- .editorContainer
 		local f = CreateFrame("Frame", nil, sliceDetail)
+		local t = f:CreateTexture()
+		t:SetColorTexture(1,0,0,0.05)
 		f:SetPoint("TOPLEFT", sliceDetail.fastClick.label, "BOTTOMLEFT", 0, -10)
 		f:SetPoint("BOTTOMRIGHT", -10, 36)
 		function f:SaveAction()
@@ -1051,7 +1053,7 @@ newSlice = CreateFrame("Frame", nil, ringContainer) do
 	end
 	for i=1,24 do
 		local f = CreateFrame("Button", nil, newSlice)
-		f:SetSize(176, 34) f:SetPoint("TOPLEFT", newSlice.desc, "BOTTOMLEFT", 178*(1 - i % 2), -math.floor((i-1)/2)*36+3)
+		f:SetSize(170, 34) f:SetPoint("TOPLEFT", newSlice.desc, "BOTTOMLEFT", 172*(1 - i % 2), -math.floor((i-1)/2)*36+8)
 		f:RegisterForDrag("LeftButton")
 		actions[i] = f
 		f:SetScript("OnDragStart", onDragStart)
@@ -1328,7 +1330,7 @@ end
 function api.createRing(name, data, bundle, importNested)
 	local name = name:match("^%s*(.-)%s*$")
 	if name == "" then return false end
-	local iname = RK:GenFreeRingName(name)
+	local iname = RK.pub:GenFreeRingName(name)
 	local mapRings, reservedINames, usedNames, nr = {}, importNested and {[iname]=1}, {[name]=true}, 2
 	if bundle then
 		for k,v in pairs(bundle) do
@@ -1336,7 +1338,7 @@ function api.createRing(name, data, bundle, importNested)
 				mapRings[k] = iname
 			elseif type(v) == "table" and importNested then
 				setImportedRingProps(genBundledRingName(name, data.name, v.name, usedNames, nr), v)
-				local n = RK:GenFreeRingName(v.name, reservedINames)
+				local n = RK.pub:GenFreeRingName(v.name, reservedINames)
 				mapRings[k], reservedINames[n], nr = n, nr, nr + 1
 			end
 		end
@@ -1489,11 +1491,11 @@ function ringDetail.scope:text()
 end
 function api.getRingProperty(key)
 	if key == "hotkey" then
-		if OneRingLib:GetRingInfo(currentRingName) then
-			local skey, _, over = OneRingLib:GetRingBinding(currentRingName)
+		if OPie:GetRingInfo(currentRingName) then
+			local skey, _, over = PC:GetRingBinding(currentRingName)
 			if over then return skey end
 		end
-		if currentRing.hotkey and not OneRingLib:GetOption("UseDefaultBindings", currentRingName) then
+		if currentRing.hotkey and not PC:GetOption("UseDefaultBindings", currentRingName) then
 			return currentRing.hotkey, "|cffa0a0a0"
 		elseif currentRing.quarantineBind and not currentRing.hotkey then
 			return currentRing.quarantineBind, "|cffa0a0a0"
@@ -1511,9 +1513,9 @@ function api.setRingProperty(name, value)
 		currentRing.quarantineBind = nil
 		ringDetail.bindingQuarantine:Hide()
 		ringDetail.binding:SetBindingText(value)
-		if OneRingLib:GetRingInfo(currentRingName) then
+		if OPie:GetRingInfo(currentRingName) then
 			conf.undo.saveProfile()
-			OneRingLib:SetRingBinding(currentRingName, value)
+			PC:SetRingBinding(currentRingName, value)
 		end
 	elseif name == "internal" then
 		local source, dest = value and ringNames or ringNames.hidden, value and ringNames.hidden or ringNames
@@ -1573,7 +1575,7 @@ function api.updateSliceOptions(slice)
 	local extraY, isCollection = 0, securecall(isCollectionSlice, RK:UnpackABAction(slice))
 	local fc, cd = sliceDetail.fastClick, sliceDetail.collectionDrop
 	fc:SetChecked(not not slice.fastClick)
-	if OneRingLib:GetOption("CenterAction", currentRingName) or OneRingLib:GetOption("MotionAction", currentRingName) then
+	if PC:GetOption("CenterAction", currentRingName) or PC:GetOption("MotionAction", currentRingName) then
 		fc:SetEnabled(true)
 		fc.tooltipText = nil
 		fc.Text:SetVertexColor(1, 1, 1)
@@ -1780,7 +1782,7 @@ function api.refreshDisplay()
 	if currentRing then
 		ringDetail.binding:SetBindingText(api.getRingProperty("hotkey"))
 		ringDetail.exportFrame:GetScript("OnHide")(ringDetail.exportFrame)
-		local noCA = not OneRingLib:GetOption("CenterAction", currentRingName) and (L"You must enable the %s option for this ring in OPie options to use quick actions."):format("|cffffffff" .. L"Quick action at ring center" .. "|r") or nil
+		local noCA = not PC:GetOption("CenterAction", currentRingName) and (L"You must enable the %s option for this ring in OPie options to use quick actions."):format("|cffffffff" .. L"Quick action at ring center" .. "|r") or nil
 		ringDetail.opportunistCA.tooltipText = noCA
 		ringDetail.opportunistCA:SetEnabled(not noCA)
 		ringDetail.opportunistCA:SetChecked(not noCA and not currentRing.noOpportunisticCA)
@@ -1842,6 +1844,7 @@ local function prot(f)
 	return function() return securecall(f) end
 end
 panel.okay, panel.default, panel.refresh = prot(panel.okay), prot(panel.default), prot(panel.refresh)
+if MODERN then panel.refresh() end
 panel:SetScript("OnShow", conf.checkSVState)
 
 SLASH_OPIE_CUSTOM_RINGS1 = "/rk"

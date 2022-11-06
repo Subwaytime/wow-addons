@@ -1,7 +1,7 @@
 ## Interface: 30400
 ## Title: Console Port
 ## Notes: Game controller addon
-## Version: 2.5.5
+## Version: 2.5.8
 
 ## Author: Sebastian Lindfors
 ## X-Website: https://github.com/seblindfors/ConsolePort

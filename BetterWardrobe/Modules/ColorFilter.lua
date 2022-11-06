@@ -184,10 +184,12 @@ end
 
 function addon.Init:InitFilterButtons()
 	local frame = CreateFrame("Button", nil, BetterWardrobeCollectionFrame)
+	local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
+
 	frame:SetSize(25, 25)
 	frame:SetScript("OnShow",function()
 			frame:ClearAllPoints()
-			if WardrobeFrame_IsAtTransmogrifier() then
+			if atTransmogrifier then
 			frame:SetPoint("TOPRIGHT", BW_SortDropDown, 5, 23)
 			else
 			frame:SetPoint("TOPRIGHT", BW_SortDropDown, 15, 23)
@@ -259,7 +261,7 @@ end
 
 
 
-function xxx()
+local function xxx()
 local ColorTable = (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable2) or {}
 BTT = {}
 --AceSerializer:Embed(addon) 
@@ -270,7 +272,7 @@ BTT[index]= temp
 end
 end
 
-function yy()
+local function yy()
 	BTT = nil
 	local ColorTable = (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable) or {}
   _,temp =addon:Deserialize(ColorTable[156])

@@ -199,6 +199,15 @@ L.Mixin(titles, L.TitlesMixin)
 L.Mixin(elements, L.ElementsMixin)
 
 ----------------------------------
+-- Initiate reputation bar
+----------------------------------
+L.Mixin(talkbox.ReputationBar, NPCFriendshipStatusBarMixin or {})
+talkbox.ReputationBar.Update = talkbox.ReputationBar.Update or nop;
+if talkbox.ReputationBar.SetColorFill then
+	talkbox.ReputationBar:SetColorFill(1, 1, 1)
+end
+
+----------------------------------
 -- Set up dynamically sized frames
 ----------------------------------
 do

@@ -1,18 +1,24 @@
-tag 25df4a17a56933db991f62d72e9f8a24784e265b 1.0.17
+tag ef967fcf8e15446b277df33b4482fa0821fde6ab 1.1.2
 Author:	Kyle Buller <bullerk@gmail.com>
-Date:	Tue Oct 4 20:08:39 2022 -0500
+Date:	Sat Oct 29 06:04:32 2022 -0500
 
-Tagging as 1.0.17
+Tagging as 1.1.2
 
-commit 3bbc2a9f6f3ee4f7c9f806c5dbdc88e446d0ecec
+commit 49f6a841087145f46d0ede07b0f7635ab3866336
 Author: Kyle Buller <bullerk@gmail.com>
-Date:   Tue Oct 4 19:43:49 2022 -0500
+Date:   Sat Oct 29 02:00:21 2022 -0500
 
-    Get it running on beta: no filtering, just sets
+    Actually add libs
 
-commit 4eeb94b0d61fc3bb8da36e54e09fb081cbc6b045
+commit 738634caf9245c3e17caef847b5a480eea7dd9bf
 Author: Kyle Buller <bullerk@gmail.com>
-Date:   Mon Oct 3 19:38:05 2022 -0500
+Date:   Fri Oct 28 23:18:45 2022 -0500
 
-    Prevent error on hover if entry id is invalid
+    Avoid UIDropDownMenu_Refresh call
+
+commit 3af68f496914e9dc2c415f8e95eca0e455a224e9
+Author: Kyle Buller <bullerk@gmail.com>
+Date:   Fri Oct 28 23:16:37 2022 -0500
+
+    Replace StaticPopup with LibDialog
 

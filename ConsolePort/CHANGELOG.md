@@ -1,9 +1,11 @@
 # Console Port
 
-## [2.5.5](https://github.com/seblindfors/ConsolePort/tree/2.5.5) (2022-10-27)
-[Full Changelog](https://github.com/seblindfors/ConsolePort/compare/2.5.4...2.5.5) [Previous Releases](https://github.com/seblindfors/ConsolePort/releases)
+## [2.5.8](https://github.com/seblindfors/ConsolePort/tree/2.5.8) (2022-11-05)
+[Full Changelog](https://github.com/seblindfors/ConsolePort/compare/2.5.7...2.5.8) [Previous Releases](https://github.com/seblindfors/ConsolePort/releases)
 
-- Update ConsolePort.toc  
-- Add gamepad+mouse overlap time to config  
-- Remove specific handling for 10.0 since 10.0 is now live  
-- Rename interact button to click override button  
+- Add option to bind action slots to bindings from spell menu  
+- Fix mount spells added to ring from popup not working  
+- Small fix in import/export to translate paddle emus  
+- Hide superfluous bars in spell slot selection  
+- Fix action page hold on retail  
+- Fix frame strata on item/spell popup  

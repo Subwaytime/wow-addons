@@ -9,7 +9,7 @@ function addon.Init:UpdateWardrobeEnhanced()
 end
 
 if not IsAddOnLoaded("LegionWardrobe") then return end
-
+if true then return end -- TODO Remove once updated
 local setsButton_tooltip = "Sets"
 local resetFilterButton_tooltip = "Reset filter"
 local colorSelectButton_tooltip = "Select color"
@@ -75,7 +75,7 @@ local function FilterVisuals(self)
 	end
 
 
-	if not WardrobeFrame_IsAtTransmogrifier() and BetterWardrobeCollectionFrame.ItemsCollectionFrame.activeCategory and filteredRecolors then
+	if not C_Transmog.IsAtTransmogNPC() and BetterWardrobeCollectionFrame.ItemsCollectionFrame.activeCategory and filteredRecolors then
 		local filteredVisualsList = { }
 		local tmp = {}
 		for q,w in pairs(filteredRecolors) do tmp[w] = true end

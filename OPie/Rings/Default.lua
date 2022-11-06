@@ -1,10 +1,10 @@
 local _, T = ...
-local L, R = T.L, OneRingLib and OneRingLib.ext and OneRingLib.ext.RingKeeper
-if not (R and R.SetRing) then return end
+local L, R = T.L, OPie.CustomRings
+if not (R and R.AddDefaultRing) then return end
 local MODERN = select(4, GetBuildInfo()) >= 8e4 or nil
 local CF_WRATH = not MODERN and select(4,GetBuildInfo()) >= 3e4 or nil
 
-R:SetRing("RaidSymbols", {
+R:AddDefaultRing("RaidSymbols", {
 	{"raidmark", 1, _u="y"}, -- yellow star
 	{"raidmark", 2, _u="o"}, -- orange circle
 	{"raidmark", 3, _u="p"}, -- purple diamond
@@ -16,7 +16,7 @@ R:SetRing("RaidSymbols", {
 	{"raidmark", 0, _u="c"}, -- clear all
 	name=L"Target Markers", hotkey="ALT-R", _u="OPCRS"
 })
-R:SetRing("CommonTrades", {
+R:AddDefaultRing("CommonTrades", {
 	{id="/cast {{spell:3908/51309}}", _u="t"}, -- tailoring
 	{id="/cast {{spell:2108/51302}}", _u="l"}, -- leatherworking
 	{id="/cast {{spell:2018/51300}}", _u="b"}, -- blacksmithing
@@ -33,7 +33,7 @@ R:SetRing("CommonTrades", {
 	        or CF_WRATH and {id="/cast {{spell:3273}}", _u="f"}, -- first aid
 	name=L"Trade Skills", hotkey="ALT-T", _u="OPCCT"
 })
-R:SetRing("TrinketSlots", {
+R:AddDefaultRing("TrinketSlots", {
 	{id="/use 13", _u="t"},
 	{id="/use 14", _u="b"},
 	name=L"Trinkets", _u="OPCTS"
@@ -41,14 +41,14 @@ R:SetRing("TrinketSlots", {
 
 if not MODERN then return end
 
-R:SetRing("DruidShift", {
+R:AddDefaultRing("DruidShift", {
 	{id="/cancelform [noflyable,noform:moonkin]\n/cast [flyable,outdoors,nocombat,noswimming,nomod][flying] {{spell:783}}; [outpost:corral,nomod,nospec:103/104] {{spell:161691}}; [swimming,nomod][flyable,nomod][flying] {{spell:783}}; [nocombat,outdoors,nomod:alt] {{mount:ground}}; [outdoors] {{spell:783}}", show="[known:783]", _u="f"}, -- Travel
 	{c="c74cff", id=24858, _u="k"}, -- Moonkin
 	{c="fff04d", id=768, _u="c"}, -- Cat
 	{c="ff0000", id=5487, _u="b"}, -- Bear
 	name=L"Shapeshifts", hotkey="BUTTON4", limit="DRUID", _u="OPCDS"
 })
-R:SetRing("DruidUtility", {
+R:AddDefaultRing("DruidUtility", {
 	{id="/cast [combat][mod,nomod:alt] {{spell:20484}}; [@target,nodead,group,nomod] {{spell:212040}}; {{spell:50769}}", _u="r"}, -- rebirth/revit/revive
 	{id="/cast [mod] {{spell:16914}}; {{spell:740/16914}}", _u="t"}, -- hurricane/tranq
 	{id="/cast [nomod] {{spell:22812}}; {{spell:61336/22812}}", _u="b"}, -- bark/survival
@@ -58,7 +58,7 @@ R:SetRing("DruidUtility", {
 	{id=2908, _u="s"}, -- soothe
 	name=L"Utility", hotkey="[noform:bear/cat] BUTTON5; ALT-BUTTON5", limit="DRUID", _u="OPCDU"
 })
-R:SetRing("DruidFeral", {
+R:AddDefaultRing("DruidFeral", {
 	{id=106951, _u="k"}, -- berserk
 	{id="/cast [noform:bear] {{spell:5217}}; {{spell:22842}}", _u="e"}, -- frenzied / tiger's fury
 	{id="/cast [mod][nospec:2/3] {{spell:1850}}; [form:bear] {{spell:77761}}; {{spell:77764}}", _u="r"}, -- dash / stampeding roar
@@ -73,7 +73,7 @@ R:SetRing("DruidFeral", {
 
 do -- Hunter Pets
 	local m = "#showtooltip [@pet,exists,nodead,nopet:%d] {{spell:%d}};\n/cast [@pet,exists,nopet:%1$d,nodead] {{spell:2641}}\n/cast [@pet,noexists,nomod] {{spell:%2$d}}; [@pet,dead][@pet,noexists] {{spell:982}}; [@pet,help,nomod] {{spell:136}}; [@pet] {{spell:2641}}"
-	R:SetRing("HunterPets", {
+	R:AddDefaultRing("HunterPets", {
 		{id=m:format(1,883), show="[known:883,havepet:1]", _u="1"},
 		{id=m:format(2,83242), show="[known:83242,havepet:2]", _u="2"},
 		{id=m:format(3,83243), show="[known:83243,havepet:3]", _u="3"},
@@ -82,7 +82,7 @@ do -- Hunter Pets
 		name=L"Pets", limit="HUNTER", _u="OPCHP", internal=true
 	})
 end
-R:SetRing("HunterAspects", {
+R:AddDefaultRing("HunterAspects", {
 	{id=186257, _u="c"}, -- cheetah
 	{id=186265, _u="t"}, -- turtle
 	{id=781, _u="d"}, -- disengage
@@ -91,14 +91,14 @@ R:SetRing("HunterAspects", {
 	{id=147362, _u="i"}, -- counter
 	name=L"Aspects", hotkey="BUTTON4", limit="HUNTER", _u="OPCHA"
 })
-R:SetRing("HunterTraps", {
+R:AddDefaultRing("HunterTraps", {
 	{id=191433, _u="e"}, -- explosive
 	{id=187650, _u="f"}, -- freezing
 	{id=187698, _u="t"}, -- tar/caltrops
 	name=L"Traps", hotkey="[spec:3] BUTTON5", limit="HUNTER", _u="OPCHT"
 })
 
-R:SetRing("MageCombat", {
+R:AddDefaultRing("MageCombat", {
 	{id=45438, _u="b"}, -- ice block
 	{id=30449, _u="s"}, -- spellsteal
 	{id=55342, _u="m"}, -- mirror image
@@ -110,7 +110,7 @@ R:SetRing("MageCombat", {
 	{id=190319, _u="c"}, -- combustion
 	name=L"Combat", limit="MAGE", hotkey="BUTTON4", _u="OPCMC"
 })
-R:SetRing("MageTools", {
+R:AddDefaultRing("MageTools", {
 	{id=42955, _u="f"}, -- food
 	{id=66, _u="i"}, -- (greater) invisibility
 	{"ring", "MagePolymorph", onlyNonEmpty=true, _u="t"},
@@ -118,7 +118,7 @@ R:SetRing("MageTools", {
 	{id=1459, _u="n"}, -- intellect
 	name=L"Utility", limit="MAGE", hotkey="BUTTON5", _u="OPCMT"
 })
-R:SetRing("MagePolymorph", {
+R:AddDefaultRing("MagePolymorph", {
 	{id=118, _u="s"}, -- sheep
 	{id=161353, _u="p"}, -- polar bear
 	{id=61721, _u="r"}, -- rabbit
@@ -134,7 +134,7 @@ R:SetRing("MagePolymorph", {
 })
 do -- MageTravel
 	local m = "/cast [mod] {{spell:%s}}; {{spell:%s}}"
-	R:SetRing("MageTravel", {
+	R:AddDefaultRing("MageTravel", {
 		{id=m:format(344597, 344587), _u="9"}, -- Oribos
 		{id=m:format("268969/281402", "281403/281404"), _u="8"}, -- Dazar'alor/Boralus
 		{id=m:format(224871, 224869), _u="b"}, -- Dalaran (Broken Isles)
@@ -152,7 +152,7 @@ do -- MageTravel
 		{id=m:format(32266, 32271), _u="x"}, -- Exodar
 	  name=L"Portals and Teleports", hotkey="ALT-G", limit="MAGE", _u="OPCMP"
 	})
-	R:SetRing("ExtraPortals", {
+	R:AddDefaultRing("ExtraPortals", {
 		{id=m:format(120146, 120145), _u="a"}, -- Ancient Dalaran
 		{id=m:format(49360, 49359), _u="m"}, -- Theramore
 		{id=m:format(49361, 49358), _u="n"}, -- Stonard
@@ -162,19 +162,19 @@ do -- MageTravel
 	})
 end
 
-R:SetRing("PaladinAuras", {
+R:AddDefaultRing("PaladinAuras", {
 	{"ring", "PaladinBlessing", onlyNonEmpty=true, _u="b"},
 	{id=1022, _u="t"}, -- hand of protection
 	{id=1044, _u="e"}, -- hand of freedom
 	{id=25780, _u="f"}, -- righteous fury
 	name=L"Paladin Buffs", hotkey="BUTTON4", limit="PALADIN", _u="OPCPA"
 })
-R:SetRing("PaladinBlessing", {
+R:AddDefaultRing("PaladinBlessing", {
 	{id=203538, _u="k"}, -- kings
 	{id=203539, _u="w"}, -- wisdom
 	name=L"Blessings", limit="PALADIN", internal=true, _u="OPCPB"
 })
-R:SetRing("PaladinTools", {
+R:AddDefaultRing("PaladinTools", {
 	{id=853, _u="h"}, -- hammer
 	{c="ed8f1b", id=498, _u="p"}, -- divine protection
 	{id=31884, _u="a"}, -- avenging wrath
@@ -184,7 +184,7 @@ R:SetRing("PaladinTools", {
 	{id=213644, _c="l"}, -- cleanse
 	name=L"Utility", limit="PALADIN", hotkey="BUTTON5", _u="OPCPT"
 })
-R:SetRing("WarlockLTS", {
+R:AddDefaultRing("WarlockLTS", {
 	{"ring", "WarlockDemons", _u="d"},
 	{id="/cast [mod][noknown:119898] {{spell:755}}; {{spell:119898}}", _u="a"}, -- funnel/command
 	{id="/cast [mod:alt] {{spell:20707}}; [group,nomod][nogroup,mod] {{spell:29893}}; {{spell:6201}}", _u="h"}, -- soul/health/well
@@ -193,7 +193,7 @@ R:SetRing("WarlockLTS", {
 	{id="/cast [flyable,nocombat,nomod] {{mount:air}}; [outdoors,nocombat,nomod:alt] {{mount:ground}}; {{spell:126}}", _u="e"}, -- mount/eye
 	name=L"Warlock General", hotkey="BUTTON4", limit="WARLOCK", _u="OPCLS"
 })
-R:SetRing("WarlockCombat", {
+R:AddDefaultRing("WarlockCombat", {
 	{id="/cast [nomod] {{spell:48018}}; {{spell:48020}}", _u="t"}, -- demonic circle
 	{id=1098, _u="e"}, -- enslave
 	{id=710, _u="a"}, -- banish
@@ -202,7 +202,7 @@ R:SetRing("WarlockCombat", {
 	{id=5484, _u="h"}, -- howl
 	name=L"Warlock Combat", hotkey="BUTTON5", limit="WARLOCK", _u="OPCLO"
 })
-R:SetRing("WarlockDemons", {
+R:AddDefaultRing("WarlockDemons", {
 	{id=30146, _u="f"}, -- felguard
 	{id=697, _u="v"}, -- void
 	{id=688, _u="i"}, -- imp
@@ -210,13 +210,13 @@ R:SetRing("WarlockDemons", {
 	{id=691, _u="h"}, -- felhunter
 	name=L"Demons", limit="WARLOCK", _u="OPCLD", internal=true
 })
-R:SetRing("WarlockGuardians", {
+R:AddDefaultRing("WarlockGuardians", {
 	{id=18540, _u="d"}, -- doomguard
 	{id=1122, _u="i"}, -- infernal
 	name=L"Guardians", limit="WARLOCK", _u="OPCLG", internal=true
 })
 
-R:SetRing("DKCombat", {
+R:AddDefaultRing("DKCombat", {
 	{c="fff4b2", id=57330, _u="h"}, -- horn
 	{c="5891ea", id=48792, _u="f"}, -- fortitude
 	{c="bcf800", id=48707, _u="s"}, -- shell
@@ -227,7 +227,7 @@ R:SetRing("DKCombat", {
 	name=L"Combat", hotkey="BUTTON5", limit="DEATHKNIGHT", _u="OPCDC"
 })
 
-R:SetRing("WorldMarkers", {
+R:AddDefaultRing("WorldMarkers", {
 	{"worldmark", 1, _u="b"},
 	{"worldmark", 2, _u="g"},
 	{"worldmark", 3, _u="p"},
@@ -240,7 +240,7 @@ R:SetRing("WorldMarkers", {
 	name=L"World Markers", hotkey="[group] ALT-Y", _u="OPCWM"
 })
 
-R:SetRing("CommonHearth", {
+R:AddDefaultRing("CommonHearth", {
 	{"item", 6948, _u="h"},
 	{"toy", 64488, _u="i"},
 	{"toy", 54452, _u="e"},
@@ -262,7 +262,7 @@ R:SetRing("CommonHearth", {
 	{"toy", 190237, _u="bt"},
 	name=L"Hearthstones", internal=true, _u="OPCHS"
 })
-R:SetRing("SpecMenu", {
+R:AddDefaultRing("SpecMenu", {
 	{"specset", 1, _u="1"},
 	{"specset", 2, _u="2"},
 	{"specset", 3, _u="3"},
@@ -272,6 +272,6 @@ R:SetRing("SpecMenu", {
 	{"item", 140192, _u="d"},
 	{"ring", "CommonHearth", onlyNonEmpty=true, rotationMode="shuffle", _u="t"},
 	{"spell", 556, _u="a"},
-	{"item", 141605, _u="w"},
+	{"item", 141605, _u="w", show="[in:broken isles/bfa]"},
 	name=L"Specializations and Travel", hotkey="ALT-H", _u="OPCTA"
 })

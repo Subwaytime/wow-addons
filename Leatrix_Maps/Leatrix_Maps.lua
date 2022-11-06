@@ -1,6 +1,6 @@
 ﻿
 	----------------------------------------------------------------------
-	-- 	Leatrix Maps 10.0.01 (27th October 2022)
+	-- 	Leatrix Maps 10.0.06 (2nd November 2022)
 	----------------------------------------------------------------------
 
 	-- 10:Func, 20:Comm, 30:Evnt, 40:Panl
@@ -12,7 +12,7 @@
 	local LeaMapsLC, LeaMapsCB, LeaConfigList = {}, {}, {}
 
 	-- Version
-	LeaMapsLC["AddonVer"] = "10.0.01"
+	LeaMapsLC["AddonVer"] = "10.0.06"
 
 	-- Get locale table
 	local void, Leatrix_Maps = ...
@@ -2886,7 +2886,12 @@
 				end
 			end
 
-			-- LockDF("IncreaseZoom", "Cannot use this in Dragonflight.") -- Increase zoom level (block taint: open map with M, close map with M, open edit mode, close edit mode)
+			-- Due to issues with Blizzard's code in Dragonflight, these are currently locked
+			-- Block taint (typically, open the map and do what the option says, close the map and enter Edit Mode)
+			LockDF("RememberZoom", "This setting is currently unavailable.")
+			LockDF("IncreaseZoom", "This setting is currently unavailable.")
+			LockDF("CenterMapOnPlayer", "This setting is currently unavailable.")
+			LockDF("ScaleWorldMap", "This setting is currently unavailable.")
 
 		elseif event == "PLAYER_LOGIN" then
 			-- Run main function
@@ -3092,4 +3097,4 @@
 	LeaMapsCB["ZoomInfoBtn"].t:SetVertexColor(0.9, 0.8, 0.0)
 	LeaMapsCB["ZoomInfoBtn"]:SetHighlightTexture("Interface\\COMMON\\help-i.blp")
 	LeaMapsCB["ZoomInfoBtn"]:GetHighlightTexture():SetTexCoord(0, 1, 0, 1)
-	LeaMapsCB["ZoomInfoBtn"].tiptext = "Enabling any of the zoom settings below will taint the map until you reload or logout."
+	LeaMapsCB["ZoomInfoBtn"].tiptext = L["Enabling any of the zoom settings below will taint the map until you reload or logout."]
