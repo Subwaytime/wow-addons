@@ -57,6 +57,10 @@ local defaults = {
         ClassIcons = {
             useclassicons = false,
             unitreaction = false,
+            customunitreaction = false,
+            customenemy = {r=1,g=0,b=0},
+            customneutral = {r=1,g=1,b=0},
+            customfriendly = {r=0,g=1,b=0},
         },
         Textures = {
             custom = false,
@@ -345,6 +349,41 @@ local options = {
                     set = "SetReaction",
                     disabled = false,
                 },
+                customunitreaction = {
+                    order = 4,
+                    name = "custom reaction colors",
+                    desc = "let's you customize the unit reaction colors",
+                    type = "toggle",
+                    get = "Get",
+                    set = "Set",
+                },
+                customenemy = {
+                    order = 5,
+                    name = "enemy",
+                    type = "color",
+                    get = "GetColor",
+                    set = "SetColor",
+                    hidden = function () return not HealthBarColor.db.profile.ClassIcons.customunitreaction end,
+                    width = 0.5,
+                },
+                customneutral = {
+                    order = 5,
+                    name = "neutral",
+                    type = "color",
+                    get = "GetColor",
+                    set = "SetColor",
+                    hidden = function () return not HealthBarColor.db.profile.ClassIcons.customunitreaction end,
+                    width = 0.5,
+                },
+                customfriendly = {
+                    order = 5,
+                    name = "friend",
+                    type = "color",
+                    get = "GetColor",
+                    set = "SetColor",
+                    hidden = function () return not HealthBarColor.db.profile.ClassIcons.customunitreaction end,
+                    width = 0.5,
+                },
             },
         },
             
@@ -389,7 +428,6 @@ function HealthBarColor:OnInitialize()
     local profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db) 
     AC:RegisterOptionsTable("HealthBarColor_Profiles", profiles)
     ACD:AddToBlizOptions("HealthBarColor_Profiles", "Profiles", "HealthBarColor")
-
     HealthBarColor:LoadConfig()
     self:RegisterChatCommand("hbc", "SlashCommand")
 end
@@ -404,6 +442,7 @@ function HealthBarColor:LoadConfig()
     HealthBarColor:FocusColor()
     HealthBarColor:BossColor()
     HealthBarColor:PetColor()
+    HealthBarColor:CustomReactionHandler()
     if self.db.profile.ClassIcons.useclassicons then
         useclassIcons = true
     end
@@ -419,6 +458,19 @@ end
 function HealthBarColor:ClassIconsProfile(bool)
     if bool then self.db.profile.ClassIcons.useclassicons = true
     else self.db.profile.ClassIcons.useclassicons = false
+    end
+end
+function HealthBarColor:CustomReactionHandler()
+    if self.db.profile.ClassIcons.customunitreaction then
+        reactionColor.enemy = self.db.profile.ClassIcons.customenemy
+        reactionColor.neutral = self.db.profile.ClassIcons.customneutral
+        reactionColor.friendly = self.db.profile.ClassIcons.customfriendly
+    else
+        reactionColor = {
+            enemy = {r=1,g=0,b=0}, --enemy
+            neutral = {r=1,g=1,b=0}, --neutral
+            friendly ={r=0,g=1,b=0}, --friendly
+        }
     end
 end
 function HealthBarColor:SetColor(info, r, g, b)

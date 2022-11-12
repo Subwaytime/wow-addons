@@ -1,6 +1,6 @@
 ﻿
 	----------------------------------------------------------------------
-	-- Leatrix Sounds 10.0.01 (27th October 2022)
+	-- Leatrix Sounds 10.0.02 (8th November 2022)
 	----------------------------------------------------------------------
 
 	--  Create global table
@@ -10,7 +10,7 @@
 	local LeaSoundsLC, LeaSoundsCB = {}, {}
 
 	-- Version
-	LeaSoundsLC["AddonVer"] = "10.0.01"
+	LeaSoundsLC["AddonVer"] = "10.0.02"
 
 	-- Get locale table
 	local void, Leatrix_Sounds = ...
@@ -877,14 +877,16 @@
 	end
 
 	-- Add slash commands
-	_G.SLASH_Leatrix_Sounds1 = "/lts"
-	_G.SLASH_Leatrix_Sounds2 = "/leasounds"
+	--_G.SLASH_Leatrix_Sounds1 = "/lts"
+	--_G.SLASH_Leatrix_Sounds2 = "/leasounds"
 	SlashCmdList["Leatrix_Sounds"] = function(self)
 		-- Run slash command function
 		SlashFunc(self)
-		-- Redirect tainted variables
-		RunScript('ACTIVE_CHAT_EDIT_BOX = ACTIVE_CHAT_EDIT_BOX')
-		RunScript('LAST_ACTIVE_CHAT_EDIT_BOX = LAST_ACTIVE_CHAT_EDIT_BOX')
+	end
+
+	-- Replacement for broken slash command system
+	function leasounds(self)
+		SlashFunc(self or "")
 	end
 
 	----------------------------------------------------------------------
@@ -911,7 +913,7 @@
 		subTitle:ClearAllPoints()
 		subTitle:SetPoint("BOTTOM", 0, 72)
 
-		local slashTitle = LeaSoundsLC:MakeTx(interPanel, "/lts", 0, 0)
+		local slashTitle = LeaSoundsLC:MakeTx(interPanel, "/leasounds", 0, 0)
 		slashTitle:SetFont(slashTitle:GetFont(), 72)
 		slashTitle:ClearAllPoints()
 		slashTitle:SetPoint("BOTTOM", subTitle, "TOP", 0, 40)

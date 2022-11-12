@@ -1,5 +1,5 @@
 ﻿----------------------------------------------------------------------
--- 	Leatrix Plus 10.0.06 (2nd November 2022)
+-- 	Leatrix Plus 10.0.10 (9th November 2022)
 ----------------------------------------------------------------------
 
 --	01:Functns, 02:Locks, 03:Restart, 20:Live, 30:Isolated, 40:Player
@@ -18,7 +18,7 @@
 	local void
 
 	-- Version
-	LeaPlusLC["AddonVer"] = "10.0.06"
+	LeaPlusLC["AddonVer"] = "10.0.10"
 
 	-- Get locale table
 	local void, Leatrix_Plus = ...
@@ -36,8 +36,10 @@
 		end
 	end
 
-	-- Check for ElvUI
+	-- Check for addons
 	if IsAddOnLoaded("ElvUI") then LeaPlusLC.ElvUI = unpack(ElvUI) end
+	if IsAddOnLoaded("Glass") then LeaPlusLC.Glass = true end
+	if IsAddOnLoaded("XLoot") then LeaPlusLC.XLoot = true end
 
 ----------------------------------------------------------------------
 --	L00: Leatrix Plus
@@ -54,7 +56,6 @@
 	LpEvt:RegisterEvent("PLAYER_LOGIN")
 
 	-- Set bindings translations
-	-- LeaPlusLC.DF: Block taint when closing the keybindings game options panel (10.0.2)
 	_G.BINDING_NAME_LEATRIX_PLUS_GLOBAL_TOGGLE = L["Toggle panel"]
 	_G.BINDING_NAME_LEATRIX_PLUS_GLOBAL_WEBLINK = L["Show web link"]
 	_G.BINDING_NAME_LEATRIX_PLUS_GLOBAL_RARE = L["Announce rare"]
@@ -77,6 +78,7 @@
 	-- Disable bag automation
 	-- Open vendor and close vendor again.
 	-- Open vendor again.
+	-- Click the bag icon to switch bag mode (either from single to combined or combined to single).
 	-- Buy alcohol if you don't have it already (if you do, skip this step) (tested with Bottle of Dalaran Noir).
 	-- Drink alcohol from bags.
 
@@ -86,8 +88,6 @@
 	-- Undock the second chat window and dock it again
 	-- Press enter in general chat to open editbox, type anything but don't press enter
 	-- Right-click General chat tab and enter Edit Mode
-
-	-- Lots of block taint in 10.0.2 but Blizzard might fix it before release
 
 ----------------------------------------------------------------------
 --	L01: Functions
@@ -684,7 +684,7 @@
 		or	(LeaPlusLC["NoRestedEmotes"]		~= LeaPlusDB["NoRestedEmotes"])			-- Silence rested emotes
 		or	(LeaPlusLC["NoPetAutomation"]		~= LeaPlusDB["NoPetAutomation"])		-- Disable pet automation
 		or	(LeaPlusLC["FasterLooting"]			~= LeaPlusDB["FasterLooting"])			-- Faster auto loot
-		or	(LeaPlusLC["FixNoQualityLootSpam"]	~= LeaPlusDB["FixNoQualityLootSpam"])	-- Faster auto loot fix spam
+		or	(LeaPlusLC["FixBlizzardLootSpam"]	~= LeaPlusDB["FixBlizzardLootSpam"])	-- Faster auto loot fix spam
 		or	(LeaPlusLC["FasterMovieSkip"]		~= LeaPlusDB["FasterMovieSkip"])		-- Faster movie skip
 		or	(LeaPlusLC["CombatPlates"]			~= LeaPlusDB["CombatPlates"])			-- Combat plates
 		or	(LeaPlusLC["EasyItemDestroy"]		~= LeaPlusDB["EasyItemDestroy"])		-- Easy item destroy
@@ -2236,11 +2236,18 @@
 			local FasterLootPanel = LeaPlusLC:CreatePanel("Faster auto loot", "FasterLootPanel")
 
 			LeaPlusLC:MakeTx(FasterLootPanel, "Settings", 16, -72)
-			LeaPlusLC:MakeCB(FasterLootPanel, "FixNoQualityLootSpam", "Fix Blizzard's NO QUALITY LOOT spam", 16, -92, true, "If checked, the NO QUALITY LOOT spam which Blizzard added to Dragonflight will be hidden.|n|nIn Dragonflight, Blizzard added code to the game that spams you with NO QUALITY LOOT messages when you loot items.  With faster looting, messages are more frequent.|n|nThis setting hides this pointless spam by replacing Blizzard's looting code.  If you are using a loot frame replacement addon, you may need to uncheck this setting.")
+			LeaPlusLC:MakeCB(FasterLootPanel, "FixBlizzardLootSpam", "Fix Blizzard's NO QUALITY LOOT spam", 16, -92, true, "If checked, the NO QUALITY LOOT spam which Blizzard added to Dragonflight will be hidden.|n|nIn Dragonflight, Blizzard added code to the game that spams you with NO QUALITY LOOT messages when you loot items.  With faster looting, messages are more frequent.|n|nThis setting hides this pointless spam by replacing Blizzard's looting code.|n|nIf you are using a loot frame replacement addon, you may need to uncheck this setting.")
 
 			if LeaPlusLC.ElvUI then
-				LeaPlusLC:LockItem(LeaPlusCB["FixNoQualityLootSpam"], true)
-				LeaPlusCB["FixNoQualityLootSpam"].tiptext = LeaPlusCB["FixNoQualityLootSpam"].tiptext .. "|n|n|cff00AAFF" .. L["Cannot be used with ElvUI"]
+				LeaLockList["FixBlizzardLootSpam"] = LeaPlusLC["FixBlizzardLootSpam"]
+				LeaPlusLC:LockItem(LeaPlusCB["FixBlizzardLootSpam"], true)
+				LeaPlusCB["FixBlizzardLootSpam"].tiptext = LeaPlusCB["FixBlizzardLootSpam"].tiptext .. "|n|n|cff00AAFF" .. L["Cannot be used with ElvUI."]
+			end
+
+			if LeaPlusLC.XLoot then
+				LeaLockList["FixBlizzardLootSpam"] = LeaPlusLC["FixBlizzardLootSpam"]
+				LeaPlusLC:LockItem(LeaPlusCB["FixBlizzardLootSpam"], true)
+				LeaPlusCB["FixBlizzardLootSpam"].tiptext = LeaPlusCB["FixBlizzardLootSpam"].tiptext .. "|n|n|cff00AAFF" .. L["Cannot be used with XLoot."]
 			end
 
 			-- Help button hidden
@@ -2272,7 +2279,7 @@
 			end)
 
 			-- Apply fix for Blizzard's NO QUALITY LOOT spam
-			if LeaPlusLC["FixNoQualityLootSpam"] == "On" and not LeaPlusLC.ElvUI then
+			if LeaPlusLC["FixBlizzardLootSpam"] == "On" and not LeaLockList["FixBlizzardLootSpam"] then
 
 				LootFrame:UnregisterEvent("LOOT_OPENED")
 				local abc = CreateFrame("FRAME")
@@ -4533,7 +4540,6 @@
 			else
 				LibDBIconStub:SetButtonRadius(1)
 			end
-			MinimapCluster:SetClampedToScreen(false)
 
 			----------------------------------------------------------------------
 			-- Configuration panel
@@ -4844,6 +4850,7 @@
 				bFrame:SetFrameLevel(8)
 
 				LeaPlusLC.bFrame = bFrame -- Used in LibDBIcon callback
+				_G["LeaPlusGlobalMinimapCombinedButtonFrame"] = bFrame -- For third party addons
 
 				-- Hide button frame automatically
 				local ButtonFrameTicker
@@ -5091,6 +5098,10 @@
 				ExpansionLandingPageMinimapButton.AlertText:ClearAllPoints()
 				ExpansionLandingPageMinimapButton.AlertText:SetPoint("RIGHT", ExpansionLandingPageMinimapButton, "LEFT", -8, 0)
 				ExpansionLandingPageMinimapButton:SetHitRectInsets(0, 0, 0, 0)
+
+				-- Set instance difficulty layout
+				MinimapCluster.InstanceDifficulty:ClearAllPoints()
+				MinimapCluster.InstanceDifficulty:SetPoint("TOPRIGHT", MinimapCluster, "TOPRIGHT", -10, -22)
 
 				-- Setup hybrid minimap when available
 				local function SetHybridMap()
@@ -7909,7 +7920,7 @@
 		-- Recent chat window
 		----------------------------------------------------------------------
 
-		if LeaPlusLC["RecentChatWindow"] == "On" then
+		if LeaPlusLC["RecentChatWindow"] == "On" and not LeaLockList["RecentChatWindow"] then
 
 			-- Create recent chat frame (LeaPlusLC.DF: Using custom template)
 			local editFrame = CreateFrame("ScrollFrame", nil, UIParent, "LeaPlusInputScrollFrameTemplate")
@@ -9429,7 +9440,7 @@
 
 					end
 
-					-- Add target line (LeaPlusLC.DF: Causes taint in 10.0.2 - Combat, hover tooltip, open spell book, hover spells)
+					-- Add target line
 					GameTooltip:AddLine(ttTarget .. ": " .. LT["Target"])
 
 				end
@@ -9437,7 +9448,6 @@
 			end
 
 			if TooltipDataProcessor then -- 10.0.2
-				-- This causes block taint - enter combat, open spell book, hover over spell
 				TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, ShowTip)
 			else
 				GameTooltip:HookScript("OnTooltipSetUnit", ShowTip)
@@ -9449,7 +9459,7 @@
 		--	Move chat editbox to top
 		----------------------------------------------------------------------
 
-		if LeaPlusLC["MoveChatEditBoxToTop"] == "On" then
+		if LeaPlusLC["MoveChatEditBoxToTop"] == "On" and not LeaLockList["MoveChatEditBoxToTop"] then
 
 			-- Set options for normal chat frames
 			for i = 1, 50 do
@@ -9667,7 +9677,7 @@
 		-- Show first run message
 		if not LeaPlusDB["FirstRunMessageSeen"] then
 			C_Timer.After(1, function()
-				LeaPlusLC:Print(L["Enter"] .. " |cff00ff00" .. "/ltp" .. "|r " .. L["or click the minimap button to open Leatrix Plus."])
+				LeaPlusLC:Print(L["Enter"] .. " |cff00ff00" .. "/run leaplus()" .. "|r " .. L["or click the minimap button to open Leatrix Plus."])
 				LeaPlusDB["FirstRunMessageSeen"] = true
 			end)
 		end
@@ -9690,7 +9700,6 @@
 		-- Flares (world markers)
 		----------------------------------------------------------------------
 
-		-- LeaPlusLC.DF: Block taint when closing the keybindings game settings panel in 10.0.2
 		do
 			local raidTable = {L["Flare: Square"], L["Flare: Triangle"], L["Flare: Diamond"], L["Flare: Cross"], L["Flare: Star"], L["Flare: Circle"], L["Flare: Moon"], L["Flare: Skull"], L["Flare: Clear all"]}
 			for i = 1, 9 do
@@ -10608,7 +10617,7 @@
 			subTitle:ClearAllPoints()
 			subTitle:SetPoint("BOTTOM", 0, 72)
 
-			local slashTitle = LeaPlusLC:MakeTx(interPanel, "/ltp", 0, 0)
+			local slashTitle = LeaPlusLC:MakeTx(interPanel, "/run leaplus()", 0, 0)
 			slashTitle:SetFont(slashTitle:GetFont(), 72)
 			slashTitle:ClearAllPoints()
 			slashTitle:SetPoint("BOTTOM", subTitle, "TOP", 0, 40)
@@ -10619,7 +10628,6 @@
 			pTex:SetAlpha(0.2)
 			pTex:SetTexCoord(0, 1, 1, 0)
 
-			-- LeaPlusLC.DF - Block taint when opening keybindings menu and closing settings panel in 10.0.2
 			expTitle:SetText(L["Dragonflight"])
 			local category = Settings.RegisterCanvasLayoutCategory(interPanel, L["Leatrix Plus"])
 			Settings.RegisterAddOnCategory(category)
@@ -11062,7 +11070,7 @@
 				LeaPlusLC:LoadVarChk("NoRaidRestrictions", "Off")			-- Remove raid restrictions
 				LeaPlusLC:LoadVarChk("NoConfirmLoot", "Off")				-- Disable loot warnings
 				LeaPlusLC:LoadVarChk("FasterLooting", "Off")				-- Faster auto loot
-				LeaPlusLC:LoadVarChk("FixNoQualityLootSpam", "On")			-- Faster auto loot fix spam
+				LeaPlusLC:LoadVarChk("FixBlizzardLootSpam", "Off")			-- Faster auto loot fix spam
 				LeaPlusLC:LoadVarChk("FasterMovieSkip", "Off")				-- Faster movie skip
 				LeaPlusLC:LoadVarChk("MovieSkipInstance", "Off")			-- Skip instance movies
 				LeaPlusLC:LoadVarChk("CombatPlates", "Off")					-- Combat plates
@@ -11084,6 +11092,35 @@
 				-- Start page
 				LeaPlusLC:LoadVarNum("LeaStartPage", 0, 0, LeaPlusLC["NumberOfPages"])
 
+
+				-- Disable items that conflict with Glass
+				if LeaPlusLC.Glass then
+
+					-- Function to disable and lock an option and add a note to the tooltip
+					local function LockOption(option)
+						LeaLockList[option] = LeaPlusLC[option]
+						LeaPlusLC:LockItem(LeaPlusCB[option], true)
+						LeaPlusCB[option].tiptext = LeaPlusCB[option].tiptext .. "|n|n|cff00AAFF" .. L["Cannot be used with Glass."]
+						-- Remove hover from configuration button if there is one
+						local temp = {LeaPlusCB[option]:GetChildren()}
+						if temp and temp[1] and temp[1].t and temp[1].t:GetTexture() == 311225 then
+							temp[1]:SetHighlightTexture(0)
+							temp[1]:SetScript("OnEnter", nil)
+						end
+					end
+
+					LockOption("UseEasyChatResizing") -- Use easy resizing
+					LockOption("NoCombatLogTab") -- Hide the combat log
+					LockOption("NoChatButtons") -- Hide chat buttons
+					LockOption("NoSocialButton") -- Hide social button
+					LockOption("UnclampChat") -- Unclamp chat frame
+					LockOption("MoveChatEditBoxToTop") -- Move editbox to top
+					LockOption("SetChatFontSize") -- Set chat font size
+					LockOption("NoChatFade") --  Disable chat fade
+					LockOption("RecentChatWindow") -- Recent chat window
+
+				end
+
 				-- Disable items that conflict with ElvUI
 				if LeaPlusLC.ElvUI then
 					local E = LeaPlusLC.ElvUI
@@ -11097,6 +11134,12 @@
 								LeaPlusCB[option].tiptext = LeaPlusCB[option].tiptext .. "|n|n|cff00AAFF" .. L["Cannot be used with ElvUI."]
 							else
 								LeaPlusCB[option].tiptext = LeaPlusCB[option].tiptext .. "|n|n|cff00AAFF" .. L["Cannot be used with ElvUI"] .. " " .. L[emodule] .. " " .. L["module"] .. "."
+							end
+							-- Remove hover from configuration button if there is one
+							local temp = {LeaPlusCB[option]:GetChildren()}
+							if temp and temp[1] and temp[1].t and temp[1].t:GetTexture() == 311225 then
+								temp[1]:SetHighlightTexture(0)
+								temp[1]:SetScript("OnEnter", nil)
 							end
 						end
 
@@ -11409,7 +11452,7 @@
 			LeaPlusDB["NoRaidRestrictions"]		= LeaPlusLC["NoRaidRestrictions"]
 			LeaPlusDB["NoConfirmLoot"] 			= LeaPlusLC["NoConfirmLoot"]
 			LeaPlusDB["FasterLooting"] 			= LeaPlusLC["FasterLooting"]
-			LeaPlusDB["FixNoQualityLootSpam"] 	= LeaPlusLC["FixNoQualityLootSpam"]
+			LeaPlusDB["FixBlizzardLootSpam"] 	= LeaPlusLC["FixBlizzardLootSpam"]
 			LeaPlusDB["FasterMovieSkip"] 		= LeaPlusLC["FasterMovieSkip"]
 			LeaPlusDB["MovieSkipInstance"] 		= LeaPlusLC["MovieSkipInstance"]
 			LeaPlusDB["CombatPlates"]			= LeaPlusLC["CombatPlates"]
@@ -14050,7 +14093,7 @@
 				LeaPlusDB["NoRaidRestrictions"] = "On"			-- Remove raid restrictions
 				LeaPlusDB["NoConfirmLoot"] = "On"				-- Disable loot warnings
 				LeaPlusDB["FasterLooting"] = "On"				-- Faster auto loot
-				LeaPlusDB["FixNoQualityLootSpam"] = "On"		-- Faster auto loot fix spam
+				LeaPlusDB["FixBlizzardLootSpam"] = "On"			-- Faster auto loot fix spam
 				LeaPlusDB["FasterMovieSkip"] = "On"				-- Faster movie skip
 				LeaPlusDB["MovieSkipInstance"] = "On"			-- Skip instance movies
 				LeaPlusDB["CombatPlates"] = "On"				-- Combat plates
@@ -14168,8 +14211,8 @@
 	end
 
 	-- Slash command for global function
-	_G.SLASH_Leatrix_Plus1 = "/ltp"
-	_G.SLASH_Leatrix_Plus2 = "/leaplus"
+	--_G.SLASH_Leatrix_Plus1 = "/ltp"
+	--_G.SLASH_Leatrix_Plus2 = "/leaplus"
 	SlashCmdList["Leatrix_Plus"] = function(self)
 		-- Run slash command function
 		LeaPlusLC:SlashFunc(self)
@@ -14179,6 +14222,11 @@
 	_G.SLASH_LEATRIX_PLUS_RL1 = "/rl"
 	SlashCmdList["LEATRIX_PLUS_RL"] = function()
 		ReloadUI()
+	end
+
+	-- Replacement for broken slash command system
+	function leaplus(self)
+		LeaPlusLC:SlashFunc(self)
 	end
 
 ----------------------------------------------------------------------
@@ -14471,18 +14519,16 @@
 	LeaPlusLC:MakeCB(LeaPlusLC[pg], "NoRestedEmotes"			, 	"Silence rested emotes"			,	146, -172, 	true,	"If checked, emote sounds will be silenced while your character is:|n|n- resting|n- in a pet battle|n- at the Halfhill Market|n- at the Grim Guzzler|n|nEmote sounds will be enabled when none of the above apply.")
 	LeaPlusLC:MakeCB(LeaPlusLC[pg], "MuteGameSounds"			, 	"Mute game sounds"				,	146, -192, 	false,	"If checked, you will be able to mute a selection of game sounds.")
 
-	LeaPlusLC:MakeTx(LeaPlusLC[pg], "Game Options"				, 	146, -232)
-	LeaPlusLC:MakeCB(LeaPlusLC[pg], "NoPetAutomation"			, 	"Disable pet automation"		, 	146, -252, 	true, 	"If checked, battle pets which are automatically summoned will be dismissed within a few seconds.|n|nThis includes dragging a pet onto the first team slot in the pet journal and entering a battle pet team save command.|n|nNote that pets which are automatically summoned during combat will be dismissed when combat ends.")
-
 	LeaPlusLC:MakeTx(LeaPlusLC[pg], "Game Options"				, 	340, -72)
-	LeaPlusLC:MakeCB(LeaPlusLC[pg], "NoRaidRestrictions"		, 	"Remove raid restrictions"		,	340, -92, 	false,	"If checked, converting a party group to a raid group will succeed even if there are low level characters in the group.|n|nEveryone in the group needs to have Leatrix Plus installed with this option enabled.")
-	LeaPlusLC:MakeCB(LeaPlusLC[pg], "NoConfirmLoot"				, 	"Disable loot warnings"			,	340, -112, 	false,	"If checked, confirmations will no longer appear when you choose a loot roll option or attempt to sell or mail a tradable item.")
-	LeaPlusLC:MakeCB(LeaPlusLC[pg], "FasterLooting"				, 	"Faster auto loot"				,	340, -132, 	true,	"If checked, the amount of time it takes to auto loot creatures will be significantly reduced.")
-	LeaPlusLC:MakeCB(LeaPlusLC[pg], "FasterMovieSkip"			, 	"Faster movie skip"				,	340, -152, 	true,	"If checked, you will be able to cancel cinematics without being prompted for confirmation.")
-	LeaPlusLC:MakeCB(LeaPlusLC[pg], "CombatPlates"				, 	"Combat plates"					,	340, -172, 	true,	"If checked, enemy nameplates will be shown during combat and hidden when combat ends.")
-	LeaPlusLC:MakeCB(LeaPlusLC[pg], "EasyItemDestroy"			, 	"Easy item destroy"				,	340, -192, 	true,	"If checked, you will no longer need to type delete when destroying a superior quality item.|n|nIn addition, item links will be shown in all item destroy confirmation windows.")
-	LeaPlusLC:MakeCB(LeaPlusLC[pg], "LockoutSharing"			, 	"Lockout sharing"				, 	340, -212, 	true, 	"If checked, the 'Display only character achievements to others' setting in the game options panel ('Social' menu) will be permanently checked and locked.")
-	LeaPlusLC:MakeCB(LeaPlusLC[pg], "NoTransforms"				, 	"Remove transforms"				, 	340, -232, 	false, 	"If checked, you will be able to have certain transforms removed automatically when they are applied to your character.|n|nYou can choose the transforms in the configuration panel.|n|nExamples include Weighted Jack-o'-Lantern and Hallowed Wand.|n|nTransforms applied during combat will be removed when combat ends.")
+	LeaPlusLC:MakeCB(LeaPlusLC[pg], "NoPetAutomation"			, 	"Disable pet automation"		, 	340, -92, 	true, 	"If checked, battle pets which are automatically summoned will be dismissed within a few seconds.|n|nThis includes dragging a pet onto the first team slot in the pet journal and entering a battle pet team save command.|n|nNote that pets which are automatically summoned during combat will be dismissed when combat ends.")
+	LeaPlusLC:MakeCB(LeaPlusLC[pg], "NoRaidRestrictions"		, 	"Remove raid restrictions"		,	340, -112, 	false,	"If checked, converting a party group to a raid group will succeed even if there are low level characters in the group.|n|nEveryone in the group needs to have Leatrix Plus installed with this option enabled.")
+	LeaPlusLC:MakeCB(LeaPlusLC[pg], "NoConfirmLoot"				, 	"Disable loot warnings"			,	340, -132, 	false,	"If checked, confirmations will no longer appear when you choose a loot roll option or attempt to sell or mail a tradable item.")
+	LeaPlusLC:MakeCB(LeaPlusLC[pg], "FasterLooting"				, 	"Faster auto loot"				,	340, -152, 	true,	"If checked, the amount of time it takes to auto loot creatures will be significantly reduced.")
+	LeaPlusLC:MakeCB(LeaPlusLC[pg], "FasterMovieSkip"			, 	"Faster movie skip"				,	340, -172, 	true,	"If checked, you will be able to cancel cinematics without being prompted for confirmation.")
+	LeaPlusLC:MakeCB(LeaPlusLC[pg], "CombatPlates"				, 	"Combat plates"					,	340, -192, 	true,	"If checked, enemy nameplates will be shown during combat and hidden when combat ends.")
+	LeaPlusLC:MakeCB(LeaPlusLC[pg], "EasyItemDestroy"			, 	"Easy item destroy"				,	340, -212, 	true,	"If checked, you will no longer need to type delete when destroying a superior quality item.|n|nIn addition, item links will be shown in all item destroy confirmation windows.")
+	LeaPlusLC:MakeCB(LeaPlusLC[pg], "LockoutSharing"			, 	"Lockout sharing"				, 	340, -232, 	true, 	"If checked, the 'Display only character achievements to others' setting in the game options panel ('Social' menu) will be permanently checked and locked.")
+	LeaPlusLC:MakeCB(LeaPlusLC[pg], "NoTransforms"				, 	"Remove transforms"				, 	340, -252, 	false, 	"If checked, you will be able to have certain transforms removed automatically when they are applied to your character.|n|nYou can choose the transforms in the configuration panel.|n|nExamples include Weighted Jack-o'-Lantern and Hallowed Wand.|n|nTransforms applied during combat will be removed when combat ends.")
 
 	LeaPlusLC:CfgBtn("SetWeatherDensityBtn", LeaPlusCB["SetWeatherDensity"])
 	LeaPlusLC:CfgBtn("FasterLootingBtn", LeaPlusCB["FasterLooting"])
