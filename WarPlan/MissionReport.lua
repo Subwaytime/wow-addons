@@ -89,9 +89,8 @@ local function Tooltip_AddGarrisonStatus(self, mt, prefixLine)
 	end
 	self:Show()
 end
-local function Tooltip_OnSetUnit(self)
-	local _, unit = self:GetUnit()
-	local guid = unit == "mouseover" and UnitGUID("mouseover")
+local function Tooltip_OnSetUnit(self, tooltipData)
+	local guid = tooltipData and tooltipData.type == Enum.TooltipDataType.Unit and tooltipData.guid
 	local cid = guid and guid:match("^Creature%-%d+%-%d+%-%d+%-%d+%-(%d+)")
 	if cid == "138704" or cid == "138706" then
 		return Tooltip_AddGarrisonStatus(self, 22)
@@ -106,7 +105,7 @@ local function Tooltip_OnLandingEnter(self)
 end
 
 function EV:I_LOAD_HOOKS()
-	GameTooltip:HookScript("OnTooltipSetUnit", Tooltip_OnSetUnit)
+	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, Tooltip_OnSetUnit)
 	GarrisonLandingPageMinimapButton:HookScript("OnEnter", Tooltip_OnLandingEnter)
 	if IsAddOnLoaded("MasterPlanA") then
 		return

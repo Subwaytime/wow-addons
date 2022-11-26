@@ -2562,7 +2562,7 @@ function KT:SetMessage(text, r, g, b, pattern, icon, x, y)
 		x = x or 0
 		y = y or 0
 		if db.sink20OutputSink == "Blizzard" then
-			x = floor(x * 3 * COMBAT_TEXT_X_SCALE)
+			x = floor(x * 3)
 			y = y - 8
 		end
 		text = format("|T%s:0:0:%d:%d|t%s", icon, x, y, text)

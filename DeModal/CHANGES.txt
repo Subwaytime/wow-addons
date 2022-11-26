@@ -1,10 +1,10 @@
-lightweight tag a769e04aaa065bcc93bf0068d2f40e28a190de40 0.7.0
+lightweight tag 08f2c8de082e4c3ce7c3e61255af3077268c9f06 0.7.1
 Author:	nezroy <nezroy@gmail.com>
-Date:	Sat Oct 29 05:04:35 2022 -0600
+Date:	Wed Nov 23 10:02:33 2022 -0700
 
-commit a769e04aaa065bcc93bf0068d2f40e28a190de40
+commit 08f2c8de082e4c3ce7c3e61255af3077268c9f06
 Author: nezroy <nezroy@gmail.com>
-Date:   Sat Oct 29 05:04:35 2022 -0600
+Date:   Wed Nov 23 10:02:33 2022 -0700
 
-    Add several missing movable frames
+    Apply default scaling logic, fixes #20
 

@@ -61,7 +61,8 @@ function optionHandler:Setter(info, value)
 		addon.Init:BuildDB()
 
 	elseif info.arg == "ShowAdditionalSourceTooltips" then
-		C_TransmogCollection.SetShowMissingSourceInItemTooltips(value);
+		---C_TransmogCollection.SetShowMissingSourceInItemTooltips(value);
+		SetCVar("missingTransmogSourceInItemTooltips",value)
 
 	elseif info.arg == "ExtraLargeTransmogArea" or info.arg == "LargeTransmogArea" then 
 		addon.TransmogVendorSizeUpdated = false
@@ -1275,7 +1276,7 @@ function addon:OnEnable()
 	addon.Init:DressingRoom()
 	--addon.Init.LoadCollectionListModule()
 	--BW_ColectionListFrameTemplate
-	addon.Init:BuildTooltips()
+	--addon.Init:BuildTooltips()
 	C_Timer.After(0.5, function()
 		addon.RefreshSubItemData()
 		addon.RefreshOutfitData()

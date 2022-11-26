@@ -1,26 +1,26 @@
-lightweight tag bdc8e7ce8b4179ea6c0ddbb44e578ea604311329 4.0.16-release
+lightweight tag d15328a1839541bb94958d491212bf237c68950b 4.0.17-release
 Author:	GitHub <noreply@github.com>
-Date:	Tue Nov 8 20:00:47 2022 +0000
+Date:	Fri Nov 18 19:45:52 2022 +0000
 
-commit bdc8e7ce8b4179ea6c0ddbb44e578ea604311329
+commit d15328a1839541bb94958d491212bf237c68950b
 Author: pereira-a <pereirasmandre@gmail.com>
-Date:   Tue Nov 8 20:00:47 2022 +0000
+Date:   Fri Nov 18 19:45:52 2022 +0000
 
-    increase addon version
+    increase version
 
-commit 6a1e69fcf8f3d0b984a1bf74800e3a2734ca9394
-Author: Valdemar <54585769+Hollicsh@users.noreply.github.com>
-Date:   Wed Nov 9 00:41:39 2022 +0500
+commit bdb386bfa77e4fb5a8393dc83d973105e4822ee8
+Author: Axel Clifford <axelclifford@gmail.com>
+Date:   Fri Nov 18 10:00:36 2022 -0700
 
-    Update localization-ruRU.lua
+    Update MBB.toc
     
-    Correct translate.
+    Bump to latest release version
 
-commit 6a1e69fcf8f3d0b984a1bf74800e3a2734ca9394
-Author: Valdemar <54585769+Hollicsh@users.noreply.github.com>
-Date:   Wed Nov 9 00:41:39 2022 +0500
+commit bdb386bfa77e4fb5a8393dc83d973105e4822ee8
+Author: Axel Clifford <axelclifford@gmail.com>
+Date:   Fri Nov 18 10:00:36 2022 -0700
 
-    Update localization-ruRU.lua
+    Update MBB.toc
     
-    Correct translate.
+    Bump to latest release version
 

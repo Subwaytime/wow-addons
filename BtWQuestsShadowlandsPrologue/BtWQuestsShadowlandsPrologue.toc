@@ -1,6 +1,6 @@
-## Interface: 90207
+## Interface: 100002
 ## Title: BtWQuests: Shadowlands Prologue
-## Version: 1.8
+## Version: 1.9
 ## Notes: Shadowlands Prologue quest data for BtWQuests
 ## Author: Breen
 ## Dependencies: BtWQuests

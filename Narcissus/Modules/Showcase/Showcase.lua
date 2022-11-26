@@ -6,9 +6,11 @@ local GetModelOffsetZ = addon.GetModelOffsetZ;
 local UseCurrentClassBackground = addon.UseCurrentClassBackground;
 local UseCurrentRaceBackground = addon.UseCurrentRaceBackground;
 local UseModelBackgroundImage = addon.UseModelBackgroundImage;
+local IsPlayerInAlteredForm = addon.TransitionAPI.IsPlayerInAlteredForm;
 
 local FadeFrame = NarciFadeUI.Fade;
 local GetAnimationName = NarciAnimationInfo.GetOfficialName;
+local IsSlotValidForTransmog = NarciAPI.IsSlotValidForTransmog;
 
 local IsShiftKeyDown = IsShiftKeyDown;
 local GetCursorPosition = GetCursorPosition;
@@ -1779,9 +1781,10 @@ end
 function NarciOutfitShowcaseMixin:SyncModel()
     --retrieve the outfit data from dressing room
     --/run NarciOutfitShowcase:SyncModel()
-    local isSheathed = PlayerActor:GetSheathed();
+    local sheatheWeapons = PlayerActor:GetSheathed();
+    local useNativeForm = not IsPlayerInAlteredForm();
     PlayerActor:SetScale(1);
-    PlayerActor:SetModelByUnit("player", isSheathed);
+    PlayerActor:SetModelByUnit("player", sheatheWeapons, nil, nil, useNativeForm);  --autoDress, hideWeapons
     PlayerActor.bowData = nil;
 
     local sourceActor;
@@ -1812,7 +1815,7 @@ function NarciOutfitShowcaseMixin:SyncModel()
     else
         return
     end
-    PlayerActor:SheatheWeapon(isSheathed);
+    PlayerActor:SheatheWeapon(sheatheWeapons);
 
     if self.mountMode then
         UpdateMountActor(true);
@@ -1822,7 +1825,9 @@ function NarciOutfitShowcaseMixin:SyncModel()
 end
 
 local function IsValidTransmogInfo(slotID, info)
-    return (info.appearanceID > 0) and ((slotID ~= 5 and slotID ~= 19) or ( not IsHiddenVisual(info.appearanceID) ));  --skip hidden tabard/shirt
+    if IsSlotValidForTransmog(slotID) then
+        return (info.appearanceID > 0) and ((slotID ~= 5 and slotID ~= 19) or ( not IsHiddenVisual(info.appearanceID) ));  --skip hidden tabard/shirt
+    end
 end
 
 function NarciOutfitShowcaseMixin:UpdateItemText(transmogInfoList)

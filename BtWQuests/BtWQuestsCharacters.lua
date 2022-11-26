@@ -310,10 +310,12 @@ end
 
 function BtWQuestsCharactersCharacterMixin:GetFriendshipReputation(factionID)
     local id, rep, maxRep, name, text, texture, reaction, threshold, nextThreshold;
-    
+
     if self.t.friendships then
         local data = self.t.friendships[factionID];
-        if data ~= nil then
+        if type(data) == "table" and data.friendshipFactionID then
+            return data;
+        elseif data ~= nil then
             if data[1] ~= nil then
                 id, rep, maxRep, name, text, texture, reaction, threshold, nextThreshold = unpack(data);
             else
@@ -322,11 +324,17 @@ function BtWQuestsCharactersCharacterMixin:GetFriendshipReputation(factionID)
         end
     end
 
-    return id, rep, maxRep, name, text, texture, reaction, threshold, nextThreshold;
-
-
-    -- local _, _, _, name, _, _, _, _ = GetFriendshipReputation(factionID)
-    -- return unpack((self.t.friendships or {})[factionID] or {})
+    return {
+        friendshipFactionID = id,
+        standing = rep,
+        maxRep = maxRep,
+        name = name,
+        text = text,
+        texture = texture,
+        reaction = reaction,
+        reactionThreshold = threshold,
+        nextThreshold = nextThreshold,
+    };
 end
 function BtWQuestsCharactersCharacterMixin:GetAchievementInfo(achievementID)
     local id, name, points, completed, month, day, year, description,
@@ -534,7 +542,7 @@ function BtWQuestsCharactersPlayerMixin:GetHeartOfAzerothLevel()
     return BtWQuestsCharactersCharacterMixin.GetHeartOfAzerothLevel(self)
 end
 function BtWQuestsCharactersPlayerMixin:GetFriendshipReputation(factionId)
-    return GetFriendshipReputation(factionId)
+    return C_GossipInfo.GetFriendshipReputation(factionId)
 end
 function BtWQuestsCharactersPlayerMixin:GetAchievementInfo(achievementId)
     return GetAchievementInfo(achievementId)
@@ -921,33 +929,11 @@ end
 local function GetFriendships(tbl, friendships)
     local tbl = tbl or {};
 
-    for id,data in pairs(tbl) do
-        temp[id] = data;
-    end
-
     wipe(tbl);
     for factionID in pairs(friendships) do
-        local id, rep, maxRep, name, text, texture, reaction, threshold, nextThreshold = GetFriendshipReputation(factionID);
-        if id ~= nil then
-            local data = temp[factionID] or {};
-            if data[1] ~= nil then
-                wipe(data);
-            end
-
-            data.name = name;
-            data.rep = rep;
-            data.maxRep = maxRep;
-            data.text = text;
-            data.texture = texture;
-            data.reaction = reaction;
-            data.threshold = threshold;
-            data.nextThreshold = nextThreshold;
-            
-            tbl[factionID] = data;
-        end
+        tbl[factionID] = C_GossipInfo.GetFriendshipReputation(factionID);
     end
 
-    wipe(temp);
     return tbl;
 end
 local function GetSkills(tbl)
@@ -1037,6 +1023,8 @@ function BtWQuestsCharacters:OnEvent(event, ...)
     end
     if event == "COVENANT_CHOSEN" or event == "PLAYER_LOGIN" then
         character.covenantID = C_Covenants and C_Covenants.GetActiveCovenantID() or nil
+        character.friendships = GetFriendships(character.friendships, self.friendships or {});
+
     end
     if event == "PLAYER_LOGOUT" then
         character.faction = UnitFactionGroup("player");

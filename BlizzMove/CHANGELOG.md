@@ -1,6 +1,6 @@
 # BlizzMove
 
-## [v3.5.4](https://github.com/Kiatra/BlizzMove/tree/v3.5.4) (2022-11-03)
-[Full Changelog](https://github.com/Kiatra/BlizzMove/compare/v3.5.3...v3.5.4) [Previous Releases](https://github.com/Kiatra/BlizzMove/releases)
+## [v3.5.6](https://github.com/Kiatra/BlizzMove/tree/v3.5.6) (2022-11-23)
+[Full Changelog](https://github.com/Kiatra/BlizzMove/compare/v3.5.5...v3.5.6) [Previous Releases](https://github.com/Kiatra/BlizzMove/releases)
 
-- Fix scale resetting when blizzard applies auto-scaling (fixes #98)  
+- Made BlizzMove hooks more robust when other addons try to overwrite them  

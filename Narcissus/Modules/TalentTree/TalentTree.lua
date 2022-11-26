@@ -32,12 +32,15 @@ local C_Traits = C_Traits;
 local C_ClassTalents = C_ClassTalents;
 local C_SpecializationInfo = C_SpecializationInfo;
 local C_PvP = C_PvP;
-local UnitLevel = UnitLevel;
+
+local CAN_USE_TALENT_UI = true;
+local CanPlayerUseTalentSpecUI = C_SpecializationInfo.CanPlayerUseTalentSpecUI;
 
 local GetSpecializationInfoByID = GetSpecializationInfoByID;
 local GetInspectSpecialization = GetInspectSpecialization;
 local UnitClass = UnitClass;
 local UnitSex = UnitSex;
+local UnitLevel = UnitLevel;
 local IsSpecializationActivateSpell = IsSpecializationActivateSpell;
 
 --local INSPECT_TRAIT_CONFIG_ID = -1;
@@ -805,6 +808,8 @@ function NarciMiniTalentTreeMixin:SetInspectMode(state)
         local playerName = UnitName(unit);
         local specID = GetInspectSpecialization(unit);
 		local classDisplayName, class = UnitClass(unit);
+        playerName = playerName or "Unknown Player";
+
 		if specID then
             local sex = UnitSex(unit);
 			local _, specName = GetSpecializationInfoByID(specID, sex);
@@ -1970,6 +1975,7 @@ EventCenter.onEvent = function(self, event, ...)
         MainFrame:RequestUpdate();
         MainFrame.PvPTalentFrame:RequestUpdate();
         MainFrame.SideTabToggle.ButtonText:SetText(DataProvider:GetCurrentSpecName());
+        CAN_USE_TALENT_UI = CanPlayerUseTalentSpecUI();
 
     elseif event == "PLAYER_ENTERING_WORLD" then
         self:UnregisterEvent(event);
@@ -2023,6 +2029,7 @@ EventCenter:SetScript("OnEvent", EventCenter.onEvent);
 
 
 if not addon.IsDragonflight() then return end;
+
 
 local ENABLE_INSPECT = false;
 local ENABLE_PAPERDOLL = false;
@@ -2078,8 +2085,7 @@ function HookUtil:HookPaperDoll()
 
     local PaperDoll = _G["PaperDollFrame"];
     PaperDoll:HookScript("OnShow", function()
-        if ENABLE_PAPERDOLL then
-            if UnitLevel("player") < 10 then return end;
+        if ENABLE_PAPERDOLL and CAN_USE_TALENT_UI then
             MainFrame:AnchorToPaperDoll();
             MainFrame:SetInspectMode(false);
             MainFrame:Show();
@@ -2103,8 +2109,7 @@ function HookUtil:HookEquipmentManager()
     if not f then return end;
 
     f:HookScript("OnShow", function()
-        if ENABLE_EQUIPMENT_MANAGER then
-            if UnitLevel("player") < 10 then return end;
+        if ENABLE_EQUIPMENT_MANAGER and CAN_USE_TALENT_UI then
             MainFrame:AnchorToPaperDoll();
             MainFrame:SetInspectMode(false);
             MainFrame:Show();
@@ -2113,7 +2118,7 @@ function HookUtil:HookEquipmentManager()
     end);
 
     f:HookScript("OnHide", function()
-        if ENABLE_PAPERDOLL and UnitLevel("player") >= 10 then
+        if ENABLE_PAPERDOLL and CAN_USE_TALENT_UI then
             MainFrame:AnchorToPaperDoll();
             MainFrame:SetInspectMode(false);
             MainFrame:Show();

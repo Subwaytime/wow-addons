@@ -2,11 +2,11 @@
 -- L00: Leatrix Maps Library
 ----------------------------------------------------------------------
 
+-- LibDBIcon 10.0.1:
 -- 11: LibStub: (?s)-- LibStubStart\R?\K.*?(?=-- LibStubEnd)
 -- 12: LibCallbackHandler: (?s)-- CallbackStart\R?\K.*?(?=-- CallbackEnd)
 -- 13: LibDataBroker: (?s)-- DataBrokerStart\R?\K.*?(?=-- DataBrokerEnd)
 -- 14: LibDBIcon: (?s)-- LibDBIconStart\R?\K.*?(?=-- LibDBIconEnd)
--- 15: Dropdown menu taint fixes
 
 local LeaMapsLC = {}
 local gameversion, gamebuild, gamedate, gametocversion = GetBuildInfo()
@@ -30,23 +30,23 @@ if not LibStub or LibStub.minor < LIBSTUB_MINOR then
 	LibStub = LibStub or {libs = {}, minors = {} }
 	_G[LIBSTUB_MAJOR] = LibStub
 	LibStub.minor = LIBSTUB_MINOR
-
+	
 	-- LibStub:NewLibrary(major, minor)
 	-- major (string) - the major version of the library
 	-- minor (string or number ) - the minor version of the library
-	--
+	-- 
 	-- returns nil if a newer or same version of the lib is already present
 	-- returns empty library object or old library object if upgrade is needed
 	function LibStub:NewLibrary(major, minor)
 		assert(type(major) == "string", "Bad argument #2 to `NewLibrary' (string expected)")
 		minor = assert(tonumber(strmatch(minor, "%d+")), "Minor version must either be a number or contain a number.")
-
+		
 		local oldminor = self.minors[major]
 		if oldminor and oldminor >= minor then return nil end
 		self.minors[major], self.libs[major] = minor, self.libs[major] or {}
 		return self.libs[major], oldminor
 	end
-
+	
 	-- LibStub:GetLibrary(major, [silent])
 	-- major (string) - the major version of the library
 	-- silent (boolean) - if true, library is optional, silently return nil if its not found
@@ -59,14 +59,14 @@ if not LibStub or LibStub.minor < LIBSTUB_MINOR then
 		end
 		return self.libs[major], self.minors[major]
 	end
-
+	
 	-- LibStub:IterateLibraries()
-	--
+	-- 
 	-- Returns an iterator for the currently registered libraries
-	function LibStub:IterateLibraries()
-		return pairs(self.libs)
+	function LibStub:IterateLibraries() 
+		return pairs(self.libs) 
 	end
-
+	
 	setmetatable(LibStub, { __call = LibStub.GetLibrary })
 end
 -- LibStubEnd
@@ -407,7 +407,7 @@ LeaDataBroker()
 local function LeaLibDBIcon()
 
 -- LibDBIconStart
-
+--@curseforge-project-slug: libdbicon-1-0@
 -----------------------------------------------------------------------
 -- LibDBIcon-1.0
 --
@@ -415,7 +415,7 @@ local function LeaLibDBIcon()
 --
 
 local DBICON10 = "LibDBIcon-1.0"
-local DBICON10_MINOR = 44 -- Bump on changes
+local DBICON10_MINOR = 45 -- Bump on changes
 if not LibStub then error(DBICON10 .. " requires LibStub.") end
 local ldb = LibStub("LibDataBroker-1.1", true)
 if not ldb then error(DBICON10 .. " requires LibDataBroker-1.1.") end
@@ -627,37 +627,49 @@ local function createButton(name, object, db)
 	button.dataObject = object
 	button.db = db
 	button:SetFrameStrata("MEDIUM")
-	if button.SetFixedFrameStrata then -- Classic support
-		button:SetFixedFrameStrata(true)
-	end
+	button:SetFixedFrameStrata(true)
 	button:SetFrameLevel(8)
-	if button.SetFixedFrameLevel then -- Classic support
-		button:SetFixedFrameLevel(true)
-	end
+	button:SetFixedFrameLevel(true)
 	button:SetSize(31, 31)
 	button:RegisterForClicks("anyUp")
 	button:RegisterForDrag("LeftButton")
 	button:SetHighlightTexture(136477) --"Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight"
-	local overlay = button:CreateTexture(nil, "OVERLAY")
-	overlay:SetSize(53, 53)
-	overlay:SetTexture(136430) --"Interface\\Minimap\\MiniMap-TrackingBorder"
-	overlay:SetPoint("TOPLEFT")
-	local background = button:CreateTexture(nil, "BACKGROUND")
-	background:SetSize(20, 20)
-	background:SetTexture(136467) --"Interface\\Minimap\\UI-Minimap-Background"
-	background:SetPoint("TOPLEFT", 7, -5)
-	local icon = button:CreateTexture(nil, "ARTWORK")
-	icon:SetSize(17, 17)
-	icon:SetTexture(object.icon)
-	icon:SetPoint("TOPLEFT", 7, -6)
-	button.icon = icon
+	if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+		local overlay = button:CreateTexture(nil, "OVERLAY")
+		overlay:SetSize(50, 50)
+		overlay:SetTexture(136430) --"Interface\\Minimap\\MiniMap-TrackingBorder"
+		overlay:SetPoint("TOPLEFT", button, "TOPLEFT", 0, 0)
+		local background = button:CreateTexture(nil, "BACKGROUND")
+		background:SetSize(24, 24)
+		background:SetTexture(136467) --"Interface\\Minimap\\UI-Minimap-Background"
+		background:SetPoint("CENTER", button, "CENTER", 0, 1)
+		local icon = button:CreateTexture(nil, "ARTWORK")
+		icon:SetSize(18, 18)
+		icon:SetTexture(object.icon)
+		icon:SetPoint("CENTER", button, "CENTER", 0, 1)
+		button.icon = icon
+	else
+		local overlay = button:CreateTexture(nil, "OVERLAY")
+		overlay:SetSize(53, 53)
+		overlay:SetTexture(136430) --"Interface\\Minimap\\MiniMap-TrackingBorder"
+		overlay:SetPoint("TOPLEFT")
+		local background = button:CreateTexture(nil, "BACKGROUND")
+		background:SetSize(20, 20)
+		background:SetTexture(136467) --"Interface\\Minimap\\UI-Minimap-Background"
+		background:SetPoint("TOPLEFT", 7, -5)
+		local icon = button:CreateTexture(nil, "ARTWORK")
+		icon:SetSize(17, 17)
+		icon:SetTexture(object.icon)
+		icon:SetPoint("TOPLEFT", 7, -6)
+		button.icon = icon
+	end
+
 	button.isMouseDown = false
+	local r, g, b = button.icon:GetVertexColor()
+	button.icon:SetVertexColor(object.iconR or r, object.iconG or g, object.iconB or b)
 
-	local r, g, b = icon:GetVertexColor()
-	icon:SetVertexColor(object.iconR or r, object.iconG or g, object.iconB or b)
-
-	icon.UpdateCoord = updateCoord
-	icon:UpdateCoord()
+	button.icon.UpdateCoord = updateCoord
+	button.icon:UpdateCoord()
 
 	button:SetScript("OnEnter", onEnter)
 	button:SetScript("OnLeave", onLeave)
@@ -888,78 +900,4 @@ lib:SetButtonRadius(lib.radius) -- Upgrade to 40
 end
 LeaLibDBIcon()
 
-----------------------------------------------------------------------
--- L15: Dropdown menu taint fixes
-----------------------------------------------------------------------
-
-if LeaMapsNotUsingThisRightNowInDragonflight then
-
-	-- UIDropDownMenu displayMode taints dropdown initialization
-	-- https://www.townlong-yak.com/bugs/Kjq4hm-DisplayModeTaint
-	if (UIDROPDOWNMENU_OPEN_PATCH_VERSION or 0) < 1 then
-		UIDROPDOWNMENU_OPEN_PATCH_VERSION = 1
-		hooksecurefunc("UIDropDownMenu_InitializeHelper", function(frame)
-			if UIDROPDOWNMENU_OPEN_PATCH_VERSION ~= 1 then
-				return
-			end
-			if UIDROPDOWNMENU_OPEN_MENU and UIDROPDOWNMENU_OPEN_MENU ~= frame
-			   and not issecurevariable(UIDROPDOWNMENU_OPEN_MENU, "displayMode") then
-				UIDROPDOWNMENU_OPEN_MENU = nil
-				local t, f, prefix, i = _G, issecurevariable, " \0", 1
-				repeat
-					i, t[prefix .. i] = i + 1
-				until f("UIDROPDOWNMENU_OPEN_MENU")
-			end
-		end)
-	end
-
-	-- UIDropDownMenu_SetSelectedValue/_Refresh can taint execution
-	-- https://www.townlong-yak.com/bugs/YhgQma-SetValueRefreshTaint
-	-- Mitigated by 8.3.0.33775
-
-	-- UIDropDownMenu_GetSelectedID taints dropdown initialization
-	-- https://www.townlong-yak.com/bugs/afKy4k-HonorFrameLoadTaint
-	-- Fixed in: 8.1.0.27934
-
-	-- UIDropDownMenu_Refresh accesses uninitialized buttons
-	-- https://www.townlong-yak.com/bugs/Mx7CWN-RefreshOverread
-	if (UIDD_REFRESH_OVERREAD_PATCH_VERSION or 0) < 1 then
-		UIDD_REFRESH_OVERREAD_PATCH_VERSION = 1
-		local function drop(t, k)
-			local c = 42
-			t[k] = nil
-			while not issecurevariable(t, k) do
-				if t[c] == nil then
-					t[c] = nil
-				end
-				c = c + 1
-			end
-		end
-
-		hooksecurefunc('UIDropDownMenu_InitializeHelper', function(frame)
-			if UIDROPDOWNMENU_VALUE_PATCH_VERSION == 1 or UIDD_REFRESH_OVERREAD_PATCH_VERSION == 1 then
-				for i=1, UIDROPDOWNMENU_MAXLEVELS do
-					local d = _G['DropDownList' .. i]
-					if d and d.numButtons then
-						for j = d.numButtons+1, UIDROPDOWNMENU_MAXBUTTONS do
-							local b, _ = _G['DropDownList' .. i .. 'Button' .. j]
-							if UIDROPDOWNMENU_VALUE_PATCH_VERSION == 1 and not (issecurevariable(b, 'value') or b:IsShown()) then
-								b.value = nil
-								repeat j, b['fx' .. j] = j+1, nil
-								until issecurevariable(b, 'value')
-							end
-							if UIDD_REFRESH_OVERREAD_PATCH_VERSION == 1 then
-								_ = issecurevariable(b, 'checked')      or drop(b, 'checked')
-								_ = issecurevariable(b, 'notCheckable') or drop(b, 'notCheckable')
-							end
-						end
-					end
-				end
-			end
-		end)
-
-	end
-
-end
-
--- L16: End
+-- L15: End

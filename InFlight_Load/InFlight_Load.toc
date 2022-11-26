@@ -1,4 +1,4 @@
-## Interface: 100000
+## Interface: 100002
 ## Title: InFlight_Load
 ## Notes: Loader for InFlight
 ## Notes-deDE: Loader für InFlight
@@ -12,7 +12,7 @@
 ## Notes-zhCN: InFlight 的載入器
 ## Notes-zhTW: InFlight 的裝載機
 ## Author: TotalPackage, Deranjata
-## Version: 10.0.1
+## Version: 10.0.25
 
 ## X-Category: Interface Enhancements
 

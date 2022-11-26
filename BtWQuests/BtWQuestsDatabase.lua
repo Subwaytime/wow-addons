@@ -2347,9 +2347,9 @@ function FriendshipItemMixin:IsActive(database, item, character)
     return true
 end
 function FriendshipItemMixin:IsCompleted(database, item, character)
-    local friendID, friendRep, friendMaxRep, friendName, friendText, friendTexture, friendTextLevel, friendThreshold, nextFriendThreshold = character:GetFriendshipReputation(item.id)
+    local factionInfo = character:GetFriendshipReputation(item.id)
     
-    return (friendRep or 0) >= item.amount
+    return (factionInfo and factionInfo.standing or 0) >= item.amount
 end
 
 local AchievementItemMixin = CreateFromMixins(ItemMixin);

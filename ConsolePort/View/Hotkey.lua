@@ -6,7 +6,6 @@
 
 local _, db = ...;
 local HotkeyMixin, HotkeyHandler = {}, CPAPI.CreateEventHandler({'Frame', '$parentHotkeyHandler', ConsolePort}, {
-	'CVAR_UPDATE';
 	'UPDATE_BINDINGS';
 	'MODIFIER_STATE_CHANGED';
 })
@@ -27,10 +26,6 @@ end)
 function HotkeyHandler:ADDON_LOADED(...)
 	-- need to run this on every addon loading
 	self:OnInterfaceUpdated()
-end
-
-function HotkeyHandler:CVAR_UPDATE(...)
-	-- not even sure this fires for gamepad stuff
 end
 
 function HotkeyHandler:UPDATE_BINDINGS(...)
@@ -130,8 +125,14 @@ do local function GetBindingSlugs(self, device, split, key, ...)
 		return GetBindingSlugs(self, device, split, db('Gamepad'):GetBindingKey(binding))
 	end
 
-	function HotkeyHandler:GetButtonSlugsForBinding(binding, separator)
-		return table.concat({self:GetButtonSlugForBinding(binding)}, separator)
+	function HotkeyHandler:GetButtonSlugsForBinding(binding, separator, limit)
+		local slugs = {self:GetButtonSlugForBinding(binding)}
+		if limit then
+			for i = limit + 1, #slugs do
+				slugs[i] = nil;
+			end
+		end
+		return table.concat(slugs, separator)
 	end
 end
 

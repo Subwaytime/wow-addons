@@ -341,6 +341,10 @@ L["Add to MogIt Wishlist"] = "Add to MogIt Wishlist";
 L["Show Taint Solution"] = "How to solve this issue?";
 L["Taint Solution Step1"] = "1. Reload your UI.";
 L["Taint Solution Step2"] = "2. "..NARCI_MODIFIER_CONTROL.." + Left-click on an item to open the dressing room.";
+L["Switch Form To Visage"] = "Switch to|cffffffff Visage|r form";
+L["Switch Form To Dracthyr"] = "Switch to|cffffffff Dracthyr|r form";
+L["Switch Form To Worgen"] = "Switch to|cffffffff Worgen|r form";
+L["Switch Form To Human"] = "Switch to|cffffffff Human|r form";
 
 --NPC Browser--
 NARCI_NPC_BROWSER_TITLE_LEVEL = ".*%?%?.?";      --Level ?? --Use this to check if the second line of the tooltip is NPC's title or unit type

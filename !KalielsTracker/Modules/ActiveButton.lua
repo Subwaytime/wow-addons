@@ -21,10 +21,7 @@ local eventFrame
 local activeFrame, abutton
 
 local extraAbilityFrame = ExtraAbilityContainer
-local pointNum = 2
-local isMoveAnything, isBartender, isElvui, isTukui = false, false, false, false
-
-local stopUpdate = false
+local isBartender, isElvui, isTukui = false, false, false
 
 --------------
 -- Internal --
@@ -61,59 +58,21 @@ local function RemoveHotkey(button)
 	end
 end
 
-local function ActiveFrame_Update()
-	if stopUpdate or dbChar.activeButtonPosition then return end
-	local point, relativeTo, relativePoint, xOfs, yOfs = "BOTTOM", UIParent, "BOTTOM", 0, 205
-	if ExtraAbilityContainer:IsInDefaultPosition() and HasExtraActionBar() then
-		point, relativeTo, relativePoint, xOfs, yOfs = "BOTTOM", ExtraAbilityContainer, "TOP", 0, -30
-	end
-	if isBartender then
-		point, relativeTo, relativePoint, xOfs, yOfs = extraAbilityFrame:GetPoint()
-		if HasExtraActionBar() or #C_ZoneAbility.GetActiveAbilities() > 0 then
-			yOfs = yOfs + 90
-		end
-	elseif isElvui then
-		if not HasExtraActionBar() then
-			extraAbilityFrame = ExtraActionBarFrame:GetParent()
-		elseif #C_ZoneAbility.GetActiveAbilities() == 0 then
-			extraAbilityFrame = ZoneAbilityFrame:GetParent()
-		end
-		point, relativeTo, relativePoint, xOfs, yOfs = extraAbilityFrame:GetPoint()
-		yOfs = yOfs - 29
-	elseif isTukui then
-		point, relativeTo, relativePoint, xOfs, yOfs = extraAbilityFrame:GetPoint()
-		if HasExtraActionBar() or #C_ZoneAbility.GetActiveAbilities() > 0 then
-			yOfs = yOfs + 90
+local function ActiveFrame_SetPosition()
+	local point, relativeTo, relativePoint, xOfs, yOfs = "BOTTOM", UIParent, "BOTTOM", 0, 285
+	if dbChar.activeButtonPosition then
+		point, relativeTo, relativePoint, xOfs, yOfs = unpack(dbChar.activeButtonPosition)
+	else
+		if isBartender then
+			yOfs = yOfs - 40
+		elseif isElvui then
+			yOfs = yOfs -14
+		elseif isTukui then
+			yOfs = yOfs + 26
 		end
 	end
-	KT:prot("ClearAllPoints", activeFrame)
-	KT:prot("SetPoint", activeFrame, point, relativeTo, relativePoint, xOfs, yOfs)
-end
-
--- TODO: Test it (MoveAnything)
-local function ActiveFrame_Init()
-	pointNum = extraAbilityFrame:GetNumPoints()
-	if isMoveAnything then
-		if MovAny.Boot then
-			hooksecurefunc(MovAny, "SyncAllFrames", function(self)
-				if extraAbilityFrame.MAHooked then
-					pointNum = 1
-				end
-			end)
-		end
-	end
-	if isElvui then
-		local parent = ExtraActionBarFrame:GetParent()
-		if not parent then
-			isElvui = false
-		end
-	elseif isTukui then
-		if TukuiExtraActionButton then
-			extraAbilityFrame:SetParent(TukuiExtraActionButton)
-		else
-			isTukui = false
-		end
-	end
+	KT:protStop("ClearAllPoints", activeFrame)
+	KT:protStop("SetPoint", activeFrame, point, relativeTo, relativePoint, xOfs, yOfs)
 end
 
 local function SetFrames()
@@ -122,10 +81,7 @@ local function SetFrames()
 		eventFrame = CreateFrame("Frame")
 		eventFrame:SetScript("OnEvent", function(self, event, arg1)
 			_DBG("Event - "..event, true)
-			if event == "PLAYER_ENTERING_WORLD" then
-				ActiveFrame_Init()
-				self:UnregisterEvent(event)
-			elseif event == "QUEST_WATCH_LIST_CHANGED" or
+			if event == "QUEST_WATCH_LIST_CHANGED" or
 					event == "ZONE_CHANGED" or
 					event == "QUEST_POI_UPDATE" or
 					event == "BAG_UPDATE_COOLDOWN" then
@@ -141,7 +97,6 @@ local function SetFrames()
 			end
 		end)
 	end
-	eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 	eventFrame:RegisterEvent("QUEST_WATCH_LIST_CHANGED")
 	eventFrame:RegisterEvent("ZONE_CHANGED")
 	eventFrame:RegisterEvent("QUEST_POI_UPDATE")
@@ -169,18 +124,19 @@ local function SetFrames()
 		activeFrame.overlay = overlay
 
 		overlay:SetScript("OnDragStart", function(self)
-			stopUpdate = true
 			self:StartMoving()
 		end)
 		overlay:SetScript("OnDragStop", function(self)
 			self:StopMovingOrSizing()
 			dbChar.activeButtonPosition = { self:GetPoint() }
-			stopUpdate = false
+			ActiveFrame_SetPosition()
+			activeFrame:ClearAllPoints()
+			activeFrame:SetPoint("CENTER", self, "CENTER")
 		end)
 		overlay:SetScript("OnMouseUp", function(self, button)
-			if button == "RightButton" and dbChar.activeButtonPosition then
+			if button == "RightButton" then
 				dbChar.activeButtonPosition = nil
-				ActiveFrame_Update()
+				ActiveFrame_SetPosition()
 				self:ClearAllPoints()
 				self:SetAllPoints(activeFrame)
 			end
@@ -190,22 +146,13 @@ local function SetFrames()
 			activeFrame:ClearAllPoints()
 			activeFrame:SetPoint("CENTER", self, "CENTER")
 		end)
-		overlay:SetScript("OnHide", function(self)
-			if not dbChar.activeButtonPosition then
-				ActiveFrame_Update()
-				self:ClearAllPoints()
-				self:SetAllPoints(activeFrame)
-			end
-		end)
 
 		activeFrame:Hide()
 		KTF.ActiveFrame = activeFrame
 	else
 		activeFrame = KTF.ActiveFrame
 	end
-	if dbChar.activeButtonPosition then
-		activeFrame:SetPoint(unpack(dbChar.activeButtonPosition))
-	end
+	ActiveFrame_SetPosition()
 
 	-- Button frame
 	if not KTF.ActiveButton then
@@ -270,50 +217,6 @@ local function SetFrames()
 	abutton = KTF.ActiveButton
 end
 
-local function SetHooks()
-	-- ExtraActionBar.lua
-	hooksecurefunc("ExtraActionBar_Update", function()
-		KT:protStop(ActiveFrame_Update)
-	end)
-
-	-- ZoneAbility.lua
-	hooksecurefunc(ZoneAbilityFrame, "UpdateDisplayedZoneAbilities", function(self)
-		KT:protStop(ActiveFrame_Update)
-	end)
-
-	-- PetActionBar.lua
-	PetActionBar:HookScript("OnUpdate", function(self, elapsed)
-		if abutton.isPet ~= self.completed then
-			KT:protStop(ActiveFrame_Update)
-			abutton.isPet = self.completed
-		end
-	end)
-
-	-- ExtraAbilityContainer.lua
-	hooksecurefunc(ExtraAbilityContainer, "UpdateShownState", function(self)
-		KT:prot(ActiveFrame_Update)
-	end)
-
-	-- Edit Mode
-	hooksecurefunc(ExtraAbilityContainer, "OnDragStart", function(self)
-		stopUpdate = true
-		KT:prot("ClearAllPoints", activeFrame)
-	end)
-
-	hooksecurefunc(ExtraAbilityContainer, "OnDragStop", function(self)
-		stopUpdate = false
-		KT:prot(ActiveFrame_Update)
-	end)
-
-	hooksecurefunc(EditModeManagerFrame, "RevertSystemChanges", function(self, systemFrame)
-		KT:prot(ActiveFrame_Update)
-	end)
-
-	hooksecurefunc(ExtraAbilityContainer, "ResetToDefaultPosition", function(self)
-		KT:prot(ActiveFrame_Update)
-	end)
-end
-
 --------------
 -- External --
 --------------
@@ -331,13 +234,11 @@ end
 
 function M:OnEnable()
 	_DBG("|cff00ff00Enable|r - "..self:GetName(), true)
-	isMoveAnything = IsAddOnLoaded("MoveAnything")
 	isBartender = IsAddOnLoaded("Bartender4")
 	isElvui = IsAddOnLoaded("ElvUI")
 	isTukui = IsAddOnLoaded("Tukui")
 
 	SetFrames()
-	SetHooks()
 	self.initialized = true
 
 	self:Update()

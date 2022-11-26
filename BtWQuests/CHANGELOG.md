@@ -1,3 +1,23 @@
+# v2.24.3
+
+- Fixed some missing localization values for the Return to Lordaeron questline
+
+# v2.24.2
+
+- Fixed The Dragonscale Expedition quest chain incorrectly showing as completed for the Dragonflight Prologue
+- Fixed an incorrect quest name for the Dragonflight Prologue
+
+# v2.24.1
+
+- Fixed some unnamed quests for the Dragonflight Prologue
+- Fixed some incorrect npc locations for the Dragonflight Prologue
+
+# v2.24.0
+
+- Added Dragonflight Prologue
+- Updated for 10.0.2
+- Updated friendship rep handling for Dragonflight
+
 # v2.23.0
 
 - Fixed an error preventing alt+clicking auction house items

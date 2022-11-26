@@ -651,7 +651,7 @@ do
 			GameTooltip:SetText(ADDON_BANNED_TOOLTIP)
 		else
 			local version = GetAddOnMetadata(index, "Version")
-			if version and version ~= "1.1.2" then
+			if version and version ~= "1.1.4" then
 				GameTooltip:AddDoubleLine(title or name, version)
 			else
 				GameTooltip:AddLine(title or name)

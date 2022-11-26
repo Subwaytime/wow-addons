@@ -1,6 +1,6 @@
 ﻿
 	----------------------------------------------------------------------
-	-- Leatrix Sounds 10.0.02 (8th November 2022)
+	-- Leatrix Sounds 10.0.11 (16th November 2022)
 	----------------------------------------------------------------------
 
 	--  Create global table
@@ -10,7 +10,7 @@
 	local LeaSoundsLC, LeaSoundsCB = {}, {}
 
 	-- Version
-	LeaSoundsLC["AddonVer"] = "10.0.02"
+	LeaSoundsLC["AddonVer"] = "10.0.11"
 
 	-- Get locale table
 	local void, Leatrix_Sounds = ...
@@ -913,7 +913,7 @@
 		subTitle:ClearAllPoints()
 		subTitle:SetPoint("BOTTOM", 0, 72)
 
-		local slashTitle = LeaSoundsLC:MakeTx(interPanel, "/leasounds", 0, 0)
+		local slashTitle = LeaSoundsLC:MakeTx(interPanel, "/run leasounds()", 0, 0)
 		slashTitle:SetFont(slashTitle:GetFont(), 72)
 		slashTitle:ClearAllPoints()
 		slashTitle:SetPoint("BOTTOM", subTitle, "TOP", 0, 40)

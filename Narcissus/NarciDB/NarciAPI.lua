@@ -44,8 +44,21 @@ if BackdropTemplateMixin then
 end
 
 --GetSlotVisualID
+local IGNORED_MOG_SLOT = {
+    [11] = true,
+    [12] = true,
+    [13] = true,
+    [14] = true,
+};
+
+local function IsSlotValidForTransmog(slotID)
+    return (slotID) and (not IGNORED_MOG_SLOT[slotID]) and slotID ~= 2
+end
+NarciAPI.IsSlotValidForTransmog = IsSlotValidForTransmog;
+
+
 local function NarciAPI_GetSlotVisualID(slotID)
-    if (slotID > 10 and slotID < 15) then
+    if IGNORED_MOG_SLOT[slotID] then
         --slotID = 2 ~ Use neck to show right shoulder
         return 0, 0;
     end
@@ -1578,17 +1591,31 @@ end
 --------------------
 -----Play Voice-----
 --------------------
-local _, _, raceID = UnitRace("player");
-local genderID = UnitSex("player") or 2;
-raceID = raceID or 1;
-genderID = genderID - 1;    --(2→1) Male (3→2) Female
-if raceID == 25 or raceID == 26 then
-    --Pandaren faction
-    raceID = 24;
-end
 
-local VOICE_BY_RACE = {
-    --[raceID] = { [gender] = {Error_NoTarget, } }
+local ERROR_NOTARGET, ALERT_INCOMING;
+
+do
+    local _, _, raceID = UnitRace("player");
+    local genderID = UnitSex("player") or 2;
+    raceID = raceID or 1;
+    genderID = genderID - 1;    --(2→1) Male (3→2) Female
+    if raceID == 25 or raceID == 26 then
+        --Pandaren faction
+        raceID = 24;
+    elseif raceID == 52 or raceID == 70 then
+        raceID = 52;
+    end
+
+    if raceID == 37 then    --Mechagnome
+        IGNORED_MOG_SLOT[8] = true;     --feet
+        IGNORED_MOG_SLOT[9] = true;     --wrist
+        IGNORED_MOG_SLOT[10] = true;    --hands
+    elseif raceID == 52 then    --Dracthyr
+
+    end
+
+    local VOICE_BY_RACE = {
+    --[raceID] = { [gender] = {Error_NoTarget, ALERT_INCOMING} }
 	[1] = {[1] = {1906, 2669, },
 				[2] = {2030, 2681, }},		            --1 Human 
 
@@ -1657,16 +1684,22 @@ local VOICE_BY_RACE = {
                 
 	[37] = {[1] = {143863, 143892, },
 				[2] = {144223, 144275, }},		        --37 Mechagnome!!!!
-}
 
-local ERROR_NOTARGET, ALERT_INCOMING;
-if VOICE_BY_RACE[raceID] then
-    ERROR_NOTARGET = VOICE_BY_RACE[raceID][genderID][1];
-    ALERT_INCOMING = VOICE_BY_RACE[raceID][genderID][2];
+    [52] = {[1] = {212644, 212598, },
+        [2] = {212644, 212688, }},		                --52 Dracthyr
+    };
 
+    if VOICE_BY_RACE[raceID] then
+        ERROR_NOTARGET = VOICE_BY_RACE[raceID][genderID][1];
+        ALERT_INCOMING = VOICE_BY_RACE[raceID][genderID][2];
+    end
+
+    ERROR_NOTARGET = ERROR_NOTARGET or 2030;
+    ALERT_INCOMING = ALERT_INCOMING or 2669;
+
+    wipe(VOICE_BY_RACE);
 end
-ERROR_NOTARGET = ERROR_NOTARGET or 2030;
-ALERT_INCOMING = ALERT_INCOMING or 2669;
+
 
 function Narci:PlayVoice(name)
     if name == "ERROR" then
@@ -1679,7 +1712,7 @@ end
 --Time
 --C_DateAndTime.GetCurrentCalendarTime
 
-
+local DEFAULT_ACTOR_INFO_ID = 1620; --438 Pre-DF
 local ActorIDByRace = {
     --local GenderID = UnitSex(unit);   2 Male 3 Female
 	--[raceID] = {male actorID, female actorID, bustOffsetZ_M, bustOffsetZ_F},
@@ -1705,10 +1738,95 @@ local ActorIDByRace = {
     [70] = {1554, 1554},    -- Dracthyr
 };
 
+local ActorIDByModelFileID = {
+    --/dump DressUpFrame.ModelScene:GetPlayerActor():GetModelFileID()
+    [4207724] = 1653,   --Dracthyr 1554
+    [4395382] = 1654,   --Visage M Dracthyr-alt 1583
+    [4220488] = 1654,   --Visage F
+
+    [878772] = 1623,    --Dwarf M
+    --[950080] = Dwarf F
+    [1890765] = 1644,   --darkirondwarf-male
+    --[1890763] = DarkIron F
+
+    [1721003] = 1640,   --kultiran-male
+    [1886724] = 1642,   --kultiran-female
+
+    [2622502] = 1649,   --mechagnome-male
+    [2564806] = 1650,   --mechagnome-female
+
+    [1890761] = 1648,   --vulpera-male
+    [1890759] = 1647,   --vulpera-female
+
+    [1630218] = 1637,   --highmountaintauren-male
+    [1630402] = 1638,   --highmountaintauren-female
+    
+    [900914] = 1622,    --Gnome M
+    [940356] = 1622,    --Gnome F
+
+    [119376] = 1628,    --goblin-male
+    [119369] = 1629,    --goblin-female
+
+    [1005887] = 1627,   --draenei-male
+    --[1022598] = draenei F
+
+    [1620605] = 1635,   --lightforgeddraenei-male
+    [1593999] = 1636,   --lightforgeddraenei-female
+
+    [1630447] = 1639,     --zandalaritroll M
+    [1662187] = 1639,     --zandalaritroll F
+
+    [1022938] = 1632,   --troll-male
+    [1018060] = 1633,   --troll-female
+
+    [959310] = 1624,    --scourge-male
+    [997378] = 1634,    --scourge-female
+
+    [535052] = 1625,    --pandaren M
+    [589715] = 1625,    --pandaren F
+
+    [307454] = 1626,    --worgen-male
+    [307453] = 1645,    --worgen-female
+
+    [917116] = 1641,     --magharorc-male hunched
+    [1968587] = 1641,     --magharorc-male straght
+    [949470] = 1643,     --magharorc-female
+
+    --[1011653] = Human M
+    --[1000764] = Human F
+
+    --[1814471] = Nightborne M
+    --[1810676] = Nightborne F
+
+    --[1734034] = VE M
+    --[1733758] = VE F
+
+    --[1100087] = BE M
+    --[1100258] = BE F
+
+    --[974343] = NE M
+    --[921844] = NE F
+};
+
+
+local GetModelSceneActorInfoByID = C_ModelInfo.GetModelSceneActorInfoByID;
+
+local function GetActorInfoByFileID(fileID)
+    --print("FileID: ", fileID)
+    local infoID;
+    if fileID and ActorIDByModelFileID[fileID] then
+        infoID = ActorIDByModelFileID[fileID];
+    else
+        infoID = DEFAULT_ACTOR_INFO_ID;
+    end
+    return GetModelSceneActorInfoByID(infoID);
+end
+addon.GetActorInfoByFileID = GetActorInfoByFileID;
+
 --Re-check this↑ table every major patch
---[[
+
 function Narci_FindActorIDBy(name)
-    local id = 500;
+    local id = 300;
     local info, tag;
     local find = string.find;
     while id < 2000 do
@@ -1723,7 +1841,7 @@ function Narci_FindActorIDBy(name)
         end
     end
 end
---]]
+
 
 
 local ZoomDistanceByRace = {
@@ -1792,7 +1910,6 @@ function NarciAPI_GetCameraZoomDistanceByUnit(unit)
     end
 end
 
-local DEFAULT_ACTOR_INFO_ID = 438;
 
 local PanningYOffsetByRace = {
     --[raceID] = { { male = {offsetY1 when frame maximiazed, offsetY2} }, {female = ...} }
@@ -1822,8 +1939,6 @@ local function GetPanningYOffset(raceID, genderID)
         return PanningYOffsetByRace[0][1]
     end
 end
-
-local GetModelSceneActorInfoByID = C_ModelInfo.GetModelSceneActorInfoByID;
 
 function NarciAPI_GetActorInfoByUnit(unit)
     if not UnitExists(unit) or not UnitIsPlayer(unit) or not CanInspect(unit, false) then return nil, PanningYOffsetByRace[0][1]; end

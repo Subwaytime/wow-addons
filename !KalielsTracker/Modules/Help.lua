@@ -174,15 +174,14 @@ local function SetupTutorials()
 			text = cTitle.."Active Button|r\n\n"..
 					"Active Button is for a better use of quest items. Displays quest item button for CLOSEST quest as Extra Action Button (like Draenor zone ability).\n\n"..
 					"Features:\n"..
-					"- Auto show Active Button when you approach the place of performance"..
+					"- "..cBold.."Auto display|r of Active Button, when you approach the place of performance"..
 					offs.."of the quest.\n"..
+					"- "..cBold.."Manual display|r of Active Button, when selecting the quest using the POI"..
+					offs.."button on the Map or in the Tracker.\n"..
 					"- You can set "..cBold.."[key bind]|r to use quest item. Key set up in "..KT.title..
 					offs.."Options. Active Button uses the same key bind as the Extra Action Button.\n"..
-					"- Button is movable using:"..
-					offs.."  - own mover (free move) - see Options > section \"Quest item buttons\""..
-					offs2.."  > button \"Unlock\","..
-					offs.."  - some addons (move with Extra Action Button) - Bartender4, Dominos,"..
-					offs2.."  ElvUI, Tukui.\n\n"..
+					"- Button is movable using own mover. See Options > section \"Quest item"..
+					offs.."buttons\" > button \"Unlock\".\n\n"..
 					cWarning.."Warning:|r\n"..
 					"- Active Button works only for tracked quests.\n"..
 					"- When tracker is collapsed, Active Button feature is paused.",
@@ -251,8 +250,17 @@ local function SetupTutorials()
 		},
 		{	-- 12
 			text = cTitle.."         What's NEW|r\n\n"..
+					cTitle.."Version 6.0.1|r\n"..
+					"- FIXED - Error when displaying Notification messages\n"..
+					"- UPDATED - Quests - Active Button - Removed anchoring from Extra Action"..
+					offs.."Button in Default UI, Bartender, ElvUI and Tukui. Positioning is static now and"..
+					offs.."moving Active Button is only through addon Options.\n"..
+					"- UPDATED - Help - Active Button (page 6)\n"..
+					"- UPDATED - Help - Supporters (Patreon)\n"..
+					"- UPDATED - Addon support - ElvUI 13.01\n"..
+					"- UPDATED - Libs\n\n"..
 					cTitle.."Version 6.0.0|r\n"..
-					"Many changes have been made in this version as error prevention. These changes may result in the cancellation of cooperation with other addons.\n\n"..
+					"Many changes have been made in this version as error prevention. "..cWarning2.."These changes may result in the cancellation of cooperation with other addons.|r\n\n"..
 					"All profiles have been reset, because the new version is not compatible with stored settings.\n\n"..
 					"- IMPROVED - Edit Mode Hack - Hack has been reduced and all negative"..
 					offs.."impacts have been removed. Removed hack info from Options and Help.\n"..
@@ -351,6 +359,7 @@ local function SetupTutorials()
 					SetFormatedPatronName("Uncommon", "Flex (drantor)")..
 					SetFormatedPatronName("Uncommon", "Kyle Fuller")..
 					SetFormatedPatronName("Uncommon", "Pablo Sebastián Molina Silva")..
+					SetFormatedPatronName("Uncommon", "Semy", "Ravencrest")..
 					SetFormatedPatronName("Uncommon", "Torresman", "Drak'thul")..
 					SetFormatedPatronName("Uncommon", "Xeelee", "Razorfen")..
 					SetFormatedPatronName("Common", "Darren Divecha")..

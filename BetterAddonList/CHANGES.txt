@@ -1,24 +1,12 @@
-tag ef967fcf8e15446b277df33b4482fa0821fde6ab 1.1.2
+tag 8a4b000e62b4b16142c5d8a8deb1345ac4685ce4 1.1.4
 Author:	Kyle Buller <bullerk@gmail.com>
-Date:	Sat Oct 29 06:04:32 2022 -0500
+Date:	Thu Nov 17 06:45:31 2022 -0600
 
-Tagging as 1.1.2
+Tagging as 1.1.4
 
-commit 49f6a841087145f46d0ede07b0f7635ab3866336
+commit 49536e11ecac725b3983b47bf06b73c0dc614a8d
 Author: Kyle Buller <bullerk@gmail.com>
-Date:   Sat Oct 29 02:00:21 2022 -0500
+Date:   Thu Nov 17 06:45:13 2022 -0600
 
-    Actually add libs
-
-commit 738634caf9245c3e17caef847b5a480eea7dd9bf
-Author: Kyle Buller <bullerk@gmail.com>
-Date:   Fri Oct 28 23:18:45 2022 -0500
-
-    Avoid UIDropDownMenu_Refresh call
-
-commit 3af68f496914e9dc2c415f8e95eca0e455a224e9
-Author: Kyle Buller <bullerk@gmail.com>
-Date:   Fri Oct 28 23:16:37 2022 -0500
-
-    Replace StaticPopup with LibDialog
+    Revert some unintended changes
 

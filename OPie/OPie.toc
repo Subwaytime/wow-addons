@@ -1,6 +1,6 @@
-## Interface: 100000
+## Interface: 100002
 ## Title: OPie
-## Version: Yuzu 1
+## Version: Yuzu 2
 ## Author: foxlit
 ## Notes: Group abilities into rings that appear when you hold down a binding.
 ## X-Website: https://www.townlong-yak.com/addons/opie

@@ -5,6 +5,7 @@ media:HashTable("statusbar")
 function Textures:OnEnable()
     Textures:ApplyAll()
     Textures:RegisterEvent("PLAYER_TARGET_CHANGED","TargetStatusbar")
+    Textures:RegisterEvent("INSTANCE_ENCOUNTER_ENGAGE_UNIT","TargetStatusbar")
     Textures:RegisterEvent("PLAYER_FOCUS_CHANGED","FocusStatusbar")
     Textures:RegisterEvent("PLAYER_ENTERING_WORLD","ApplyAll")
     Textures:RegisterEvent("ZONE_CHANGED_NEW_AREA","FocusStatusbar")
@@ -13,7 +14,7 @@ end
 --Player
 function Textures:PlayerStatusbar()
     if not IsAddOnLoaded("BiggerHealthBar") then
-        PlayerFrameHealthBar:SetStatusBarTexture(media:Fetch("statusbar", HealthBarColor.db.profile.Textures.statusbar)) 
+        PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.HealthBarArea.HealthBar:SetStatusBarTexture(media:Fetch("statusbar", HealthBarColor.db.profile.Textures.statusbar)) 
     end
 end
 --Target

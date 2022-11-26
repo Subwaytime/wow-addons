@@ -48,7 +48,7 @@ end
 
 -- ElvUI
 local function ElvUI_SetSupport()
-    if KT:CheckAddOn("ElvUI", "12.99", true) then
+    if KT:CheckAddOn("ElvUI", "13.01", true) then
         local E = unpack(_G.ElvUI)
         local B = E:GetModule("Blizzard")
         B.SetObjectiveFrameHeight = function() end    -- preventive
@@ -61,7 +61,7 @@ local function ElvUI_SetSupport()
         hooksecurefunc(E, "CheckIncompatible", function(self)
             self.private.skins.blizzard.objectiveTracker = false
         end)
-        hooksecurefunc(E, "ToggleOptionsUI", function(self)
+        hooksecurefunc(E, "ToggleOptions", function(self)
             if E.Libs.AceConfigDialog.OpenFrames[self.name] then
                 local options = self.Options.args.general.args.blizzUIImprovements
                 options.args[addonName.."Warning"] = {
