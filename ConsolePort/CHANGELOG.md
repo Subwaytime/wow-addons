@@ -1,7 +1,8 @@
 # Console Port
 
-## [2.5.12](https://github.com/seblindfors/ConsolePort/tree/2.5.12) (2022-11-19)
-[Full Changelog](https://github.com/seblindfors/ConsolePort/compare/2.5.11...2.5.12) [Previous Releases](https://github.com/seblindfors/ConsolePort/releases)
+## [2.5.13](https://github.com/seblindfors/ConsolePort/tree/2.5.13) (2022-11-27)
+[Full Changelog](https://github.com/seblindfors/ConsolePort/compare/2.5.12...2.5.13) [Previous Releases](https://github.com/seblindfors/ConsolePort/releases)
 
-- Update TOCs, add reload option to taint popup  
-- Fix bug in profile import on Classic  
+- Update ConsolePort.toc  
+- Fix mounts not having spell menu options  
+- Fix action bar taint from talent UI while using interface cursor  
