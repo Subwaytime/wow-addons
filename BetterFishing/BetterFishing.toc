@@ -1,0 +1,7 @@
+## Interface: 100002
+## Title: |cffEEE4AEBetter Fishing|r
+## Notes: |cff58C6FAJust better|r
+## Author: Yuyuli
+## Version: 1.1.2
+
+BetterFishing.lua

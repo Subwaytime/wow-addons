@@ -1,0 +1,5 @@
+<Bindings>
+	<Binding name="BETTERFISHINGKEY" category="ADDONS">
+		BetterFishing_Run()
+	</Binding>
+</Bindings>
