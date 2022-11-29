@@ -1,3 +1,9 @@
+# v2.24.4
+
+- Added Dragonflight
+- Removed Dragonflight Prologue
+- Removed Shadowlands
+
 # v2.24.3
 
 - Fixed some missing localization values for the Return to Lordaeron questline

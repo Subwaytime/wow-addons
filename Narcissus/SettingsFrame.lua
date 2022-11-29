@@ -2073,20 +2073,34 @@ if IS_DRAGONFLIGHT then
         SettingFunctions.ShowMiniTalentTreeForEquipmentManager(state);
     end
 
+    local function TalentTreeSetPosition(self, id)
+        SettingFunctions.SetTalentTreePosition(id);
+    end
+
     local function TalentTreeUseClassBackground(self, state)
         SettingFunctions.SetUseClassBackground(state);
     end
 
+    local function TalentTreeUseBiggerUI(self, state)
+        SettingFunctions.SetUseBiggerUI(state);
+    end
+
     local talentCategory = {name = TALENTS or "Talents", level = 1, key = "talents",
-    widgets = {
-        {type = "header", level = 0, text = L["Mini Talent Tree"]},
-        {type = "subheader", level = 1, text = L["Show Talent Tree When"]},
-        {type = "checkbox", level = 1, key = "TalentTreeForPaperDoll",text = L["Show Talent Tree Paperdoll"], onValueChangedFunc = ShowTreeCase1},
-        {type = "checkbox", level = 1, key = "TalentTreeForInspection", text = L["Show Talent Tree Inspection"],  onValueChangedFunc = ShowTreeCase2},
-        {type = "checkbox", level = 1, key = "TalentTreeForEquipmentManager", text = L["Show Talent Tree Equipment Manager"],  onValueChangedFunc = ShowTreeCase3},
-        {type = "subheader", level = 1, text = L["Appearance"], extraTopPadding = 1},
-        {type = "checkbox", level = 1, key = "TalentTreeUseClassBackground", text = L["Use Class Background"],  onValueChangedFunc = TalentTreeUseClassBackground},
-    }};
+        widgets = {
+            {type = "header", level = 0, text = L["Mini Talent Tree"]},
+            {type = "subheader", level = 1, text = L["Show Talent Tree When"]},
+            {type = "checkbox", level = 1, key = "TalentTreeForPaperDoll",text = L["Show Talent Tree Paperdoll"], onValueChangedFunc = ShowTreeCase1},
+            {type = "checkbox", level = 1, key = "TalentTreeForInspection", text = L["Show Talent Tree Inspection"],  onValueChangedFunc = ShowTreeCase2},
+            {type = "checkbox", level = 1, key = "TalentTreeForEquipmentManager", text = L["Show Talent Tree Equipment Manager"],  onValueChangedFunc = ShowTreeCase3},
+
+            {type = "subheader", level = 1, text = L["Place UI"], extraTopPadding = 1},
+            {type = "radio", level = 1, key = "TalentTreeAnchor", texts = {L["Place Talent UI Right"], L["Place Talent UI Bottom"]},  onValueChangedFunc = TalentTreeSetPosition},
+
+            {type = "subheader", level = 1, text = L["Appearance"], extraTopPadding = 1},
+            {type = "checkbox", level = 1, key = "TalentTreeUseClassBackground", text = L["Use Class Background"],  onValueChangedFunc = TalentTreeUseClassBackground},
+            {type = "checkbox", level = 1, key = "TalentTreeBiggerUI", text = L["Use Bigger UI"],  onValueChangedFunc = TalentTreeUseBiggerUI},
+        }
+    };
 
     table.insert(Categories, #Categories -1, talentCategory);
 

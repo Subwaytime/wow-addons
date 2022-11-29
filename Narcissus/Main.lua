@@ -2040,25 +2040,16 @@ end
 function NarciItemLevelFrameMixin:OnLoad()
 	--Declared in Modules\CharacterFrame\ItemLevelFrame.lua
 	ItemLevelFrame = self;
-	if NarciDominationIndicatorMixin then
-		local inhertMethods = {
-			"IsNarcissusUI", "Update", "CheckSetBonus", "SetNodeLayout", "ShowTooltip",
-		};
-		for k, v in pairs(inhertMethods) do
-			self.DominationOverlay[v] = NarciDominationIndicatorMixin[v];
-		end
-		self.checkDomination = true;
-	end
 
 	local LeftButton = self.LeftButton;
 	LeftButton:SetScript("OnEnter", function(f)
 		if f.isSameLevel then
-			f.tooltipHeadline = format(f.tooltipFormat, f.Level:GetText());
+			f.tooltipHeadline = string.format(f.tooltipFormat, f.Level:GetText());
 		else
-			f.tooltipHeadline = format(f.tooltipFormat, f.Level:GetText()) .. format("  (max %s)", f.avgItemLevel);
+			f.tooltipHeadline = string.format(f.tooltipFormat, f.Level:GetText()) .. string.format("  (max %s)", f.avgItemLevel);
 		end
 		if f.avgItemLevelPvp and f.avgItemLevelPvp ~= 0 then
-			f.tooltipSpecial = format(STAT_AVERAGE_PVP_ITEM_LEVEL, f.avgItemLevelPvp);
+			f.tooltipSpecial = string.format(STAT_AVERAGE_PVP_ITEM_LEVEL, f.avgItemLevelPvp);
 		else
 			f.tooltipSpecial = nil;
 		end

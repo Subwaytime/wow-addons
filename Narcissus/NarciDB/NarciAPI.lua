@@ -636,17 +636,20 @@ function NarciAPI_GetItemStatsFromSlot(slotID)
 end
 
 
-local function GetItemBagPosition(itemID)
-    for bagID = 0, (NUM_BAG_SLOTS or 4) do
-        for slotID = 1, GetContainerNumSlots(bagID) do
-            if(GetContainerItemID(bagID, slotID) == itemID) then
-                return bagID, slotID
+do
+    local GetContainerNumSlots = (C_Container and C_Container.GetContainerNumSlots) or GetContainerNumSlots;
+    local GetContainerItemID = (C_Container and C_Container.GetContainerItemID) or GetContainerItemID;
+    local function GetItemBagPosition(itemID)
+        for bagID = 0, (NUM_BAG_SLOTS or 4) do
+            for slotID = 1, GetContainerNumSlots(bagID) do
+                if(GetContainerItemID(bagID, slotID) == itemID) then
+                    return bagID, slotID
+                end
             end
         end
     end
+    NarciAPI.GetItemBagPosition = GetItemBagPosition;
 end
-
-NarciAPI.GetItemBagPosition = GetItemBagPosition;
 
 
 --------------------
@@ -923,6 +926,31 @@ local function SetScrollRange(scrollFrame, range)
     scrollFrame.range = range;
 end
 
+
+local SmoothScrollFrameMixin = {};
+
+function SmoothScrollFrameMixin:GetEndPosition()
+    return self.SmoothScrollContainer.endValue;
+end
+
+function SmoothScrollFrameMixin:SnapToEndPosition()
+    local offset = self:GetEndPosition();
+    self.SmoothScrollContainer:Hide();
+    self.scrollBar:SetValue(offset);
+end
+
+function SmoothScrollFrameMixin:SnapToOffset(offset)
+    if self.range and offset > self.range then
+        offset = self.range;
+    elseif offset < 0 then
+        offset = 0;
+    end
+    self.SmoothScrollContainer:Hide();
+    self.scrollBar:SetValue(offset);
+    self.SmoothScrollContainer.endValue = offset;
+end
+
+
 function NarciAPI_SmoothScroll_Initialization(scrollFrame, updatedList, updateFunc, deltaRatio, speedRatio, minOffset, positionFunc, onScrollFinishedFunc)
     if updateFunc then
         scrollFrame.update = updateFunc;
@@ -973,6 +1001,10 @@ function NarciAPI_SmoothScroll_Initialization(scrollFrame, updatedList, updateFu
     end
 
     scrollFrame.SetScrollRange = SetScrollRange;
+
+    for k, v in pairs(SmoothScrollFrameMixin) do
+        scrollFrame[k] = v;
+    end
 end
 
 function NarciAPI_ApplySmoothScrollToScrollFrame(scrollFrame, deltaRatio, speedRatio, positionFunc, buttonHeight, range, parentScrollFunc, onScrollFinishedFunc)

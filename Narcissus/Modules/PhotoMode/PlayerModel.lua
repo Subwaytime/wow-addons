@@ -4806,4 +4806,6 @@ end
 
 
 /script local m=Narci.ActiveModel;local v=m.variationID;v=(v<15 and v+1)or(0);m.variationID=v;m:PlayAnimation(m.animationID);print(v);
+/script local f=function(s)	s:SetAnimation(s.animationID or 0,s.variationID or 0) end;local m;for i=1,8 do m=_G["NarciPlayerModelFrame"..i] if m then m:SetScript("OnAnimFinished", f) end end
+/script local f=function(s) if s then s:SetScript("OnAnimFinished",function() s:SetAnimation(s.animationID or 0,s.variationID or 0) end) end end;for i=1,8 do f(_G["NarciPlayerModelFrame"..i]) f(_G["NarciNPCModelFrame"..i]) end
 --]]

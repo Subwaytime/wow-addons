@@ -2,22 +2,6 @@ local _, BlizzHUDTweaks = ...
 local addon = LibStub("AceAddon-3.0"):GetAddon("BlizzHUDTweaks")
 local MouseoverFrameFading = addon:GetModule("MouseoverFrameFading")
 
-local function determineFadeDuration(globalOptions, frameOptions)
-  local fadeDuration = 0.25
-
-  if frameOptions.UseGlobalOptions then
-    if globalOptions.FadeDuration then
-      fadeDuration = globalOptions.FadeDuration
-    end
-  else
-    if frameOptions.FadeDuration then
-      fadeDuration = frameOptions.FadeDuration
-    end
-  end
-
-  return fadeDuration
-end
-
 local function inCombatAlphaValue(globalOptions, frameOptions)
   if frameOptions.UseGlobalOptions then
     if globalOptions.FadeInCombat then
@@ -167,35 +151,7 @@ local function getNormalizedFrameAlpha(frame)
   return tonumber(string.format("%.2f", frame:GetAlpha()))
 end
 
--------------------------------------------------------------------------------
--- Public API
-
-function MouseoverFrameFading:Fade(frame, currentAlpha, targetAlpha, duration, delay, forced)
-  if currentAlpha and targetAlpha and frame:IsShown() then
-    if currentAlpha ~= targetAlpha or forced then
-      if not frame.BlizzHUDTweaksAnimationGroup then
-        local animationGroup = frame:CreateAnimationGroup()
-        animationGroup:SetToFinalAlpha(true)
-
-        frame.BlizzHUDTweaksAnimationGroup = animationGroup
-        frame.BlizzHUDTweaksFadeAnimation = animationGroup:CreateAnimation("Alpha")
-      end
-
-      frame.BlizzHUDTweaksFadeAnimation:SetFromAlpha(currentAlpha or 1)
-      frame.BlizzHUDTweaksFadeAnimation:SetToAlpha(targetAlpha or 1)
-      frame.BlizzHUDTweaksFadeAnimation:SetDuration(math.min(duration, 2))
-      frame.BlizzHUDTweaksFadeAnimation:SetStartDelay(delay or 0)
-
-      frame.BlizzHUDTweaksAnimationGroup:Restart()
-    end
-  end
-end
-
-local mouseoverFrames = {}
-
-local function fadeSubFrames(options, currentAlpha, targetAlpha, fadeDuration)
-  local subFrames = options.subFrames
-
+local function fadeSubFrames(subFrames, currentAlpha, targetAlpha, fadeDuration)
   if subFrames then
     for _, frame in ipairs(subFrames) do
       MouseoverFrameFading:Fade(frame, currentAlpha, targetAlpha, fadeDuration)
@@ -203,7 +159,71 @@ local function fadeSubFrames(options, currentAlpha, targetAlpha, fadeDuration)
   end
 end
 
-function MouseoverFrameFading:RefreshMouseoverFrameAlphas(forced)
+local function determineMouseOver(profile, frameName, frameOptions)
+  local linkedFrames = profile[frameName .. "LinkedFrames"]
+  local linkedFrameMouseover
+
+  if linkedFrames then
+    for linkedFrameName, _ in pairs(linkedFrames) do
+      if profile[linkedFrameName].Enabled then
+        if linkedFrames[linkedFrameName] and addon:GetFrameMapping()[linkedFrameName].mainFrame then
+          if addon:GetFrameMapping()[linkedFrameName].mainFrame:IsMouseOver() then
+            linkedFrameMouseover = true
+            return linkedFrameMouseover or frameOptions.mainFrame:IsMouseOver()
+          end
+        end
+      end
+    end
+  end
+
+  return frameOptions.mainFrame:IsMouseOver()
+end
+
+-------------------------------------------------------------------------------
+-- Public API
+
+function MouseoverFrameFading:DetermineFadeDuration(globalOptions, frameOptions)
+  local fadeDuration = 0.25
+
+  if frameOptions.UseGlobalOptions then
+    if globalOptions.FadeDuration then
+      fadeDuration = globalOptions.FadeDuration
+    end
+  else
+    if frameOptions.FadeDuration then
+      fadeDuration = frameOptions.FadeDuration
+    end
+  end
+
+  return fadeDuration
+end
+
+function MouseoverFrameFading:Fade(frame, currentAlpha, targetAlpha, duration, delay, forced)
+  if currentAlpha and targetAlpha and frame:IsShown() then
+    if not frame.BlizzHUDTweaksForceFaded then
+      if (currentAlpha ~= targetAlpha) or forced then
+        if not frame.BlizzHUDTweaksAnimationGroup then
+          local animationGroup = frame:CreateAnimationGroup()
+          animationGroup:SetToFinalAlpha(true)
+
+          frame.BlizzHUDTweaksAnimationGroup = animationGroup
+          frame.BlizzHUDTweaksFadeAnimation = animationGroup:CreateAnimation("Alpha")
+        end
+
+        frame.BlizzHUDTweaksFadeAnimation:SetFromAlpha(currentAlpha or 1)
+        frame.BlizzHUDTweaksFadeAnimation:SetToAlpha(targetAlpha or 1)
+        frame.BlizzHUDTweaksFadeAnimation:SetDuration(math.min(duration, 2))
+        frame.BlizzHUDTweaksFadeAnimation:SetStartDelay(delay or 0)
+
+        frame.BlizzHUDTweaksAnimationGroup:Restart()
+      end
+    end
+  end
+end
+
+local mouseoverFrames = {}
+
+function MouseoverFrameFading:RefreshMouseoverFrameAlphas()
   if addon:IsEnabled() and MouseoverFrameFading:IsEnabled() then
     local profile = addon:GetProfileDB()
     local inCombat = BlizzHUDTweaks.inCombat
@@ -212,24 +232,23 @@ function MouseoverFrameFading:RefreshMouseoverFrameAlphas(forced)
     for frameName, frameMappingOptions in pairs(addon:GetFrameMapping()) do
       local frameOptions = profile[frameName]
       if frameOptions.Enabled and frameMappingOptions.mainFrame then
-        local isMouseover = frameMappingOptions.mainFrame:IsMouseOver()
+        local isMouseover = determineMouseOver(profile, frameName, frameMappingOptions)
         local currentAlpha = getNormalizedFrameAlpha(frameMappingOptions.mainFrame)
-        local fadeDuration = determineFadeDuration(globalOptions, frameOptions)
+        local fadeDuration = MouseoverFrameFading:DetermineFadeDuration(globalOptions, frameOptions)
 
         if isMouseover and not mouseoverFrames[frameMappingOptions.mainFrame] then
           if not inCombat then
-            self:Fade(frameMappingOptions.mainFrame, currentAlpha, 1, fadeDuration, forced)
-            fadeSubFrames(frameMappingOptions, currentAlpha, 1, fadeDuration)
+            self:Fade(frameMappingOptions.mainFrame, currentAlpha, 1, fadeDuration)
+            fadeSubFrames(frameMappingOptions.subFrames, currentAlpha, 1, fadeDuration)
           elseif (frameOptions.UseGlobalOptions and globalOptions.MouseOverInCombat) or (not frameOptions.UseGlobalOptions and frameOptions.MouseOverInCombat) then
-            self:Fade(frameMappingOptions.mainFrame, currentAlpha, 1, fadeDuration, forced)
-            fadeSubFrames(frameMappingOptions, currentAlpha, 1, fadeDuration)
+            self:Fade(frameMappingOptions.mainFrame, currentAlpha, 1, fadeDuration)
+            fadeSubFrames(frameMappingOptions.subFrames, currentAlpha, 1, fadeDuration)
           end
         elseif not isMouseover and mouseoverFrames[frameMappingOptions.mainFrame] then
           local targetAlpha = determineTargetAlpha(globalOptions, frameOptions)
-          self:Fade(frameMappingOptions.mainFrame, currentAlpha, targetAlpha, fadeDuration, forced)
-          fadeSubFrames(frameMappingOptions, currentAlpha, targetAlpha, fadeDuration)
+          self:Fade(frameMappingOptions.mainFrame, currentAlpha, targetAlpha, fadeDuration)
+          fadeSubFrames(frameMappingOptions.subFrames, currentAlpha, targetAlpha, fadeDuration)
         end
-
         mouseoverFrames[frameMappingOptions.mainFrame] = isMouseover
       end
     end
@@ -245,7 +264,7 @@ function MouseoverFrameFading:RefreshFrameAlphas(forced, useFadeDelay)
       local frameOptions = profile[frameName]
 
       if frameOptions.Enabled and frameMappingOptions.mainFrame then
-        local fadeDuration = determineFadeDuration(globalOptions, frameOptions)
+        local fadeDuration = MouseoverFrameFading:DetermineFadeDuration(globalOptions, frameOptions)
         local currentAlpha = getNormalizedFrameAlpha(frameMappingOptions.mainFrame)
         local targetAlpha = determineTargetAlpha(globalOptions, frameOptions)
 
@@ -255,7 +274,7 @@ function MouseoverFrameFading:RefreshFrameAlphas(forced, useFadeDelay)
             fadeDelay = determineFadeDelay(globalOptions, frameOptions)
           end
           self:Fade(frameMappingOptions.mainFrame, currentAlpha, targetAlpha, fadeDuration, fadeDelay, forced)
-          fadeSubFrames(frameMappingOptions, currentAlpha, targetAlpha, fadeDuration)
+          fadeSubFrames(frameMappingOptions.subFrames, currentAlpha, targetAlpha, fadeDuration)
         end
       end
     end

@@ -32,6 +32,10 @@ end
 
 local fadeOrderDescription = addon:ColoredString("\n\nFading Order", "fcba03") .. ": InCombat > HasTarget > InstancedArea > RestedArea > OutOfCombat"
 
+local function doNothing()
+  return
+end
+
 local function addFrameOptions(order, t, frameName, frameOptions, withUseGlobal)
   local subOptions = {}
 
@@ -39,6 +43,7 @@ local function addFrameOptions(order, t, frameName, frameOptions, withUseGlobal)
     name = generateFrameOptionName(frameOptions, frameName),
     desc = generateFrameOptionDescription(frameOptions, frameName),
     type = "group",
+    disabled = "GetDisabledFrameOptions",
     args = subOptions
   }
 
@@ -56,7 +61,8 @@ local function addFrameOptions(order, t, frameName, frameOptions, withUseGlobal)
         addon:ResetFrameByMappingOptions(addon:GetFrameMapping()[frameName])
         MouseoverFrameFading:RefreshFrameAlphas()
       end,
-      arg = frameName
+      arg = frameName,
+      disabled = doNothing
     }
     order = order + 0.1
     subOptions["CopyFrom"] = {
@@ -82,7 +88,8 @@ local function addFrameOptions(order, t, frameName, frameOptions, withUseGlobal)
         addon:RefreshOptionTables()
         MouseoverFrameFading:RefreshFrameAlphas()
       end,
-      arg = frameName
+      arg = frameName,
+      disabled = doNothing
     }
   end
 
@@ -93,9 +100,6 @@ local function addFrameOptions(order, t, frameName, frameOptions, withUseGlobal)
     desc = "When activated you can mouseover action bars and frames while within combat to show the frame with full alpha.",
     width = "full",
     type = "toggle",
-    get = "GetValue",
-    set = "SetValue",
-    disabled = "GetUseGlobalFrameOptions",
     arg = frameName
   }
   order = order + 0.1
@@ -105,24 +109,21 @@ local function addFrameOptions(order, t, frameName, frameOptions, withUseGlobal)
     desc = "The duration how long the fade should take (fade in and out).",
     width = 0.8,
     type = "range",
-    get = "GetValue",
-    set = "SetValue",
     min = 0.05,
     max = 2,
     step = 0.05,
-    disabled = "GetUseGlobalFrameOptions",
     arg = frameName
   }
   if not withUseGlobal then
     order = order + 0.1
     subOptions["UpdateInterval"] = {
       order = order,
-      name = "Update Interval",
+      name = "Update Interval" .. addon:ColoredString(" (!)", "eb4034"),
       desc = "The interval in which the add-on should check for necessary alpha changes." ..
-        "If you don't need mouseovers to be instantaneously, a value of 0.1 should be fine for you." ..
-          addon:ColoredString("\n\nNOTE: ", "eb4034") ..
-            "Setting a value below 0.1 puts some stress on the CPU, since the add-on will check" ..
-              "for mouseovers far more often. It shouldn't be a real problem, but if " .. "you have any FPS issues, try increasing the value again.",
+        "If you don't need mouseovers to be instantaneously, a value of 0.2 should be fine for you." ..
+          addon:ColoredString("\n\nCaution: ", "eb4034") ..
+            "If the value is decreased, the CPU load increases exponentially. Recommended value is 0.2." ..
+              " If you decrease this value and experience any FPS drops, please consider increasing the value again.",
       width = 0.8,
       type = "range",
       get = "GetUpdateTickerValue",
@@ -162,9 +163,6 @@ local function addFrameOptions(order, t, frameName, frameOptions, withUseGlobal)
         desc = "When active the fade value will be applied when you're in combat." .. fadeOrderDescription,
         width = 0.6,
         type = "toggle",
-        get = "GetValue",
-        set = "SetValue",
-        disabled = "GetUseGlobalFrameOptions",
         arg = frameName
       },
       ["InCombatAlpha"] = {
@@ -180,7 +178,6 @@ local function addFrameOptions(order, t, frameName, frameOptions, withUseGlobal)
         softMin = 0,
         softMax = 100,
         step = 5,
-        disabled = "GetUseGlobalFrameOptions",
         arg = frameName
       }
     }
@@ -199,9 +196,6 @@ local function addFrameOptions(order, t, frameName, frameOptions, withUseGlobal)
         desc = "When active the fade wll change to the in combat fade when you have a target of the corresponding target type (friendly, hostile, or both)." .. fadeOrderDescription,
         width = "normal",
         type = "toggle",
-        get = "GetValue",
-        set = "SetValue",
-        disabled = "GetUseGlobalFrameOptions",
         arg = frameName
       },
       ["TreatTargetLikeInCombatTargetType"] = {
@@ -213,7 +207,6 @@ local function addFrameOptions(order, t, frameName, frameOptions, withUseGlobal)
         set = "SetValue",
         get = "GetValue",
         values = {["friendly"] = "Friendly", ["hostile"] = "Hostile", ["both"] = "Both"},
-        disabled = "GetUseGlobalFrameOptions",
         arg = frameName
       }
     }
@@ -232,9 +225,6 @@ local function addFrameOptions(order, t, frameName, frameOptions, withUseGlobal)
         desc = "When active this fade will be applied if you're in an instanced area and *not* in combat." .. fadeOrderDescription,
         width = 0.6,
         type = "toggle",
-        get = "GetValue",
-        set = "SetValue",
-        disabled = "GetUseGlobalFrameOptions",
         arg = frameName
       },
       ["InstancedAreaAlpha"] = {
@@ -250,7 +240,6 @@ local function addFrameOptions(order, t, frameName, frameOptions, withUseGlobal)
         softMin = 0,
         softMax = 100,
         step = 5,
-        disabled = "GetUseGlobalFrameOptions",
         arg = frameName
       }
     }
@@ -269,9 +258,6 @@ local function addFrameOptions(order, t, frameName, frameOptions, withUseGlobal)
         desc = "When active this fade will be applied when you're in a rested area." .. fadeOrderDescription,
         width = 0.6,
         type = "toggle",
-        get = "GetValue",
-        set = "SetValue",
-        disabled = "GetUseGlobalFrameOptions",
         arg = frameName
       },
       ["RestedAreaAlpha"] = {
@@ -287,7 +273,6 @@ local function addFrameOptions(order, t, frameName, frameOptions, withUseGlobal)
         softMin = 0,
         softMax = 100,
         step = 5,
-        disabled = "GetUseGlobalFrameOptions",
         arg = frameName
       }
     }
@@ -305,9 +290,6 @@ local function addFrameOptions(order, t, frameName, frameOptions, withUseGlobal)
         desc = "When active the fade value will be applied when you're not in combat." .. fadeOrderDescription,
         width = 0.6,
         type = "toggle",
-        get = "GetValue",
-        set = "SetValue",
-        disabled = "GetUseGlobalFrameOptions",
         arg = frameName
       },
       ["OutOfCombatAlpha"] = {
@@ -323,7 +305,6 @@ local function addFrameOptions(order, t, frameName, frameOptions, withUseGlobal)
         softMin = 0,
         softMax = 100,
         step = 5,
-        disabled = "GetUseGlobalFrameOptions",
         arg = frameName
       },
       ["OutOfCombatFadeDelay"] = {
@@ -335,16 +316,113 @@ local function addFrameOptions(order, t, frameName, frameOptions, withUseGlobal)
               addon:ColoredString("\n\nNOTE: ", "eb4034") .. "Mouseover a frame will interrupt the delay and use the normal alpha values instead.",
         width = 0.8,
         type = "range",
-        get = "GetValue",
-        set = "SetValue",
         min = 0,
         max = 60,
         step = 0.5,
-        disabled = "GetUseGlobalFrameOptions",
         arg = frameName
       }
     }
   }
+end
+
+local function resetAllFrameLinks(profile, frameTable)
+  for frameName, _ in pairs(frameTable) do
+    if profile[frameName .. "LinkedFrames"] then
+      profile[frameName .. "LinkedFrames"] = {}
+    end
+  end
+end
+
+local function addMouseoverFrameLinkOptions(t, profile)
+  local args = {}
+  local selectValues = addon:GetFrameTable()
+  selectValues["*Global*"] = nil
+
+  args["FrameLinksResetAll"] = {
+    order = 0,
+    type = "execute",
+    name = "Reset all links",
+    func = function()
+      resetAllFrameLinks(profile, selectValues)
+    end
+  }
+  args["FrameLinksDescription"] = {
+    order = 1,
+    name = addon:ColoredString("\n\nNOTE: ", "eb4034") ..
+      "You can specify if frames should be faded together if you mouseover one of them. Each link will act like you mouseover all of the frames at the same time.\n\n" ..
+        "The linked frames will only be faded if those frames are enabled. Each link is automatically synchronized with all other frames.\n\n",
+    width = "full",
+    type = "description",
+    fontSize = "medium"
+  }
+
+  for frameName, frameOptions in pairs(profile) do
+    if type(frameOptions) == "table" and frameOptions.displayName then
+      if not frameOptions.Hidden and frameName ~= "*Global*" then
+        local selectValuesForFrame = addon:tClone(selectValues)
+        selectValuesForFrame[frameName] = nil
+        args[frameName .. "LinkedFramesOptions"] = {
+          type = "group",
+          order = 3,
+          name = frameOptions.displayName or frameName,
+          args = {
+            [frameName .. "ResetLinkedFrames"] = {
+              order = 1,
+              type = "execute",
+              name = "Reset " .. (frameOptions.displayName or frameName) .. " links",
+              func = function()
+                local currentFrameLinks = profile[frameName .. "LinkedFrames"]
+                for k, _ in pairs(currentFrameLinks) do
+                  profile[k .. "LinkedFrames"] = {}
+                end
+                profile[frameName .. "LinkedFrames"] = {}
+              end
+            },
+            [frameName .. "LinkedFrames"] = {
+              order = 2,
+              name = frameName .. " Links",
+              type = "multiselect",
+              values = selectValuesForFrame,
+              set = "SetMultiselectValue",
+              get = "GetMultiselectValue",
+              arg = frameName
+            }
+          }
+        }
+      end
+    end
+  end
+
+  t["FrameLinks"] = {
+    type = "group",
+    childGroups = "select",
+    name = "! |T517160:16:16:0:0:64:64:6:58:6:58|t|cFFa0a832 Frame Links|r",
+    args = args
+  }
+end
+
+local function getMouseoverFrameFadingOptions(profile)
+  local options = {}
+
+  local order = 1
+  local withUseGlobal
+
+  for frameName, frameOptions in pairs(profile) do
+    if type(frameOptions) == "table" and frameOptions.displayName then
+      if frameName ~= "*Global*" then
+        withUseGlobal = true
+      else
+        withUseGlobal = false
+      end
+
+      if not frameOptions.Hidden then
+        addFrameOptions(order, options, frameName, frameOptions, withUseGlobal)
+        order = order + 1
+      end
+    end
+  end
+
+  return options
 end
 
 -------------------------------------------------------------------------------
@@ -372,6 +450,32 @@ function MouseoverFrameFading:SetFadeSliderValue(info, value)
   MouseoverFrameFading:RefreshFrameAlphas()
 end
 
+function MouseoverFrameFading:SetMultiselectValue(info, selectedValue, value)
+  if not addon:GetProfileDB()[info[#info]] then
+    addon:GetProfileDB()[info[#info]] = {}
+  end
+
+  if not addon:GetProfileDB()[selectedValue .. "LinkedFrames"] then
+    addon:GetProfileDB()[selectedValue .. "LinkedFrames"] = {}
+  end
+
+  addon:GetProfileDB()[info[#info]][selectedValue] = value
+
+  local currentLinkedFrames = addon:GetProfileDB()[info.arg .. "LinkedFrames"]
+
+  -- sync options to selected frames
+  for k, _ in pairs(currentLinkedFrames) do
+    addon:GetProfileDB()[k .. "LinkedFrames"] = currentLinkedFrames
+    addon:GetProfileDB()[k .. "LinkedFrames"][info.arg] = true
+  end
+end
+
+function MouseoverFrameFading:GetMultiselectValue(info, value)
+  if addon:GetProfileDB()[info[#info]] then
+    return addon:GetProfileDB()[info[#info]][value]
+  end
+end
+
 function MouseoverFrameFading:GetUpdateTickerValue(info)
   return Options:GetValue(info) or 1
 end
@@ -382,10 +486,10 @@ function MouseoverFrameFading:SetUpdateTickerValue(info, value)
   addon:RefreshUpdateTicker(interval)
 end
 
-function MouseoverFrameFading:GetUseGlobalFrameOptions(info)
+function MouseoverFrameFading:GetDisabledFrameOptions(info)
   if info then
     if addon:GetProfileDB()[info.arg] then
-      return addon:GetProfileDB()[info.arg]["UseGlobalOptions"] or false
+      return (addon:GetProfileDB()[info.arg]["UseGlobalOptions"] or not addon:GetProfileDB()[info.arg]["Enabled"]) or false
     end
   end
 end
@@ -400,35 +504,16 @@ function MouseoverFrameFading:SetValue(info, value)
   MouseoverFrameFading:RefreshFrameAlphas()
 end
 
-function MouseoverFrameFading:GetMouseoverFrameFadingOptions(profile)
-  local options = {}
-
-  local order = 1
-  local withUseGlobal
-
-  for frameName, frameOptions in pairs(profile) do
-    if type(frameOptions) == "table" and frameOptions.displayName then
-      if frameName ~= "*Global*" then
-        withUseGlobal = true
-      else
-        withUseGlobal = false
-      end
-
-      if not frameOptions.Hidden then
-        addFrameOptions(order, options, frameName, frameOptions, withUseGlobal)
-        order = order + 1
-      end
-    end
-  end
-
-  return options
-end
-
 function MouseoverFrameFading:GetOptionsTable(profile)
+  local args = getMouseoverFrameFadingOptions(profile)
+  addMouseoverFrameLinkOptions(args, profile)
+
   return {
-    name = "Mouseover Frame Fading",
+    name = "Mouseover Fading",
     type = "group",
+    set = "SetValue",
+    get = "GetValue",
     handler = MouseoverFrameFading,
-    args = MouseoverFrameFading:GetMouseoverFrameFadingOptions(profile)
+    args = args
   }
 end

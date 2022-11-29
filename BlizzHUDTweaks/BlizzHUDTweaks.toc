@@ -1,6 +1,6 @@
 ## Interface: 100002
 ## Title: BlizzHUDTweaks
-## Version: 1.24.2
+## Version: 1.26.8
 ## Author: Kevin
 ## Notes: Add some tweaks to the new default blizz HUD.
 ## OptionalDeps: Ace3

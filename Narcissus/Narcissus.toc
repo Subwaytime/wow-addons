@@ -30,7 +30,7 @@ NarciDB\API.xml
 Modules\ModuleManager\ModuleManager.lua
 Modules\PaperDollWidget\Controller.xml
 
-Modules\CharacterFrame\Progenitor.xml
+Modules\CharacterFrame\ClassSet.xml
 
 Widgets\NarciUITemplates.xml
 Widgets\NarciTooltip.xml
@@ -88,6 +88,7 @@ Modules\AR\AR.xml
 
 Modules\Achievement\Core.xml
 Modules\Statistics\Core.lua
+Modules\AddOnError\AddOnError.xml
 
 #Modules\ParticleSystem\ParticleSystem.xml
 

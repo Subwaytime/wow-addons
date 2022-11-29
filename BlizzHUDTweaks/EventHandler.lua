@@ -25,7 +25,11 @@ local function installKeyDownHandler()
             if (string.find(keybind, "SHIFT") and not shiftDown) or (string.find(keybind, "CTRL") and not ctrlDown) or (string.find(keybind, "ALT") and not altDown) then
               return
             end
-            MouseoverFrameFading:Toggle()
+
+            local normalizedKeybind = keybind:gsub("SHIFT", ""):gsub("ALT", ""):gsub("CTRL", ""):gsub("-", "")
+            if string.len(normalizedKeybind) == string.len(pressedKey) then
+              MouseoverFrameFading:Toggle()
+            end
           end
         end
       end
@@ -33,11 +37,24 @@ local function installKeyDownHandler()
   end
 end
 
+local function updatePartyAndRaidFrame()
+  if IsInGroup() then
+    local frameMapping = addon:GetFrameMapping()
+    if frameMapping["PartyFrame"].Enabled or frameMapping["CompactRaidFrameContainer"].Enabled then
+      addon:InitializePartyAndRaidSubFrames(true)
+    end
+  end
+end
+
 local function restoreMouseoverFade()
-  if BlizzHUDTweaks.hasTarget then
-    MouseoverFrameFading:RefreshFrameAlphas(true)
-  else
-    MouseoverFrameFading:RefreshFrameAlphas(true, true)
+  if MouseoverFrameFading:IsEnabled() then
+    updatePartyAndRaidFrame()
+
+    if BlizzHUDTweaks.hasTarget then
+      MouseoverFrameFading:RefreshFrameAlphas()
+    else
+      MouseoverFrameFading:RefreshFrameAlphas(nil, true)
+    end
   end
 end
 
@@ -55,7 +72,9 @@ local eventsToRegister = {
   "ACTIONBAR_SHOWGRID",
   "ACTIONBAR_HIDEGRID",
   "GROUP_ROSTER_UPDATE",
-  "GROUP_LEFT"
+  "GROUP_LEFT",
+  "UNIT_QUEST_LOG_CHANGED",
+  "UPDATE_SHAPESHIFT_COOLDOWN"
 }
 
 local registeredEvents = {}
@@ -89,7 +108,9 @@ function EventHandler:PLAYER_REGEN_ENABLED()
   BlizzHUDTweaks.inCombat = false
 
   if addon:IsEnabled() then
-    MouseoverFrameFading:RefreshFrameAlphas(true, true)
+    if MouseoverFrameFading:IsEnabled() then
+      MouseoverFrameFading:RefreshFrameAlphas(true, true)
+    end
   end
 end
 
@@ -97,7 +118,9 @@ function EventHandler:PLAYER_REGEN_DISABLED()
   BlizzHUDTweaks.inCombat = true
 
   if addon:IsEnabled() then
-    MouseoverFrameFading:RefreshFrameAlphas()
+    if MouseoverFrameFading:IsEnabled() then
+      MouseoverFrameFading:RefreshFrameAlphas()
+    end
   end
 end
 
@@ -105,7 +128,9 @@ function EventHandler:PLAYER_UPDATE_RESTING()
   BlizzHUDTweaks.isResting = IsResting("player")
 
   if addon:IsEnabled() and not BlizzHUDTweaks.inCombat then
-    MouseoverFrameFading:RefreshFrameAlphas()
+    if MouseoverFrameFading:IsEnabled() then
+      MouseoverFrameFading:RefreshFrameAlphas()
+    end
   end
 end
 
@@ -122,11 +147,18 @@ function EventHandler:PLAYER_ENTERING_WORLD()
 
   if addon:IsEnabled() then
     local profile = addon:GetProfileDB()
-    restoreMouseoverFade()
 
-    ClassResource:Restore(profile)
-    ClassResource:RestoreTotemFrame(profile)
-    Miscellaneous:RestoreAll(profile)
+    if ClassResource:IsEnabled() then
+      ClassResource:Restore(profile)
+      ClassResource:RestoreTotemFrame(profile)
+    end
+
+    if Miscellaneous:IsEnabled() then
+      Miscellaneous:RestoreAll(profile)
+      Miscellaneous:UpdateActionbar1UnusedButtons()
+    end
+
+    restoreMouseoverFade()
     installKeyDownHandler()
   end
 end
@@ -145,8 +177,10 @@ function EventHandler:PLAYER_TOTEM_UPDATE()
   end
 
   if addon:IsEnabled() then
-    ClassResource:Restore(profile)
-    ClassResource:RestoreTotemFrame(profile)
+    if ClassResource:IsEnabled() then
+      ClassResource:Restore(profile)
+      ClassResource:RestoreTotemFrame(profile)
+    end
   end
 end
 
@@ -154,40 +188,54 @@ function EventHandler:PLAYER_LOGIN()
   if addon:IsEnabled() then
     addon:InitializePartyAndRaidSubFrames()
     addon:RefreshOptionTables()
-    Miscellaneous:InstallHooks()
+
+    if Miscellaneous:IsEnabled() then
+      Miscellaneous:InstallHooks()
+    end
   end
 end
 
 function EventHandler:PLAYER_SPECIALIZATION_CHANGED()
   if addon:IsEnabled() then
-    local profile = addon:GetProfileDB()
+    if ClassResource:IsEnabled() then
+      local profile = addon:GetProfileDB()
 
-    ClassResource:Restore(profile)
-    ClassResource:RestoreTotemFrame(profile)
+      ClassResource:Restore(profile)
+      ClassResource:RestoreTotemFrame(profile)
+    end
   end
 end
 
 function EventHandler:ACTIONBAR_SLOT_CHANGED()
   if addon:IsEnabled() then
-    local profile = addon:GetProfileDB()
+    if Miscellaneous:IsEnabled() then
+      local profile = addon:GetProfileDB()
 
-    Miscellaneous:RestoreActionbarPaddings(profile, true, true)
+      Miscellaneous:RestoreActionbarPaddings(profile, true, true)
+      Miscellaneous:UpdateActionbar1UnusedButtons()
+    end
   end
 end
 
 function EventHandler:ACTIONBAR_SHOWGRID()
   if addon:IsEnabled() then
-    local profile = addon:GetProfileDB()
+    if Miscellaneous:IsEnabled() then
+      local profile = addon:GetProfileDB()
 
-    Miscellaneous:RestoreActionbarPaddings(profile, true, true)
+      Miscellaneous:RestoreActionbarPaddings(profile, true, true)
+      Miscellaneous:UpdateActionbar1UnusedButtons()
+    end
   end
 end
 
 function EventHandler:ACTIONBAR_HIDEGRID()
   if addon:IsEnabled() then
-    local profile = addon:GetProfileDB()
+    if Miscellaneous:IsEnabled() then
+      local profile = addon:GetProfileDB()
 
-    Miscellaneous:RestoreActionbarPaddings(profile, true, true)
+      Miscellaneous:RestoreActionbarPaddings(profile, true, true)
+      Miscellaneous:UpdateActionbar1UnusedButtons()
+    end
   end
 end
 
@@ -197,21 +245,33 @@ function EventHandler:UNIT_PET(_, unit)
       local profile = addon:GetProfileDB()
 
       restoreMouseoverFade()
-      Miscellaneous:RestoreActionbarPaddings(profile, true, true)
+
+      if Miscellaneous:IsEnabled() then
+        Miscellaneous:RestoreActionbarPaddings(profile, true, true)
+      end
     end
   end
 end
 
 function EventHandler:GROUP_ROSTER_UPDATE()
-  if IsInGroup() then
-    local frameMapping = addon:GetFrameMapping()
-    if frameMapping["PartyFrame"].Enabled or frameMapping["CompactRaidFrameContainer"].Enabled then
-      addon:InitializePartyAndRaidSubFrames(true)
-      restoreMouseoverFade()
-    end
+  if addon:IsEnabled() then
+    updatePartyAndRaidFrame()
   end
 end
 
 function EventHandler:GROUP_LEFT()
-  addon:ClearPartyAndRaidSubFrames()
+  if addon:IsEnabled() then
+    addon:ClearPartyAndRaidSubFrames()
+  end
+end
+
+function EventHandler:UNIT_QUEST_LOG_CHANGED()
+  if addon:IsEnabled() then
+    local profile = addon:GetProfileDB()
+    Miscellaneous:FlashObjectiveTracker(profile)
+  end
+end
+
+function EventHandler:UPDATE_SHAPESHIFT_COOLDOWN()
+  Miscellaneous:UpdateActionbar1UnusedButtons()
 end

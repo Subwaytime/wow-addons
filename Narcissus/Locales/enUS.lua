@@ -644,7 +644,8 @@ L["Show Talent Tree Paperdoll"] = "Open Paper Doll";
 L["Show Talent Tree Inspection"] = "Inspect Other Players";
 L["Show Talent Tree Equipment Manager"] = "Access Equipment Manager";
 L["Appearance"] = "Appearance";
-L["Use Class Background"] = "Use Class Background";
+L["Use Class Background"] = "Class Background";
+L["Use Bigger UI"] = "Bigger UI";
 L["Empty Loadout Name"] = "Name";
 L["No Save Slot Red"] = NARCI_COLOR_RED_MILD.. "No Save Slot" .."|r";
 L["Save"] = "Save";
@@ -658,6 +659,10 @@ L["Create Macro Instruction 4"] = "Drag this macro onto your action bar.";
 L["Create Macro In Combat"] = "Cannot Create macro during combat.";
 L["Create Macro Next"] = "NEXT";
 L["Create Marco Created"] = "CREATED";
+L["Place UI"] = "Place the UI...";
+L["Place Talent UI Right"] = "to the Right of Paper Doll";
+L["Place Talent UI Bottom"] = "Below Paper Doll";
+
 
 --Bag Item Filter--
 L["Bag Item Filter"] = "Bag Item Filter";

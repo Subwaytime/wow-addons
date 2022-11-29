@@ -1,7 +1,7 @@
-local NARCI_VERSION_INFO = "1.3.5";
+local NARCI_VERSION_INFO = "1.3.6";
 
-local VERSION_DATE = 1668784871;
-local CURRENT_VERSION = 10305;
+local VERSION_DATE = 1669649426;
+local CURRENT_VERSION = 10306;
 local PREVIOUS_VERSION = CURRENT_VERSION;
 local TIME_SINCE_LAST_UPDATE = 0;
 
@@ -75,7 +75,9 @@ local DefaultValues = {
     TalentTreeForInspection = true,
     TalentTreeForPaperDoll = false,              --True on Beta for testing
     TalentTreeForEquipmentManager = true,
+    TalentTreeAnchor = 1,                        --Relative Position 1.Right 2.Bottom
     TalentTreeUseClassBackground = false,
+    TalentTreeBiggerUI = false,
 
     --# NPC
     SearchRelatives = false,                    --Search for NPCs with the same last name

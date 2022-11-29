@@ -557,7 +557,7 @@
 		</Scripts>
 	</Frame>
 
-	<Frame name="NarciTaintAlertFrame" frameStrata="DIALOG" hidden="true" mixin="NarciTaintAlertFrameMixin" parent="UIParent" enableMouse="true">
+	<Frame name="NarciDressingRoomTaintAlertFrame" frameStrata="DIALOG" hidden="true" mixin="NarciDressingRoomTaintAlertFrameMixin" parent="UIParent" enableMouse="true">
 		<Size x="320" y="72"/>
 		<Anchors>
 			<Anchor point="TOP" relativeKey="$parent" relativePoint="TOP" y="-135"/>

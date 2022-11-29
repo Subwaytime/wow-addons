@@ -1470,7 +1470,7 @@ local function GetBagItemSubText(bag, slot)
 
     local tooltipData = GetInfoByBagItem(bag, slot);
     if tooltipData then
-        return GetLineText(tooltipData.lines, 2);
+        return GetLineText(tooltipData.lines, 2) or ""
     end
 end
 
@@ -1486,6 +1486,23 @@ local function GetCreatureName(creatureID)
 end
 
 NarciAPI.GetCreatureName = GetCreatureName;
+
+local function GetDominationShardEffect(item)
+    if not item then return end;
+
+    local tooltipData;
+    if type(item) == "number" then
+        tooltipData = GetInfoByItemID(item);
+    else
+        tooltipData = GetInfoByHyperlink(item);
+    end
+    DT = tooltipData
+    if tooltipData then
+        return GetLineText(tooltipData.lines, 5);
+    end
+end
+
+NarciAPI.GetDominationShardEffect = GetDominationShardEffect;
 
 
 --]]

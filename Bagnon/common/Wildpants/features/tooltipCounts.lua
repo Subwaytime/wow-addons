@@ -8,9 +8,10 @@ local L = LibStub('AceLocale-3.0'):GetLocale(ADDON)
 local TipCounts = Addon:NewModule('TooltipCounts')
 
 local SILVER = '|cffc7c7cf%s|r'
-local LAST_BANK_SLOT = NUM_BAG_SLOTS + NUM_BANKBAGSLOTS
-local FIRST_BANK_SLOT = NUM_BAG_SLOTS + 1
+local LAST_BANK_SLOT = Addon.NumBags + NUM_BANKBAGSLOTS
+local FIRST_BANK_SLOT = Addon.NumBags + 1
 local TOTAL = SILVER:format(L.Total)
+
 
 
 --[[ Startup ]]--
@@ -20,9 +21,13 @@ function TipCounts:OnEnable()
 		if not self.Text then
 			self.Text, self.Counts = {}, {}
 
-			for _,frame in pairs {UIParent:GetChildren()} do
-				if not frame:IsForbidden() and frame:GetObjectType() == 'GameTooltip' then
-					self:Hook(frame)
+			if TooltipDataProcessor then
+				TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item,  self.OnItem)
+			else
+				for _,frame in pairs {UIParent:GetChildren()} do
+					if not frame:IsForbidden() and frame:GetObjectType() == 'GameTooltip' then
+						self:Hook(frame)
+					end
 				end
 			end
 		end
@@ -43,6 +48,9 @@ function TipCounts:Hook(tip)
 			hooksecurefunc(tip, 'SetRecipeReagentItem', self.OnTradeSkill('GetRecipeReagentItemLink'))
 			hooksecurefunc(tip, 'SetRecipeResultItem', self.OnTradeSkill('GetRecipeItemLink'))
 		end
+	else
+		hooksecurefunc(tip, 'SetTradeSkillItem', self.OnSetTradeSkillItem)
+		hooksecurefunc(tip, 'SetCraftItem', self.OnSetCraftItem)
 	end
 end
 
@@ -50,7 +58,7 @@ end
 --[[ Events ]]--
 
 function TipCounts.OnItem(tip)
-	local name, link = tip:GetItem()
+	local name, link = (tip.GetItem or TooltipUtil.GetDisplayedItem)(tip)
 	if name ~= '' then
 		TipCounts:AddOwners(tip, link)
 	end
@@ -66,15 +74,27 @@ function TipCounts.OnTradeSkill(api)
 	end
 end
 
+function TipCounts.OnSetTradeSkillItem(tip, skill, index)
+	if index then
+		TipCounts:AddOwners(tip, GetTradeSkillReagentItemLink(skill, index))
+	else
+		TipCounts:AddOwners(tip, GetTradeSkillItemLink(skill))
+	end
+end
+
+function TipCounts.OnSetCraftItem(tip, ...)
+	TipCounts:AddOwners(tip, GetCraftReagentItemLink(...))
+end
+
 function TipCounts.OnClear(tip)
-	tip.__tamedCounts = false
+	tip.__hasCounters = false
 end
 
 
 --[[ API ]]--
 
 function TipCounts:AddOwners(tip, link)
-	if not Addon.sets.tipCount or tip.__tamedCounts then
+	if not Addon.sets.tipCount or tip.__hasCounters then
 		return
 	end
 
@@ -100,7 +120,7 @@ function TipCounts:AddOwners(tip, link)
 				local bags, bank = 0,0
 
 				if info.cached then
-					for i = BACKPACK_CONTAINER, NUM_BAG_SLOTS do
+					for i = BACKPACK_CONTAINER, Addon.NumBags do
 						bags = bags + self:GetCount(owner, i, itemID)
 					end
 
@@ -152,7 +172,7 @@ function TipCounts:AddOwners(tip, link)
 		tip:AddDoubleLine(TOTAL, SILVER:format(total))
 	end
 
-	tip.__tamedCounts = true
+	tip.__hasCounters = not TooltipDataProcessor
 	tip:Show()
 end
 

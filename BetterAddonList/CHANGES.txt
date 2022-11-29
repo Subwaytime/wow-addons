@@ -1,12 +1,18 @@
-tag 8a4b000e62b4b16142c5d8a8deb1345ac4685ce4 1.1.4
+tag 3523d0eb3c86a5831b7a2c3d46bd857a2ec1ea8d 1.1.5
 Author:	Kyle Buller <bullerk@gmail.com>
-Date:	Thu Nov 17 06:45:31 2022 -0600
+Date:	Mon Nov 28 00:47:57 2022 -0600
 
-Tagging as 1.1.4
+Tagging as 1.1.5
 
-commit 49536e11ecac725b3983b47bf06b73c0dc614a8d
+commit 800402dcc7762ae9eea08d982049029af2da5754
 Author: Kyle Buller <bullerk@gmail.com>
-Date:   Thu Nov 17 06:45:13 2022 -0600
+Date:   Mon Nov 28 00:47:25 2022 -0600
 
-    Revert some unintended changes
+    Tweak
+
+commit 957f346e00d0f475ac08cc0efccba104c906cbd6
+Author: Kyle Buller <bullerk@gmail.com>
+Date:   Mon Nov 28 00:47:05 2022 -0600
+
+    Fix changing the "Okay" button to "Reload" on changes
 

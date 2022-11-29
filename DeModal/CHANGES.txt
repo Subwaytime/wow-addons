@@ -1,10 +1,10 @@
-lightweight tag 08f2c8de082e4c3ce7c3e61255af3077268c9f06 0.7.1
+lightweight tag e826729024fbf738bb28f44aaa4a58c8f6c29c33 0.7.2
 Author:	nezroy <nezroy@gmail.com>
-Date:	Wed Nov 23 10:02:33 2022 -0700
+Date:	Tue Nov 29 03:06:29 2022 -0700
 
-commit 08f2c8de082e4c3ce7c3e61255af3077268c9f06
+commit e826729024fbf738bb28f44aaa4a58c8f6c29c33
 Author: nezroy <nezroy@gmail.com>
-Date:   Wed Nov 23 10:02:33 2022 -0700
+Date:   Tue Nov 29 03:06:29 2022 -0700
 
-    Apply default scaling logic, fixes #20
+    Add feature to merge quest, gossip, etc. frames
 

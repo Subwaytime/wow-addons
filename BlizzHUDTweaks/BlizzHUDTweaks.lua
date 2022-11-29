@@ -54,7 +54,7 @@ end
 
 local defaultConfig = {
   ["global"] = {
-    ["version"] = "1.24.2",
+    ["version"] = "1.26.8",
     ["minimap"] = {
       ["hide"] = false
     }
@@ -65,7 +65,7 @@ local defaultConfig = {
     ["GlobalOptionsMiscellaneousEnabled"] = true,
     ["Enabled"] = true,
     ["*Global*"] = {
-      displayName = "* |T134063:16:16:0:0:64:64:6:58:6:58|t|cFFa0a832 Global Settings|r",
+      displayName = "! |T134063:16:16:0:0:64:64:6:58:6:58|t|cFFa0a832 Global Settings|r",
       description = "You can set global values which can be activated for each frame."
     },
     ["PlayerFrame"] = {
@@ -232,7 +232,7 @@ do
       if frameName ~= "*Global*" then
         frameOptions["UseGlobalOptions"] = true
       else
-        frameOptions["UpdateInterval"] = 0.1
+        frameOptions["UpdateInterval"] = 0.2
       end
 
       if tContains({"Minimap", "BuffFrame", "DebuffFrame", "ObjectiveTrackerFrame"}, frameName) then
@@ -518,12 +518,16 @@ end
 
 function addon:ResetFrame(frame)
   if frame then
+    if frame.BlizzHUDTweaksAnimationGroup then
+      frame.BlizzHUDTweaksAnimationGroup:Stop()
+    end
     frame:SetAlpha(1)
   end
 end
 
 function addon:ResetFrameByMappingOptions(frameMappingOptions)
   addon:ResetFrame(frameMappingOptions.mainFrame)
+
   if frameMappingOptions.subFrames then
     for _, subFrame in ipairs(frameMappingOptions.subFrames) do
       addon:ResetFrame(subFrame)
