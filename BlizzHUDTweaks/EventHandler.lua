@@ -74,7 +74,8 @@ local eventsToRegister = {
   "GROUP_ROSTER_UPDATE",
   "GROUP_LEFT",
   "UNIT_QUEST_LOG_CHANGED",
-  "UPDATE_SHAPESHIFT_COOLDOWN"
+  "UPDATE_SHAPESHIFT_COOLDOWN",
+  "UPDATE_BONUS_ACTIONBAR"
 }
 
 local registeredEvents = {}
@@ -210,7 +211,6 @@ function EventHandler:ACTIONBAR_SLOT_CHANGED()
   if addon:IsEnabled() then
     if Miscellaneous:IsEnabled() then
       local profile = addon:GetProfileDB()
-
       Miscellaneous:RestoreActionbarPaddings(profile, true, true)
       Miscellaneous:UpdateActionbar1UnusedButtons()
     end
@@ -273,5 +273,9 @@ function EventHandler:UNIT_QUEST_LOG_CHANGED()
 end
 
 function EventHandler:UPDATE_SHAPESHIFT_COOLDOWN()
+  Miscellaneous:UpdateActionbar1UnusedButtons()
+end
+
+function EventHandler:UPDATE_BONUS_ACTIONBAR()
   Miscellaneous:UpdateActionbar1UnusedButtons()
 end

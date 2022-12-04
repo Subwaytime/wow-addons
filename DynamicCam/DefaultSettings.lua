@@ -75,6 +75,8 @@ DynamicCam.situationDefaults = {
             ["BuffFrame"]    = true,
             ["DebuffFrame"]  = true,
             ["GossipFrame"]  = true,
+            ["QuestFrame"]  = true,
+            ["MerchantFrame"]  = true,
           },
 
 
@@ -312,6 +314,18 @@ if formId and this.travelFormIds[formId] then
 else
   return false
 end]],
+            },
+
+
+            ["120"] = {
+                name = "Dracthyr Soar",
+                events = {"UNIT_AURA"},
+                priority = 100,
+                condition = [[for i = 1, 40 do
+  local name, _, _, _, _, _, _, _, _, spellId = UnitBuff("player", i)
+  if spellId == 369536 then return true end
+end
+return false]],
             },
 
             ["200"] = {

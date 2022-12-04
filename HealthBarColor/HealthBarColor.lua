@@ -891,6 +891,8 @@ end
 HealthBarColor:RegisterEvent("PLAYER_TARGET_CHANGED","TargetColor")
 HealthBarColor:RegisterEvent("PLAYER_FOCUS_CHANGED","FocusColor")
 --i think this is a good function to hook as it doesn't get called to often and contains all the frames the addon needs
+local unpack = unpack
+local CLASS_ICON_TCOORDS = CLASS_ICON_TCOORDS
 HealthBarColor:SecureHook("UnitFramePortrait_Update", function(self) 
     if self.unit == "targettarget" then 
         HealthBarColor:TargetofTargetColor(self.unit)
