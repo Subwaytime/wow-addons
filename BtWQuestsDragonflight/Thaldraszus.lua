@@ -1,5 +1,3 @@
--- AUTO GENERATED - NEEDS UPDATING
-
 local BtWQuests = BtWQuests
 local Database = BtWQuests.Database
 local L = BtWQuests.L
@@ -27,7 +25,6 @@ local LEVEL_PREREQUISITES = {
 Chain.ValdrakkenCityOfDragons = 100401
 Chain.TimeManagement = 100402
 Chain.BigTimeAdventurer = 100403
-Chain.TheMotherOathstone = 100404
 Chain.TempChain01 = 100411
 Chain.TempChain02 = 100412
 Chain.TempChain03 = 100413
@@ -43,6 +40,7 @@ Chain.TempChain12 = 100422
 Chain.TempChain13 = 100423
 Chain.TempChain14 = 100424
 Chain.TempChain15 = 100425
+Chain.TempChain16 = 100426
 Chain.OtherAlliance = 100497
 Chain.OtherHorde = 100498
 Chain.OtherBoth = 100499
@@ -609,6 +607,15 @@ Database:AddChain(Chain.BigTimeAdventurer, {
             type = "quest",
             id = 66221,
             x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 72192,
+            aside = true,
+            x = 0,
         },
         {
             type = "quest",
@@ -616,75 +623,6 @@ Database:AddChain(Chain.BigTimeAdventurer, {
             visible = false,
             x = 0,
             comment = "Removed?",
-        },
-    },
-})
-Database:AddChain(Chain.TheMotherOathstone, {
-    name = "Uknown", -- BtWQuests_GetAchievementCriteriaNameDelayed(ACHIEVEMENT_ID_1, 4),
-    questline = 1333,
-    category = CATEGORY_ID,
-    expansion = EXPANSION_ID,
-    range = LEVEL_RANGE,
-    major = true,
-    prerequisites = {
-        {
-            type = "level",
-            variations = {
-                { level = 58, restrictions = THREADS_OF_FATE_RESTRICTION, },
-                { level = 66, },
-            },
-        },
-        {
-            type = "achievement",
-            id = 16336,
-            lowPriority = true,
-            restrictions = NOT_THREADS_OF_FATE_RESTRICTION,
-        },
-        {
-            type = "chain",
-            id = Chain.ValdrakkenCityOfDragons,
-            lowPriority = true,
-        },
-        {
-            type = "chain",
-            id = Chain.TimeManagement,
-            lowPriority = true,
-        },
-        {
-            type = "chain",
-            id = Chain.BigTimeAdventurer,
-        },
-    },
-    active = {
-        type = "quest",
-        id = 70437,
-        status = {'active', 'completed'},
-    },
-    completed = {
-        type = "quest",
-        id = 66675,
-    },
-    items = {
-        {
-            type = "npc",
-            id = 186931,
-            x = 0,
-            connections = {
-                1, 
-            },
-        },
-        {
-            type = "quest",
-            id = 70437,
-            x = 0,
-            connections = {
-                1, 
-            },
-        },
-        {
-            type = "quest",
-            id = 66675,
-            x = 0,
         },
     },
 })
@@ -1453,6 +1391,35 @@ Database:AddChain(Chain.TempChain10, {
     category = CATEGORY_ID,
     expansion = EXPANSION_ID,
     range = LEVEL_RANGE,
+    prerequisites = {
+        {
+            type = "level",
+            variations = {
+                { level = 58, restrictions = THREADS_OF_FATE_RESTRICTION, },
+                { level = 66, },
+            },
+        },
+        {
+            type = "achievement",
+            id = 16336,
+            lowPriority = true,
+            restrictions = NOT_THREADS_OF_FATE_RESTRICTION,
+        },
+        {
+            type = "chain",
+            id = Chain.ValdrakkenCityOfDragons,
+            lowPriority = true,
+        },
+        {
+            type = "chain",
+            id = Chain.TimeManagement,
+        },
+    },
+    active = {
+        type = "quest",
+        id = 70040,
+        status = {'active', 'completed'},
+    },
     completed = {
         type = "quest",
         id = 66468,
@@ -1557,6 +1524,9 @@ Database:AddChain(Chain.TempChain13, {
         {
             type = "level",
             level = 70,
+        },
+        {
+            name = L["UNKNOWN"]
         }
     },
     active = {
@@ -1589,7 +1559,6 @@ Database:AddChain(Chain.TempChain13, {
             connections = {
                 1, 
             },
-            comments = "Unknown requirements",
         },
         {
             type = "quest",
@@ -1619,15 +1588,36 @@ Database:AddChain(Chain.TempChain14, {
     category = CATEGORY_ID,
     expansion = EXPANSION_ID,
     range = LEVEL_RANGE,
+    major = true,
     prerequisites = {
         {
             type = "level",
             level = 70,
-        }
+        },
+        {
+            type = "achievement",
+            id = 16336,
+            lowPriority = true,
+            restrictions = NOT_THREADS_OF_FATE_RESTRICTION,
+        },
+        {
+            type = "chain",
+            id = Chain.ValdrakkenCityOfDragons,
+            lowPriority = true,
+        },
+        {
+            type = "chain",
+            id = Chain.TimeManagement,
+            lowPriority = true,
+        },
+        {
+            type = "chain",
+            id = Chain.BigTimeAdventurer,
+        },
     },
     active = {
         type = "quest",
-        ids = {70846, 70180,},
+        ids = {70846, 72773, 70180,},
         status = {'active', 'completed'}
     },
     completed = {
@@ -1643,6 +1633,15 @@ Database:AddChain(Chain.TempChain14, {
                     restrictions = {
                         type = "quest",
                         id = 70846,
+                        status = { "active", "completed", },
+                    },
+                },
+                {
+                    type = "quest",
+                    id = 72773,
+                    restrictions = {
+                        type = "quest",
+                        id = 72773,
                         status = { "active", "completed", },
                     },
                 },
@@ -1723,6 +1722,122 @@ Database:AddChain(Chain.TempChain15, {
         },
     },
 })
+Database:AddChain(Chain.TempChain16, {
+    name = L["BORN_TO_BE_WILDER"],
+    questline = 1366,
+    category = CATEGORY_ID,
+    expansion = EXPANSION_ID,
+    range = LEVEL_RANGE,
+    prerequisites = {
+        {
+            type = "level",
+            variations = {
+                { level = 58, restrictions = THREADS_OF_FATE_RESTRICTION, },
+                { level = 66, },
+            },
+        },
+        {
+            type = "achievement",
+            id = 16336,
+            lowPriority = true,
+            restrictions = NOT_THREADS_OF_FATE_RESTRICTION,
+        },
+        {
+            type = "chain",
+            id = Chain.ValdrakkenCityOfDragons,
+            lowPriority = true,
+        },
+        {
+            type = "chain",
+            id = Chain.TimeManagement,
+            lowPriority = true,
+        },
+        {
+            type = "chain",
+            id = Chain.BigTimeAdventurer,
+        },
+    },
+    active = {
+        type = "quest",
+        id = 70647,
+        status = {'active', 'completed'},
+    },
+    completed = {
+        type = "quest",
+        id = 70854,
+    },
+    items = {
+        {
+            type = "npc",
+            id = 185563,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 70647,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 70697,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 70722,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 70732,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 70849,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 70851,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 70853,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 70854,
+            x = 0,
+        },
+    },
+})
 Database:AddChain(Chain.OtherAlliance, {
     name = "Other Alliance",
     category = CATEGORY_ID,
@@ -1783,6 +1898,7 @@ Database:AddChain(Chain.OtherBoth, {
 Database:AddCategory(CATEGORY_ID, {
     name = BtWQuests.GetMapName(MAP_ID),
     expansion = EXPANSION_ID,
+    buttonImage = 4742929,
     items = {
         {
             type = "chain",
@@ -1796,12 +1912,6 @@ Database:AddCategory(CATEGORY_ID, {
             type = "chain",
             id = Chain.BigTimeAdventurer,
         },
---[==[@debug@
-        {
-            type = "chain",
-            id = Chain.TheMotherOathstone,
-        },
---@end-debug@]==]
         {
             type = "chain",
             id = Chain.TempChain01,
@@ -1836,21 +1946,21 @@ Database:AddCategory(CATEGORY_ID, {
         },
         {
             type = "chain",
-            id = Chain.TempChain14,
-        },
-        {
-            type = "chain",
             id = Chain.TempChain13,
         },
         {
             type = "chain",
             id = Chain.TempChain11,
         },
---[==[@debug@
+        {
+            type = "chain",
+            id = Chain.TempChain16,
+        },
         {
             type = "chain",
             id = Chain.TempChain10,
         },
+--[==[@debug@
         {
             type = "chain",
             id = Chain.TempChain09,
@@ -1913,6 +2023,10 @@ Database:AddContinentItems(CONTINENT_ID, {
     {
         type = "chain",
         id = Chain.TempChain06,
+    },
+    {
+        type = "chain",
+        id = Chain.TempChain10,
     },
 --[==[@debug@
     {

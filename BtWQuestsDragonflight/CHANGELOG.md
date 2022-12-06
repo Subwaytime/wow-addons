@@ -1,3 +1,17 @@
+# v1.2
+
+- Added multiple quest chains including A Mystery, Solved and The Silver Purpose.
+- Updated multiple quest chains to display on the world map
+- Updated Spark of Ingenuity quest chain, moving it outside of the Thaldraszus category
+- Updated 10,000 Years of Roasting quest chain with unknown prerequisite
+- Fixed incorrect layout of Brackenhide Water Hole quest chain
+- Fixed Wingrest Embassy not showing as completed correctly
+
+# v1.1
+
+- Added category button images
+- Fixed Opportunities Abound quest showing for non-rogues and updated it to no longer be required for Wingrest Embassy quest chain
+
 # v1.0
 
 - Added Localizations

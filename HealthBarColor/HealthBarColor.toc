@@ -19,4 +19,5 @@ Libs\AceGUI-3.0-SharedMediaWidgets\widget.xml
 
 
 HealthBarColor.lua
-HealthBarColor_Textures.lua
+Modules\Textures.lua
+Modules\PartyColor.lua

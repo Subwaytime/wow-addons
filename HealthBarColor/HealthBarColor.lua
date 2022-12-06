@@ -5,10 +5,12 @@ HealthBarColor = LibStub("AceAddon-3.0"):NewAddon("HealthBarColor", "AceConsole-
 local AC = LibStub("AceConfig-3.0")
 local ACD = LibStub("AceConfigDialog-3.0")
 local media = LibStub("LibSharedMedia-3.0")
-HealthBarColor:SetDefaultModuleLibraries("AceConsole-3.0", "AceEvent-3.0")
+HealthBarColor:SetDefaultModuleLibraries("AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 HealthBarColor:SetDefaultModuleState(false)
 local ULx,ULy,LLx,LLy,URx,URy,LRx,LRy = TargetFrame.TargetFrameContainer.Portrait:GetTexCoord()
 local useclassIcons = false
+local unpack = unpack
+local CLASS_ICON_TCOORDS = CLASS_ICON_TCOORDS
 local reactionColor = {
     enemy = {r=1,g=0,b=0}, --enemy
     neutral = {r=1,g=1,b=0}, --neutral
@@ -46,6 +48,7 @@ local defaults = {
             npccolor =  {r = 0, g = 0.9, b = 0.3},
         },
         PartyColor = {
+            active = false,
             classcolor = false,
             targetsclasscolor = true,
             color =  {r = 0, g = 0, b = 0},
@@ -326,6 +329,16 @@ local options = {
             type = "group",
             inline = true,
             args = {
+                active = {
+                    order = 0,
+                    name = "Activate PartyColor Module",
+                    desc = "Color settings for the defaulft non raid style party frames. You will have to /reload to apply the settings",
+                    type = "toggle",
+                    get = "Get",
+                    set = "Set",
+                    disabled = false,
+                    width = 4,
+                },
                 classcolor = {
                     order = 3,
                     name = "my class color  ",
@@ -334,6 +347,7 @@ local options = {
                     set = "SetClassColor",
                     disabled = false,
                     width = 0.8,
+                    hidden = function () return not HealthBarColor.db.profile.PartyColor.active end,
                 },
                 targetsclasscolor = {
                     order = 1,
@@ -341,6 +355,7 @@ local options = {
                     type = "toggle",
                     get = "GetTargetsClassColor",
                     set = "SetTargetsClassColor",
+                    hidden = function () return not HealthBarColor.db.profile.PartyColor.active end,
                 },
                 color = {
                     order = 4,
@@ -349,6 +364,7 @@ local options = {
                     get = "GetColor",
                     set = "SetColor",
                     disabled = false,
+                    hidden = function () return not HealthBarColor.db.profile.PartyColor.active end,
                 },
                 npccolor = {
                     guiHidden = true,
@@ -490,6 +506,7 @@ function HealthBarColor:LoadConfig()
     HealthBarColor:BossColor()
     HealthBarColor:PetColor()
     HealthBarColor:CustomReactionHandler()
+    HealthBarColor:PortraitHandler()
     if self.db.profile.ClassIcons.useclassicons then
         useclassIcons = true
     end
@@ -500,6 +517,11 @@ function HealthBarColor:LoadConfig()
         if IsAddOnLoaded("BiggerHealthBar") then
             PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.HealthBarArea.HealthBar:SetStatusBarTexture(media:Fetch("statusbar", HealthBarColor.db.profile.Textures.statusbar)) 
         end
+    end
+    if self.db.profile.PartyColor.active then
+        HealthBarColor:EnableModule("PartyColor")
+    else
+        HealthBarColor:DisableModule("PartyColor")
     end
 end
 
@@ -622,6 +644,7 @@ function HealthBarColor:PlayerColor()
 end
 --target
 function HealthBarColor:TargetColor()
+    HealthBarColor:TargetofTargetColor()
     if self.db.profile.Target.targetsclasscolor then
         if UnitIsPlayer("target") then
             local _, englishClass = UnitClass("target");
@@ -675,10 +698,10 @@ function HealthBarColor:TargetColor()
     end
 end
 --target of target 
-function HealthBarColor:TargetofTargetColor(unit)
+function HealthBarColor:TargetofTargetColor()
     if self.db.profile.TargetOfTarget.targetsclasscolor then
-        if UnitIsPlayer(unit) then
-        local _, englishClass = UnitClass(unit);
+        if UnitIsPlayer("targettarget") then
+        local _, englishClass = UnitClass("targettarget");
         local r, g, b = GetClassColor(englishClass)
         TargetFrameToT.HealthBar:SetStatusBarColor(r, g, b)
         else
@@ -732,6 +755,7 @@ function HealthBarColor:TargetofTargetColor(unit)
 end
 --focus
 function HealthBarColor:FocusColor()
+    HealthBarColor:FocusTargetColor()
     if self.db.profile.Focus.targetsclasscolor then
         if UnitIsPlayer("focus") then
         local _, englishClass = UnitClass("focus");
@@ -787,10 +811,10 @@ function HealthBarColor:FocusColor()
     end
 end
 --focus's target
-function HealthBarColor:TargetOfFocusColor(unit)
+function HealthBarColor:FocusTargetColor()
     if self.db.profile.TargetOfFocus.targetsclasscolor then
-        if UnitIsPlayer(unit) then
-            local _, englishClass = UnitClass(unit);
+        if UnitIsPlayer("focustarget") then
+            local _, englishClass = UnitClass("focustarget");
             local r, g, b = GetClassColor(englishClass)
             FocusFrameToT.HealthBar:SetStatusBarColor(r, g, b)
         else
@@ -868,57 +892,42 @@ function HealthBarColor:PetColor()
         PetFrameHealthBar:SetStatusBarColor(self.db.profile.Pet.color.r, self.db.profile.Pet.color.g, self.db.profile.Pet.color.b)
     end
 end
---party frame
-function HealthBarColor:PartyColor(unit, healthbar)
-    if self.db.profile.PartyColor.targetsclasscolor then
-        if UnitIsPlayer(unit) then
-            local _, englishClass = UnitClass(unit);
-            local r, g, b = GetClassColor(englishClass)
-            healthbar:SetStatusBarDesaturated(true)
-            healthbar:SetStatusBarColor(r, g, b)
+--to set target of target and focus
+function HealthBarColor:UnitTargetHandler(self, unitTarget)
+    if unitTarget == "target" then
+        HealthBarColor:TargetofTargetColor()
+     end
+    if unitTarget == "focus" then
+        HealthBarColor:FocusTargetColor()
+    end
+end
+--portraits
+function HealthBarColor:PortraitHandler()
+    if self.db.profile.ClassIcons.useclassicons then
+        if not HealthBarColor:IsHooked("UnitFramePortrait_Update") then
+            HealthBarColor:SecureHook("UnitFramePortrait_Update", function(self) 
+                if self.portrait then
+                    if UnitIsPlayer(self.unit) then
+                        local _, englishClass = UnitClass(self.unit)
+                        local classcoords = CLASS_ICON_TCOORDS[englishClass]   
+                        self.portrait:SetTexture("Interface\\TargetingFrame\\UI-Classes-Circles")
+                        if classcoords ~= nil then
+                            self.portrait:SetTexCoord(unpack(classcoords))      
+                        end
+                    else
+                        self.portrait:SetTexCoord(ULx,ULy,LLx,LLy,URx,URy,LRx,LRy)
+                    end
+                end
+            end)
         end
-    elseif self.db.profile.PartyColor.classcolor then
-        local _, englishClass = UnitClass("player");
-        local r, g, b = GetClassColor(englishClass)
-        healthbar:SetStatusBarDesaturated(true)
-        healthbar:SetStatusBarColor(r, g, b)
     else
-        healthbar:SetStatusBarDesaturated(true)
-        healthbar:SetStatusBarColor(self.db.profile.PartyColor.color.r, self.db.profile.PartyColor.color.g, self.db.profile.PartyColor.color.b)
+        if HealthBarColor:IsHooked("UnitFramePortrait_Update") then
+            HealthBarColor:Unhook("UnitFramePortrait_Update")
+        end
     end
 end
 --events
 HealthBarColor:RegisterEvent("PLAYER_TARGET_CHANGED","TargetColor")
 HealthBarColor:RegisterEvent("PLAYER_FOCUS_CHANGED","FocusColor")
---i think this is a good function to hook as it doesn't get called to often and contains all the frames the addon needs
-local unpack = unpack
-local CLASS_ICON_TCOORDS = CLASS_ICON_TCOORDS
-HealthBarColor:SecureHook("UnitFramePortrait_Update", function(self) 
-    if self.unit == "targettarget" then 
-        HealthBarColor:TargetofTargetColor(self.unit)
-    end
-    if self.unit == "focustarget" then 
-        HealthBarColor:TargetOfFocusColor(self.unit)
-    end
-        if self.unit:match("party") then
-            HealthBarColor:PartyColor(self.unit, self.healthbar)
-        end
-    if useclassIcons then
-        if self.portrait then
-            if UnitIsPlayer(self.unit) then
-                local _, englishClass = UnitClass(self.unit)
-                local classcoords = CLASS_ICON_TCOORDS[englishClass]   
-                self.portrait:SetTexture("Interface\\TargetingFrame\\UI-Classes-Circles")
-                if classcoords ~= nil then
-                    self.portrait:SetTexCoord(unpack(classcoords))      
-                end
-            else
-                self.portrait:SetTexCoord(ULx,ULy,LLx,LLy,URx,URy,LRx,LRy)
-            end
-        end
-    end
-end)
-
-
-
+HealthBarColor:RegisterEvent("UNIT_TARGET","UnitTargetHandler")
 

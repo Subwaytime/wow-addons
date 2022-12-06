@@ -3,10 +3,20 @@ local Options = addon:GetModule("Options")
 local Miscellaneous = addon:GetModule("Miscellaneous")
 
 local function toggleFrame(option, _, value)
-  if value then
-    option.frame:Hide()
-  else
-    option.frame:Show()
+  if option.frame then
+    if value then
+      option.frame:Hide()
+    else
+      option.frame:Show()
+    end
+  end
+end
+
+local function toggleFrames(option, _, value)
+  if option.frames then
+    for _, frame in ipairs(option.frames) do
+      toggleFrame({frame = frame}, nil, value)
+    end
   end
 end
 
@@ -27,9 +37,23 @@ end
 local function doNothing()
 end
 
+local function hideFrame(option)
+  if option.frame then
+    option.frame:Hide()
+  end
+end
+
 local function showFrame(option)
   if option.frame then
     option.frame:Show()
+  end
+end
+
+local function showFrames(option)
+  if option.frames then
+    for _, frame in ipairs(option.frames) do
+      showFrame({frame = frame})
+    end
   end
 end
 
@@ -215,6 +239,36 @@ Miscellaneous.options = {
         type = "toggle",
         setFn = toggleFrame,
         restoreOriginalValueFn = showFrame
+      },
+      {
+        optionName = "MiscellaneousShowHidePetStatusText",
+        displayName = "Hide Status Texts",
+        frames = {
+          PetFrameHealthBarTextLeft,
+          PetFrameHealthBarTextRight,
+          PetFrameHealthBarText,
+          PetFrameManaBarTextLeft,
+          PetFrameManaBarTextRight,
+          PetFrameManaBarText
+        },
+        type = "toggle",
+        setFn = toggleFrames,
+        restoreOriginalValueFn = showFrames,
+        frameHooks = {
+          function(option)
+            for _, frame in ipairs(option.frames) do
+              if not frame.__BlizzHUDTweaksOnShowHooked then
+                frame:HookScript(
+                  "OnShow",
+                  function()
+                    hideFrame({frame = frame})
+                  end
+                )
+                frame.__BlizzHUDTweaksOnShowHooked = true
+              end
+            end
+          end
+        }
       }
     }
   },

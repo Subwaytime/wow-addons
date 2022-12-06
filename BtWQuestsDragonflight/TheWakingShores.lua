@@ -2,6 +2,7 @@
 
 local BtWQuests = BtWQuests
 local Database = BtWQuests.Database
+local L = BtWQuests.L
 local EXPANSION_ID = BtWQuests.Constant.Expansions.Dragonflight
 local CATEGORY_ID = BtWQuests.Constant.Category.Dragonflight.TheWakingShores
 local Chain = BtWQuests.Constant.Chain.Dragonflight.TheWakingShores
@@ -55,6 +56,9 @@ Chain.TempChain38 = 100148
 Chain.TempChain39 = 100149
 Chain.TempChain40 = 100150
 Chain.TempChain41 = 100151
+Chain.TempChain42 = 100152
+Chain.TempChain43 = 100153
+Chain.TempChain44 = 100154
 
 Chain.OtherAlliance = 100197
 Chain.OtherHorde = 100198
@@ -1700,7 +1704,15 @@ Database:AddChain(Chain.TempChain16, {
             type = "quest",
             id = 70132,
             x = 0,
-            comment = "Check Availability",
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 70134,
+            x = 0,
         },
     },
 })
@@ -1728,6 +1740,10 @@ Database:AddChain(Chain.TempChain21, {
     category = CATEGORY_ID,
     expansion = EXPANSION_ID,
     range = LEVEL_RANGE,
+    restrictions = {
+        type = "class",
+        id = BtWQuests.Constant.Class.Rogue,
+    },
     items = {
         {
             type = "npc",
@@ -2203,19 +2219,20 @@ Database:AddChain(Chain.TempChain41, {
     },
     active = {
         type = "quest",
-        ids = {70042, 66110, 66101},
+        ids = {66110, 66101},
         status = {'active', 'completed'},
     },
     completed = {
         type = "quest",
-        ids = {70042, 66101, 66111, 70135, 66112},
-        count = 4,
+        ids = {66101, 66111, 70135, 66112},
+        count = 3,
     },
     items = {
         {
             type = "chain",
             id = Chain.TempChain21,
             embed = true,
+            aside = true,
         },
         {
             type = "chain",
@@ -2226,6 +2243,187 @@ Database:AddChain(Chain.TempChain41, {
             type = "chain",
             id = Chain.TempChain34,
             embed = true,
+        },
+    },
+})
+Database:AddChain(Chain.TempChain42, {
+    category = CATEGORY_ID,
+    expansion = EXPANSION_ID,
+    range = LEVEL_RANGE,
+    prerequisites = {
+        {
+            type = "quest",
+            id = 65998,
+        },
+        {
+            type = "quest",
+            id = 65999,
+        },
+        {
+            type = "quest",
+            id = 66000,
+        },
+    },
+    active = {
+        type = "quest",
+        id = 70179,
+        status = {'active', 'completed'},
+    },
+    completed = {
+        type = "quest",
+        id = 70179,
+    },
+    items = {
+        {
+            type = "npc",
+            id = 194525,
+            x = 0,
+            connections = {
+                1
+            }
+        },
+        {
+            type = "quest",
+            id = 70179,
+            x = 0,
+        },
+    },
+})
+Database:AddChain(Chain.TempChain43, {
+    name = L["ANCIENT_WAYGATES"],
+    category = CATEGORY_ID,
+    expansion = EXPANSION_ID,
+    range = LEVEL_RANGE,
+    prerequisites = {
+        {
+            type = "level",
+            level = 60,
+        },
+        {
+            type = "currency",
+            id = 2021,
+            amount = 7,
+        },
+    },
+    active = {
+        type = "quest",
+        ids = {66595, 66597,},
+        status = {'active', 'completed'},
+    },
+    completed = {
+        type = "quest",
+        id = 70156,
+    },
+    items = {
+        {
+            type = "quest",
+            id = 66595,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 66597,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 66598,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 70215,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 66582,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 70154,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 70156,
+            x = 0,
+        },
+    },
+})
+Database:AddChain(Chain.TempChain44, {
+    name = L["CATALOGING_THE_EXPEIDITION"],
+    category = CATEGORY_ID,
+    expansion = EXPANSION_ID,
+    range = LEVEL_RANGE,
+    prerequisites = {
+        {
+            type = "level",
+            level = 60,
+        },
+        {
+            type = "currency",
+            id = 2021,
+            amount = 8,
+        },
+    },
+    active = {
+        type = "quest",
+        ids = {69869, 72525,},
+        status = {'active', 'completed'},
+    },
+    completed = {
+        type = "quest",
+        id = 70179,
+    },
+    items = {
+        {
+            type = "quest",
+            id = 69869,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 72525,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 69870,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 65486,
+            x = 0,
         },
     },
 })
@@ -2309,6 +2507,7 @@ Database:AddChain(Chain.OtherBoth, {
 Database:AddCategory(CATEGORY_ID, {
     name = BtWQuests.GetMapName(MAP_ID),
     expansion = EXPANSION_ID,
+    buttonImage = 4742927,
     items = {
         {
             type = "chain",
@@ -2370,6 +2569,10 @@ Database:AddCategory(CATEGORY_ID, {
             type = "chain",
             id = Chain.TempChain13,
         },
+        {
+            type = "chain",
+            id = Chain.TempChain43,
+        },
 --[==[@debug@
         {
             type = "chain",
@@ -2425,6 +2628,50 @@ Database:AddContinentItems(CONTINENT_ID, {
     {
         type = "chain",
         id = Chain.TempChain06,
+    },
+    {
+        type = "chain",
+        id = Chain.TempChain29,
+    },
+    {
+        type = "chain",
+        id = Chain.TempChain14,
+    },
+    {
+        type = "chain",
+        id = Chain.TempChain15,
+    },
+    {
+        type = "chain",
+        id = Chain.TempChain16,
+    },
+    {
+        type = "chain",
+        id = Chain.TempChain21,
+    },
+    {
+        type = "chain",
+        id = Chain.TempChain33,
+    },
+    {
+        type = "chain",
+        id = Chain.TempChain34,
+    },
+    {
+        type = "chain",
+        id = Chain.TempChain42,
+    },
+    {
+        type = "chain",
+        id = Chain.TempChain19,
+    },
+    {
+        type = "chain",
+        id = Chain.TempChain23,
+    },
+    {
+        type = "chain",
+        id = Chain.TempChain43,
     },
 --[==[@debug@
     {

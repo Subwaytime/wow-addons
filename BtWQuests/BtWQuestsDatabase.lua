@@ -2431,7 +2431,7 @@ function CurrencyItemMixin:GetName(database, item, character)
     return format(name, info.icon, info.displayAmount, info.name);
 end
 function CurrencyItemMixin:IsCompleted(database, item, character)
-    return false
+    return character:GetCurrencyQuantity(item.id) >= item.amount
 end
 function CurrencyItemMixin:IsActive(database, item, character)
     return true

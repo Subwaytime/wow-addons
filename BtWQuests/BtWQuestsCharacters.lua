@@ -308,6 +308,9 @@ function BtWQuestsCharactersCharacterMixin:GetChromieTimeID()
     return self.t.chromieTimeID or 0
 end
 
+function BtWQuestsCharactersCharacterMixin:GetCurrencyQuantity(id)
+    return self.t.currencies and self.t.currencies[id] and self.t.currencies[id].quantity or 0;
+end
 function BtWQuestsCharactersCharacterMixin:GetFriendshipReputation(factionID)
     local id, rep, maxRep, name, text, texture, reaction, threshold, nextThreshold;
 
@@ -540,6 +543,10 @@ function BtWQuestsCharactersPlayerMixin:GetHeartOfAzerothLevel()
     end
 
     return BtWQuestsCharactersCharacterMixin.GetHeartOfAzerothLevel(self)
+end
+function BtWQuestsCharactersPlayerMixin:GetCurrencyQuantity(id)
+    local info = C_CurrencyInfo.GetCurrencyInfo(id);
+    return info and info.quantity or 0
 end
 function BtWQuestsCharactersPlayerMixin:GetFriendshipReputation(factionId)
     return C_GossipInfo.GetFriendshipReputation(factionId)
@@ -936,6 +943,16 @@ local function GetFriendships(tbl, friendships)
 
     return tbl;
 end
+local function GetCurrencies(tbl, currencies)
+    local tbl = tbl or {};
+
+    wipe(tbl);
+    for id in pairs(currencies) do
+        tbl[id] = C_CurrencyInfo.GetCurrencyInfo(id);
+    end
+
+    return tbl;
+end
 local function GetSkills(tbl)
     local tbl = tbl or {};
 
@@ -1035,6 +1052,7 @@ function BtWQuestsCharacters:OnEvent(event, ...)
         
         character.reputations = GetFactions(character.reputations);
         character.friendships = GetFriendships(character.friendships, self.friendships or {});
+        character.currencies = GetCurrencies(character.currencies, self.currencies or {});
 
         if C_AzeriteItem and C_AzeriteItem.HasActiveAzeriteItem() then
             local itemLocation = C_AzeriteItem.FindActiveAzeriteItem();
@@ -1056,6 +1074,12 @@ function BtWQuestsCharacters:AddFriendshipReputation(factionId)
         self.friendships = {}
     end
     self.friendships[factionId] = true;
+end
+function BtWQuestsCharacters:AddCurrency(id)
+    if self.currencies == nil then
+        self.currencies = {}
+    end
+    self.currencies[id] = true;
 end
 function BtWQuestsCharacters:AddAchievement(achievementId)
     if self.achievements == nil then

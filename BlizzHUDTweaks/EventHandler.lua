@@ -46,14 +46,12 @@ local function updatePartyAndRaidFrame()
   end
 end
 
-local function restoreMouseoverFade()
+local function restoreMouseoverFade(forced, ignoreFadeWhenFading)
   if MouseoverFrameFading:IsEnabled() then
-    updatePartyAndRaidFrame()
-
     if BlizzHUDTweaks.hasTarget then
-      MouseoverFrameFading:RefreshFrameAlphas()
+      MouseoverFrameFading:RefreshFrameAlphas(forced)
     else
-      MouseoverFrameFading:RefreshFrameAlphas(nil, true)
+      MouseoverFrameFading:RefreshFrameAlphas(forced, true, ignoreFadeWhenFading)
     end
   end
 end
@@ -75,7 +73,8 @@ local eventsToRegister = {
   "GROUP_LEFT",
   "UNIT_QUEST_LOG_CHANGED",
   "UPDATE_SHAPESHIFT_COOLDOWN",
-  "UPDATE_BONUS_ACTIONBAR"
+  "UPDATE_BONUS_ACTIONBAR",
+  "UNIT_HEALTH"
 }
 
 local registeredEvents = {}
@@ -135,12 +134,19 @@ function EventHandler:PLAYER_UPDATE_RESTING()
   end
 end
 
+BlizzHUDTweaks.lastUpdate = 0
+
 function EventHandler:PLAYER_TARGET_CHANGED()
   BlizzHUDTweaks.hasTarget = UnitExists("target")
 
-  if addon:IsEnabled() and not BlizzHUDTweaks.inCombat then
-    restoreMouseoverFade()
+  if GetTime() ~= BlizzHUDTweaks.lastUpdate and (GetTime() - BlizzHUDTweaks.lastUpdate) > 0.05 then
+    if addon:IsEnabled() and not BlizzHUDTweaks.inCombat then
+      MouseoverFrameFading:StopAnimations()
+      restoreMouseoverFade()
+    end
   end
+
+  BlizzHUDTweaks.lastUpdate = GetTime()
 end
 
 function EventHandler:PLAYER_ENTERING_WORLD()
@@ -160,6 +166,7 @@ function EventHandler:PLAYER_ENTERING_WORLD()
     end
 
     restoreMouseoverFade()
+    updatePartyAndRaidFrame()
     installKeyDownHandler()
   end
 end
@@ -192,6 +199,10 @@ function EventHandler:PLAYER_LOGIN()
 
     if Miscellaneous:IsEnabled() then
       Miscellaneous:InstallHooks()
+    end
+
+    if MouseoverFrameFading:IsEnabled() then
+      MouseoverFrameFading:InstallHooks()
     end
   end
 end
@@ -278,4 +289,10 @@ end
 
 function EventHandler:UPDATE_BONUS_ACTIONBAR()
   Miscellaneous:UpdateActionbar1UnusedButtons()
+end
+
+function EventHandler:UNIT_HEALTH(_, unit)
+  if unit == "player" then
+    MouseoverFrameFading:RefreshFrameAlphas()
+  end
 end

@@ -1,6 +1,6 @@
 ## Interface: 100002
 ## Title: BlizzHUDTweaks
-## Version: 1.26.10
+## Version: 1.27.7
 ## Author: Kevin
 ## Notes: Add some tweaks to the new default blizz HUD.
 ## OptionalDeps: Ace3
@@ -8,7 +8,7 @@
 ## X-Category: HUDs
 ## X-Wago-ID: rkGrWlNy
 ## X-Curse-Project-ID: 698104
-## OptionalDeps: EditModeExpanded
+## OptionalDeps: EditModeExpanded, WorldQuestTracker
 
 Libs\LibStub\LibStub.lua
 Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
