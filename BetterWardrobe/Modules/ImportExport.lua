@@ -1,77 +1,26 @@
+--TODO:  Rework broken import/export using new set links
 local addonName, addon = ...
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 local Profile
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local LISTWINDOW
 local AceGUI = LibStub("AceGUI-3.0")
-
+local itemLink = "item:%d:0";
+local itemLinkMod = "item:%d:0:::::::::::1:%d";
+local itemBonusPattern = "item:(%d+):%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:(%d*):%d*:([%d:]+)"
 
 local IE ={}
 
 local function Export(itemString, button)
-	if LISTWINDOW then LISTWINDOW:Hide() end
-
-	for _, listPopup in pairs(BetterWardrobeOutfitFrameMixin.popups) do
-		StaticPopup_Hide(listPopup)
-	end
-
-	local f = AceGUI:Create("Window")
-	
-	--f:SetBackdrop(	BACKDROP_DIALOG_32_32 )
-	f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) end)
-	f:SetTitle("Wardrobe Export")
-	f:SetLayout("Fill")
-	--f:SetAutoAdjustHeight(true)
-	f:EnableResize(false)
-	_G["BetterWardrobeExportWindow"] = f.frame
-	--Mixin(f.frame, BackdropTemplateMixin )
-	--f.UISpecialFrames:SetBackdrop(	BACKDROP_DIALOG_32_32 )
-	LISTWINDOW = f
-	tinsert(UISpecialFrames, "BetterWardrobeExportWindow")
-
-	local MultiLineEditBox = AceGUI:Create("MultiLineEditBox")
-	MultiLineEditBox:SetFullHeight(true)
-	MultiLineEditBox:SetFullWidth(true)
-	MultiLineEditBox:SetLabel("")
-	MultiLineEditBox:DisableButton(button)
-	f:AddChild(MultiLineEditBox)
-
-	MultiLineEditBox:SetText(itemString or "")
 end
 
 --local testString = "compare?items=16955:32570:137109:29337:42376:35221:37363:16952:13075:50632:27512:34675"
 --local t2 = "compare?items=163307.0.0.0.0.0.0.0.0.0.5126:163453.0.0.0.0.0.0.0.0.0.5126:163455.0.0.0.0.0.0.0.0.0.5126:163456.0.0.0.0.0.0.0.0.0.5126:163458.0.0.0.0.0.0.0.0.0.5126:163459.0.0.0.0.0.0.0.0.0.5126:163460.0.0.0.0.0.0.0.0.0.5126:163461.0.0.0.0.0.0.0.0.0.5126"
 
 --compare?items=16955:32570:137109:29337:42376:35221:37363:16952:13075:50632:27512:34675
-local itemStringShort = "item:%d:0";
-local itemStringLong = "item:%d:0::::::::::%d:1:%d";
-
-local function ToStringItem(id, bonus, diff)
-	-- itemID, enchantID, instanceDifficulty, numBonusIDs, bonusID1
-	if (bonus and bonus ~= 0) or (diff and diff ~= 0) then
-		return format(itemStringLong, id, diff or 0, bonus or 0);
-	else
-		return format(itemStringShort, id);
-	end
-end
 
 
 local function ImportSet(importString)
-	importString = importString and importString:match("items=([^#]+)")
-	if importString then
-		local tbl = {};
-
-		for item in importString:gmatch("([^:;]+)") do
-			local itemID, bonusMod = item:match("^(%d+)%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.(%d+)")
-			itemID = itemID or item:match("^(%d+)");
-			local link = ToStringItem(tonumber(itemID), tonumber(bonusMod))
-			table.insert(tbl, link)
-		end
-		BW_DressingRoomHideArmorButton_OnClick()
-		for i, link in ipairs(tbl) do
-			DressUpLink(link)
-		end
-	end
 end
 
 
@@ -109,74 +58,16 @@ StaticPopupDialogs["BETTER_WARDROBE_IMPORT_SET_POPUP"] = {
 
 --https://www.wowhead.com/item=163307/honorbound-centurions-vambraces?bonus=5126:1562#see-also
 local WowheadURL = "www.wowhead.com/item=(%d+).-bonus=(%d+):%d*"
-local itemStringPattern_Long = "item:(%d+):%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:%d*:(%d*):%d*:([%d:]+)"
-local itemStringPattern_Short = ":(%d+)"
-local function ToNumberItem(item)
-	if type(item) == "string" then
-		local id, diff, bonus = item:match(itemStringPattern_Long) --or item:match(itemStringPattern_Short);
-		-- bonus ID can also be warforged, socketed, etc
-		-- if there is more than one bonus ID, need to check all
-		if bonus then
-			if not tonumber(bonus) then
-				for bonusID in gmatch(bonus, "%d+") do
-					if bonusID then
-						bonus = tonumber(bonusID)
-						break;
-					end
-				end
-			elseif not bonusDiffs[tonumber(bonus)] then
-				bonus = nil;
-			end
-		end
 
-		id = id or item:match("item:(%d+)");
-		return tonumber(id), tonumber(bonus), tonumber(diff);
-	elseif type(item) == "number" then
-		return item;
-	end
+local function ConvertItemLink(item)
 end
 
 
 local function ImportItem(importString)
-	local text = importString
-	if text then
-		local itemID = ToNumberItem(text);
-		if not id then
-			itemID,bonusMod = text:match("item=(%d+)"),text:match("bonus=(%d+)");
-		end
-		if not itemID then
-			itemID = text:match("(%d+).-$");
-			bonusMod = nil;
-		end
-		local link = ToStringItem(tonumber(itemID), tonumber(bonusMod))
-		DressUpLink(link)
-	end
 end
 
 
 local function ImportItemTransMogVendor(importString)
-	local transmogSources = {}
-	local text = importString
-	if text then
-		local itemID = ToNumberItem(text);
-		if not id then
-			itemID,bonusMod = text:match("item=(%d+)"),text:match("bonus=(%d+)");
-		end
-
-		if not itemID then
-			itemID = text:match("(%d+).-$");
-			bonusMod = nil;
-		end
-
-		local link = ToStringItem(tonumber(itemID), tonumber(bonusMod))
-		local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(link)
-		local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-		if sourceInfo then
-			local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
-			transmogSources[slot] = sourceID
-			C_Transmog.LoadSources(transmogSources, -1, -1);
-		end
-	end
 end
 
 
@@ -210,69 +101,17 @@ StaticPopupDialogs["BETTER_WARDROBE_IMPORT_ITEM_POPUP"] = {
 
 
 function addon:ExportSet()
-	local str;
-	local Buttons = BW_DressingRoomFrame.PreviewButtonFrame.Slots
-	for index, button in pairs(Buttons) do
-		local itemlink = nil
-		local slot = button:GetID()
-		
-		--if not DressingRoom:IsSlotHidden(slot) then
-			itemlink = button.itemLink --GetInventoryItemLink("player", slot)
-			if itemlink then
-				local id,bonus = ToNumberItem(itemlink)
-				str = (str and str..":" or "compare?items=")..id..(bonus and ".0.0.0.0.0.0.0.0.0."..bonus or "")
-			end
-		--end
-	end
-	Export(str,false)
-	--return str
 end
 
 
 local function ExportTransmogVendorSet()
-	local str;
-	for key, transmogSlot in pairs(TRANSMOG_SLOTS) do
-		if ( transmogSlot.location:IsAppearance() ) then
-			
-			----local sourceID = WardrobeOutfitDropDown:GetSlotSourceID(transmogSlot.location)
-			local _, _, sourceID = TransmogUtil.GetInfoForEquippedSlot(transmogSlot.location);
-			if ( sourceID ) then
-				local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-				if sourceInfo then 
-					local id = sourceInfo.itemID
-					local bonus = sourceInfo.itemModID
-					str = (str and str..":" or "compare?items=")..id..(bonus and ".0.0.0.0.0.0.0.0.0."..bonus or "")
-				end
-			end
-		end
-	end
-	Export(str,false)
 end
 
 
 --compare?items=57290.0.0.0.0.0.0.0.0.0.0:163458.0.0.0.0.0.0.0.0.0.1:37513.0.0.0.0.0.0.0.0.0.0:173460.0.0.0.0.0.0.0.0.0.0:98093.0.0.0.0.0.0.0.0.0.0:38115.0.0.0.0.0.0.0.0.0.0:152399.0.0.0.0.0.0.0.0.0.0:80698.0.0.0.0.0.0.0.0.0.0:167829.0.0.0.0.0.0.0.0.0.0:98149.0.0.0.0.0.0.0.0.0.0:35870.0.0.0.0.0.0.0.0.0.0:62968.0.0.0.0.0.0.0.0.0.0:155409.0.0.0.0.0.0.0.0.0.0
 
 function IE.ImportTransmogVendorSet(importString)
-	importString = importString and importString:match("items=([^#]+)")
-	if importString then
-		local transmogSources = {};
-		for item in importString:gmatch("([^:;]+)") do
-			local itemID, bonusMod = item:match("^(%d+)%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.%d+%.(%d+)")
-			itemID = itemID or item:match("^(%d+)");
-			local link = ToStringItem(tonumber(itemID), tonumber(bonusMod))
-			local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(link)
-			if sourceID then 
-			local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
-				if sourceInfo then
-					local slot = C_Transmog.GetSlotForInventoryType(sourceInfo.invType);
-					local pendingInfo = TransmogUtil.CreateTransmogPendingInfo(Enum.TransmogPendingType.Apply, appearanceID);
-					local transmogLocation = TransmogUtil.CreateTransmogLocation(slot, Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
-					C_Transmog.SetPending(transmogLocation, pendingInfo);
-				end
 
-			end
-		end
-	end
 end
 
 
@@ -287,7 +126,7 @@ function addon:CreateChatLink()
 		--if not DressingRoom:IsSlotHidden(slot) then
 			itemlink = button.itemLink --GetInventoryItemLink("player", slot)
 			if itemlink then
-				local id,bonus = ToNumberItem(itemlink)
+				local id, dif, bonus = ConvertItemLink(itemlink)
 				string = string..linkText:format(id,bonus or 0)
 			end
 		--end
@@ -337,7 +176,7 @@ function BW_TransmogVendorExportButton_OnClick(self)
 			isNotRadio = true,
 			notCheckable = true,
 		},
-		{
+	--[[	{
 			text = L["Import Item"],
 			func = function()
 				importFrom = "Transmog"
@@ -363,6 +202,7 @@ function BW_TransmogVendorExportButton_OnClick(self)
 			notCheckable = true,
 			isNotRadio = true,
 		},
+		]]--
 				{
 			text = L["Create Dressing Room Command Link"],
 			func = function()

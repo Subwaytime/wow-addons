@@ -1775,6 +1775,7 @@ function NarciBarberShopMixin:OnBarberShopOpen()
             end
         end
     end
+    self.isDragonriding = isDragonriding;
 
     local currentCharacterData = C_BarberShop.GetCurrentCharacterData();
     local sex, raceName;
@@ -1795,8 +1796,12 @@ function NarciBarberShopMixin:OnBarberShopClose()
 end
 
 function NarciBarberShopMixin:ResetCustomizationInternally()
-    if self.initialCustomizationData then
-        CustomizationUtil:ApplyCustomizationCategoryData(self.initialCustomizationData, true);
+    if self.isDragonriding then
+        C_BarberShop.ResetCustomizationChoices();
+    else
+        if self.initialCustomizationData then
+            CustomizationUtil:ApplyCustomizationCategoryData(self.initialCustomizationData, true);
+        end
     end
 end
 

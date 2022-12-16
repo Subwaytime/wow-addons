@@ -1,6 +1,7 @@
 local _, BlizzHUDTweaks = ...
 local addon = LibStub("AceAddon-3.0"):GetAddon("BlizzHUDTweaks")
 local MouseoverFrameFading = addon:GetModule("MouseoverFrameFading")
+local Debug = addon:GetModule("Debug")
 
 local function byHealthAlphaValue(globalOptions, frameOptions)
   if frameOptions.UseGlobalOptions then
@@ -39,27 +40,23 @@ local function outOfCombatAlphaValue(globalOptions, frameOptions)
 end
 
 local function instancedAreaAlphaValue(globalOptions, frameOptions)
-  local inCombat = BlizzHUDTweaks.inCombat
   local alpha
 
-  if not inCombat then
-    if frameOptions.UseGlobalOptions then
-      if globalOptions.FadeInInstancedArea then
-        alpha = globalOptions.InstancedAreaAlpha
-      end
-    elseif frameOptions.FadeInInstancedArea then
-      alpha = frameOptions.InstancedAreaAlpha
+  if frameOptions.UseGlobalOptions then
+    if globalOptions.FadeInInstancedArea then
+      alpha = globalOptions.InstancedAreaAlpha
     end
+  elseif frameOptions.FadeInInstancedArea then
+    alpha = frameOptions.InstancedAreaAlpha
   end
 
   return alpha
 end
 
 local function restedAreaAlphaValue(globalOptions, frameOptions)
-  local inCombat = BlizzHUDTweaks.inCombat
   local alpha
 
-  if BlizzHUDTweaks.isResting and not inCombat then
+  if BlizzHUDTweaks.isResting then
     if frameOptions.UseGlobalOptions then
       if globalOptions.FadeInRestedArea then
         alpha = globalOptions.RestedAreaAlpha
@@ -143,13 +140,13 @@ local function determineTargetAlpha(globalOptions, frameOptions)
 
   if inCombat and inCombatFadeActive(globalOptions, frameOptions) then
     alpha = inCombatAlphaValue(globalOptions, frameOptions)
-  elseif not inCombat and hasTarget and inCombatFadeActive(globalOptions, frameOptions) and treatTargetFadeActive(globalOptions, frameOptions) then
+  elseif hasTarget and inCombatFadeActive(globalOptions, frameOptions) and treatTargetFadeActive(globalOptions, frameOptions) then
     alpha = treatTargetAsCombatAlphaValue(globalOptions, frameOptions)
-  elseif not inCombat and byHealthFadeActive(globalOptions, frameOptions) then
+  elseif byHealthFadeActive(globalOptions, frameOptions) then
     alpha = byHealthAlphaValue(globalOptions, frameOptions)
-  elseif not inCombat and select(2, GetInstanceInfo()) ~= "none" and instancedAreaFadeActive(globalOptions, frameOptions) then
+  elseif select(2, GetInstanceInfo()) ~= "none" and instancedAreaFadeActive(globalOptions, frameOptions) then
     alpha = instancedAreaAlphaValue(globalOptions, frameOptions)
-  elseif not inCombat and isResting and restedAreaFadeActive(globalOptions, frameOptions) then
+  elseif isResting and restedAreaFadeActive(globalOptions, frameOptions) then
     alpha = restedAreaAlphaValue(globalOptions, frameOptions)
   else
     alpha = outOfCombatAlphaValue(globalOptions, frameOptions)
@@ -270,6 +267,9 @@ function MouseoverFrameFading:Fade(frame, currentAlpha, targetAlpha, duration, d
           frame.__BlizzHUDTweaksAnimationGroup = animationGroup
           frame.__BlizzHUDTweaksFadeAnimation = animationGroup:CreateAnimation("Alpha")
         end
+
+        Debug:IncrementFnCall("MouseoverFrameFading:Fade")
+
         frame.__BlizzHUDTweaksFadeAnimation:Stop()
         frame.__BlizzHUDTweaksAnimationGroup:Stop()
 
@@ -321,9 +321,9 @@ function MouseoverFrameFading:RefreshMouseoverFrameAlphas()
   end
 end
 
-local function shouldFade(frame, ignoreFadeWhenFading)
+local function shouldFade(frame)
   if frame then
-    if ignoreFadeWhenFading and frame.__BlizzHUDTweaksAnimationGroup then
+    if frame.__BlizzHUDTweaksAnimationGroup then
       if not frame.__BlizzHUDTweaksAnimationGroup:IsPlaying() then
         return true
       end
@@ -344,13 +344,13 @@ function MouseoverFrameFading:StopAnimations()
   end
 end
 
-function MouseoverFrameFading:RefreshFrameAlphas(forced, useFadeDelay, ignoreFadeWhenFading)
+function MouseoverFrameFading:RefreshFrameAlphas(forced, useFadeDelay)
   if addon:IsEnabled() and MouseoverFrameFading:IsEnabled() then
     local profile = addon:GetProfileDB()
     local globalOptions = addon:GetProfileDB()["*Global*"]
 
     for frameName, frameMappingOptions in pairs(addon:GetFrameMapping()) do
-      if shouldFade(frameMappingOptions.mainFrame, ignoreFadeWhenFading) then
+      if shouldFade(frameMappingOptions.mainFrame) then
         local frameOptions = profile[frameName]
 
         if frameOptions.Enabled and frameMappingOptions.mainFrame then

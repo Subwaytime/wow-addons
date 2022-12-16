@@ -9,6 +9,7 @@ local Options = addon:NewModule("Options")
 local MouseoverFrameFading = addon:NewModule("MouseoverFrameFading")
 local ClassResource = addon:NewModule("ClassResource")
 local Miscellaneous = addon:NewModule("Miscellaneous")
+local Debug = addon:NewModule("Debug")
 
 local LibDBIcon = LibStub:GetLibrary("LibDBIcon-1.0", true)
 
@@ -54,7 +55,7 @@ end
 
 local defaultConfig = {
   ["global"] = {
-    ["version"] = "1.27.7",
+    ["version"] = "1.30.0",
     ["minimap"] = {
       ["hide"] = false
     }
@@ -162,6 +163,12 @@ local defaultConfig = {
     },
     ["FocusFrameToT"] = {
       displayName = "Target of Focus Target"
+    },
+    ["UIWidgetPowerBarContainerFrame"] = {
+      displayName = "Encounter Bar"
+    },
+    ["BuffFrame.CollapseAndExpandButton"] = {
+      displayName = "BuffFrame Collapse Button"
     }
   }
 }
@@ -197,7 +204,9 @@ local frameMapping = {
   ["PartyFrame"] = {mainFrame = PartyFrame},
   ["CompactRaidFrameContainer"] = {mainFrame = CompactRaidFrameContainer},
   ["MainMenuBarVehicleLeaveButton"] = {mainFrame = MainMenuBarVehicleLeaveButton},
-  ["FocusFrameToT"] = {mainFrame = FocusFrameToT}
+  ["FocusFrameToT"] = {mainFrame = FocusFrameToT},
+  ["UIWidgetPowerBarContainerFrame"] = {mainFrame = UIWidgetPowerBarContainerFrame},
+  ["BuffFrame.CollapseAndExpandButton"] = {mainFrame = BuffFrame.CollapseAndExpandButton}
 }
 
 local function setFrameDefaultOptions(frameOptions)
@@ -483,6 +492,16 @@ function addon:InitializeUpdateTicker()
   end
 end
 
+function addon:LoadProfileByName(name)
+  local profiles = self.db:GetProfiles()
+
+  if not tContains(profiles, name) then
+    addon:Print("The profile", name, "was not found.")
+  else
+    self.db:SetProfile(name)
+  end
+end
+
 function addon:OnInitialize()
   self.db = LibStub("AceDB-3.0"):New("BlizzHUDTweaksDB", defaultConfig, "Default")
   updateFramesForLoadedAddons(self.db.profile)
@@ -510,6 +529,11 @@ function addon:OnInitialize()
 
   addon:InitializeUpdateTicker()
   addon:InitializeOptions()
+
+  --[==[@debug@
+  self.db.profile.debug = false
+  Debug:Init()
+  --@end-debug@]==]
 end
 
 function addon:InitializeOptions()

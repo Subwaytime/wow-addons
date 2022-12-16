@@ -1,6 +1,6 @@
 ## Interface: 100002
-## Title: BetterWardrobe (4.4.9)
-## Version: 4.4.9
+## Title: BetterWardrobe (4.5.6)
+## Version: 4.5.6
 ## Author: SLOKnightfall
 ## Notes: 
 ## OptionalDeps: MogIt, CanIMogIt, LegionWardrobe, WardrobeEnhanced, Rarity, TransmogOutfits, ExtendedSets, ElvUI
@@ -34,9 +34,7 @@ Locale\SetNames_enUS.lua
 Locale\deDE.lua
 Locale\zhTW.lua
 
-
 #Core files
-#Modules\Inspect.lua
 Data\Globals.lua
 Modules\Templates.xml
 Modules\Core.lua
@@ -75,7 +73,6 @@ Modules\Tooltips.lua
 #Modules\UI.lua
 Modules\SortingFunctions.lua
 
-
 #3rd party addon compatability
 Plugins\ElvUI.lua
 Plugins\CanIMogIt.lua
@@ -83,6 +80,4 @@ Plugins\MogIt.lua
 Plugins\WardrobeEnhanced.lua
 Plugins\TransmogOutfits.lua
 Plugins\ExtendedTransmog.lua
-
-
 

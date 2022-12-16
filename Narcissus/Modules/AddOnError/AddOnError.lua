@@ -211,6 +211,11 @@ function NarciGenericTaintAlertFrameMixin:OnShow()
     self:RegisterEvent("PLAYER_REGEN_DISABLED");
     self:RegisterEvent("PLAYER_REGEN_ENABLED");
     self:SetScript("OnKeyDown", AlertFrame_OnKeyDown);
+    if InCombatLockdown() then
+        self.ReloadButton:Disable();
+    else
+        self.ReloadButton:Enable();
+    end
 end
 
 function NarciGenericTaintAlertFrameMixin:OnHide()
@@ -271,7 +276,7 @@ function NarciGenericTaintAlertFrameMixin:SetupDescription(addonName, blockedAct
     self:ReleaseFontStrings();
     local descText;
     if blockedAction then
-        descText = string.format("- Blocked function: |cffffffff%s|r", blockedAction);
+        descText = string.format("- Blocked function: |cffffffff%s (%s)|r ", blockedAction, addonName);
         self:AcquireAndSetFontString(descText);
     end
     local numErrorsToday = CountErrorTimes(addonName, 1);

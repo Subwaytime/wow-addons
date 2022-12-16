@@ -1,3 +1,6 @@
+10.0.21 - 10th December 2022
+- Updated for game version 10.0.2.46924.
+
 10.0.12 - 1st December 2022
 - Updated for game version 10.0.2.46879.
 

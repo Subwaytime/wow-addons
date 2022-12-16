@@ -296,7 +296,7 @@
 												<Anchor point="BOTTOMLEFT" relativeKey="$parent" relativePoint="TOPLEFT" x="8" y="-4"/>
 											</Anchors>
 										</Texture>
-										<FontString inherits="NarciFontNormal10" text="Item List" justifyH="LEFT">
+										<FontString parentKey="Header" inherits="NarciFontNormal10" text="Item List" justifyH="LEFT">
 											<Size x="120" y="12"/>
 											<Color r="0.286" g="0.8" b="0.93"/>
 											<Anchors>
@@ -400,7 +400,7 @@
 												<Anchor point="BOTTOMLEFT" relativeKey="$parent" relativePoint="TOPLEFT" x="8" y="-4"/>
 											</Anchors>
 										</Texture>
-										<FontString inherits="NarciFontNormal10" text="In-Game Command" justifyH="LEFT">
+										<FontString parentKey="Header" inherits="NarciFontNormal10" text="In-Game Command" justifyH="LEFT">
 											<Size x="120" y="12"/>
 											<Color r="0.957" g="0.753" b="0.165"/>
 											<Anchors>

@@ -1,5 +1,5 @@
 ﻿----------------------------------------------------------------------
--- 	Leatrix Plus 10.0.17 (3rd December 2022)
+-- 	Leatrix Plus 10.0.23 (16th December 2022)
 ----------------------------------------------------------------------
 
 --	01:Functns, 02:Locks, 03:Restart, 20:Live, 30:Isolated, 40:Player
@@ -18,7 +18,7 @@
 	local void
 
 	-- Version
-	LeaPlusLC["AddonVer"] = "10.0.17"
+	LeaPlusLC["AddonVer"] = "10.0.23"
 
 	-- Get locale table
 	local void, Leatrix_Plus = ...
@@ -59,10 +59,6 @@
 	_G.BINDING_NAME_LEATRIX_PLUS_GLOBAL_WEBLINK = L["Show web link"]
 	_G.BINDING_NAME_LEATRIX_PLUS_GLOBAL_RARE = L["Announce rare"]
 	_G.BINDING_NAME_LEATRIX_PLUS_GLOBAL_MOUNTSPECIAL = L["Mount special"]
-
-	-- Faster auto loot
-	-- Prints NO QUALITY LOOT in chat frequently but it does this with or without addons (just less frequent without addons)
-	-- Currently employing a fix to replace the loot function.
 
 	-- Minimap compartment button
 	-- LibDBIcon will be updated in future with a better replacement for Blizzard's compartment menu
@@ -596,6 +592,7 @@
 		LeaPlusLC:LockOption("ClassColFrames", "ClassColFramesBtn", true)			-- Class colored frames
 		LeaPlusLC:LockOption("SetWeatherDensity", "SetWeatherDensityBtn", false)	-- Set weather density
 		LeaPlusLC:LockOption("MuteGameSounds", "MuteGameSoundsBtn", false)			-- Mute game sounds
+		LeaPlusLC:LockOption("FasterLooting", "FasterLootingBtn", true)				-- Faster auto loot
 		LeaPlusLC:LockOption("NoTransforms", "NoTransformsBtn", false)				-- Remove transforms
 	end
 
@@ -2169,12 +2166,52 @@
 
 		if LeaPlusLC["FasterLooting"] == "On" then
 
+
+			-- Create configuration panel
+			local FasterLootPanel = LeaPlusLC:CreatePanel("Faster auto loot", "FasterLootPanel")
+
+			LeaPlusLC:MakeTx(FasterLootPanel, "Delay", 16, -72)
+			LeaPlusLC:MakeSL(FasterLootPanel, "LeaPlusFasterLootDelay", "Drag to set the delay between looting items.|n|nLower is faster but may not always give the best results.|n|nIt's recommended that you leave this setting at 0.3 but feel free to try lower values if you wish.", 0.1, 0.3, 0.1, 16, -92, "%.1f")
+			LeaPlusLC:MakeFT(FasterLootPanel, "The default delay setting is 0.3.  Lower is faster but may not always give the best results.  It's recommended that you leave this setting at 0.3.", 16, 510, 96)
+
+			-- Help button hidden
+			FasterLootPanel.h:Hide()
+
+			-- Back button handler
+			FasterLootPanel.b:SetScript("OnClick", function()
+				FasterLootPanel:Hide(); LeaPlusLC["PageF"]:Show(); LeaPlusLC["Page7"]:Show()
+				return
+			end)
+
+			-- Reset button handler
+			FasterLootPanel.r:SetScript("OnClick", function()
+
+				-- Reset slider
+				LeaPlusLC["LeaPlusFasterLootDelay"] = 0.3
+
+				-- Refresh side panel
+				FasterLootPanel:Hide(); FasterLootPanel:Show()
+
+			end)
+
+			-- Show configuration panal when options panel button is clicked
+			LeaPlusCB["FasterLootingBtn"]:SetScript("OnClick", function()
+				if IsShiftKeyDown() and IsControlKeyDown() then
+					-- Preset profile
+					LeaPlusLC["LeaPlusFasterLootDelay"] = 0.3
+					FasterLootPanel:Hide(); FasterLootPanel:Show()
+				else
+					FasterLootPanel:Show()
+					LeaPlusLC:HideFrames()
+				end
+			end)
+
 			-- Time delay
 			local tDelay = 0
 
 			-- Fast loot function
 			local function FastLoot()
-				if GetTime() - tDelay >= 0.3 then
+				if GetTime() - tDelay >= LeaPlusLC["LeaPlusFasterLootDelay"] then
 					tDelay = GetTime()
 					if GetCVarBool("autoLootDefault") ~= IsModifiedClick("AUTOLOOTTOGGLE") then
 						if TSMDestroyBtn and TSMDestroyBtn:IsShown() and TSMDestroyBtn:GetButtonState() == "DISABLED" then tDelay = GetTime() return end
@@ -2415,14 +2452,31 @@
 					if questID == 43923		-- Starlight Rose
 					or questID == 43924		-- Leyblood
 					or questID == 43925		-- Runescale Koi
-
+					or questID == 71162		-- Waygate: Algeth'era (Thaelin Darkanvil, Dragonflight)
+					or questID == 71165		-- Waygate: Eon's Fringe (Thaelin Darkanvil, Dragonflight)
+					or questID == 71138		-- Waygate: Rusza'thar Reach (Thaelin Darkanvil, Dragonflight)
+					or questID == 71178		-- Waygate: Shady Sanctuary (Thaelin Darkanvil, Dragonflight)
+					or questID == 71157		-- Waygate: Skytop Observatory (Thaelin Darkanvil, Dragonflight)
+					or questID == 71161		-- Waygate: Vakthros (Thaelin Darkanvil, Dragonflight)
 					then
 						return true
 					end
 				end
 			end
 
-			-- Function to check if quest requires currency or a crafting reagent
+			-- Function to check if a required item is account-bound
+			local function IsItemAccountBound(itemID)
+				local tooltipData = C_TooltipInfo.GetItemByID(itemID)
+				TooltipUtil.SurfaceArgs(tooltipData)
+				for row, line in ipairs(tooltipData.lines) do
+				   TooltipUtil.SurfaceArgs(line)
+					if tooltipData.lines[row] and tooltipData.lines[row].leftText and (tooltipData.lines[row].leftText == ITEM_BNETACCOUNTBOUND or tooltipData.lines[row].leftText == ITEM_BIND_TO_BNETACCOUNT or tooltipData.lines[row].leftText == ITEM_BIND_TO_ACCOUNT or tooltipData.lines[row].leftText == ITEM_ACCOUNTBOUND) then
+						return true
+					end
+				end
+			end
+
+			-- Function to check if quest requires currency or a crafting reagent or required item is account-bound
 			local function QuestRequiresCurrency()
 				for i = 1, 6 do
 					local progItem = _G["QuestProgressItem" ..i] or nil
@@ -2432,18 +2486,12 @@
 							return true
 						elseif progItem.objectType == "item" then
 							-- Quest requires an item
-							local name, texture, numItems = GetQuestItemInfo("required", i)
-							if name then
-								local itemID = GetItemInfoInstant(name)
-								if itemID then
-									local void, void, void, void, void, void, void, void, void, void, void, void, void, void, void, void, isCraftingReagent = GetItemInfo(itemID)
-									if isCraftingReagent then
-										-- Item is a crafting reagent so do nothing
-										return true
-									end
-									if itemID == 104286 then -- Quivering Firestorm Egg
-										return true
-									end
+							local name, texture, numItems, void, void, itemID = GetQuestItemInfo("required", i)
+							if name and itemID then
+								local void, void, void, void, void, void, void, void, void, void, void, void, void, void, void, void, isCraftingReagent = GetItemInfo(itemID)
+								if isCraftingReagent or IsItemAccountBound(itemID) then
+									-- Item is a crafting reagent or account-bound so do nothing
+									return true
 								end
 							end
 						end
@@ -2921,6 +2969,22 @@
 
 				end
 
+				-- These items cannot be sold but the game thinks they can be
+				-- https://www.wowhead.com/items/quest/min-level:1/max-level:1/quality:0?filter=64;3;1
+
+				-- Continued Waygate Exploration
+				whiteList[200590] = "Carefully Rolled Message"
+				whiteList[200593] = "Sealed Expedition Note"
+				whiteList[200594] = "Thaelin's Second Favorite Comb"
+				whiteList[200595] = "Odorous Parchment"
+				whiteList[200596] = "Letter from Thaelin Darkanvil"
+
+				-- Dirty Old Satchel
+				whiteList[200592] = "Dirty Old Satchel"
+				whiteList[200606] = "Previously Owned Map"
+
+				-- End of whitelist
+
 				local whiteString = eb.Text:GetText()
 				if whiteString and whiteString ~= "" then
 					whiteString = whiteString:gsub("[^,%d]", "")
@@ -3097,13 +3161,22 @@
 							if itemID and whiteList[itemID] then
 								if Rarity == 0 then
 									-- Junk item to keep
-									Rarity = 3
+									Rarity = 20
 									ItemPrice = 0
 								elseif Rarity == 1 then
 									-- White item to sell
 									Rarity = 0
 								end
 							end
+							-- Don't sell grey quest items (some quest items have a sell price when they cannot actually be sold)
+							-- This is not currently used as the affected items are whitelisted above
+							-- if classID == 12 then
+							-- 	if Rarity == 0 or Rarity == 20 then
+							-- 		-- local name22 = GetItemInfo(CurrentItemLink); print(name22, classID)
+							-- 		Rarity = 20
+							-- 		ItemPrice = 0
+							-- 	end
+							-- end
 							-- Continue
 							local cInfo = C_Container.GetContainerItemInfo(BagID, BagSlot)
 							local itemCount = cInfo.stackCount
@@ -5755,12 +5828,24 @@
 
 				-- Professions
 				["TransProfessions"] = {
-					--[[A Cultivator's Colors]] 394005,
-					--[[Rockin' Mining Gear]] 394006,
-					--[[Ready To Build]] 394007,
-					--[[A Looker's Charm]] 394008,
-					--[[Fishing For Attention]] 394009,
-					--[[Dressed To Kill]] 394011,
+					-- Crafting
+					--[[Blacksmithing: Suited for Smithing]] 388658,
+					--[[Jewelcrafting: An Eye For Shine]] 394015,
+					--[[Tailoring: Wrapped Up In Weaving]] 391312,
+					--[[Engineering: Ready To Build]] 394007,
+					--[[Enchanting: A Looker's Charm]] 394008,
+					--[[Alchemy: Spark of Madness]] 394003,
+					--[[Inscription: Artist's Duds]] 394016,
+					--[[Leatherworking: Sculpting Leather Finery]] 394001,
+
+					-- Gathering
+					--[[Herbalism: A Cultivator's Colors]] 394005,
+					--[[Mining: Rockin' Mining Gear]] 394006,
+					--[[Skinning: Dressed To Kill]] 394011,
+
+					-- Secondary
+					--[[Cooking: What's Cookin', Good Lookin'?]] 391775,
+					--[[Fishing: Fishing For Attention 394009,]] -- Not used as removing the buff also cancels fishing
 				},
 
 			}
@@ -5843,23 +5928,19 @@
 			local GetPlayerAuraBySpellID = GetPlayerAuraBySpellID
 
 			-- Check for buffs
-			spellFrame:SetScript("OnEvent", function(self, event, unit, isFullUpdate, updatedAuras)
+			spellFrame:SetScript("OnEvent", function(self, event, unit, updatedAuras)
 				if event == "UNIT_AURA" then
-
-					-- Full update
-					if isFullUpdate and not updatedAuras then
-						eventFunc()
+					if updatedAuras then
+						if updatedAuras.isFullUpdate then
+							eventFunc()
+						elseif updatedAuras.addedAuras then
+							for void, aura in ipairs(updatedAuras.addedAuras) do
+								if aura.spellId and cTable[aura.spellId] then
+									eventFunc()
+								end
+							end
+						end
 					end
-
-					-- Change update
-					if not updatedAuras then return end
-
-					-- Traverse updated auras to check if one is in cTable and is active on the player
-					for void, auraData in pairs(updatedAuras) do
-						auraSpellId = auraData.spellId
-						if auraSpellId and cTable[auraSpellId] and GetPlayerAuraBySpellID(auraSpellId) then eventFunc() end
-					end
-
 				elseif event == "PLAYER_REGEN_ENABLED" then
 
 					-- Traverse buffs (will only run spell was found in cTable previously)
@@ -7973,6 +8054,7 @@
 						end
 
 						chatMessage = gsub(chatMessage, "|T.-|t", "") -- Remove textures
+						chatMessage = gsub(chatMessage, "|A.-|a", "") -- Remove links
 						editBox:Insert(chatMessage .. "|r|n")
 
 					end
@@ -8057,7 +8139,6 @@
 				-- Create cooldown frame
 				icon[i] = CreateFrame("Frame", nil, UIParent)
 				icon[i]:SetFrameStrata("MEDIUM")
-				icon[i]:SetToplevel(true)
 				icon[i]:SetWidth(21)
 				icon[i]:SetHeight(21)
 
@@ -8119,7 +8200,7 @@
 					-- Handle events
 					icon[i]:RegisterUnitEvent("UNIT_AURA", owner)
 					icon[i]:RegisterUnitEvent("UNIT_PET", "player")
-					icon[i]:SetScript("OnEvent", function(self, event, arg1, isFullUpdate, updatedAuras)
+					icon[i]:SetScript("OnEvent", function(self, event, arg1, updatedAuras)
 
 						-- If pet was dismissed (or otherwise disappears such as when flying), hide pet cooldowns
 						if event == "UNIT_PET" then
@@ -8132,47 +8213,16 @@
 						-- Ensure cooldown belongs to the owner we are watching (player or pet)
 						elseif arg1 == owner then
 
-							-- Full update
-							if isFullUpdate and not updatedAuras then
+							-- Hide the cooldown frame (required for cooldowns to disappear after the duration)
+							icon[i]:Hide()
 
-								-- Hide the cooldown frame (required for cooldowns to disappear after the duration)
-								icon[i]:Hide()
-
-								-- If buff matches cooldown we want, start the cooldown
-								for q = 1, 40 do
-									local void, void, void, void, length, expire, void, void, void, spellID = UnitBuff(owner, q)
-									if spellID and id == spellID then
-										icon[i]:Show()
-										local start = expire - length
-										CooldownFrame_Set(icon[i].c, start, length, 1)
-									end
+							-- If buff matches cooldown we want, start the cooldown
+							AuraUtil.ForEachAura(owner, "HELPFUL", nil, function(aura)
+								if aura.spellId and aura.spellId == id and aura.expirationTime and aura.duration then
+									icon[i]:Show()
+									CooldownFrame_Set(icon[i].c, aura.expirationTime - aura.duration, aura.duration, 1)
 								end
-
-							end
-
-							-- Change update
-							if not updatedAuras then return end
-
-							-- Traverse updated auras to check the one we want
-							for void, auraData in pairs(updatedAuras) do
-								local auraSpellId = auraData.spellId
-								if auraSpellId and auraSpellId == id then
-
-									-- Hide the cooldown frame (required for cooldowns to disappear after the duration)
-									icon[i]:Hide()
-
-									-- If buff matches cooldown we want, start the cooldown
-									for q = 1, 40 do
-										local void, void, void, void, length, expire, void, void, void, spellID = UnitBuff(owner, q)
-										if spellID and id == spellID then
-											icon[i]:Show()
-											local start = expire - length
-											CooldownFrame_Set(icon[i].c, start, length, 1)
-										end
-									end
-
-								end
-							end
+							end, true)
 
 						end
 					end)
@@ -8294,14 +8344,13 @@
 						icon[i]:Hide()
 
 						-- If buff matches spell we want, show cooldown icon
-						for q = 1, 40 do
-							local void, void, void, void, length, expire, void, void, void, spellID = UnitBuff(newowner, q)
-							if spellID and newspell == spellID then
+						AuraUtil.ForEachAura(newowner, "HELPFUL", nil, function(aura)
+							if aura.spellId and aura.spellId == newspell and aura.expirationTime and aura.duration then
 								icon[i]:Show()
-								-- Set the cooldown to the buff cooldown
-								CooldownFrame_Set(icon[i].c, expire - length, length, 1)
+								CooldownFrame_Set(icon[i].c, aura.expirationTime - aura.duration, aura.duration, 1)
 							end
-						end
+						end, true)
+
 					end
 
 				end
@@ -10699,23 +10748,13 @@
 					if LeaPlusDB[oldvar] and not LeaPlusDB[newvar] then LeaPlusDB[newvar] = LeaPlusDB[oldvar]; LeaPlusDB[oldvar] = nil end
 				end
 
-				UpdateVars("MuteHorned", "MuteUnicorns")					-- 9.0.22 (27th March 2021)
-				UpdateVars("MuteCreeper", "MuteSoulseekers")				-- 9.0.22 (27th March 2021)
-				UpdateVars("MuteATV", "MuteHovercraft")						-- 9.0.22 (27th March 2021)
-				UpdateVars("MuteR21X", "MuteAerials")						-- 9.0.22 (27th March 2021)
-				UpdateVars("MuteGolem", "MuteMechsuits")					-- 9.0.22 (27th March 2021)
-				UpdateVars("HideLevelUpDisplay", "HideEventToasts")			-- 9.1.24 (19th November 2021)
-				UpdateVars("ManageWidget", "ManageWidgetTop")				-- 9.2.03 (16th March 2022)
-				UpdateVars("WidgetA", "WidgetTopA")							-- 9.2.03 (16th March 2022)
-				UpdateVars("WidgetR", "WidgetTopR")							-- 9.2.03 (16th March 2022)
-				UpdateVars("WidgetX", "WidgetTopX")							-- 9.2.03 (16th March 2022)
-				UpdateVars("WidgetY", "WidgetTopY")							-- 9.2.03 (16th March 2022)
-				UpdateVars("WidgetScale", "WidgetTopScale")					-- 9.2.03 (16th March 2022)
-				UpdateVars("AutoQuestAvailable", "AutoQuestRegular")		-- 9.2.07 (27th April 2022)
-				UpdateVars("MuteMechsuits", "MuteMechSteps")				-- 9.2.13 (1st June 2022)
-				UpdateVars("MuteStriders", "MuteMechSteps")					-- 9.2.13 (1st June 2022)
 				UpdateVars("MinimapMod", "MinimapModder")					-- 9.2.26 (24th August 2022)
 				UpdateVars("RestorechatMessages", "RestoreChatMessages")	-- 9.2.36 (20th September 2022)
+
+				-- Minimum faster auto loot delay changed from 0.0 to 0.1 in 10.0.20
+				if LeaPlusDB["LeaPlusFasterLootDelay"] and LeaPlusDB["LeaPlusFasterLootDelay"] == 0 then
+					LeaPlusDB["LeaPlusFasterLootDelay"] = 0.1
+				end
 
 				if LeaPlusDB["AutoQuestNoDaily"] and not LeaPlusDB["AutoQuestDaily"] then
 					if LeaPlusDB["AutoQuestNoDaily"] == "On" then
@@ -10724,15 +10763,6 @@
 						LeaPlusDB["AutoQuestDaily"] = "On"
 					end
 					LeaPlusDB["AutoQuestNoDaily"] = nil
-				end
-
-				if LeaPlusDB["AutoQuestNoWeekly"] and not LeaPlusDB["AutoQuestWeekly"] then
-					if LeaPlusDB["AutoQuestNoWeekly"] == "On" then
-						LeaPlusDB["AutoQuestWeekly"] = "Off"
-					else
-						LeaPlusDB["AutoQuestWeekly"] = "On"
-					end
-					LeaPlusDB["AutoQuestNoWeekly"] = nil
 				end
 
 				-- Automation
@@ -10943,6 +10973,8 @@
 				LeaPlusLC:LoadVarChk("NoRaidRestrictions", "Off")			-- Remove raid restrictions
 				LeaPlusLC:LoadVarChk("NoConfirmLoot", "Off")				-- Disable loot warnings
 				LeaPlusLC:LoadVarChk("FasterLooting", "Off")				-- Faster auto loot
+				LeaPlusLC:LoadVarNum("LeaPlusFasterLootDelay", 0.3, 0.1, 0.3)	-- Faster auto loot delay
+
 				LeaPlusLC:LoadVarChk("FasterMovieSkip", "Off")				-- Faster movie skip
 				LeaPlusLC:LoadVarChk("CombatPlates", "Off")					-- Combat plates
 				LeaPlusLC:LoadVarChk("EasyItemDestroy", "Off")				-- Easy item destroy
@@ -11324,6 +11356,8 @@
 			LeaPlusDB["NoRaidRestrictions"]		= LeaPlusLC["NoRaidRestrictions"]
 			LeaPlusDB["NoConfirmLoot"] 			= LeaPlusLC["NoConfirmLoot"]
 			LeaPlusDB["FasterLooting"] 			= LeaPlusLC["FasterLooting"]
+			LeaPlusDB["LeaPlusFasterLootDelay"] = LeaPlusLC["LeaPlusFasterLootDelay"]
+
 			LeaPlusDB["FasterMovieSkip"] 		= LeaPlusLC["FasterMovieSkip"]
 			LeaPlusDB["CombatPlates"]			= LeaPlusLC["CombatPlates"]
 			LeaPlusDB["EasyItemDestroy"]		= LeaPlusLC["EasyItemDestroy"]
@@ -13964,6 +13998,8 @@
 				LeaPlusDB["NoRaidRestrictions"] = "On"			-- Remove raid restrictions
 				LeaPlusDB["NoConfirmLoot"] = "On"				-- Disable loot warnings
 				LeaPlusDB["FasterLooting"] = "On"				-- Faster auto loot
+				LeaPlusDB["LeaPlusFasterLootDelay"] = 0.3		-- Faster loot delay
+
 				LeaPlusDB["FasterMovieSkip"] = "On"				-- Faster movie skip
 				LeaPlusDB["CombatPlates"] = "On"				-- Combat plates
 				LeaPlusDB["EasyItemDestroy"] = "On"				-- Easy item destroy
@@ -14211,7 +14247,7 @@
 	pg = "Page1"
 
 	LeaPlusLC:MakeTx(LeaPlusLC[pg], "Character"					, 	146, -72)
-	LeaPlusLC:MakeCB(LeaPlusLC[pg], "AutomateQuests"			,	"Automate quests"				,	146, -92, 	false,	"If checked, quests will be selected, accepted and turned-in automatically.|n|nQuests which have a gold, currency or crafting reagent requirement will not be turned-in automatically.")
+	LeaPlusLC:MakeCB(LeaPlusLC[pg], "AutomateQuests"			,	"Automate quests"				,	146, -92, 	false,	"If checked, quests will be selected, accepted and turned-in automatically.|n|nQuests which require gold, currency, a crafting reagent or an account-bound item will not be turned-in automatically.")
 	LeaPlusLC:MakeCB(LeaPlusLC[pg], "AutomateGossip"			,	"Automate gossip"				,	146, -112, 	false,	"If checked, you can hold down the alt key while opening a gossip window to automatically select a single gossip option.")
 	LeaPlusLC:MakeCB(LeaPlusLC[pg], "AutoAcceptSummon"			,	"Accept summon"					, 	146, -132, 	false,	"If checked, summon requests will be accepted automatically unless you are in combat.")
 	LeaPlusLC:MakeCB(LeaPlusLC[pg], "AutoAcceptRes"				,	"Accept resurrection"			, 	146, -152, 	false,	"If checked, resurrection requests will be accepted automatically.|n|nResurrection requests from a Brazier of Awakening or a Failure Detection Pylon will not be accepted automatically.")
@@ -14404,6 +14440,7 @@
 
 	LeaPlusLC:CfgBtn("SetWeatherDensityBtn", LeaPlusCB["SetWeatherDensity"])
 	LeaPlusLC:CfgBtn("MuteGameSoundsBtn", LeaPlusCB["MuteGameSounds"])
+	LeaPlusLC:CfgBtn("FasterLootingBtn", LeaPlusCB["FasterLooting"])
 	LeaPlusLC:CfgBtn("NoTransformsBtn", LeaPlusCB["NoTransforms"])
 
 ----------------------------------------------------------------------

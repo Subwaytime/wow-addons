@@ -41,7 +41,6 @@ local UnitClass = UnitClass;
 local UnitSex = UnitSex;
 local UnitLevel = UnitLevel;
 local IsSpecializationActivateSpell = IsSpecializationActivateSpell;
-local IsPlayerMoving= IsPlayerMoving;
 
 local sqrt = math.sqrt;
 local atan2 = math.atan2;
@@ -291,7 +290,9 @@ end
 
 local SetBranchColor = SetBranchColorYellow;
 
-
+local function ShouldHideBackground()
+    return IsPlayerMoving() or IsMouselooking()
+end
 
 local InspectDisplayModeUtil = {};
 InspectDisplayModeUtil.buttons = {};
@@ -391,7 +392,7 @@ function NarciMiniTalentTreeMixin:OnLoad()
 
     self.LoadoutToggle = TextButtonUtil:CreateButton(self, "right", "center", "vertical", 96, "arrowDown");
     self.LoadoutToggle:SetFrameLevel(frameLevel + 18);
-    self.LoadoutToggle.ButtonText:SetText("Loadout");
+    self.LoadoutToggle.ButtonText:SetText(L["Loadout"]);
     self.LoadoutToggle:SetScript("OnClick", function()
         LoadoutUtil:ToggleList();
     end);
@@ -406,7 +407,7 @@ function NarciMiniTalentTreeMixin:OnLoad()
 
     self.PvPTalentToggle = TextButtonUtil:CreateButton(self, "right", "right", "horizontal", nil, "arrowRight");
     self.PvPTalentToggle:SetFrameLevel(frameLevel + 14);
-    self.PvPTalentToggle.ButtonText:SetText("PvP");
+    self.PvPTalentToggle.ButtonText:SetText(L["PvP"]);
     self.PvPTalentToggle:SetScript("OnClick", function(f)
         self.PvPTalentFrame:Toggle();
     end);
@@ -1156,9 +1157,12 @@ function NarciMiniTalentTreeMixin:OnShow()
     self:RegisterEvent("PLAYER_STARTED_TURNING");
     self:RegisterEvent("PLAYER_STOPPED_TURNING");
     
-    if IsPlayerMoving() then
+    if ShouldHideBackground() then
         self:SetBackgroundAlpha(0);
         self:EnableMouse(false);
+    else
+        self:SetBackgroundAlpha(1);
+        self:EnableMouse(true);
     end
 end
 
@@ -1384,7 +1388,7 @@ function NarciMiniTalentTreeMixin:OnEvent(event, ...)
     if event == "PLAYER_STARTED_MOVING" or event == "PLAYER_STARTED_LOOKING" or event == "PLAYER_STARTED_TURNING" then
         self:SetFading(-4);
     elseif event == "PLAYER_STOPPED_MOVING" or event == "PLAYER_STOPPED_LOOKING" or event == "PLAYER_STOPPED_TURNING" then
-        if not (IsPlayerMoving() or IsMouselooking()) then
+        if not ShouldHideBackground() then
             self:SetFading(4);
         end
     end
@@ -1611,9 +1615,9 @@ function LoadoutUtil:ShowList()
     self.container:SetScript("OnUpdate", self.ShowFrame_OnUpdate);
 
     if anyLoadout then
-        MainFrame.LoadoutToggle.ButtonText:SetText("Loadout");
+        MainFrame.LoadoutToggle.ButtonText:SetText(L["Loadout"]);
     else
-        MainFrame.LoadoutToggle.ButtonText:SetText("No Loadout");
+        MainFrame.LoadoutToggle.ButtonText:SetText(L["No Loadout"]);
     end
     MainFrame.LoadoutToggle.Icon:SetTexCoord(0.25, 0.5, 0.25, 0);
 end

@@ -6,6 +6,7 @@ local CATEGORY_ID = BtWQuests.Constant.Category.Dragonflight.Dragonflight
 local Chain = BtWQuests.Constant.Chain.Dragonflight.Dragonflight
 local THREADS_OF_FATE_RESTRICTION = BtWQuests.Constant.Restrictions.DragonflightToF
 local NOT_THREADS_OF_FATE_RESTRICTION = BtWQuests.Constant.Restrictions.NOTDragonflightToF
+local CONTINENT_ID = 1978
 local ACHIEVEMENT_ID_1 = 16808
 local LEVEL_RANGE = {70, 70}
 
@@ -15,6 +16,7 @@ Chain.TheSilverPurpose = 100503
 Chain.InTheHallsOfTitans = 100504
 Chain.GardenOfSecrets = 100505
 Chain.TheDreamer = 100506
+Chain.EmbedChain01 = 100511
 
 Database:AddChain(Chain.TheChieftainsDuty, {
     name = BtWQuests_GetAchievementCriteriaNameDelayed(ACHIEVEMENT_ID_1, 4),
@@ -35,14 +37,126 @@ Database:AddChain(Chain.TheChieftainsDuty, {
     },
     active = {
         type = "quest",
-        ids = {70846, 72773, 70180,},
+        id = 68640,
         status = {'active', 'completed'}
     },
     completed = {
         type = "quest",
-        id = 70633,
+        id = 66444,
     },
     items = {
+        { -- Dont track this quest for active since its flagged completed account bound
+            type = "quest",
+            id = 68863,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 68640,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 66409,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 66410,
+            x = 0,
+            connections = {
+                1, 2, 
+            },
+        },
+        {
+            type = "quest",
+            id = 66411,
+            x = -1,
+            connections = {
+                2, 
+            },
+        },
+        {
+            type = "quest",
+            id = 66417,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 66418,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 66414,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 66440,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 66431,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 66415,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 66443,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 66444,
+            x = 0,
+        },
+        {
+            visible = false,
+            x = -3,
+            y = 3,
+        },
+        {
+            type = "chain",
+            id = Chain.EmbedChain01,
+            embed = true,
+            x = 3,
+            y = 3,
+        },
     },
 })
 Database:AddChain(Chain.AMysterySealed, {
@@ -64,7 +178,7 @@ Database:AddChain(Chain.AMysterySealed, {
     },
     active = {
         type = "quest",
-        ids = {69093, 66012,},
+        id = 66012,
         status = {'active', 'completed'}
     },
     completed = {
@@ -72,7 +186,7 @@ Database:AddChain(Chain.AMysterySealed, {
         id = 66128,
     },
     items = {
-        {
+        { -- Dont track this quest for active since its flagged completed account bound
             type = "quest",
             id = 69093,
             x = 0,
@@ -167,14 +281,18 @@ Database:AddChain(Chain.TheSilverPurpose, {
             level = 70,
         },
         {
-            type = "currency",
-            id = 2088,
-            amount = 12,
-        },
+            name = {
+                type = "currency",
+                id = 2088,
+                amount = 12,
+            },
+            type = "achievement",
+            id = 16988, -- Account bound achievement for Rank 12
+        }
     },
     active = {
         type = "quest",
-        ids = {68794, 67074,},
+        id = 67074,
         status = {'active', 'completed'}
     },
     completed = {
@@ -182,7 +300,7 @@ Database:AddChain(Chain.TheSilverPurpose, {
         id = 67084,
     },
     items = {
-        {
+        { -- Dont track this quest for active since its flagged completed account bound
             type = "quest",
             id = 68794,
             x = 0,
@@ -347,17 +465,57 @@ Database:AddChain(Chain.TheDreamer, {
     },
 })
 
+Database:AddChain(Chain.EmbedChain01, {
+    questline = 1388,
+    category = CATEGORY_ID,
+    expansion = EXPANSION_ID,
+    range = LEVEL_RANGE,
+    prerequisites = {
+        {
+            type = "level",
+            level = 70,
+        },
+        {
+            type = "currency",
+            id = 2087,
+            amount = 11,
+        },
+    },
+    active = {
+        type = "quest",
+        id = 66413,
+        status = {'active', 'completed'}
+    },
+    completed = {
+        type = "quest",
+        id = 66413,
+    },
+    items = {
+        {
+            type = "object",
+            id = 384405,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 66413,
+            x = 0,
+        },
+    }
+})
+
 Database:AddCategory(CATEGORY_ID, {
     name = BtWQuests_GetAchievementNameDelayed(ACHIEVEMENT_ID_1),
     expansion = EXPANSION_ID,
     buttonImage = 4742925,
     items = {
---[==[@debug@
         {
             type = "chain",
             id = Chain.TheChieftainsDuty,
         },
---@end-debug@]==]
         {
             type = "chain",
             id = Chain.AMysterySealed,
@@ -386,5 +544,12 @@ BtWQuestsDatabase:AddExpansionItems(EXPANSION_ID, {
     {
         type = "category",
         id = CATEGORY_ID,
+    },
+})
+
+Database:AddContinentItems(CONTINENT_ID, {
+    {
+        type = "chain",
+        id = Chain.EmbedChain01,
     },
 })

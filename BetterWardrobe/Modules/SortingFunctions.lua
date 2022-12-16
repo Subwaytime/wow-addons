@@ -6,45 +6,6 @@ addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
 local f = addon.frame
 
-local function rgb2lab(r, g, b)
-	r = r / 255;
-	g = g / 255;
-	b = b / 255;
-	local x, y, z;
-	
-	r = (r > 0.04045) and math.pow((r + 0.055) / 1.055, 2.4) or r / 12.92;
-	g = (g > 0.04045) and math.pow((g + 0.055) / 1.055, 2.4) or g / 12.92;
-	b = (b > 0.04045) and math.pow((b + 0.055) / 1.055, 2.4) or b / 12.92;
-	
-	x = (r * 0.4124 + g * 0.3576 + b * 0.1805) / 0.95047;
-	y = (r * 0.2126 + g * 0.7152 + b * 0.0722) / 1.00000;
-	z = (r * 0.0193 + g * 0.1192 + b * 0.9505) / 1.08883;
-	
-	x = (x > 0.008856) and math.pow(x, 1/3) or (7.787 * x) + 16/116;
-	y = (y > 0.008856) and math.pow(y, 1/3) or (7.787 * y) + 16/116;
-	z = (z > 0.008856) and math.pow(z, 1/3) or (7.787 * z) + 16/116;
-	
-	return (116 * y) - 16, 500 * (x - y), 200 * (y - z)
-end
-
-local function labDiff(Ar, Ag, Ab, Br, Bg, Bb)
-	local deltaL = Ar - Br;
-	local deltaA = Ag - Bg;
-	local deltaB = Ab - Bb;
-	local c1 = math.sqrt(Ag * Ag + Ab * Ab);
-	local c2 = math.sqrt(Bg * Bg + Bb * Bb);
-	local deltaC = c1 - c2;
-	local deltaH = deltaA * deltaA + deltaB * deltaB - deltaC * deltaC;
-	deltaH = deltaH < 0 and 0 or math.sqrt(deltaH);
-	local sc = 1.0 + 0.045 * c1;
-	local sh = 1.0 + 0.015 * c1;
-	local deltaLKlsl = deltaL / (1.0);
-	local deltaCkcsc = deltaC / (sc);
-	local deltaHkhsh = deltaH / (sh);
-	local i = deltaLKlsl * deltaLKlsl + deltaCkcsc * deltaCkcsc + deltaHkhsh * deltaHkhsh;
-	return i < 0 and 0 or math.sqrt(i);
-end
-
 local nameVisuals, nameCache = {}, {}
 local catCompleted, itemLevels = {}, {}
 local unknown = {-1}
@@ -253,7 +214,7 @@ local Sort = {
 
 			--[[if color1 and color2 then
 										local c = 1
-										local labA, labB, labC = rgb2lab(0, 0, 0)
+										local labA, labB, labC = addon:ConvertRGB_to_LAB(0, 0, 0)
 										local index1 = #colors+1
 										--local baseColor1 = color1[1]
 										local _, colors = addon:Deserialize(color1)
@@ -264,7 +225,7 @@ local Sort = {
 											local cG = baseColor1[c+1]
 											local cB = baseColor1[c+2]
 											if cR and cG and cB then
-												color1diff = labDiff(labA, labB, labC, rgb2lab(cR, cG, cB))
+												color1diff = addon:CompareLAB(labA, labB, labC, addon:ConvertRGB_to_LAB(cR, cG, cB))
 										
 											end
 										
@@ -277,7 +238,7 @@ local Sort = {
 											local cG = baseColor2[c+1]
 											local cB = baseColor2[c+2]
 											if cR and cG and cB then
-												color2diff = labDiff(labA, labB, labC, rgb2lab(cR, cG, cB))
+												color2diff = addon:CompareLAB(labA, labB, labC, addon:ConvertRGB_to_LAB(cR, cG, cB))
 										
 											end
 										

@@ -437,7 +437,7 @@
 						</Layers>
 						<Scripts>
 							<OnUpdate>
-								if ( self:IsMouseOver() ) then
+								if self:IsMouseOver() then
 									self:SetAlpha(0);
 								else
 									self:SetAlpha(abs(mod(GetTime(), 2) - 1));
@@ -472,7 +472,7 @@
 						</Layers>
 						<Scripts>
 							<OnUpdate>
-								if ( self:IsMouseOver() ) then
+								if self:IsMouseOver() then
 									self:SetAlpha(0);
 								else
 									self:SetAlpha(abs(mod(GetTime(), 2) - 1));
@@ -507,7 +507,7 @@
 						</Layers>
 						<Scripts>
 							<OnUpdate>
-								if ( self:IsMouseOver() ) then
+								if self:IsMouseOver() then
 									self:SetAlpha(0);
 								else
 									self:SetAlpha(abs(mod(GetTime(), 2) - 1));
@@ -1695,7 +1695,7 @@
 						self.Icon:SetPoint("TOPLEFT", 0, 0);
 					</OnMouseUp>
 					<OnLeave>
-						if ( not self:GetParent():IsMouseOver() ) then
+						if not self:GetParent():IsMouseOver() then
 							self:Hide();
 						end
 					</OnLeave>

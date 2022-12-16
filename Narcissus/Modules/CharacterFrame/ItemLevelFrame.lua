@@ -155,24 +155,34 @@ function NarciItemLevelFrameMixin:UpdateItemLevel(playerLevel)
 	self.CenterButton.tooltipHeadline = STAT_AVERAGE_ITEM_LEVEL .." "..avgItemLevel;
 end
 
-function NarciItemLevelFrameMixin:UpdateRenownLevel(newLevel)
+function NarciItemLevelFrameMixin:UpdateCovenantRenownLevel(newLevel)
 	local renownLevel = newLevel or C_CovenantSanctumUI.GetRenownLevel() or 0;
 	local headerText = string.format(COVENANT_SANCTUM_LEVEL, renownLevel);
 	if C_CovenantSanctumUI.HasMaximumRenown() then
 		headerText = headerText.. "  (maxed)";
-	else
-		--to-do: get max level: C_CovenantSanctumUI.GetRenownLevels is too much
 	end
 	local frame = self.RightButton;
 	frame.Header:SetText("RN");
 	frame.tooltipHeadline = headerText;
 	frame.Number:SetText(renownLevel);
+	frame.tooltipLine1 = COVENANT_RENOWN_TUTORIAL_PROGRESS;
+end
 
-	if renownLevel == 0 then
-		frame.tooltipLine1 = "You will be able to join a Covenant and progress Renown level once you reach 60.";
-	else
-		frame.tooltipLine1 = COVENANT_RENOWN_TUTORIAL_PROGRESS;
+function NarciItemLevelFrameMixin:UpdateRenownLevel()
+	local factionIDs = C_MajorFactions.GetMajorFactionIDs();
+	local level, primaryFactionID;
+	local maxLevel = 0;
+	for _, majorFactionID in ipairs(factionIDs) do
+		level = C_MajorFactions.GetCurrentRenownLevel(majorFactionID);
+		if level > maxLevel then
+			primaryFactionID = majorFactionID;
+			maxLevel = level;
+		end
 	end
+
+	local frame = self.RightButton;
+	frame.Header:SetText("RN");
+	frame.Number:SetText(maxLevel);
 end
 
 function NarciItemLevelFrameMixin:SetThemeByName(themeName)

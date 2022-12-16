@@ -992,6 +992,12 @@ Database:AddChain(Chain.TempChain04, {
     category = CATEGORY_ID,
     expansion = EXPANSION_ID,
     range = LEVEL_RANGE,
+    prerequisites = LEVEL_PREREQUISITES,
+    active = {
+        type = "quest",
+        ids = {71235, 68639, 68641},
+        status = {'active', 'completed'}
+    },
     completed = {
         type = "quest",
         id = 70338,
@@ -1846,7 +1852,7 @@ Database:AddChain(Chain.TempChain17, {
     prerequisites = LEVEL_PREREQUISITES,
     completed = {
         type = "quest",
-        id = 66556,
+        id = 66622,
     },
     items = {
         {
@@ -1959,7 +1965,7 @@ Database:AddChain(Chain.TempChain19, {
     prerequisites = LEVEL_PREREQUISITES,
     completed = {
         type = "quest",
-        id = 66556,
+        id = 66844,
     },
     items = {
         {
@@ -1984,7 +1990,7 @@ Database:AddChain(Chain.TempChain21, {
     prerequisites = LEVEL_PREREQUISITES,
     completed = {
         type = "quest",
-        id = 66556,
+        id = 66843,
     },
     items = {
         {
@@ -2029,7 +2035,7 @@ Database:AddChain(Chain.TempChain22, {
     },
     completed = {
         type = "quest",
-        id = 70168,
+        id = 70171,
     },
     items = {
         {
@@ -2052,6 +2058,30 @@ Database:AddChain(Chain.TempChain22, {
             type = "quest",
             id = 70168,
             x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 70169,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 70170,
+            x = 0,
+            connections = {
+                1, 
+            },
+        },
+        {
+            type = "quest",
+            id = 70171,
+            x = 0,
         },
     }
 })
@@ -2062,7 +2092,7 @@ Database:AddChain(Chain.TempChain23, {
     prerequisites = LEVEL_PREREQUISITES,
     completed = {
         type = "quest",
-        id = 66556,
+        id = 66503,
     },
     items = {
         {
@@ -2108,7 +2138,7 @@ Database:AddChain(Chain.TempChain24, {
     prerequisites = LEVEL_PREREQUISITES,
     completed = {
         type = "quest",
-        id = 66556,
+        id = 66493,
     },
     items = {
         {

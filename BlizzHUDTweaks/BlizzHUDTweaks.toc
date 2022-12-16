@@ -1,6 +1,6 @@
 ## Interface: 100002
 ## Title: BlizzHUDTweaks
-## Version: 1.27.7
+## Version: 1.30.0
 ## Author: Kevin
 ## Notes: Add some tweaks to the new default blizz HUD.
 ## OptionalDeps: Ace3
@@ -28,7 +28,8 @@ BlizzHUDTweaks.lua
 MouseoverFrameFading.lua
 ClassResource.lua
 Miscellaneous.lua
-
+API.lua
+Debug.lua
 
 Util.lua
 EventHandler.lua

@@ -2,23 +2,17 @@ local addonName, addon = ...
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
-
-
 local CollectionList = {}
 addon.CollectionList = CollectionList
 CollectionList.showAll = true
 
 local MogItLoaded = false
 
-
 function  addon.Init:initCollectionList()
-	local f = CreateFrame("Frame", "BW_ColectionListFrame", BetterWardrobeCollectionFrame, "BW_ColectionListFrameTemplate" )
+	local f = CreateFrame("Frame", "BW_ColectionListFrame", BetterWardrobeCollectionFrame, "BW_ColectionListFrameTemplate")
 	local ContextMenu = CreateFrame("Frame", addonName .. "ContextMenuFrame", UIParent, "BW_UIDropDownMenuTemplate")
-addon.ContextMenu = ContextMenu
-
+	addon.ContextMenu = ContextMenu
 end
-
-
 
 function CollectionList:BuildCollectionList(complete)
 	local list = {}
@@ -27,6 +21,7 @@ function CollectionList:BuildCollectionList(complete)
 	local filterUncollected = C_TransmogCollection.GetUncollectedShown()
 	local filterSource = {}
 	local selectedCategory = BetterWardrobeCollectionFrame.ItemsCollectionFrame:GetActiveCategory()
+
 	for i = 1, 6 do
 		filterSource[i] = C_TransmogCollection.IsSourceTypeFilterChecked(i)
 	end
@@ -35,7 +30,7 @@ function CollectionList:BuildCollectionList(complete)
 	for visualID, _ in pairs(collectionList["item"]) do
 		local sources = C_TransmogCollection.GetAllAppearanceSources(visualID)
 
-		if sources then 
+		if sources then
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(sources[1])
 			local camera = C_TransmogCollection.GetAppearanceCameraID(visualID)	
 			sourceInfo.camera = camera
@@ -44,40 +39,46 @@ function CollectionList:BuildCollectionList(complete)
 
 			for i,d in pairs(sources)do
 				local info = C_TransmogCollection.GetSourceInfo(d)
-				 if info.sourceType then 
+				 if info.sourceType then
 				 	sourceTypes[info.sourceType] = true
 				 end
 				 local collected = select(5,C_TransmogCollection.GetAppearanceSourceInfo(d))
 
-				 if collected then 
+				 if collected then
 				 	isCollected = true
 				 end
 			end
 
 			local filter = false
 			for i in pairs(sourceTypes) do
-				if  filterSource[i] then 
+				if  filterSource[i] then
 					filter = true
 					break
 				end
+			end
+
+			if #sourceTypes == 0 then
+				filter = true
 			end
 
 			local catType = sourceInfo.categoryID
 			local invTypeMatch = false
 			if CollectionList.showAll then
 				invTypeMatch = true
-			elseif (CollectionList.Category == 117  and catType == 19)  then 
+
+			elseif (CollectionList.Category == 117  and catType == 19)  then
 				invTypeMatch = true
+
 			elseif 	(CollectionList.Category == 116  and catType > 11 and catType ~= 19)  then
 				invTypeMatch = true
+
 			else
 				invTypeMatch = 	catType == CollectionList.Category
 			end
 
 			if complete then
 				tinsert(list, sourceInfo)
-			elseif  (((not isCollected and filterUncollected) and not filter) or (isCollected and filterCollected) ) and invTypeMatch  then
-
+			elseif ((not isCollected and filterUncollected) or (isCollected and filterCollected)) and filter  and invTypeMatch  then
 				if searchString then
 					for i, data in pairs(sources) do
 						local source_info = C_TransmogCollection.GetSourceInfo(data)
@@ -97,7 +98,6 @@ function CollectionList:BuildCollectionList(complete)
 	return list
 end
 
-
 function CollectionList:BuildShoppingList()
 	local collectionList = self:BuildCollectionList(true)
 	local shoppingList = {}
@@ -113,7 +113,6 @@ function CollectionList:BuildShoppingList()
 	return shoppingList
 end
 
-
 --Needs to to take account of variant
 function CollectionList:UpdateList(type, typeID, add, sourceID)
 	typeID = tonumber(typeID)
@@ -122,7 +121,7 @@ function CollectionList:UpdateList(type, typeID, add, sourceID)
 	local setName, setInfo, itemModID
 	local selectedList = CollectionList:SelectedCollectionList()
 	if selectedList == "MOGIT" then
-		--return addon.MogIt.UpdateWishlistItem(type, typeID, add, sourceID )
+		--return addon.MogIt.UpdateWishlistItem(type, typeID, add, sourceID)
 	end
 
 	local collectionList = addon.CollectionList:CurrentList()
@@ -132,7 +131,7 @@ function CollectionList:UpdateList(type, typeID, add, sourceID)
 		if BetterWardrobeCollectionFrame.ItemsCollectionFrame:IsShown() then
 			BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 			BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
-			print(add and L["Appearance added."] or L["Appearance removed."] )
+			print(add and L["Appearance added."] or L["Appearance removed."])
 		end
 		
 		return collectionList[type][typeID]
@@ -170,7 +169,7 @@ function CollectionList:UpdateList(type, typeID, add, sourceID)
 		----	BW_SetsCollectionFrame:OnSearchUpdate()
 		-----end
 
-		--print( addSet and L["%s: Uncollected items added"]:format(setName) or L["No new appearces needed."])
+		--print(addSet and L["%s: Uncollected items added"]:format(setName) or L["No new appearces needed."])
 		return addSet
 	end	
 end
@@ -178,12 +177,12 @@ end
 
 BetterWardrobeSetsCollectionListMixin = {}
 function BetterWardrobeSetsCollectionListMixin:Toggle(toggleState)
-	if ( IsShiftKeyDown() ) then
+	if (IsShiftKeyDown()) then
 		CollectionList:GenerateListView()
 	else
-		local atTransmogrifier = C_Transmog.IsAtTransmogNPC();
-		local transmogLocation = TransmogUtil.GetTransmogLocation("HEADSLOT", Enum.TransmogType.Appearance, Enum.TransmogModification.Main);
-		BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot(transmogLocation);
+		local atTransmogrifier = C_Transmog.IsAtTransmogNPC()
+		local transmogLocation = TransmogUtil.GetTransmogLocation("HEADSLOT", Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
+		BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot(transmogLocation)
 		--BetterWardrobeCollectionFrame.ItemsCollectionFrame:SetActiveSlot("HEADSLOT", Enum.TransmogType.Appearance)
 		BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 		BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
@@ -196,33 +195,28 @@ function BetterWardrobeSetsCollectionListMixin:Toggle(toggleState)
 	end
 end
 
-
 function BetterWardrobeSetsCollectionListMixin:SetTitle()
 	self.CollectionListTitle.Name:SetText(L["Collection List"])
 	self.CollectionListHelpText.Name:SetText(L["COLLECTION_LIST_HELP"])
 end
-
 
 function addon.Init:BuildCollectionList()
 	--CollectionList:AddMogItData()
 	CollectionList:CreateDropdown()
 end
 
-
-local spacingNoSmallButton = 2;
-local spacingWithSmallButton = 12;
-local defaultSectionSpacing = 24;
-local shorterSectionSpacing = 19;
+local spacingNoSmallButton = 2
+local spacingWithSmallButton = 12
+local defaultSectionSpacing = 24
+local shorterSectionSpacing = 19
 
 function addon:GetActiveCategory()
 	return CollectionList.Category
 end
 
-
 function addon:IsWeaponCat()
 	return BW_CollectionListButton.ToggleState and CollectionList.Category and CollectionList.Category > 100
 end
-
 
 local catchAll = TransmogUtil.GetTransmogLocation("HEADSLOT", Enum.TransmogType.Appearance, Enum.TransmogModification.Main)
 --function WardrobeItemsCollectionMixin:SetActiveSlot(transmogLocation, category, ignorePreviousSlot)
@@ -237,63 +231,61 @@ local function slotOnClick(self, transmogLocation)
 	if self.transmogLocation:IsAppearance() then
 		CollectionList.Category = transmogLocation and self.transmogLocation:GetArmorCategoryID() or self.transmogLocation:GetSlotID() + 100
 		CollectionList.showAll = false
-		BetterWardrobeCollectionFrame.ItemsCollectionFrame:ChangeModelsSlot(transmogLocation);
-	else 
+		BetterWardrobeCollectionFrame.ItemsCollectionFrame:ChangeModelsSlot(transmogLocation)
+	else
 
 		CollectionList.Category = catchAll and catchAll:GetArmorCategoryID()
-		BetterWardrobeCollectionFrame.ItemsCollectionFrame:ChangeModelsSlot(catchAll);
+		BetterWardrobeCollectionFrame.ItemsCollectionFrame:ChangeModelsSlot(catchAll)
 		CollectionList.showAll = true
 	end
 
 	CloseDropDownMenus()
 	BW_CloseDropDownMenus()
-	PlaySound(SOUNDKIT.UI_TRANSMOG_GEAR_SLOT_CLICK);
+	PlaySound(SOUNDKIT.UI_TRANSMOG_GEAR_SLOT_CLICK)
 	BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
 	BetterWardrobeCollectionFrame.ItemsCollectionFrame:UpdateItems()
 end
 
-
 function BetterWardrobeSetsCollectionListMixin:CreateSlotButtons()
 	local slots = { "head", "shoulder", "back", "chest", "shirt", "tabard", "wrist",  "hands", "waist", "legs", "feet",  "mainhand", "secondaryhand" }
-	local parentFrame = self.SlotsFrame;
-	local lastButton;
-	local xOffset = spacingNoSmallButton;
+	local parentFrame = self.SlotsFrame
+	local lastButton
+	local xOffset = spacingNoSmallButton
 
-	local button = CreateFrame("BUTTON", nil, parentFrame, "WardrobeSlotButtonTemplate");
+	local button = CreateFrame("BUTTON", nil, parentFrame, "WardrobeSlotButtonTemplate")
 	button:SetSize(40,40)
 	button.NormalTexture:ClearAllPoints()
 	button.NormalTexture:SetAllPoints()
-	button.NormalTexture:SetAtlas("transmog-nav-slot-enchant", false);
+	button.NormalTexture:SetAtlas("transmog-nav-slot-enchant", false)
 	button.transmogLocation = TransmogUtil.GetTransmogLocation("MAINHANDSLOT", Enum.TransmogType.Illusion, Enum.TransmogModification.Main)
 	button.parent = parentFrame
 	button.SelectedTexture:SetShown(true)
 
-	button:SetPoint("TOPLEFT");
-	button:SetScript("OnEnter", function(button) 	GameTooltip:SetOwner(button, "ANCHOR_RIGHT");
-	GameTooltip:SetText(L["View All"]);end)
-	button:SetScript("OnClick", function(button)  slotOnClick(button, button.transmogLocation) end)
+	button:SetPoint("TOPLEFT")
+	button:SetScript("OnEnter", function(button) GameTooltip:SetOwner(button, "ANCHOR_RIGHT"); GameTooltip:SetText(L["View All"]); end)
+	button:SetScript("OnClick", function(button) slotOnClick(button, button.transmogLocation) end)
 	lastButton = button
 
 	for i = 1, #slots do
-		local value = tonumber(slots[i]);
-		if ( value ) then
+		local value = tonumber(slots[i])
+		if (value) then
 			-- this is a spacer
-			xOffset = value;
+			xOffset = value
 		else
-			local slotString = slots[i];
-			local button = CreateFrame("BUTTON", nil, parentFrame, "WardrobeSlotButtonTemplate");
-			button.NormalTexture:SetAtlas("transmog-nav-slot-"..slotString, true);
-			if ( lastButton ) then
-				button:SetPoint("LEFT", lastButton, "RIGHT", xOffset, 0);
+			local slotString = slots[i]
+			local button = CreateFrame("BUTTON", nil, parentFrame, "WardrobeSlotButtonTemplate")
+			button.NormalTexture:SetAtlas("transmog-nav-slot-"..slotString, true)
+			if (lastButton) then
+				button:SetPoint("LEFT", lastButton, "RIGHT", xOffset, 0)
 			else
-				button:SetPoint("TOPLEFT");
+				button:SetPoint("TOPLEFT")
 			end
-			button.slot = string.upper(slotString).."SLOT";
-			xOffset = spacingNoSmallButton;
-			lastButton = button;
+			button.slot = string.upper(slotString).."SLOT"
+			xOffset = spacingNoSmallButton
+			lastButton = button
 			button.parent = parentFrame
-			button.transmogLocation = TransmogUtil.GetTransmogLocation(button.slot, button.transmogType, button.modification);
-			button:SetScript("OnClick", function(button )  slotOnClick(button , button.transmogLocation) end)
+			button.transmogLocation = TransmogUtil.GetTransmogLocation(button.slot, button.transmogType, button.modification)
+			button:SetScript("OnClick", function(button)  slotOnClick(button , button.transmogLocation) end)
 		end
 	end
 end
@@ -323,8 +315,7 @@ function CollectionList:Dropdown_Initialize(frame, level, menuList)
 		end
 	end
 
-	if MogItLoaded then 
-		
+	if MogItLoaded then
 		--key["MOGIT"] = "MogIt Wishlist"
 		--local info = BW_UIDropDownMenu_CreateInfo()
 		info.func = CollectionList.Dropdown_OnClick
@@ -340,13 +331,10 @@ end
 --Dropdownmenu for the Collection List
 function CollectionList:CreateDropdown()
 	BW_CollectionList_Dropdown = CreateFrame("Frame", "BW_CollectionList_Dropdown", BW_ColectionListFrame, "BW_UIDropDownMenuTemplate")
-
-	--BW_CollectionList_Dropdown = BW_UIDropDownMenu_Create("BW_CollectionList_Dropdown", BW_ColectionListFrame)
 	BW_CollectionList_Dropdown:SetPoint("BOTTOM", -80, 15)
+
 	local level = BW_ColectionListFrame:GetFrameLevel()
 	BW_CollectionList_Dropdown:SetFrameLevel(level+1)
-	--BW_UIDropDownMenu_SetWidth(BW_CollectionList_Dropdown, 157) -- Use in place of dropDown:SetWidth
--- Bind an initializer function to the dropdown; see previous sections for initializer function examples.
 	BW_UIDropDownMenu_Initialize(BW_CollectionList_Dropdown, CollectionList.Dropdown_Initialize)
 	BW_UIDropDownMenu_SetText(BW_CollectionList_Dropdown, "")
 
@@ -354,15 +342,12 @@ function CollectionList:CreateDropdown()
 
 	BW_ColectionListFrame.dropdownFrame = BW_CollectionList_Dropdown
 
-	--"BW_CollectionListOptionsButton"
 	local button = CreateFrame("Button", "BW_CollectionListOptionsButton", BW_CollectionList_Dropdown, "SquareIconButtonTemplate")
 	button:SetSize(30,30)
-		button:SetPoint("LEFT", "BW_CollectionList_DropdownButton", "RIGHT", 1, -2)
-		button.Icon:SetTexture("Interface\\Buttons\\UI-OptionsButton")
-		button.Icon:SetSize(15,15)
-		button:SetScript("OnClick", function(button) CollectionList:OptionButton_OnClick(button) end)
-					--	BW_DressingRoomButton_OnEnter(self, "Settings")
-					--</OnEnter>
+	button:SetPoint("LEFT", "BW_CollectionList_DropdownButton", "RIGHT", 1, -2)
+	button.Icon:SetTexture("Interface\\Buttons\\UI-OptionsButton")
+	button.Icon:SetSize(15,15)
+	button:SetScript("OnClick", function(button) CollectionList:OptionButton_OnClick(button) end)
 end
 
 
@@ -384,7 +369,7 @@ function CollectionList:OptionButton_OnClick(button)
 		},
 		{
 			text = L["Rename"],
-			func = function() 
+			func = function()
 				action = "rename"
 				BetterWardrobeOutfitFrameMixin:ShowPopup("BW_NAME_COLLECTION")
 			end,
@@ -419,7 +404,7 @@ end
 
 function CollectionList:AddMogItData()
 	MogItLoaded = true --IsAddOnLoaded("MogIt")
-	 if not MogItLoaded and CollectionList:SelectedCollectionList() == "MOGIT" then 
+	 if not MogItLoaded and CollectionList:SelectedCollectionList() == "MOGIT" then
 	 	CollectionList:SelectedCollectionList(1)
 	 end
 end
@@ -452,10 +437,11 @@ end
 
 function CollectionList:DeleteList()
 	local profile = addon.collectionListDB.profile
-	if #profile.lists == 1 then 
+	if #profile.lists == 1 then
 		--Error cant delete last list
-		return false 
+		return false
 	end
+
 	tremove(profile.lists, CollectionList:SelectedCollectionList())
 	CollectionList:SelectedCollectionList(1)
 	BetterWardrobeCollectionFrame.ItemsCollectionFrame:RefreshVisualsList()
@@ -484,9 +470,6 @@ function CollectionList:IsInList(itemID, itemType, full)
 	end
 end
 
-
-
-
 --[[	if Wow.IsAddonEnabled("TheUndermineJournal") and TUJMarketInfo then
 		local function GetTUJPrice(itemLink, arg)
 			local data = TUJMarketInfo(itemLink)
@@ -507,20 +490,18 @@ function CollectionList:ListCount(type)
 	return counter
 end
 
-
 function CollectionList:CurrentList()
 	local selectedList = CollectionList:SelectedCollectionList()
-	if selectedList == MogItKey then 
+	if selectedList == MogItKey then
 		return addon.MogIt.GetMogitWishlist()
 	else
 		return addon.collectionListDB.profile.lists[selectedList]
 	end
 end
 
-
 --Returns selected list and  sets list if value is included
 function CollectionList:SelectedCollectionList(value)
-	if value then 
+	if value then
 		addon.collectionListDB.profile.selectedCollectionList = value
 		BW_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, value)
 		local list = CollectionList:CurrentList()
@@ -532,16 +513,13 @@ function CollectionList:SelectedCollectionList(value)
 	return addon.collectionListDB.profile.selectedCollectionList
 end
 
-
 local function GetCustomPriceValue(source, itemID)
 	return TSM_API.GetCustomPriceValue(source, itemID)
 end
 
-
 local function MoneyToString(priceMarket)
 	return TSM_API.FormatMoneyString(priceMarket)
 end
-
 
 local TSMSources
 local function TSMPricelookup(itemID)
@@ -553,14 +531,13 @@ local function TSMPricelookup(itemID)
 	end
 
 	local source = TSMSources[addon.db.profile["TSM_Market"]] or "DBMarket"
-	return MoneyToString((GetCustomPriceValue(source, "i:"..itemID) or 0) )
+	return MoneyToString((GetCustomPriceValue(source, "i:"..itemID) or 0))
 end
-
 
 local function GetBossInfo(itemID)
 	local drops = C_TransmogCollection.GetAppearanceSourceDrops(itemID)
 	local sourceText = ""
-	if ( #drops == 1 ) then
+	if (#drops == 1) then
 		sourceText = _G["TRANSMOG_SOURCE_"..TRANSMOG_SOURCE_BOSS_DROP]..": "..string.format(WARDROBE_TOOLTIP_ENCOUNTER_SOURCE, drops[1].encounter, drops[1].instance)
 		showDifficulty = true
 	end
@@ -576,8 +553,7 @@ function CollectionList:GenerateListView()
 	-- Create a container frame
 	local f = AceGUI:Create("Window")
 	f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) end)
-	f:SetTitle("Cageing List")
-	f:SetStatusText("Status Bar")
+	f:SetTitle("Collection List")
 	f:SetLayout("Flow")
 	--f:SetAutoAdjustHeight(true)
 	f:EnableResize(false)
@@ -608,7 +584,6 @@ function CollectionList:GenerateListView()
 
 	local list = CollectionList:BuildShoppingList()
 	for i, data in ipairs(list) do
-			--cal itemID, itemType, itemSubType, itemEquipLoc, icon, itemClassID, itemSubClassID = GetItemInfoInstant(data.itemID)
 		if data then
 			local _, itemLink, _, _, _, _, _, _, _, itemIcon, _, _, _, _, expacID = GetItemInfo(data.itemID)
 			local nameColor = ITEM_QUALITY_COLORS[data.quality] or ""
@@ -623,7 +598,7 @@ function CollectionList:GenerateListView()
 				bossinfo = GetBossInfo(data.sourceID)
 				CheckBox:SetText(L.COLLECTIONLIST_TEXT:format(name, bossinfo))
 			elseif data.sourceType and (data.sourceType == 3 or data.sourceType == 4 or data.sourceType == 6) then
-				CheckBox:SetText(L.SHOPPINGLIST_TEXT:format( name, transmogSource, priceText ))
+				CheckBox:SetText(L.SHOPPINGLIST_TEXT:format(name, transmogSource, priceText))
 			else
 				CheckBox:SetText(L.COLLECTIONLIST_TEXT:format(name, transmogSource))
 			end
@@ -637,19 +612,20 @@ function CollectionList:GenerateListView()
 				Heading:SetFullWidth(true)
 				scroll:AddChild(Heading)
 			end
+
 			CheckBox:SetCallback("OnClick", function()
-				if ( IsModifiedClick("CHATLINK") ) then
-						if ( itemLink ) then
+				if IsModifiedClick("CHATLINK") then
+						if (itemLink) then
 							HandleModifiedItemClick(itemLink)
 						end
-				elseif ( IsModifiedClick("DRESSUP") ) then
+				elseif IsModifiedClick("DRESSUP") then
 					DressUpVisual(data.sourceID)
 				end
 			end)
 
 			CheckBox:SetCallback("OnEnter", function()
 				GameTooltip:SetOwner(UIParent, "ANCHOR_CURSOR", 0, 0)
-				if (itemLink) then 
+				if itemLink then
 				GameTooltip:SetHyperlink(itemLink)
 				GameTooltip:Show()
 			end
@@ -663,13 +639,11 @@ function CollectionList:GenerateListView()
 	end
 end
 
-
---Exports a TSM group listing.  Items are grouped by visualID
 function CollectionList:TSMGroupExport()
 	if self.LISTWINDOW then self.LISTWINDOW:Hide() end
 	local f = AceGUI:Create("Window")
 	f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) end)
-	f:SetTitle("TSM Export")
+	--f:SetTitle("TSM Export")
 	f:SetLayout("Fill")
 	--f:SetAutoAdjustHeight(true)
 	f:EnableResize(false)
@@ -703,21 +677,18 @@ function CollectionList:TSMGroupExport()
 end
 
 function CollectionListTooltip_OnEnter(self)
-						GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-						GameTooltip:SetText(L["Click: Show Collection List"])
-						GameTooltip:AddLine(L["Shift Click: Show Detail List"])
-						GameTooltip:Show()
-					end
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+	GameTooltip:SetText(L["Click: Show Collection List"])
+	GameTooltip:AddLine(L["Shift Click: Show Detail List"])
+	GameTooltip:Show()
+end
 
 BW_CollectionListDropDownMixin = {}
-
---BW_DressingRoomMixin
 
 function BW_CollectionListDropDownMixin:OnLoad()
 	local button = _G[self:GetName().."Button"]
 	button:Hide()
 end
-
 
 StaticPopupDialogs["BETTER_WARDROBE_COLLECTIONLIST_ITEM_POPUP"] = {
 	text = L["Type the item ID in the text box below"],
@@ -738,14 +709,14 @@ StaticPopupDialogs["BETTER_WARDROBE_COLLECTIONLIST_ITEM_POPUP"] = {
 		CollectionList:UpdateList("item", appearanceID, true)
 		end,
 	EditBoxOnEnterPressed = function(self)
-		if (self:GetParent().button1:IsEnabled()) then
+		if self:GetParent().button1:IsEnabled() then
 			StaticPopup_OnClick(self:GetParent(), 1)
 		end
 	end,
-	EditBoxOnEscapePressed = HideParentPanel;
+	EditBoxOnEscapePressed = HideParentPanel,
 	exclusive = true,
 	whileDead = true,
-};
+}
 
 StaticPopupDialogs["BW_NAME_COLLECTION"] = {
 	preferredIndex = 3,
@@ -754,9 +725,9 @@ StaticPopupDialogs["BW_NAME_COLLECTION"] = {
 	button2 = CANCEL,
 	OnAccept = function(self)
 		local name = self.editBox:GetText()
-		if action == "add" then 
+		if action == "add" then
 			CollectionList:AddList(name)
-		elseif action == "rename" then 
+		elseif action == "rename" then
 			CollectionList:RenameList(name)
 		end
 		action = nil
@@ -775,13 +746,13 @@ StaticPopupDialogs["BW_NAME_COLLECTION"] = {
 		self.editBox:SetText("")
 	end,
 	EditBoxOnEnterPressed = function(self)
-		if (self:GetParent().button1:IsEnabled()) then
+		if self:GetParent().button1:IsEnabled() then
 			StaticPopup_OnClick(self:GetParent(), 1)
 		end
 	end,
 	EditBoxOnTextChanged = function (self)
 		local parent = self:GetParent()
-		if (parent.editBox:GetText() ~= "") then
+		if parent.editBox:GetText() ~= "" then
 			parent.button1:Enable()
 		else
 			parent.button1:Disable()
@@ -791,4 +762,3 @@ StaticPopupDialogs["BW_NAME_COLLECTION"] = {
 		self:GetParent():Hide()
 	end
 }
-

@@ -28,10 +28,7 @@ local Profile
 local playerNme
 local realmName
 local playerClass, classID,_
-
-
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
-
 
 --ACE3 Option Handlers
 local optionHandler = {}
@@ -39,50 +36,53 @@ function optionHandler:Setter(info, value)
 	Profile[info[#info]] = value
 
 	if info.arg == "tooltipRotate" then
-		addon.tooltip.rotate:SetShown(value);	
+		addon.tooltip.rotate:SetShown(value)	
+
 	elseif info.arg == "tooltipWidth" then
-		addon.tooltip:SetWidth(value);
+		addon.tooltip:SetWidth(value)
+
 	elseif info.arg == "tooltipHeight" then
-		addon.tooltip:SetHeight(value);
+		addon.tooltip:SetHeight(value)
+
 	elseif info.arg == "DR_Width" then
 		DressUpFrame:SetWidth(value)
 		DressUpFrame.BW_ResizeFrame = true
+
 	elseif info.arg == "DR_Height" then
 		DressUpFrame:SetHeight(value)
 		DressUpFrame.BW_ResizeFrame = true
+
 	elseif info.arg == "DR_OptionsEnable" then
 		if not Profile.DR_OptionsEnable then
 			addon:DressingRoom_Disable()
+
 		else
 			addon:DressingRoom_Enable()
 		end
-	elseif info.arg == IgnoreClassRestrictions or info.arg == IgnoreClassLookalikeRestrictions then 
+	elseif info.arg == IgnoreClassRestrictions or info.arg == IgnoreClassLookalikeRestrictions then
 		--addon.extraSetsCache = nil
 		addon.Init:BuildDB()
 
 	elseif info.arg == "ShowAdditionalSourceTooltips" then
-		---C_TransmogCollection.SetShowMissingSourceInItemTooltips(value);
+		---C_TransmogCollection.SetShowMissingSourceInItemTooltips(value)
 		SetCVar("missingTransmogSourceInItemTooltips",value)
 
-	elseif info.arg == "ExtraLargeTransmogArea" or info.arg == "LargeTransmogArea" then 
+	elseif info.arg == "ExtraLargeTransmogArea" or info.arg == "LargeTransmogArea" then
 		addon.TransmogVendorSizeUpdated = false
 		addon.ExtendTransmogView()
-	elseif info.arg == "ExtraLargeTransmogAreaMax" then 
+	elseif info.arg == "ExtraLargeTransmogAreaMax" then
 		addon.ExtendTransmogView(true)
 
 	end
 end
 
-
 function optionHandler:Getter(info)
 	return Profile[info[#info]]
 end
 
-
 function optionHandler:TSMDisable(info)
 	return not IsAddOnLoaded("TradeSkillMaster")
 end
-
 
 function optionHandler:TSMSources(info)
 	local sources = {}
@@ -93,7 +93,6 @@ function optionHandler:TSMSources(info)
 
 	return sources
 end
-
 
 function optionHandler:TSM_MarketGetter(info)
 	if Profile[info[#info]] == "DBMarket" then
@@ -200,7 +199,7 @@ local options = {
 							width = "double",
 							values = "TSMSources",
 							disabled = "TSMDisable",
-						}, 
+						},
 					},
 				},
 				transmog_settings={
@@ -404,11 +403,11 @@ local options = {
 								values = function()
 											local tbl = {
 												None = L["None"],
-											};
+											}
 											for k,v in pairs(addon.Globals.mods) do
-												tbl[k] = k;
+												tbl[k] = k
 											end
-											return tbl;
+											return tbl
 										end,
 								width = 1.2,
 							},
@@ -458,11 +457,11 @@ local options = {
 								values = function()
 											local tbl = {
 												None = "None",
-											};
+											}
 											for k,v in pairs(addon.Globals.mods) do
-												tbl[k] = k;
+												tbl[k] = k
 											end
-											return tbl;
+											return tbl
 										end,
 								width = 1.2,
 								hidden = true,
@@ -546,7 +545,7 @@ local options = {
 								type = "execute",
 								order = 15.1,
 								name = L["Reset"],
-								func = function() 
+								func = function()
 									addon.tooltip:SetWidth(280)
 									addon.tooltip:SetHeight(380)
 									addon.Profile.TooltipPreview_Width = 280
@@ -600,7 +599,7 @@ local options = {
 								},
 								disabled = function() return not addon.Profile.TooltipPreview_CustomModel or not addon.Profile.ShowTooltipPreview end,
 								width = 1.2,
-								--hidden = true, 
+								--hidden = true,
 							},
 						},
 				},
@@ -621,7 +620,7 @@ local options = {
 							order = 1.2,
 							name = L["Enable"],
 							type = "toggle",
-							disabled = false, 
+							disabled = false,
 							width = "full",
 							arg = "DR_OptionsEnable"
 						},
@@ -700,10 +699,10 @@ local options = {
 							type = "execute",
 							order = 12,
 							name = L["Reset"],
-							func = function() 
-								local defaultWidth, defaultHeight = 450, 545;  
+							func = function()
+								local defaultWidth, defaultHeight = 450, 545 
 								DressUpFrame:SetWidth(defaultWidth)
-								DressUpFrame:SetHeight(defaultHeight) 
+								DressUpFrame:SetHeight(defaultHeight)
 								addon.Profile.DR_Width = defaultWidth
 								addon.Profile.DR_Height = defaultHeight
 								DressUpFrame.BW_ResizeFrame = false
@@ -755,16 +754,16 @@ local itemSub_options = {
 					width = 1,
 					set = function(info, value) subTextFields[1] = value end,
 					get = function(info) return subTextFields[1] end,
-					validate = function(info, value) 
+					validate = function(info, value)
 						local id = tonumber(value)
 						if not id then return L["Not a valid itemID"] end
 
-						local itemEquipLoc1 = GetItemInfoInstant(tonumber(value)) 
+						local itemEquipLoc1 = GetItemInfoInstant(tonumber(value))
 
-						if itemEquipLoc1 == nil then 
+						if itemEquipLoc1 == nil then
 						--message(itemID.." not a valid itemID")
 								return L["Not a valid itemID"]
-						else 
+						else
 							return true
 						end
 					end,
@@ -776,16 +775,16 @@ local itemSub_options = {
 					width = 1,
 					set = function(info, value) subTextFields[2] = value end,
 					get = function(info) return subTextFields[2] end,
-					validate = function(info, value) 
+					validate = function(info, value)
 						local id = tonumber(value)
 						if not id then return L["Not a valid itemID"] end
 
-						local itemEquipLoc1 = GetItemInfoInstant(tonumber(value)) 
+						local itemEquipLoc1 = GetItemInfoInstant(tonumber(value))
 
-						if itemEquipLoc1 == nil then 
+						if itemEquipLoc1 == nil then
 						--message(itemID.." not a valid itemID")
 								return L["Not a valid itemID"]
-						else 
+						else
 							return true
 						end
 					end,
@@ -795,16 +794,16 @@ local itemSub_options = {
 							name = L["Add"],
 							type = "execute",
 							width = 1,
-							func = function(info) 
+							func = function(info)
 								addon.SetItemSubstitute(subTextFields[1], subTextFields[2])
 							end,
 
-							validate = function(info, value) 
+							validate = function(info, value)
 								local _, _, _, itemEquipLoc1 = GetItemInfoInstant(tonumber(subTextFields[1]) )
 								local _, _, _, itemEquipLoc2 = GetItemInfoInstant(tonumber(subTextFields[2]) )
 
-								if itemEquipLoc1 ~= itemEquipLoc2 then 
-									return L["Item Locations Don't Match"] 
+								if itemEquipLoc1 ~= itemEquipLoc2 then
+									return L["Item Locations Don't Match"]
 								else
 									return true
 								end
@@ -823,18 +822,17 @@ local itemSub_options = {
 	},
 }
 
-
 function addon.RefreshSubItemData()
 	local function RemoveItemSubstitute(itemID)
 		addon:RemoveItemSubstitute(itemID)
 	end
-	local args = {} 
+	local args = {}
 	for i, data in pairs(addon.itemsubdb.profile.items) do
 		args["BaseItem"..i] = {
 			order = i,
 			name = function(info)
 				local text = (L["item: %d - %s \n==>\nitem: %d - %s"]):format(data.subID, data.subLink or "", i, data.itemLink or "")
-				return text 
+				return text
 			end,
 			type = "description",
 			width = 2.5,
@@ -846,13 +844,12 @@ function addon.RefreshSubItemData()
 			name = L["Remove"],
 			type = "execute",
 			width = .5,
-			func = function()   
+			func = function()  
 					return RemoveItemSubstitute(i) end,
 		}	
 	end
 	itemSub_options.args.settings.args.settings.plugins["items"] = args
 end
-
 
 function addon.RefreshCollectionListData()
 	BW_UIDropDownMenu_SetSelectedID(BW_CollectionList_Dropdown, addon.CollectionList:SelectedCollectionList())
@@ -868,7 +865,6 @@ local savedOutfits_options = {
 	},
 }
 
-
 function addon.RefreshOutfitData()
 	local function RemoveCharacterData(name)
 		addon.setdb.global.sets[name] = nil
@@ -877,13 +873,13 @@ function addon.RefreshOutfitData()
 		--addon.RefreshSaveOutfitDropdown()
 	end
 
-	local args = {} 
+	local args = {}
 	local i = 1
 	for name, data in pairs(addon.setdb.global.sets) do
 		args["BaseItem"..i] = {
 			order = i,
 			name = function(info)
-				return name 
+				return name
 			end,
 			type = "description",
 			width = 2.5,
@@ -895,7 +891,7 @@ function addon.RefreshOutfitData()
 			name = L["Remove"],
 			type = "execute",
 			width = .5,
-			func = function()   
+			func = function()  
 					return RemoveCharacterData(name) end,
 		}	
 
@@ -928,7 +924,7 @@ local defaults = {
 		TooltipPreview_ZoomItemModifier = L["None"],
 		TooltipPreview_CustomRace = 1,
 		TooltipPreview_CustomGender = 0,
-		TooltipPreview_DressingDummy = false, 
+		TooltipPreview_DressingDummy = false,
 		IgnoreClassRestrictions = false,
 		ExtraLargeTransmogArea = false,
 		ExtraLargeTransmogAreaMax = screenWidth,
@@ -979,8 +975,6 @@ local DB_Defaults = {
 	},
 }
 
-
-
 local firstRun = false
 local function UpdateDB()
 	local characterDB = BetterWardrobe_CharacterData
@@ -996,7 +990,7 @@ local function UpdateDB()
 	if not characterDB or (characterDB and not characterDB.profiles) then firstRun = true; return end
 	--Update 1. splt favorites and collection tables from characterDB. Update collections to allow multiple lists  10/27/20
 
-	if listDB.lastUpdte ~= 1 then 
+	if listDB.lastUpdte ~= 1 then
 	--Populate profile keys
 		favoriteDB.profileKeys = CopyTable(characterDB.profileKeys)
 		collectionDB.profileKeys = CopyTable(characterDB.profileKeys)
@@ -1024,38 +1018,38 @@ local function UpdateDB()
 		-- do the second update to split into seperate profiles
 		for profile, data in pairs(characterDB.profiles) do
 			favoriteDB.profiles[profile] = {}
-			if data.favorite_items then 
+			if data.favorite_items then
 				favoriteDB.profiles[profile].item = CopyTable(data.favorite_items)
 				data.favorite_items = nil
 			end
-			if data.favorite then 
+			if data.favorite then
 				favoriteDB.profiles[profile].extraset = CopyTable(data.favorite)
 				data.favorite = nil
 			end
 
 			collectionDB.profiles[profile] = {}
-			if  data.selectedCollectionList then 
+			if  data.selectedCollectionList then
 				collectionDB.profiles[profile].selectedCollectionList = data.selectedCollectionList
 				data.selectedCollectionList = nil
 			end
 
-			if data.lists then 
+			if data.lists then
 				collectionDB.profiles[profile].lists = CopyTable(data.lists)
 				data.lists = nil
 			end
 
 			hiddenDB.profiles[profile] = {}
-			if data.item then 
+			if data.item then
 				hiddenDB.profiles[profile].item = CopyTable(data.item)
 				data.item = nil
 			end
 
-			if data.set then 
+			if data.set then
 				hiddenDB.profiles[profile].set = CopyTable(data.set)
 				data.set = nil
 			end
 
-			if data.extraset then 
+			if data.extraset then
 				hiddenDB.profiles[profile].extraset = CopyTable(data.extraset)
 				data.extraset = nil
 			end
@@ -1071,7 +1065,7 @@ local function UpdateDB()
 		for profile, data in pairs(characterDB.profileKeys) do
 			outfitDB.profileKeys[profile] = profile
 
-			if characterDB.profiles[data] then 
+			if characterDB.profiles[data] then
 				outfitDB.char[profile] = {}
 				if characterDB.profiles[data].outfits then
 					outfitDB.char[profile].outfits = CopyTable(characterDB.profiles[data].outfits)
@@ -1082,9 +1076,6 @@ local function UpdateDB()
 			end
 		end
 
-
-			--collectionDB.profiles[profile].collectionList = nil
-
 		listDB.lastUpdte = 1
 	end
 end
@@ -1093,18 +1084,19 @@ end
 local function UpdateDB_8_4()
 	BetterWardrobe_Updates = BetterWardrobe_Updates or {}
 
-	if not BetterWardrobe_Updates["8_4"] then 
+	if not BetterWardrobe_Updates["8_4"] then
+		local characterDB = BetterWardrobe_CharacterData
+		local listDB = BetterWardrobe_ListData
+		local favoriteDB = listDB.favoritesDB or {}
+		local hiddenDB = listDB.HiddenAppearanceDB or {}
 
-	local characterDB = BetterWardrobe_CharacterData
-	local listDB = BetterWardrobe_ListData
-	local favoriteDB = listDB.favoritesDB or {}
-	local hiddenDB = listDB.HiddenAppearanceDB or {}
-	if not favoriteDB.profiles then BetterWardrobe_Updates["8_4"] = true; return end
+		if not favoriteDB.profiles then BetterWardrobe_Updates["8_4"] = true; return end
+
 		for profile, data in pairs(favoriteDB.profiles) do
 			local extraSets = {}
-			if data.extraset then 
+			if data.extraset then
 				for setid, value in pairs(data.extraset) do
-					if setid > 100000 then 
+					if setid > 100000 then
 						extraSets[setid / 100000] = value
 					else
 						extraSets[setid + 10000] = value
@@ -1116,33 +1108,20 @@ local function UpdateDB_8_4()
 
 		for profile, data in pairs(hiddenDB.profiles) do
 			local extraSets = {}
-			if data.extraset then 
+			if data.extraset then
 				for setid, value in pairs(data.extraset) do
-					if setid > 100000 then 
+					if setid > 100000 then
 						extraSets[setid / 100000] = value
+
 					else
 						extraSets[setid + 10000] = value
 					end
 				end
+
 				data.extraset = extraSets
 			end
 		end
 
-		--[[for profile, data in pairs(BetterWardrobe_ListData.collectionListDB.profiles) do
-			local extraSets = {}
-			if data.lists then 
-				for list_index, list_data in pairs(data.lists) do
-					if list_data.set then 
-						for setID, set_data in pairs(list_data.set) do
-							if setid > 100000 then 
-								extraSets[setid / 100000] = value
-							else
-								extraSets[setid + 10000] = value
-							end
-				end
-				data.extraset = extraSets
-			end
-		end]]
 		BetterWardrobe_Updates["8_4"] = true
 	end
 end
@@ -1153,18 +1132,17 @@ function addon:RefreshConfig()
 	Profile = addon.Profile
 end
 
-
 ---Updates Profile after changes
 function addon:RefreshCharConfig()
 	--addon.Profile = self.db.profile
 	--Profile = addon.Profile
 end
 
-local f = CreateFrame("Frame",nil,UIParent)
+local f = CreateFrame("Frame", nil, UIParent)
 f:SetHeight(1)
 f:SetWidth(1)
 f:SetPoint("TOPLEFT", UIParent, "TOPRIGHT")
-f.model = CreateFrame("DressUpModel",nil, UIParent)
+f.model = CreateFrame("DressUpModel", nil, UIParent)
 --f.model:SetPoint("CENTER", UIParent, "CENTER")
 f.model:SetPoint("TOPLEFT", UIParent, "TOPRIGHT")
 f.model:SetHeight(1)
@@ -1174,7 +1152,6 @@ f.model:Hide()
 f.model:SetAutoDress(false)
 f.model:SetUnit("PLAYER")
 addon.frame = f
-
 
 ---Ace based addon initilization
 function addon:OnInitialize()
@@ -1209,8 +1186,6 @@ function addon:OnInitialize()
 	self.char_savedOutfits = LibStub("AceDB-3.0"):New("BetterWardrobe_SavedOutfitData", charSavedOutfits_defaults, true)
 
 	local profile = self.setdb:GetCurrentProfile()
-
-
 	--self.setdb.global[profile] = self.setdb.char
 	addon.SelecteSavedList = false
 	options.args.subitems = itemSub_options
@@ -1230,13 +1205,9 @@ function addon:OnInitialize()
 	options.args.list_profiles.args.collectionLists.name = L["Collection List"]
 	options.args.list_profiles.args.collectionLists.order = 3
 
-
-
 	options.args.list_profiles.args.HiddenAppearanceDB = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.HiddenAppearanceDB)
 	options.args.list_profiles.args.HiddenAppearanceDB.name = L["Hidden Items & Sets"]
 	options.args.list_profiles.args.HiddenAppearanceDB.order = 4
-
-
 
 	LibStub("AceConfigRegistry-3.0"):ValidateOptionsTable(options, addonName)
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, options)
@@ -1244,23 +1215,15 @@ function addon:OnInitialize()
 	self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("BetterWardrobe", "BetterWardrobe")
 	self.db.RegisterCallback(addon, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(addon, "OnProfileCopied", "RefreshConfig")
-
-
 	self.collectionListDB.RegisterCallback(addon, "OnProfileChanged", "RefreshCollectionListData")
-
-
 	self.itemsubdb.RegisterCallback(addon, "OnProfileReset", "RefreshSubItemData")	
 
 	if firstRun then
 		listDB.lastUpdte = 1
 	end
-
 end
 
-
-
-local inizliaed
-
+local initialize
 function addon:OnEnable()
 	_,playerClass, classID = UnitClass("player")
 	addon.Profile = self.db.profile
@@ -1268,23 +1231,19 @@ function addon:OnEnable()
 
 	addon.Init:InitDB()
 	--addon.Init:BuildTooltips()
-
-
-	---loadll()
-	------local f = CreateFrame("Frame", "BW_DressingRoomOutfitFrame", WardrobeCollectionFrame, "BW_DressingRoomOutfitFrameTemplate" )
-
 	addon.Init:DressingRoom()
 	--addon.Init.LoadCollectionListModule()
 	--BW_ColectionListFrameTemplate
 	--addon.Init:BuildTooltips()
+
 	C_Timer.After(0.5, function()
 		addon.RefreshSubItemData()
 		addon.RefreshOutfitData()
 	end)
+	
 	addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_REMOVED", "EventHandler")
 	addon:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED", "EventHandler")
-	if IsAddOnLoaded("Blizzard_Collections") then 
-		--BetterWardrobeCollectionFrame = WardrobeCollectionFrame
+	if IsAddOnLoaded("Blizzard_Collections") then
 		C_Timer.After(0.5, function() addon.Init:LoadModules() end)
 	else
 		addon:RegisterEvent("ADDON_LOADED", "EventHandler")
@@ -1294,27 +1253,26 @@ function addon:OnEnable()
 
 	--Cache any default Blizz Saved Sets
 	addon.StoreBlizzardSets()
-	inizliaed = true
+	initialize = true
 end
-
 
 --Hides default collection window when at transmog vendor
 local function UpdateTransmogVendor()
-	WardrobeCollectionFrame:Hide();
-	BetterWardrobeCollectionFrame:Show();
-	BetterWardrobeCollectionFrame:SetContainer(WardrobeFrame);
+	WardrobeCollectionFrame:Hide()
+	BetterWardrobeCollectionFrame:Show()
+	BetterWardrobeCollectionFrame:SetContainer(WardrobeFrame)
 end
 
 --Loads various modules and builds frames once the Blizzard_Collection addon is loaded
 function addon.Init:LoadModules()
 	--Check to make sure that the addon has completed loading
-	if not inizliaed then 
+	if not initialize then
 		C_Timer.After(0.5, function() addon.Init:LoadModules() end)
 		return false
 	end
 
 	--Check to make sure that the Blizzard Frames have completed loading
-	if not WardrobeTransmogFrame then 
+	if not WardrobeTransmogFrame then
 		C_Timer.After(0.5, function() addon.Init:LoadModules() end)
 		return false
 	end
@@ -1322,26 +1280,23 @@ function addon.Init:LoadModules()
 	C_Timer.After(0, function() addon.Init:UpdateWardrobeEnhanced() end)
 
 	local f = CreateFrame("Frame", "BetterWardrobeCollectionFrame", UIParent, "BetterWardrobeCollectionFrameTemplate" )
-
 	--Hooks into the colection tabs and sets Better Wardobe when viewing the wardrobe collection
-	addon:SecureHook(nil, "CollectionsJournal_UpdateSelectedTab", function(self) 
-		local selected = CollectionsJournal_GetTab(self);
+	addon:SecureHook(nil, "CollectionsJournal_UpdateSelectedTab", function(self)
+		local selected = CollectionsJournal_GetTab(self)
 
 		-- don't touch the wardrobe frame if it's used by the transmogrifier
-		if ( WardrobeCollectionFrame:GetParent() == self or not WardrobeCollectionFrame:GetParent():IsShown() ) then
-			if ( selected == 5 ) then
-				HideUIPanel(WardrobeFrame);
-				WardrobeCollectionFrame:Hide();
-				BetterWardrobeCollectionFrame:SetContainer(self);
+		if (WardrobeCollectionFrame:GetParent() == self or not WardrobeCollectionFrame:GetParent():IsShown()) then
+			if selected == 5 then
+				HideUIPanel(WardrobeFrame)
+				WardrobeCollectionFrame:Hide()
+				BetterWardrobeCollectionFrame:SetContainer(self)
 				if addon.ExtendedTransmogSwap then
-					
 					addon.ExtendedTransmogSwap:Show()
 				end
 			else
-				WardrobeCollectionFrame:Hide();
-				BetterWardrobeCollectionFrame:Hide();
+				WardrobeCollectionFrame:Hide()
+				BetterWardrobeCollectionFrame:Hide()
 				if addon.ExtendedTransmogSwap then
-					
 					addon.ExtendedTransmogSwap:Hide()
 				end
 			end
@@ -1350,58 +1305,56 @@ function addon.Init:LoadModules()
 
 	--addon.Init:LoadWardrobeModule()
 
-
 	WardrobeFrame:HookScript("OnShow",  function() UpdateTransmogVendor() end)
 
-addon:SecureHook(WardrobeTransmogFrame, "GetRandomAppearanceID", function(self) BW_TransmogFrameMixin.GetRandomAppearanceID(self) end)
-addon:SecureHook(WardrobeTransmogFrame, "SelectSlotButton", function(self, slotButton, fromOnClick) BW_TransmogFrameMixin.SelectSlotButton(self, slotButton, fromOnClick) end)
-addon:SecureHook(WardrobeTransmogFrame, "EvaluateSecondaryAppearanceCheckbox", function(self) BW_TransmogFrameMixin.EvaluateSecondaryAppearanceCheckbox(self) end)
-addon:SecureHook(WardrobeTransmogFrame, "GetSelectedTransmogLocation", function(self) BW_TransmogFrameMixin.GetSelectedTransmogLocation(self) end)
-----addon:SecureHook(WardrobeTransmogFrame, "Update", function(self) BW_TransmogFrameMixin.Update(self) end)
-addon:SecureHook(WardrobeTransmogFrame, "SetPendingTransmog", function(self,...) BW_TransmogFrameMixin.Update(self,...) end)
-addon:SecureHook(WardrobeTransmogFrame, "GetSlotButton", function(self,...) BW_TransmogFrameMixin.GetSlotButton(self,...) end)
---addon:SecureHook(WardrobeTransmogFrame, "OnTransmogApplied", function(self,...) BW_TransmogFrameMixin.OnTransmogApplied(self,...) end)
-	
+	addon:SecureHook(WardrobeTransmogFrame, "GetRandomAppearanceID", function(self) BW_TransmogFrameMixin.GetRandomAppearanceID(self) end)
+	addon:SecureHook(WardrobeTransmogFrame, "SelectSlotButton", function(self, slotButton, fromOnClick) BW_TransmogFrameMixin.SelectSlotButton(self, slotButton, fromOnClick) end)
+	addon:SecureHook(WardrobeTransmogFrame, "EvaluateSecondaryAppearanceCheckbox", function(self) BW_TransmogFrameMixin.EvaluateSecondaryAppearanceCheckbox(self) end)
+	addon:SecureHook(WardrobeTransmogFrame, "GetSelectedTransmogLocation", function(self) BW_TransmogFrameMixin.GetSelectedTransmogLocation(self) end)
+	----addon:SecureHook(WardrobeTransmogFrame, "Update", function(self) BW_TransmogFrameMixin.Update(self) end)
+	addon:SecureHook(WardrobeTransmogFrame, "SetPendingTransmog", function(self,...) BW_TransmogFrameMixin.Update(self,...) end)
+	addon:SecureHook(WardrobeTransmogFrame, "GetSlotButton", function(self,...) BW_TransmogFrameMixin.GetSlotButton(self,...) end)
+	--addon:SecureHook(WardrobeTransmogFrame, "OnTransmogApplied", function(self,...) BW_TransmogFrameMixin.OnTransmogApplied(self,...) end)
+		
  	addon.Init:initCollectionList()
  	addon.Init:BuildCollectionList()
 	addon.Init:BuildTransmogVendorUI()
 	addon.Init.SortDropDown_Initialize()
 	addon:UpdateCanIMogIt()
-	addon:InitExtendedSetsSwap() 
+	addon:InitExtendedSetsSwap()
 	addon.Init.SavedSetsDropDown_Initialize()
 end
 
-
 function addon:EventHandler(event, ...)
-	if event == "ADDON_LOADED" and ... == "Blizzard_Collections" then 
+	if event == "ADDON_LOADED" and ... == "Blizzard_Collections" then
 		addon.Init:LoadModules()
 		addon:SendMessage("BW_ADDON_LOADED")
 		addon:UnregisterEvent("ADDON_LOADED")
 		
-		C_Timer.After(0.5, function() 
-
-		WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox.Label:ClearAllPoints()
-		WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:ClearAllPoints()
-		WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox.Label:SetPoint("RIGHT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.PagingFrame.PageText, "LEFT", -30, 0);
-		WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetPoint("RIGHT", WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox.Label, "LEFT", 0, 0);
+		C_Timer.After(0.5, function()
+			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox.Label:ClearAllPoints()
+			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:ClearAllPoints()
+			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox.Label:SetPoint("RIGHT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.PagingFrame.PageText, "LEFT", -30, 0)
+			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetPoint("RIGHT", WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox.Label, "LEFT", 0, 0)
 		 end)
 
 	elseif (event == "PLAYER_ENTERING_WORLD") then
 		addon:SendMessage("BW_OnPlayerEnterWorld")
-		C_Timer.After(1, function() addon:ResetSetsCollectionFrame() end )
+		C_Timer.After(1, function() addon:ResetSetsCollectionFrame() end)
+
 	elseif (event == "TRANSMOG_COLLECTION_SOURCE_ADDED") then
 		local x = ...
 		BetterWardrobeCollectionFrameMixin:OnEvent(event, x)
+
 	elseif (event == "TRANSMOG_COLLECTION_SOURCE_REMOVED") then
 		local x = ...
 		BetterWardrobeCollectionFrameMixin:OnEvent(event, x)
 	end
 end
 
-
-local f=CreateFrame("Frame",nil,UIParent)
-	f:ClearAllPoints()
-	f:SetPoint("TOPRIGHT",100, 100)
-	f:SetSize(1,1)
-	f:Hide()
-	addon.prisonFrame = f
+local f=CreateFrame("Frame", nil, UIParent)
+f:ClearAllPoints()
+f:SetPoint("TOPRIGHT", 100, 100)
+f:SetSize(1, 1)
+f:Hide()
+addon.prisonFrame = f

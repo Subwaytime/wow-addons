@@ -1,10 +1,10 @@
-lightweight tag e826729024fbf738bb28f44aaa4a58c8f6c29c33 0.7.2
+lightweight tag e32d03e380b5c893841724e3241a69c742e8924c 0.7.3
 Author:	nezroy <nezroy@gmail.com>
-Date:	Tue Nov 29 03:06:29 2022 -0700
+Date:	Thu Dec 8 22:41:38 2022 -0700
 
-commit e826729024fbf738bb28f44aaa4a58c8f6c29c33
+commit e32d03e380b5c893841724e3241a69c742e8924c
 Author: nezroy <nezroy@gmail.com>
-Date:   Tue Nov 29 03:06:29 2022 -0700
+Date:   Thu Dec 8 22:41:38 2022 -0700
 
-    Add feature to merge quest, gossip, etc. frames
+    Defer window positioning until entering world event
 

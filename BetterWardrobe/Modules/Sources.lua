@@ -19,23 +19,20 @@ local RetrievingDataText =  RED_FONT_COLOR_CODE..RETRIEVING_ITEM_INFO
 local function GetBossInfo(itemID)
 	local drops = C_TransmogCollection.GetAppearanceSourceDrops(itemID)
 	local sourceText = ""
-	if ( #drops == 1 ) then
+	if #drops == 1 then
 		sourceText = string.format(WARDROBE_TOOLTIP_ENCOUNTER_SOURCE, drops[1].encounter, drops[1].instance)
-		showDifficulty = true
 
-		if ( showDifficulty ) then
-				local drop = drops[1];
-				local diffText = drop.difficulties[1];
-				if ( diffText ) then
-					for i = 2, #drop.difficulties do
-						diffText = diffText..", "..drop.difficulties[i];
-					end
-				end
-				if ( diffText ) then
-					sourceText = sourceText.." "..string.format(PARENS_TEMPLATE, diffText);
-				end
+		local drop = drops[1]
+		local diffText = drop.difficulties[1]
+		if diffText then
+			for i = 2, #drop.difficulties do
+				diffText = diffText..", "..drop.difficulties[i]
 			end
+
+			sourceText = sourceText.." "..string.format(PARENS_TEMPLATE, diffText)
+		end
 	end
+
 	return sourceText
 end
 
@@ -223,7 +220,6 @@ end
 
 local function GetZoneName(zone)
 	return ""
-	-- body
 end
 
 local function GetPrice(itemID)
@@ -266,7 +262,6 @@ local function AddAdditional(parent, index, data, itemID)
 	parent:AddChild(Collected)
 
 	local SourceInfo = AceGUI:Create("InteractiveLabel")
-	--SourceInfo:SetFont(SourceInfo.label:GetFont(),12)
 	SourceInfo:SetHeight(20)
 	local link, sourceName
 
@@ -305,23 +300,19 @@ local function AddAdditional(parent, index, data, itemID)
 	--Quest
 	elseif index == 4 then 
 		sourceName, zoneName, questID, link = GetQuestnfo(data)
-		--if not sourceName then AddAdditional(parent, index, data, itemID) return end
-		--data.questName = sourceName
-		--sourceDB = questList
 		transmogSource = _G["TRANSMOG_SOURCE_2"] or ""
 
 		if sourceName then 
-		sourceName = ACHIEVEMENT_COLOR_CODE..sourceName..L.ENDCOLOR
+			sourceName = ACHIEVEMENT_COLOR_CODE..sourceName..L.ENDCOLOR
 		else
 			if refresh_count < 100 then
-			sourceName = RetrievingDataText..L.ENDCOLOR
+				sourceName = RetrievingDataText..L.ENDCOLOR
 			else
 
+			end
 		end
-	end
 
 		if zoneName then
-			--SourceInfo:SetText(("    %s: %s - %s: [%s]"):format(L["Zone"], zoneName or "?", transmogSource, sourceName or L["No Data Available"]))
 			SourceInfo:SetText(("-%s: %s - [%s] "):format(transmogSource, zoneName, sourceName or L["No Data Available"].." (QuestID:"..questID..")"))
 		else
 			SourceInfo:SetText(("-%s: [%s] "):format(transmogSource, sourceName or "Quest"..questID))
@@ -359,6 +350,7 @@ local function AddAdditional(parent, index, data, itemID)
 				zones = zones..locationDB[tonumber(zondID)]..","
 			end
 		end
+
 		transmogSource = _G["TRANSMOG_SOURCE_3"] or ""
 		prices, currency, items = GetPrice(itemID)
 		price_text = ""
@@ -368,12 +360,12 @@ local function AddAdditional(parent, index, data, itemID)
 			SourceInfo:SetText(("-%s: %s - %s: %s - Price: %s"):format( transmogSource, L[vendorName] or L["No Data Available"], L["Zone"], zones or "?", price_text))
 		end
 
-		for i=1, #currency, 2 do
+		for i = 1, #currency, 2 do
 			if currency[i] then 
 				local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(tonumber(currency[i]))
 				local name = currencyInfo.name
 				local icon = currencyInfo.iconFileID
-				local cost = currency[i+1] or 0
+				local cost = currency[i + 1] or 0
 
 				local text = price_text
 				price_text = price_text..cost.." |T"..icon..":0|t ".."["..name.."] "
@@ -382,10 +374,10 @@ local function AddAdditional(parent, index, data, itemID)
 			end
 		end
 
-		for i=1,#items, 2 do
+		for i = 1, #items, 2 do
 			if items[i] then 
 				local item = Item:CreateFromItemID(tonumber(items[i]))
-				local cost = items[i+1]
+				local cost = items[i + 1]
 				item:ContinueOnItemLoad(function()
 					local name = item:GetItemName()
 					local icon = item:GetItemIcon()
@@ -397,28 +389,15 @@ local function AddAdditional(parent, index, data, itemID)
 
 			end
 		end
-		--SourceInfo:SetText(("    %s: %s - %s: %s - Price: %s"):format( transmogSource, L[vendorName] or L["No Data Available"], L["Zone"], zoneName or "?", price_text))
-
 	else
-
 		if data then 
 			transmogSource = _G["TRANSMOG_SOURCE_"..data] or ""
-		SourceInfo:SetText(("-%s: %s"):format(transmogSource,L["No Data Available"]))
+			SourceInfo:SetText(("-%s: %s"):format(transmogSource,L["No Data Available"]))
 
 		else
-		SourceInfo:SetText(("-%s"):format(L["No Data Available"]))
-
+			SourceInfo:SetText(("-%s"):format(L["No Data Available"]))
 		end
-
 	end
-
-
-
-	--[[			if i == 1 or list[i-1].visualID ~= data.visualID then
-		local Heading = AceGUI:Create("Heading")
-		Heading:SetFullWidth(true)
-		parent:AddChild(Heading)
-	end]]
 
 	SourceInfo:SetCallback("OnEnter", function()
 		GameTooltip:SetOwner(UIParent, "ANCHOR_CURSOR", 0, 0)
@@ -428,46 +407,29 @@ local function AddAdditional(parent, index, data, itemID)
 		end
 	end)
 	
-	SourceInfo:SetCallback("OnLeave", function()
-		GameTooltip:Hide()
-	end)
-
+	SourceInfo:SetCallback("OnLeave", function() GameTooltip:Hide()	end)
 	SourceInfo:SetRelativeWidth(.86)
 	parent:AddChild(SourceInfo)
 
 	local LinkButton = AceGUI:Create("InteractiveLabel")
-	--LinkButton:SetText("Link")
 	LinkButton:SetWidth(60)
 	LinkButton:SetHeight(20)
 
-
-	--LinkButton:SetCallback("OnClick", function()
-		--Export(data.itemID, parent)
-	--end)
 	parent:AddChild(LinkButton)
 	local sourceName = ""
 	local zoneName, questlink
-
-	--Export
-	--
-
-
 end
 
 local refresh_VisID
-
 function CollectionList:GenerateSourceListView(visualID)
 	if self.LISTWINDOW then self.LISTWINDOW:Hide() end
-	-- Create a container frame
 	local f = AceGUI:Create("Window")
-	--f:SetStatusText("") 
 	f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) end)
 	f:SetCallback("OnHide",function(widget) AceGUI:Release(widget) end)
 
 	f:SetTitle(L["Sources"])
 	f:SetStatusText("Status Bar")
 	f:SetLayout("LIST")
-	--f:SetAutoAdjustHeight(true)
 	f:EnableResize(false)
 	_G["BetterWardrobeCollectionListWindow"] = f.frame
 	self.LISTWINDOW = f
@@ -480,7 +442,6 @@ function CollectionList:GenerateSourceListView(visualID)
 	f:AddChild(scrollcontainer)
 
 	local MultiLineEditBox = AceGUI:Create("MultiLineEditBox")
-	--MultiLineEditBox:SetFullHeight(true)
 	MultiLineEditBox:SetFullWidth(true)
 	MultiLineEditBox:SetLabel("")
 	MultiLineEditBox.button:Hide()
@@ -497,7 +458,6 @@ function CollectionList:GenerateSourceListView(visualID)
 
 	local list = BuildSourceList(visualID)
 	for i, data in ipairs(list) do
-			--cal itemID, itemType, itemSubType, itemEquipLoc, icon, itemClassID, itemSubClassID = GetItemInfoInstant(data.itemID)
 		if data then
 			local categoryID, visualID, canEnchant, itemIcon, isCollected, itemLink, transmogLink = C_TransmogCollection.GetAppearanceSourceInfo(data.sourceID)
 			local collectedStatus = ""
@@ -520,9 +480,9 @@ function CollectionList:GenerateSourceListView(visualID)
 				Collected:SetImage("Interface\\RaidFrame\\ReadyCheck-Ready")
 			else
 				Collected:SetImage("Interface\\RaidFrame\\ReadyCheck-NotReady")
-
 			end
-			Collected:SetImageSize(20,20)
+
+			Collected:SetImageSize(20, 20)
 			Collected:SetWidth(25)
 			scroll:AddChild(Collected)
 
@@ -533,18 +493,19 @@ function CollectionList:GenerateSourceListView(visualID)
 			icon:SetWidth(25)
 
 			local CheckBox = AceGUI:Create("InteractiveLabel")
-			-- 	CheckBox:SetFont(CheckBox.label:GetFont(),12)
 			CheckBox:SetHeight(25)
+
 			local priceText = ""
 			itemName = itemName and nameColor.hex..itemName..L.ENDCOLOR or ""
 			CheckBox:SetText(itemName)
 
 			CheckBox:SetCallback("OnClick", function()
-				if ( IsModifiedClick("CHATLINK") ) then
-						if ( itemLink ) then
-							HandleModifiedItemClick(itemLink)
-						end
-				elseif ( IsModifiedClick("DRESSUP") ) then
+				if IsModifiedClick("CHATLINK") then
+					if itemLink then
+						HandleModifiedItemClick(itemLink)
+					end
+
+				elseif IsModifiedClick("DRESSUP") then
 					DressUpVisual(data.sourceID)
 				end
 			end)
@@ -568,18 +529,15 @@ function CollectionList:GenerateSourceListView(visualID)
 			LinkButton:SetText("Link")
 			LinkButton:SetWidth(60)
 			LinkButton:SetHeight(25)
-
-
 			LinkButton:SetCallback("OnClick", function()
 				local url = "https://www.wowhead.com/item="
 				MultiLineEditBox:SetText(url..data.itemID) 
-				--Export(data.itemID, scroll)
 			end)
+
 			scroll:AddChild(LinkButton)
 			local sourceName = ""
 			local zoneName, questlink
 			local datafound = false
-
 
 			if data.sourceType and data.sourceType == 1 then
 				sourceName = GetBossInfo(data.sourceID)
@@ -587,51 +545,42 @@ function CollectionList:GenerateSourceListView(visualID)
 				datafound = true
 			end
 
-
-			local zonelist, objectlist, containerlist, questList, achievementList, professionList, vendorList = GetSourceInfo(data.itemID)
-
-			if #zonelist > 0 then
+			local zonelist, objectlist, containerlist, questList, achievementList, professionList, vendorList = GetSourceInfo(data.itemID)			if #zonelist > 0 then
 				AddAdditional(scroll, 1, zonelist, data.itemID)
 				datafound = true
-
 			end
 
 			local DB_List = {objectlist,containerlist,questList,achievementList ,professionList,vendorList}
-				for index, list in ipairs(DB_List) do
-						for _, db_data in ipairs(list) do
-							AddAdditional(scroll, index+1, db_data, data.itemID)
-							datafound = true
-						end 
-				end
+			for index, list in ipairs(DB_List) do
+				for _, db_data in ipairs(list) do
+					AddAdditional(scroll, index + 1, db_data, data.itemID)
+					datafound = true
+				end 
+			end
+
 			if not datafound then 
 				AddAdditional(scroll, 10, data.sourceType, data.itemID)
 			end
 		end
 	end
 
-	MultiLineEditBox.frame:SetPoint("BOTTOM",f.frame,"BOTTOM", 0,-15)
-	if needsRefresh and refresh_count <100 then
-		--print(refresh_count)
+	MultiLineEditBox.frame:SetPoint("BOTTOM", f.frame,"BOTTOM", 0, -15)
+	if needsRefresh and refresh_count < 100 then
 		refresh_VisID = visualID
 		refresh_count = refresh_count + 1
-		C_Timer.After(0, function() CollectionList:GenerateSourceListView(refresh_VisID)
-		end)
+		C_Timer.After(0, function() CollectionList:GenerateSourceListView(refresh_VisID) end)
+
 	else
 		refresh_VisID = nil
 		refresh_count = 0	
 	end
-
 end
 
-
-
-
 function CollectionListTooltip_OnEnter(self)
-						GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-						GameTooltip:SetText(L["Click: Show Collection List"])
-						GameTooltip:AddLine(L["Shift Click: Show Detail List"])
-						GameTooltip:Show()
-					end
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+	GameTooltip:SetText(L["Click: Show Collection List"])
+	GameTooltip:AddLine(L["Shift Click: Show Detail List"])
+	GameTooltip:Show()
+end
 
 BW_CollectionListDropDownMixin = {}
-

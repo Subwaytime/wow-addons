@@ -2,8 +2,6 @@ local addonName, addon = ...
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
-
-
 local UI = {}
 
 local LE_DEFAULT = addon.Globals.LE_DEFAULT
@@ -19,12 +17,9 @@ local TAB_EXTRASETS = addon.Globals.TAB_EXTRASETS
 local TAB_SAVED_SETS = addon.Globals.TAB_SAVED_SETS
 local TABS_MAX_WIDTH = addon.Globals.TABS_MAX_WIDTH
 
-
 local db, active
 local FileData
 local SortOrder
-
-
 
 --= {INVTYPE_HEAD, INVTYPE_SHOULDER, INVTYPE_CLOAK, INVTYPE_CHEST, INVTYPE_WAIST, INVTYPE_LEGS, INVTYPE_FEET, INVTYPE_WRIST, INVTYPE_HAND}
 local defaults = {
@@ -32,29 +27,19 @@ local defaults = {
 	reverse = false,
 }
 
-
 function addon.Init:BuildUI()
 	UI.DefaultButtons_Update()
 	BW_WardrobeCollectionFrame.BW_SetsHideSlotButton:SetScript("OnClick", function(self) UI:JournalHideSlotMenu_OnClick(BW_WardrobeCollectionFrame.BW_SetsHideSlotButton) end)
-	--.BW_SetsHideSlotButton:
 	local level = BW_SetsCollectionFrame.Model:GetFrameLevel()
 	BW_WardrobeCollectionFrame.BW_SetsHideSlotButton:SetFrameLevel(level + 5)
 	UI.CreateOptionsDropdown()
 	addon.Init:CreateRightClickDropDown()
-	--	WardrobeFrame:HookScript("OnShow",  function() print("XXX"); UI.ExtendTransmogView() end)
---	hooksecurefunc(WardrobeCollectionFrame.ItemsCollectionFrame, "UpdateWeaponDropDown", PositionDropDown)
 end
-
-
-
-
 
 local tabType = {"item", "set", "extraset"}
 --Adds icons and added right click menu options to the various frames
 function UI.DefaultButtons_Update()
-
 end
-
 
 function UI:JournalHideSlotMenu_OnClick(parent)
 	local Profile = addon.Profile
@@ -74,17 +59,21 @@ function UI:JournalHideSlotMenu_OnClick(parent)
 
 	local contextMenuData = {
 		{
-				text = L["Toggle Hidden View"],
-				func = function (self, arg1, arg2, value)
-					addon.setdb.profile.autoHideSlot.toggle = not addon.setdb.profile.autoHideSlot.toggle
-					resetModel()
-				end,
-				isNotRadio = true,
-				notCheckable = false,
-				checked = function() return addon.setdb.profile.autoHideSlot.toggle end,
-				keepShownOnClick = true, 
+			text = L["Toggle Hidden View"],
+			func = function (self, arg1, arg2, value)
+				addon.setdb.profile.autoHideSlot.toggle = not addon.setdb.profile.autoHideSlot.toggle
+				resetModel()
+			end,
+			isNotRadio = true,
+			notCheckable = false,
+			checked = function() return addon.setdb.profile.autoHideSlot.toggle end,
+			keepShownOnClick = true, 
 		},
-		{ text = L["Select Slot to Hide"], isTitle = true, notCheckable = true},
+		{ 
+			text = L["Select Slot to Hide"], 
+			isTitle = true, 
+			notCheckable = true,
+		},
 	}
 
 	for i = 1, 19 do 
@@ -101,7 +90,6 @@ function UI:JournalHideSlotMenu_OnClick(parent)
 				keepShownOnClick = true, 
 			}
 			tinsert (contextMenuData, menu)
-
 		end
 	end
 	BW_UIDropDownMenu_SetAnchor(addon.ContextMenu, 0, 0, "BOTTOMLEFT", parent, "BOTTOMLEFT")
@@ -110,7 +98,6 @@ end
 
 
 function 	UI.CreateOptionsDropdown()
---local f = BW_UIDropDownMenu_Create("BW_TransmogOptionsDropDown", BW_WardrobeCollectionFrame)
 	local BW_TransmogOptionsDropDown= CreateFrame("Frame", "BW_TransmogOptionsDropDown", BW_WardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
 	BW_TransmogOptionsDropDown = BW_TransmogOptionsDropDown
 	BW_WardrobeCollectionFrame.OptionsDropDown = BW_TransmogOptionsDropDown

@@ -145,7 +145,7 @@ local options = {
                 },
                 npccolor = {
                     order = 2,
-                    name = "npc color",
+                    name = "NPC color",
                     type = "color",
                     get = "GetColor",
                     set = "SetColor",
@@ -186,7 +186,7 @@ local options = {
                 },
                 npccolor = {
                     order = 2,
-                    name = "npc color",
+                    name = "NPC color",
                     type = "color",
                     get = "GetColor",
                     set = "SetColor",
@@ -227,7 +227,7 @@ local options = {
                 },
                 npccolor = {
                     order = 2,
-                    name = "npc color",
+                    name = "NPC color",
                     type = "color",
                     get = "GetColor",
                     set = "SetColor",
@@ -268,7 +268,7 @@ local options = {
                 },
                 npccolor = {
                     order = 2,
-                    name = "npc color",
+                    name = "NPC color",
                     type = "color",
                     get = "GetColor",
                     set = "SetColor",

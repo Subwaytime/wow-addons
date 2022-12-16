@@ -85,7 +85,7 @@ Private.AddUpdater(Module, function(self)
 
 			if (retail) then
 
-				local tooltipData = C_TooltipInfo.GetBagItem(self.bag, self:GetID())
+				local tooltipData = C_TooltipInfo.GetBagItem(self:GetBag(), self:GetID())
 
 				-- Assign data to 'type' and 'guid' fields.
 				TooltipUtil.SurfaceArgs(tooltipData)
@@ -97,7 +97,7 @@ Private.AddUpdater(Module, function(self)
 
 				if (isgear) then
 					for i = 2,3 do
-						local msg = tooltipData.lines[i].leftText
+						local msg = tooltipData.lines[i] and tooltipData.lines[i].leftText
 						if (not msg) then break end
 
 						local itemlevel = string_match(msg, s_item_level)
@@ -113,7 +113,7 @@ Private.AddUpdater(Module, function(self)
 
 				if (isbag) then
 					for i = 3,4 do
-						local msg = tooltipData.lines[i].leftText
+						local msg = tooltipData.lines[i] and tooltipData.lines[i].leftText
 						if (not msg) then break end
 
 						local numslots = string_match(msg, s_num_slots)
@@ -130,7 +130,7 @@ Private.AddUpdater(Module, function(self)
 			else
 
 				if (not tooltip.owner or not tooltip.bag or not tooltip.slot) then
-					tooltip.owner, tooltip.bag,tooltip.slot = self, self.bag, self:GetID()
+					tooltip.owner, tooltip.bag,tooltip.slot = self, self:GetBag(), self:GetID()
 					tooltip:SetOwner(tooltip.owner, "ANCHOR_NONE")
 					tooltip:SetBagItem(tooltip.bag, tooltip.slot)
 				end
