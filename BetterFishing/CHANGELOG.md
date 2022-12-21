@@ -1,3 +1,6 @@
+### 1.1.6
+- Shouldn't break the 'looking for lunkers' spell anymore.
+
 ### 1.1.5
 - Fix error with double click to cast
 - Add Option to disable icon above bobber (mostly only works with default ui anyway)

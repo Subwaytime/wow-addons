@@ -55,7 +55,7 @@ end
 
 local defaultConfig = {
   ["global"] = {
-    ["version"] = "1.30.0",
+    ["version"] = "1.30.2",
     ["minimap"] = {
       ["hide"] = false
     }

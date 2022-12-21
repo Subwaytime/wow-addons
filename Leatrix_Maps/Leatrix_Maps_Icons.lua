@@ -745,7 +745,7 @@
 		},
 
 		[2023] =  --[[Ohn'ahran Plains]] {
-			{"Dungeon", 61.5, 42.6, L["The Nokhud Offensive"], L["Dungeon"], 1198}, -- Unconfirmed
+			{"Dungeon", 60.9, 39.0, L["The Nokhud Offensive"], L["Dungeon"], 1198}, -- Unconfirmed
 		},
 
 		[2024] =  --[[The Azure Span]] {
@@ -757,6 +757,12 @@
 			{"Dungeon", 58.3, 42.3, L["Algeth'ar Academy"], L["Dungeon"], 1201},
 			{"Dungeon", 59.4, 60.8, L["Halls of Infusion"], L["Dungeon"], 1204},
 			{"Raid", 73.0, 55.7, L["Vault of the Incarnates"], L["Raid"], 1200},
+		},
+
+		[2112] =  --[[Valdrakken]] {
+			{"PortalN", 53.9, 55.0, L["Valdrakken Portals"] .. "|n" .. L["Dalaran"] .. ", " .. L["Shadowmoon Valley"] .. ",|n" .. L["Jade Forest"]},
+			{"PortalH", 56.6, 38.4, L["Orgrimmar"], L["Portal"]},
+			{"PortalA", 59.7, 41.8, L["Stormwind"], L["Portal"]},
 		},
 
 	}

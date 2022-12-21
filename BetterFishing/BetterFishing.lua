@@ -1,20 +1,14 @@
--- Classic is not supported at all, so don't even attempt to load
-if WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
-  return
-end
-
 local addonName = ...
 local BetterFishing = {}
 local internal = {
   -- Defaults
   _frame = CreateFrame("frame"),
   clear_override = false,
-  fishingID = 131474,
-  fishingCastingID = 131476,
   DOUBLECLICK_MAX_SECONDS = 0.2,
   DOUBLECLICK_MIN_SECONDS = 0.04,
   previousClickTime = 0,
-  isClassic = (WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE),
+  isClassic = WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE,
+  isClassicEra = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 }
 
 local soundCache = {}
@@ -32,14 +26,14 @@ local CVarCacheSounds = {
 BINDING_NAME_BETTERFISHINGKEY = "Cast and Interact"
 
 local ClassicFishingIDs = {
-  {7620, 7731, 7732, 18248, 33095, 51294}
+  7620, 7731, 7732, 18248, 33095, 51294
 }
 
 function BetterFishing:GetFishingCastID()
   if internal.isClassic then
     for i=1, #ClassicFishingIDs do
-      if IsSpellKnown(ClassicFishingIDs[i][1]) then
-        return ClassicFishingIDs[i][1]
+      if IsSpellKnown(ClassicFishingIDs[i]) then
+        return ClassicFishingIDs[i]
       end
     end
   end
@@ -47,12 +41,23 @@ function BetterFishing:GetFishingCastID()
   return 131476
 end
 
+function BetterFishing:GetFishingID()
+  if internal.isClassic then
+    for i=1, #ClassicFishingIDs do
+      if IsSpellKnown(ClassicFishingIDs[i]) then
+        return ClassicFishingIDs[i]
+      end
+    end
+  end
+
+  return 131474
+end
+
 function BetterFishing:GetFishingName()
   -- technically 7620 exists on every version but still add mainline fallback if for some reason not
   local localizedName = GetSpellInfo(7620)
   return localizedName or GetSpellInfo(131474)
 end
-
 
 local function IsTaintable()
   return (InCombatLockdown() or (UnitAffectingCombat("player") or UnitAffectingCombat("pet")))
@@ -63,23 +68,31 @@ function BetterFishing:GetSecureButton()
     local button = CreateFrame("Button", addonName.."Button", nil, "SecureActionButtonTemplate")
     button:RegisterForClicks("AnyDown", "AnyUp")
     button:SetAttribute("type", "spell")
-    button:SetAttribute("spell", internal.fishingID)
+    button:SetAttribute("spell", self:GetFishingID())
     button:SetScript("PostClick", function(self, mouse_button, down)
       MouselookStart()
       if down then return end
       MouselookStop()
     end)
-    SecureHandlerWrapScript(button, "PostClick", button,  [[
-      if down then return end
-      self:ClearBindings()
-    ]])
+    SecureHandlerWrapScript(button, "PostClick", button,  string.format([[
+      local isClassic = %s
+      if isClassic == true then
+        self:ClearBindings()
+      else
+        if not down then
+          self:ClearBindings()
+        end
+      end
+    ]], tostring(internal.isClassic)))
+
     self.secureButton = button
   end
   return self.secureButton
 end
 
 function BetterFishing_Run()
-  if IsTaintable() or IsFlying() or GetNumLootItems() ~= 0 then return end
+  if internal.isClassicEra then return end
+  if IsTaintable() or IsFlying() or GetNumLootItems() ~= 0 or (UnitChannelInfo("player") ~= nil) then return end
   local key1, key2 = GetBindingKey("BETTERFISHINGKEY")
   local localizedName = BetterFishing:GetFishingName()
   if key1 then
@@ -115,7 +128,7 @@ function BetterFishing:IsFishing()
 end
 
 function BetterFishing:AllowFishing()
-  if not IsSpellKnown(internal.fishingID)
+  if not IsSpellKnown(self:GetFishingID())
   or IsPlayerMoving()
   or IsMounted()
   or IsFlying()
@@ -134,7 +147,7 @@ function BetterFishing:AllowFishing()
     return false
   end
 
-  if self:IsFishing() then
+  if (UnitChannelInfo("player") ~= nil) then
     return false
   end
 
@@ -152,7 +165,6 @@ function BetterFishing:ResetCVars()
   SetCVar("SoftTargetInteract", cachedSoftTargetInteract);
   SetCVar("SoftTargetInteractArc", cachedSoftTargetInteractArc);
   SetCVar("SoftTargetInteractRange", cachedSoftTargetInteractRange);
-  if BetterFishingDB.objectIconDisabled then return end
   SetCVar("SoftTargetIconInteract", cachedSoftTargetIconInteract);
   SetCVar("SoftTargetIconGameObject", cachedSoftTargetIconGameObject);
 end
@@ -167,9 +179,8 @@ function BetterFishing:SetCVars()
   SetCVar("SoftTargetInteract", 3);
   SetCVar("SoftTargetInteractArc", 2);
   SetCVar("SoftTargetInteractRange", 15);
-  if BetterFishingDB.objectIconDisabled then return end
-  SetCVar("SoftTargetIconGameObject", 1);
-  SetCVar("SoftTargetIconInteract", 1);
+  SetCVar("SoftTargetIconGameObject", BetterFishingDB.objectIconDisabled and 0 or 1);
+  SetCVar("SoftTargetIconInteract", BetterFishingDB.objectIconDisabled and 0 or 1);
 end
 
 function BetterFishing:OnEvent(event, ...)
@@ -285,24 +296,26 @@ function BetterFishing:CreateSettings()
   local info = {
     "enhanceSounds#Enhance Sounds",
     "doubleClickEnabled#Double Click to cast",
-    "objectIconDisabled#Disable Icon above bobber (Default UI, visibility varies for nameplate addons)"
+    "objectIconDisabled#Disable icon above bobber (visibility varies for nameplate addons)"
   }
   local prevCheckButton
   for i, keyInfo in ipairs(info) do
     local option, text = strsplit("#", keyInfo)
-    local checkButton = makeCheckButton(text)
-    if not prevCheckButton then
-      checkButton:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 0, -16)
-    else
-      checkButton:SetPoint("TOPLEFT", prevCheckButton, "BOTTOMLEFT", 0, 0)
-    end
-    checkButton:SetChecked(BetterFishingDB[option])
-    checkButton:SetScript("OnClick", function()
-      BetterFishingDB[option] = not BetterFishingDB[option]
+    if not (internal.isClassic and option == "objectIconDisabled") then
+      local checkButton = makeCheckButton(text)
+      if not prevCheckButton then
+        checkButton:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 0, -16)
+      else
+        checkButton:SetPoint("TOPLEFT", prevCheckButton, "BOTTOMLEFT", 0, 0)
+      end
       checkButton:SetChecked(BetterFishingDB[option])
-    end)
+      checkButton:SetScript("OnClick", function()
+        BetterFishingDB[option] = not BetterFishingDB[option]
+        checkButton:SetChecked(BetterFishingDB[option])
+      end)
 
-    prevCheckButton = checkButton
+      prevCheckButton = checkButton
+    end
   end
   if internal.isClassic then
     local slider = CreateFrame("Slider", addonName.."_Slider", optionsFrame, "OptionsSliderTemplate")

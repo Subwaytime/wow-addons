@@ -1,11 +1,14 @@
+10.0.24 - 21st December 2022
+- Updated sounds to game version 10.0.2.47213 (Dec 19 2022) (100002).
+
 10.0.21 - 10th December 2022
-- Updated for game version 10.0.2.46924.
+- Updated sounds to game version 10.0.2.46924.
 
 10.0.12 - 1st December 2022
-- Updated for game version 10.0.2.46879.
+- Updated sounds to game version 10.0.2.46879.
 
 10.0.11 - 16th November 2022
-- Updated for game version 10.0.2.46658.
+- Updated sounds to game version 10.0.2.46658.
 
 10.0.02 - 8th November 2022
 - Due to problems with Blizzard's code in Dragonflight, the '/lts' slash command has been removed for the time being.  As a workaround, you can enter '/run leasounds()' to open Leatrix Sounds.  If you want to pass a parameter, enter it in quotes between the brackets.  Example: /run leasounds("wipe").  This (hopefully temporary) change is necessary because of a bug in the game code with the slash command system.  Entering any addon related slash command will taint the UI and cause errors to show at some point.  Blizzard are aware of the bug.  When they fix it, the /lts slash command will return.  You can assign a hotkey to open Leatrix Sounds in the game keybindings panel if you prefer.
