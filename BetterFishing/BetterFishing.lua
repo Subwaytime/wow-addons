@@ -92,7 +92,7 @@ end
 
 function BetterFishing_Run()
   if internal.isClassicEra then return end
-  if IsTaintable() or IsFlying() or GetNumLootItems() ~= 0 or (UnitChannelInfo("player") ~= nil) then return end
+  if IsTaintable() or IsFlying() or GetNumLootItems() ~= 0 or BetterFishing:IsFishing() or (not BetterFishingDB.overrideLunker and BetterFishing:IsLunkerActive()) then return end
   local key1, key2 = GetBindingKey("BETTERFISHINGKEY")
   local localizedName = BetterFishing:GetFishingName()
   if key1 then
@@ -121,14 +121,34 @@ end)
 
 function BetterFishing:IsFishing()
   local spellID = select(8,UnitChannelInfo("player"))
-  if spellID == self:GetFishingCastID() then
+  if spellID == self:GetFishingCastID() or spellID == 377895 then
     return true
+  end
+  return false
+end
+
+function BetterFishing:IsLunkerActive()
+  local spellID = select(8,UnitChannelInfo("player"))
+  if spellID == 392270 then
+    return true
+  end
+  return false
+end
+
+function BetterFishing:IsFishingpoleEquipped()
+  local itemID = GetInventoryItemID("player", INVSLOT_MAINHAND)
+  if itemID then
+    local subclassID = select(7, GetItemInfoInstant(itemID))
+    if subclassID and subclassID == Enum.ItemWeaponSubclass.Fishingpole then
+      return true
+    end
   end
   return false
 end
 
 function BetterFishing:AllowFishing()
   if not IsSpellKnown(self:GetFishingID())
+  or internal.isClassic and not self:IsFishingpoleEquipped()
   or IsPlayerMoving()
   or IsMounted()
   or IsFlying()
@@ -142,12 +162,7 @@ function BetterFishing:AllowFishing()
     return false
   end
 
-  local form = GetShapeshiftForm(true)
-  if form and form > 0 then
-    return false
-  end
-
-  if (UnitChannelInfo("player") ~= nil) then
+  if self:IsFishing() and not BetterFishingDB.recastOnDoubleClick or (not BetterFishingDB.overrideLunker and self:IsLunkerActive()) then
     return false
   end
 
@@ -178,7 +193,7 @@ function BetterFishing:SetCVars()
   cachedSoftTargetIconInteract = GetCVar("SoftTargetIconInteract");
   SetCVar("SoftTargetInteract", 3);
   SetCVar("SoftTargetInteractArc", 2);
-  SetCVar("SoftTargetInteractRange", 15);
+  SetCVar("SoftTargetInteractRange", 25);
   SetCVar("SoftTargetIconGameObject", BetterFishingDB.objectIconDisabled and 0 or 1);
   SetCVar("SoftTargetIconInteract", BetterFishingDB.objectIconDisabled and 0 or 1);
 end
@@ -194,7 +209,7 @@ function BetterFishing:OnEvent(event, ...)
     end
   elseif event == "UNIT_SPELLCAST_CHANNEL_START" then
     local unit,_,spellID = ...
-    if unit == "player" and spellID == self:GetFishingCastID() then
+    if unit == "player" and (spellID == self:GetFishingCastID() or spellID == 377895) then
       BetterFishing:SetCVars()
       if IsTaintable() then return end
       local key1, key2 = GetBindingKey("BETTERFISHINGKEY")
@@ -207,7 +222,7 @@ function BetterFishing:OnEvent(event, ...)
     end
   elseif event == "UNIT_SPELLCAST_CHANNEL_STOP" then
     local unit,_,spellID = ...
-    if unit == "player" and spellID == self:GetFishingCastID() then
+    if unit == "player" and (spellID == self:GetFishingCastID() or spellID == 377895) then
       BetterFishing:ResetCVars()
       if not IsTaintable() then
         ClearOverrideBindings(BetterFishing:GetSecureButton());
@@ -271,7 +286,7 @@ function BetterFishing:CreateSettings()
     optionsFrame.name = "Better Fishing"
   else
     optionsFrame = CreateFrame("Frame")
-    category, layout = Settings.RegisterCanvasLayoutCategory(optionsFrame, "Better Fishing |Tinterface/cursor/crosshair/fishing:18:18:0:0|t");
+    local category, layout = Settings.RegisterCanvasLayoutCategory(optionsFrame, "Better Fishing |Tinterface/cursor/crosshair/fishing:18:18:0:0|t");
     category.ID = "Better Fishing";
     Settings.RegisterAddOnCategory(category);
   end
@@ -293,25 +308,26 @@ function BetterFishing:CreateSettings()
 
     return checkBox
   end
-  local info = {
-    "enhanceSounds#Enhance Sounds",
-    "doubleClickEnabled#Double Click to cast",
-    "objectIconDisabled#Disable icon above bobber (visibility varies for nameplate addons)"
+  local settingsInfo = {
+    { option = "enhanceSounds", detail = "Enhance Sounds" },
+    { option = "doubleClickEnabled", detail = "Double Click to cast" },
+    { option = "recastOnDoubleClick", detail = "When Double Click is enabled allow recasting while fishing" },
+    { option = "overrideLunker", detail = "Allow Fishing while \"Looking for Lunkers\" buff is active", minExpansion = LE_EXPANSION_DRAGONFLIGHT },
+    { option = "objectIconDisabled", detail = "Disable icon above bobber (visibility varies for nameplate addons)", minExpansion = LE_EXPANSION_DRAGONFLIGHT }
   }
   local prevCheckButton
-  for i, keyInfo in ipairs(info) do
-    local option, text = strsplit("#", keyInfo)
-    if not (internal.isClassic and option == "objectIconDisabled") then
-      local checkButton = makeCheckButton(text)
+  for _, keyInfo in ipairs(settingsInfo) do
+    if not keyInfo.minExpansion or LE_EXPANSION_LEVEL_CURRENT >= keyInfo.minExpansion then
+      local checkButton = makeCheckButton(keyInfo.detail)
       if not prevCheckButton then
         checkButton:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 0, -16)
       else
         checkButton:SetPoint("TOPLEFT", prevCheckButton, "BOTTOMLEFT", 0, 0)
       end
-      checkButton:SetChecked(BetterFishingDB[option])
+      checkButton:SetChecked(BetterFishingDB[keyInfo.option])
       checkButton:SetScript("OnClick", function()
-        BetterFishingDB[option] = not BetterFishingDB[option]
-        checkButton:SetChecked(BetterFishingDB[option])
+        BetterFishingDB[keyInfo.option] = not BetterFishingDB[keyInfo.option]
+        checkButton:SetChecked(BetterFishingDB[keyInfo.option])
       end)
 
       prevCheckButton = checkButton

@@ -1,4 +1,4 @@
-## Interface: 100002
+## Interface: 100005
 ## Version: 1.5
 ## Title: HealthBarColor
 ## Author: Slothpala
@@ -21,3 +21,5 @@ Libs\AceGUI-3.0-SharedMediaWidgets\widget.xml
 HealthBarColor.lua
 Modules\Textures.lua
 Modules\PartyColor.lua
+Modules\DebuffColor.lua
+Modules\BackgroundTexture.lua

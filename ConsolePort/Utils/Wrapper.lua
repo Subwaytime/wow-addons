@@ -58,12 +58,17 @@ function CPAPI.GetItemLevelColor(...)
 	if GetItemLevelColor then
 		return GetItemLevelColor(...)
 	end
-	return CPAPI.GetClassColor()
+	local r, g, b = CPAPI.GetClassColor()
+	return r, g, b;
 end
 
 function CPAPI.GetAverageItemLevel(...)
 	if GetAverageItemLevel then
 		return floor(select(2, GetAverageItemLevel(...)))
+	end
+	-- TODO: Some simple method of calculating average ilvl on Classic
+	if GetClassicExpansionLevel and MAX_PLAYER_LEVEL_TABLE then
+		return MAX_PLAYER_LEVEL_TABLE[GetClassicExpansionLevel()]
 	end
 	return MAX_PLAYER_LEVEL
 end
@@ -189,8 +194,11 @@ do
 local function nopz() return 0  end;
 local function nopt() return {} end;
 
+CPAPI.ContainerIDToInventoryID = C_Container and C_Container.ContainerIDToInventoryID or ContainerIDToInventoryID;
 CPAPI.GetActiveZoneAbilities = C_ZoneAbility and C_ZoneAbility.GetActiveAbilities or nopt;
 CPAPI.GetBonusBarIndexForSlot = C_ActionBar.GetBonusBarIndexForSlot or nop;
+CPAPI.GetCollectedDragonridingMounts = C_MountJournal and C_MountJournal.GetCollectedDragonridingMounts or nopt;
+CPAPI.GetContainerItemID = C_Container and C_Container.GetContainerItemID or GetContainerItemID;
 CPAPI.GetContainerItemQuestInfo = C_Container and C_Container.GetContainerItemQuestInfo or GetContainerItemQuestInfo;
 CPAPI.GetContainerNumFreeSlots = C_Container and C_Container.GetContainerNumFreeSlots or GetContainerNumFreeSlots;
 CPAPI.GetContainerNumSlots = C_Container and C_Container.GetContainerNumSlots or GetContainerNumSlots;
@@ -207,6 +215,7 @@ CPAPI.IsXPUserDisabled = IsXPUserDisabled or nop;
 CPAPI.LeaveParty = C_PartyInfo and C_PartyInfo.LeaveParty or LeaveParty;
 CPAPI.PickupContainerItem = C_Container and C_Container.PickupContainerItem or PickupContainerItem;
 CPAPI.PutActionInSlot = C_ActionBar and C_ActionBar.PutActionInSlot or PlaceAction;
+CPAPI.RequestLoadQuestByID = C_QuestLog and C_QuestLog.RequestLoadQuestByID or nop;
 CPAPI.UseContainerItem = C_Container and C_Container.UseContainerItem or UseContainerItem;
 
 end

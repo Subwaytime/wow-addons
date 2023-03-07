@@ -1,3 +1,28 @@
+10.0.48 - 7th March 2023
+- Maintenance update.
+
+10.0.39 - 22nd February 2023
+- Updated sounds to game version 10.0.5.48069 (Feb 10 2023) (100005).
+
+10.0.38 - 4th February 2023
+- Updated sounds to game version 10.0.5.47967 (Feb 2 2023) (100005).
+
+10.0.35 - 1st February 2023
+- Updated sounds to game version 10.0.5.47884 (Jan 27 2023) (100005).
+- Updated close button code.
+
+10.0.34 - 27th January 2023
+- In order to ensure that Leatrix Sounds includes the latest sound files, the addon panel now includes an 'Unknown' checkbox.  If checked, unknown sound files will be shown in the listing.  These are typically newer sound files that do not have names yet.  Note that some unknown sound files may not be currently playable (this can change in future game patches).
+
+10.0.33 - 25th January 2023
+- Updated for game patch 10.0.5.
+- Updated sounds to game version 10.0.5.47799 (Jan 24 2023) (100005).
+- The /lts slash command has returned.  The /run leasounds() command is no longer available.
+
+10.0.27 - 4th January 2023
+- You can now hold control and left-click a track to insert the track ID in chat or right-click a track to insert the track ID in the chat editbox.  This makes it easier to add the track ID to the new 'Mute custom sounds' option ('System') in Leatrix Plus.
+- Additional sounds update for game version 10.0.2.47213 (Dec 19 2022) (100002).
+
 10.0.24 - 21st December 2022
 - Updated sounds to game version 10.0.2.47213 (Dec 19 2022) (100002).
 

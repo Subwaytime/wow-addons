@@ -55,7 +55,7 @@ end
 
 local defaultConfig = {
   ["global"] = {
-    ["version"] = "1.30.2",
+    ["version"] = "1.32.2",
     ["minimap"] = {
       ["hide"] = false
     }
@@ -111,9 +111,7 @@ local defaultConfig = {
     ["StanceBar"] = {
       displayName = "Stance Bar"
     },
-    ["MicroButtonAndBagsBar"] = {
-      displayName = "System and Bags Bar"
-    },
+    ["MicroButtonAndBagsBar"] = nil,
     ["ObjectiveTrackerFrame"] = {
       displayName = "Objective Tracker"
     },
@@ -169,6 +167,12 @@ local defaultConfig = {
     },
     ["BuffFrame.CollapseAndExpandButton"] = {
       displayName = "BuffFrame Collapse Button"
+    },
+    ["BagsBar"] = {
+      displayName = "Bag Bar"
+    },
+    ["MicroMenu"] = {
+      displayName = "MicroMenu"
     }
   }
 }
@@ -188,7 +192,6 @@ local frameMapping = {
   ["ActionBar8"] = {mainFrame = MultiBar7},
   ["PetActionBar"] = {mainFrame = PetActionBar},
   ["StanceBar"] = {mainFrame = StanceBar},
-  ["MicroButtonAndBagsBar"] = {mainFrame = MicroButtonAndBagsBar},
   ["ObjectiveTrackerFrame"] = {mainFrame = ObjectiveTrackerFrame},
   ["BuffFrame"] = {mainFrame = BuffFrame},
   ["DebuffFrame"] = {mainFrame = DebuffFrame},
@@ -206,7 +209,9 @@ local frameMapping = {
   ["MainMenuBarVehicleLeaveButton"] = {mainFrame = MainMenuBarVehicleLeaveButton},
   ["FocusFrameToT"] = {mainFrame = FocusFrameToT},
   ["UIWidgetPowerBarContainerFrame"] = {mainFrame = UIWidgetPowerBarContainerFrame},
-  ["BuffFrame.CollapseAndExpandButton"] = {mainFrame = BuffFrame.CollapseAndExpandButton}
+  ["BuffFrame.CollapseAndExpandButton"] = {mainFrame = BuffFrame.CollapseAndExpandButton},
+  ["BagsBar"] = {mainFrame = BagsBar},
+  ["MicroMenu"] = {mainFrame = MicroMenu}
 }
 
 local function setFrameDefaultOptions(frameOptions)

@@ -357,20 +357,20 @@
 		</Layers>
 		<Frames>
 			<Frame parentKey="CanUse" mixin = "BetterWardrobeSetsDetailsItemUseabiltiyMixin" >
-			<Size x="25" y="25"/>
+				<Size x="25" y="25"/>
 
-			<Anchors>
-				<Anchor point="TOP" relativeKey="$parent" x="0" y = "15"/>
-			</Anchors>
-				<Layers>
-					<Layer level="OVERLAY">
-						<Texture parentKey="Icon" atlas="PlayerRaidBlip" useAtlasSize="false" hidden="false" setAllPoints = "true" />
-					</Layer>
-				</Layers>
-			<Scripts>
-			<OnEnter method="OnEnter"/>
-			<OnLeave method="OnLeave"/>
-		</Scripts>
+				<Anchors>
+					<Anchor point="TOP" relativeKey="$parent" x="0" y = "15"/>
+				</Anchors>
+					<Layers>
+						<Layer level="OVERLAY">
+							<Texture parentKey="Icon" atlas="PlayerRaidBlip" useAtlasSize="false" hidden="false" setAllPoints = "true" />
+						</Layer>
+					</Layers>
+				<Scripts>
+					<OnEnter method="OnEnter"/>
+					<OnLeave method="OnLeave"/>
+				</Scripts>
 			</Frame>
 			<Frame parentKey="Favorite" setAllPoints="true">
 				<Layers>
@@ -406,7 +406,7 @@
 		<Frames>
 			<Button name="$parentTab1" parentKey="ItemsTab" inherits="BW_PanelTopTabButtonTemplate" text="WARDROBE_ITEMS" id="1" frameLevel="40">
 				<KeyValues>
-					<KeyValue key="minWidth" value="57" type="number"/>
+					<KeyValue key="minWidth" value="2" type="number"/>
 				</KeyValues>
 				<Anchors>
 					<Anchor point="TOPLEFT" x="58" y="-28"/>
@@ -419,7 +419,7 @@
 			</Button>
 			<Button name="$parentTab2" parentKey="SetsTab" inherits="BW_PanelTopTabButtonTemplate" text="WARDROBE_SETS" id="2" frameLevel="40" >
 				<KeyValues>
-					<KeyValue key="minWidth" value="57" type="number"/>
+					<KeyValue key="minWidth" value="2" type="number"/>
 				</KeyValues>
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentTab1"  relativePoint="RIGHT" x="0" y="0"/>
@@ -454,7 +454,7 @@
 			</Button>
 			<Button name="$parentTab3" parentKey="ExtraSetsTab" inherits="BW_PanelTopTabButtonTemplate" text="Extra" id="3" frameLevel="40" >
 				<KeyValues>
-					<KeyValue key="minWidth" value="57" type="number"/>
+					<KeyValue key="minWidth" value="2" type="number"/>
 				</KeyValues>
 				<Anchors>
 					<Anchor point="LEFT" relativeKey="$parent.SetsTab" relativePoint="RIGHT" x="0" y="0"/>
@@ -489,7 +489,7 @@
 			</Button>
 			<Button name="$parentTab4" parentKey="SavedSetsTab" inherits="BW_PanelTopTabButtonTemplate" text="Saved" id="4" frameLevel="40" >
 				<KeyValues>
-					<KeyValue key="minWidth" value="57" type="number"/>
+					<KeyValue key="minWidth" value="2" type="number"/>
 				</KeyValues>
 				<Anchors>
 					<Anchor point="LEFT" relativeKey="$parent.ExtraSetsTab"  relativePoint="RIGHT" x="0" y="0"/>
@@ -713,6 +713,13 @@
 					<OnEnter method="OnEnter"/>
 					<OnLeave method="OnLeave"/>
 				</Scripts>
+			</Button>
+			<Button parentKey="AlteredFormSwapButton" mixin="BetterWardrobeAlteredFormSwapButtonMixin" inherits = "BW_AlteredFormSwapButtonTemplate" ignoreParentScale="true" frameLevel="600">
+				<Size x="28" y="38"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeKey="$parent" relativePoint="TOPRIGHT" x="-4" y="-25"/>
+				</Anchors>
+
 			</Button>
 			<DropDownToggleButton parentKey="FilterButton" inherits="UIResettableDropdownButtonTemplate" text="FILTER">
 				<Size x="93" y="22"/>
@@ -1289,7 +1296,6 @@
 								</Layers>
 								<Scripts>
 									<OnShow> 
-
 									</OnShow>
 									<OnEnter>
 										GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
@@ -1297,13 +1303,12 @@
 										GameTooltip:Show();
 									</OnEnter>
 									<OnLeave function="GameTooltip_Hide"/>
-
 									<OnClick>
 										self:GetParent():GetParent():LinkSetInChat(self.setID)
 									</OnClick>
-
 								</Scripts>
 							</Button>
+
 							<DropDownToggleButton name="BetterWardrobeSetsCollectionVariantSetsButton" parentKey="VariantSetsButton" inherits="UIMenuButtonStretchTemplate" frameLevel="60">
 								<Size x="108" y="22"/>
 								<Anchors>

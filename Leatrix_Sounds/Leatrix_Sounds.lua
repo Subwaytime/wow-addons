@@ -1,6 +1,6 @@
 ﻿
 	----------------------------------------------------------------------
-	-- Leatrix Sounds 10.0.24 (21st December 2022)
+	-- Leatrix Sounds 10.0.48 (7th March 2023)
 	----------------------------------------------------------------------
 
 	--  Create global table
@@ -10,7 +10,7 @@
 	local LeaSoundsLC, LeaSoundsCB = {}, {}
 
 	-- Version
-	LeaSoundsLC["AddonVer"] = "10.0.24"
+	LeaSoundsLC["AddonVer"] = "10.0.48"
 
 	-- Get locale table
 	local void, Leatrix_Sounds = ...
@@ -45,6 +45,18 @@
 	-- Print text
 	function LeaSoundsLC:Print(text)
 		DEFAULT_CHAT_FRAME:AddMessage(L[text], 1.0, 0.85, 0.0)
+	end
+
+	-- Create a close button without using a template
+	function LeaSoundsLC:CreateCloseButton(parent, w, h, anchor, x, y)
+		local btn = CreateFrame("BUTTON", nil, parent)
+		btn:SetSize(w, h)
+		btn:SetPoint(anchor, x, y)
+		btn:SetNormalTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Up")
+		btn:SetHighlightTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight")
+		btn:SetPushedTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Down")
+		btn:SetDisabledTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Disabled")
+		return btn
 	end
 
 	-- Load a numeric variable and set it to default if it's not within a given range
@@ -197,13 +209,13 @@
 		Cbox.f:SetWordWrap(false)
 
 		-- Set maximum label width
-		if Cbox.f:GetWidth() > 50 then
-			Cbox.f:SetWidth(50)
+		if Cbox.f:GetWidth() > 60 then
+			Cbox.f:SetWidth(60)
 		end
 
 		-- Set checkbox click width
-		if Cbox.f:GetStringWidth() > 50 then
-			Cbox:SetHitRectInsets(0, -40, 0, 0)
+		if Cbox.f:GetStringWidth() > 60 then
+			Cbox:SetHitRectInsets(0, -50, 0, 0)
 		else
 			Cbox:SetHitRectInsets(0, -Cbox.f:GetStringWidth() + 4, 0, 0)
 		end
@@ -301,9 +313,7 @@
 		PageF.footTex:SetVertexColor(0.5, 0.5, 0.5, 1.0)
 
 		-- Add close Button
-		PageF.cb = CreateFrame("Button", nil, PageF, "LeaSoundsUIPanelCloseButtonNoScripts")
-		PageF.cb:SetSize(30, 30)
-		PageF.cb:SetPoint("TOPRIGHT", 0, 0)
+		PageF.cb = LeaSoundsLC:CreateCloseButton(PageF, 30, 30, "TOPRIGHT", 0, 0)
 		PageF.cb:SetScript("OnClick", function() PageF:Hide() end)
 
 		-- Set panel position when shown
@@ -313,16 +323,19 @@
 		end)
 
 		-- Create help button
-		local helpBtn = LeaSoundsLC:CreateButton("HelpButton", LeaSoundsLC["PageF"], "Help", "BOTTOMRIGHT", -10, 10, 25, "Searches can consist of up to 10 keywords.  Keywords prefixed with ! are excluded from search results.|n|nWhile a track is selected, you can press W and S to play the previous and next track, E to replay the currently selected track or Q to stop playback.|n|nHold SHIFT and click to print (left-click) or insert (right-click) the selected track details in chat.")
+		local helpBtn = LeaSoundsLC:CreateButton("HelpButton", LeaSoundsLC["PageF"], "Help", "BOTTOMRIGHT", -10, 10, 25, "Searches can consist of up to 10 keywords.  Keywords prefixed with ! are excluded from search results.|n|nWhile a track is selected, you can press W and S to play the previous and next track, E to replay the currently selected track or Q to stop playback.|n|nHold SHIFT and click to print (left-click) or insert (right-click) the selected track details in chat.|n|nHold CONTROL and click to print (left-click) or insert (right-click) the selected track ID in chat.")
 		helpBtn:SetPushedTextOffset(0, 0)
 
 		-- Create checkboxes
 		LeaSoundsLC:MakeCB("SoundMusic", "Music", 416, -276, "If checked, music will be shown in the listing.")
 		LeaSoundsLC:MakeCB("SoundSFX", "SFX", 486, -276, "If checked, sound effects will be shown in the listing.")
+		LeaSoundsLC:MakeCB("SoundUnknown", "Unknown", 486, -276, "If checked, unknown sound files will be shown in the listing.|n|nThese are typically newer sound files which do not have names yet.|n|nNote that some unknown sound files may not be currently playable.")
 
 		-- Position checkboxes
+		LeaSoundsCB["SoundUnknown"]:ClearAllPoints()
+		LeaSoundsCB["SoundUnknown"]:SetPoint("RIGHT", LeaSoundsCB["HelpButton"], "LEFT", -76, 0)
 		LeaSoundsCB["SoundSFX"]:ClearAllPoints()
-		LeaSoundsCB["SoundSFX"]:SetPoint("RIGHT", LeaSoundsCB["HelpButton"], "LEFT", -50, 0)
+		LeaSoundsCB["SoundSFX"]:SetPoint("RIGHT", LeaSoundsCB["SoundUnknown"], "LEFT", -35, 0)
 		LeaSoundsCB["SoundMusic"]:ClearAllPoints()
 		LeaSoundsCB["SoundMusic"]:SetPoint("RIGHT", LeaSoundsCB["SoundSFX"], "LEFT", -50, 0)
 
@@ -420,7 +433,7 @@
 		searchLabel:ClearAllPoints()
 		searchLabel:SetPoint("BOTTOMLEFT", 16, 17)
 
-		local sBox = LeaSoundsLC:CreateEditBox("SearchBox", LeaSoundsLC["PageF"], 432, 100, "TOPLEFT", 101, -272)
+		local sBox = LeaSoundsLC:CreateEditBox("SearchBox", LeaSoundsLC["PageF"], 354, 100, "TOPLEFT", 101, -272)
 		LeaSoundsCB["sBox"] = sBox
 		sBox:ClearAllPoints()
 		sBox:SetPoint("LEFT", searchLabel, "RIGHT", 16, 0)
@@ -496,7 +509,7 @@
 				ListData[5] = "|cffffffff" .. L["So I guess there's nothing to see here."]
 			end
 			-- Show message if no sound categories are checked
-			if LeaSoundsLC["SoundMusic"] == "Off" and LeaSoundsLC["SoundSFX"] == "Off" then
+			if LeaSoundsLC["SoundMusic"] == "Off" and LeaSoundsLC["SoundSFX"] == "Off" and LeaSoundsLC["SoundUnknown"] == "Off" then
 				ListData[4] = "|cffffd800" .. L["Oops!"]
 				ListData[5] = "|cffffffff" .. L["You need to select at least one sound category."]
 			end
@@ -525,7 +538,9 @@
 
 		-- Function to show sound listing
 		local function SetListingFunc()
+
 			wipe(Leatrix_Sounds["Listing"])
+
 			-- Populate sound table
 			if LeaSoundsLC["SoundMusic"] == "On" then
 				for i = 1, #Leatrix_Sounds["MP3"] do
@@ -537,29 +552,43 @@
 					tinsert(Leatrix_Sounds["Listing"], Leatrix_Sounds["OGG"][i])
 				end
 			end
+
 			-- Sort the table
 			table.sort(Leatrix_Sounds["Listing"])
+
+			-- Add the unknown table (done after the sort because it is already sorted)
+			if LeaSoundsLC["SoundUnknown"] == "On" then
+				for i = 1, #Leatrix_Sounds["EXT"] do
+					tinsert(Leatrix_Sounds["Listing"], Leatrix_Sounds["EXT"][i])
+				end
+			end
+
 			-- Show headings if needed
-			if LeaSoundsLC["SoundMusic"] == "Off" and LeaSoundsLC["SoundSFX"] == "Off" then
+			if LeaSoundsLC["SoundMusic"] == "Off" and LeaSoundsLC["SoundSFX"] == "Off" and LeaSoundsLC["SoundUnknown"] == "Off" then
 				tinsert(Leatrix_Sounds["Listing"], "|cffffd800" .. L["Leatrix Sounds"] .. " " .. LeaSoundsLC["AddonVer"])
 				tinsert(Leatrix_Sounds["Listing"], "|cffffffaa{" .. #Leatrix_Sounds["Listing"] - 1 .. " " .. L["results"] .. "}")
 				tinsert(Leatrix_Sounds["Listing"], "|cffffffff")
 				tinsert(Leatrix_Sounds["Listing"], "|cffffd800" .. L["Oops!"])
 				tinsert(Leatrix_Sounds["Listing"], "|cffffffff" .. L["You need to select at least one sound category."])
 			end
+
 			-- If editbox is not empty, show search results
 			if LeaSoundsCB["sBox"]:GetText() ~= "" then
 				ListData = searchTable
 				ShowSearchResults()
 			end
+
 			-- Clear editbox focus
 			sBox:ClearFocus()
+
 			-- Update listing buttons
 			UpdateList()
+
 		end
 
 		LeaSoundsCB["SoundMusic"]:HookScript("OnClick", function() playScroll = nil; C_Timer.After(0.001, SetListingFunc) end)
 		LeaSoundsCB["SoundSFX"]:HookScript("OnClick", function() playScroll = nil; C_Timer.After(0.001, SetListingFunc) end)
+		LeaSoundsCB["SoundUnknown"]:HookScript("OnClick", function() playScroll = nil; C_Timer.After(0.001, SetListingFunc) end)
 
 		-- Create list items
 		scrollFrame.buttons = {}
@@ -616,6 +645,14 @@
 							DEFAULT_CHAT_FRAME:AddMessage(item)
 							return
 						end
+						-- Print ID in chat if control is held
+						if IsControlKeyDown() and not IsShiftKeyDown() then
+							local file, soundID = item:match("([^,]+)%#([^,]+)")
+							if soundID then
+								DEFAULT_CHAT_FRAME:AddMessage(soundID)
+								return
+							end
+						end
 						-- Enable sound if required
 						if GetCVar("Sound_EnableAllSound") == "0" then SetCVar("Sound_EnableAllSound", "1") end
 						-- Disable music if it's currently enabled
@@ -664,8 +701,8 @@
 						end
 						return
 					end
-					-- Print track name in editbox
-					if IsShiftKeyDown() and not IsControlKeyDown() then
+					-- Print track name or ID in editbox
+					if IsShiftKeyDown() or IsControlKeyDown() then
 						-- Remove focus from search box
 						sBox:ClearFocus()
 						-- Get clicked track text
@@ -673,11 +710,23 @@
 						-- Do nothing if its a blank line or informational heading
 						if not item or strfind(item, "|c") then return end
 						if strfind(item, "#") then
-							-- Print track name in chat editbox and highlight it
-							local eBox = ChatEdit_ChooseBoxForSend()
-							ChatEdit_ActivateChat(eBox)
-							eBox:SetText(item)
-							eBox:HighlightText()
+							if IsShiftKeyDown() and not IsControlKeyDown() then
+								-- Print track name in chat editbox and highlight it
+								local eBox = ChatEdit_ChooseBoxForSend()
+								ChatEdit_ActivateChat(eBox)
+								eBox:SetText(item)
+								eBox:HighlightText()
+							end
+							if IsControlKeyDown() and not IsShiftKeyDown() then
+								-- Print track name in chat editbox and highlight it
+								local file, soundID = item:match("([^,]+)%#([^,]+)")
+								if soundID then
+									local eBox = ChatEdit_ChooseBoxForSend()
+									ChatEdit_ActivateChat(eBox)
+									eBox:SetText(soundID)
+									eBox:HighlightText()
+								end
+							end
 						end
 						return
 					end
@@ -811,6 +860,7 @@
 			LeaSoundsLC:LoadVarNum("MainPanelY", 0, -5000, 5000)
 			LeaSoundsLC:LoadVarChk("SoundMusic", "On")
 			LeaSoundsLC:LoadVarChk("SoundSFX", "On")
+			LeaSoundsLC:LoadVarChk("SoundUnknown", "On")
 
 		elseif event == "PLAYER_LOGIN" then
 			-- Run main function
@@ -824,6 +874,7 @@
 			LeaSoundsDB["MainPanelY"] = LeaSoundsLC["MainPanelY"]
 			LeaSoundsDB["SoundMusic"] = LeaSoundsLC["SoundMusic"]
 			LeaSoundsDB["SoundSFX"] = LeaSoundsLC["SoundSFX"]
+			LeaSoundsDB["SoundUnknown"] = LeaSoundsLC["SoundUnknown"]
 
 		end
 
@@ -877,16 +928,12 @@
 	end
 
 	-- Add slash commands
-	--_G.SLASH_Leatrix_Sounds1 = "/lts"
-	--_G.SLASH_Leatrix_Sounds2 = "/leasounds"
+	_G.SLASH_Leatrix_Sounds1 = "/lts"
+	_G.SLASH_Leatrix_Sounds2 = "/leasounds"
+
 	SlashCmdList["Leatrix_Sounds"] = function(self)
 		-- Run slash command function
 		SlashFunc(self)
-	end
-
-	-- Replacement for broken slash command system
-	function leasounds(self)
-		SlashFunc(self or "")
 	end
 
 	----------------------------------------------------------------------
@@ -913,7 +960,7 @@
 		subTitle:ClearAllPoints()
 		subTitle:SetPoint("BOTTOM", 0, 72)
 
-		local slashTitle = LeaSoundsLC:MakeTx(interPanel, "/run leasounds()", 0, 0)
+		local slashTitle = LeaSoundsLC:MakeTx(interPanel, "/lts", 0, 0)
 		slashTitle:SetFont(slashTitle:GetFont(), 72)
 		slashTitle:ClearAllPoints()
 		slashTitle:SetPoint("BOTTOM", subTitle, "TOP", 0, 40)

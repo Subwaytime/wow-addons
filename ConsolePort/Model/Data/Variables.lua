@@ -3,7 +3,6 @@ local STICK_SELECT = {'Movement', 'Camera', 'Gyro'};
 local MODID_SELECT = {'SHIFT', 'CTRL', 'ALT'};
 local MODID_EXTEND = {'SHIFT', 'CTRL', 'ALT', 'CTRL-SHIFT', 'ALT-SHIFT', 'ALT-CTRL'};
 local ADVANCED_OPT = RED_FONT_COLOR:WrapTextInColorCode(ADVANCED_OPTIONS);
-local INTERACT_OPT = UNIT_FRAME_DROPDOWN_SUBSECTION_TITLE_INTERACT;
 
 local unpack, _, db = unpack, ...; db('Data')();
 ------------------------------------------------------------------------------------------------------------
@@ -177,25 +176,61 @@ db:Register('Variables', {
 	--------------------------------------------------------------------------------------------------------
 	-- Raid cursor:
 	--------------------------------------------------------------------------------------------------------
-	raidCursorDirect = {Bool(false);
-		head = 'Raid Cursor';
-		sort = 1;
-		name = 'Direct Targeting';
-		desc = 'Change target each time the cursor is moved, instead of routing appropriate spells.';
-		note = 'The cursor cannot route macros or ambiguous spells. Enable this if you use a lot of macros.';
-	};
 	raidCursorScale = {Number(1, 0.1);
 		head = 'Raid Cursor';
-		sort = 2;
+		sort = 1;
 		name = 'Scale';
 		desc = 'Scale of the cursor.';
+	};
+	raidCursorMode = {Map(1, {'Redirect', FOCUS, TARGET}),
+		head = 'Raid Cursor';
+		sort = 2;
+		name = 'Targeting Mode';
+		desc = 'Change how the raid cursor acquires a target. Redirect and focus modes will reroute appropriate spells without changing your target.';
+		note = 'Basic redirect cannot route macros or ambiguous spells. Use target mode or focus mode with [@focus] macros to control behavior.';
 	};
 	raidCursorModifier = {Select('<none>', '<none>', unpack(MODID_EXTEND));
 		head = 'Raid Cursor';
 		sort = 3;
 		name = 'Modifier';
-		desc = 'Which modifier to use with the directional pad to move the cursor.';
-		note = 'The bindings underlying the button combinations will be unavailable while the cursor is in use.';
+		desc = 'Which modifier to use with the movement buttons to move the cursor.';
+		note = 'The bindings underlying the button combinations will be unavailable while the cursor is in use.\n\nModifier can also be configured on a per button basis.';
+	};
+	raidCursorUp = {Button('PADDUP', true);
+		head = 'Raid Cursor';
+		sort = 4;
+		name = 'Move Up';
+		desc = 'Button to move the cursor up.';
+		advd = true;
+	};
+	raidCursorDown = {Button('PADDDOWN', true);
+		head = 'Raid Cursor';
+		sort = 5;
+		name = 'Move Down';
+		desc = 'Button to move the cursor down.';
+		advd = true;
+	};
+	raidCursorLeft = {Button('PADDLEFT', true);
+		head = 'Raid Cursor';
+		sort = 6;
+		name = 'Move Left';
+		desc = 'Button to move the cursor left.';
+		advd = true;
+	};
+	raidCursorRight = {Button('PADDRIGHT', true);
+		head = 'Raid Cursor';
+		sort = 7;
+		name = 'Move Right';
+		desc = 'Button to move the cursor right.';
+		advd = true;
+	};
+	raidCursorFilter = {String(nil);
+		head = 'Raid Cursor';
+		sort = 8;
+		name = 'Filter Condition';
+		desc = 'Filter condition to find raid cursor frames.';
+		note = BLUE_FONT_COLOR:WrapTextInColorCode('node') .. ' is the current frame under scrutinization.';
+		advd = true;
 	};
 	--------------------------------------------------------------------------------------------------------
 	-- Interface cursor:
@@ -373,6 +408,33 @@ db:Register('Variables', {
 		advd = true;
 	};
 	--------------------------------------------------------------------------------------------------------
+	-- Power Level:
+	--------------------------------------------------------------------------------------------------------
+	powerLevelShow = {Bool(false);
+		head = 'Power Level';
+		sort = 1;
+		name = 'Show Gauge';
+		desc = 'Display power level for the current active gamepad.';
+		note = 'This will not work with Xbox controllers connected via bluetooth. The Xbox Adapter is required.';
+		hide = CPAPI.IsClassicEraVersion;
+	};
+	powerLevelShowIcon = {Bool(true);
+		head = 'Power Level';
+		sort = 2;
+		name = 'Show Type Icon';
+		desc = 'Display icon next to the power level for the current active gamepad.';
+		note = 'Types are PlayStation, Xbox, or Generic.';
+		hide = CPAPI.IsClassicEraVersion;
+	};
+	powerLevelShowText = {Bool(true);
+		head = 'Power Level';
+		sort = 3;
+		name = 'Show Status Text';
+		desc = 'Display power level status text for the current active gamepad.';
+		note = 'Critical, Low, Medium, High, Wired/Charging, or Unknown/Disconnected.';
+		hide = CPAPI.IsClassicEraVersion;
+	};
+	--------------------------------------------------------------------------------------------------------
 	-- Bindings:
 	--------------------------------------------------------------------------------------------------------
 	bindingOverlapEnable = {Bool(false);
@@ -481,14 +543,6 @@ db:Register('Variables', {
 		sort = 3;
 		name = 'Override Class File';
 		desc = 'Override class theme for interface styling.';
-		advd = true;
-	};
-	raidCursorFilter = {String(nil);
-		head = ADVANCED_OPT;
-		sort = 4;
-		name = 'Raid Cursor Condition';
-		desc = 'Filter condition to find raid cursor frames.';
-		note = BLUE_FONT_COLOR:WrapTextInColorCode('node') .. ' is the current frame under scrutinization.';
 		advd = true;
 	};
 })  --------------------------------------------------------------------------------------------------------

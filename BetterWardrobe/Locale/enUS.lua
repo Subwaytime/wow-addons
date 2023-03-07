@@ -3,24 +3,24 @@ local L = _G.LibStub("AceLocale-3.0"):NewLocale("BetterWardrobe", "enUS", true, 
 
 if not L then return end
 
-local LE_DEFAULT = 1
-local LE_APPEARANCE = 2
-local LE_ALPHABETIC = 3
-local LE_ITEM_SOURCE = 6
-local LE_EXPANSION = 5
-local LE_ARTIFACT = 7
-local LE_COLOR = 4
+local DEFAULT = 1
+local APPEARANCE = 2
+local ALPHABETIC = 3
+local ITEM_SOURCE = 6
+local EXPANSION = 5
+local ARTIFACT = 7
+local COLOR = 4
 local TAB_ITEMS = 1
 local TAB_SETS = 2
 local TAB_EXTRASETS = 3
 
-L[LE_DEFAULT] = DEFAULT
-L[LE_APPEARANCE] = APPEARANCE_LABEL
-L[LE_ALPHABETIC] = COMPACT_UNIT_FRAME_PROFILE_SORTBY_ALPHABETICAL
-L[LE_ITEM_SOURCE] = SOURCE:gsub("[:：]", "")
-L[LE_COLOR] = COLOR
-L[LE_EXPANSION] = "Expansion"
-L[LE_ARTIFACT] = ITEM_QUALITY6_DESC
+L[DEFAULT] = _G["DEFAULT"]
+L[APPEARANCE] = APPEARANCE_LABEL
+L[ALPHABETIC] = COMPACT_UNIT_FRAME_PROFILE_SORTBY_ALPHABETICAL
+L[ITEM_SOURCE] = SOURCE:gsub("[:：]", "")
+L[COLOR] = _G["COLOR"]
+L[EXPANSION] = "Expansion"
+L[ARTIFACT] = ITEM_QUALITY6_DESC
 
 L.OM_GOLD = "|c00FFD200"
 L.ENDCOLOR = "|r"
@@ -327,7 +327,7 @@ L["Added missing appearances of: \124cffff7fff\124H%s:%s\124h[%s]\124h\124r"] = 
 L["Added appearance in Collection List"] = true
 
 L["Set Substitution"] = true
-L["Substitue Item"] = true
+L["Substitute Item"] = true
 
 L["Item No Longer Available"] = true
 

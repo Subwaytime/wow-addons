@@ -75,6 +75,8 @@ function addon:DressingRoom_Enable()
 
 	if DressUpFrame.MaximizeMinimizeFrame then
 		DressUpFrame.MaximizeMinimizeFrame:SetOnMaximizedCallback(function(self)
+			DressUpFrameOutfitDropDown:Hide()
+
 			if Profile.DR_ResizeWindow then
 				DressUpFrame.MaximizeMinimizeFrame:GetParent():SetSize(Profile.DR_Width, Profile.DR_Height) 
 			else
@@ -82,6 +84,12 @@ function addon:DressingRoom_Enable()
 			end
 			UpdateUIPanelPositions(DressUpFrame.MaximizeMinimizeFrame)
 		end)
+			
+
+
+		addon:Hook(DressUpFrame.MaximizeMinimizeFrame, "minimizedCallback", function() DressUpFrameOutfitDropDown:Hide() end, true)
+
+
 	end
 
 	DressUpFrame:SetMovable(true)
@@ -102,6 +110,8 @@ function addon:DressingRoom_Disable()
 			DressUpFrame.MaximizeMinimizeFrame:GetParent():SetSize(defaultWidth, defaultHeight)
 			UpdateUIPanelPositions(DressUpFrame.MaximizeMinimizeFrame)
 		end)
+
+		addon:Unhook(DressUpFrame.MaximizeMinimizeFrame, "minimizedCallback")
 	end
 end
 
@@ -385,14 +395,14 @@ function DressingRoom:UpdateModel(unit)
 	if useTarget then
 		model = unit
 		isPlayer = false
-		actor:SetModelByUnit(model, sheatheWeapons, true)
+		actor:SetModelByUnit(model, sheatheWeapons, true, false, addon.useNativeForm )
 		refresh = true
 
 	else
 		model = "player"
 		if not isPlayer then
 			isPlayer = true
-			actor:SetModelByUnit(model, sheatheWeapons, true)
+			actor:SetModelByUnit(model, sheatheWeapons, true, false, addon.useNativeForm)
 			refresh = true
 		end
 	end
@@ -431,6 +441,10 @@ function BW_DressingRoomFrameMixin:OnLoad()
 	highlight:ClearAllPoints()
 	highlight:SetPoint("TOPLEFT",DressUpFrame.LinkButton, "TOPLEFT",-3,-1 )
 	highlight:SetPoint("BOTTOMRIGHT",DressUpFrame.LinkButton, "BOTTOMRIGHT",-8,5 )
+
+	if IsAddOnLoaded("Narcissus") then
+		BW_DressingRoomFrame.BW_DressingRoomSwapFormButton:Hide()
+	end
 end
 
 
@@ -476,6 +490,9 @@ function BW_DressingRoomFrameMixin:OnEvent(event, ...)
 	elseif event == "ADDON_LOADED" and arg1 == "Blizzard_InspectUI" then 
 		addon:HookScript(InspectPaperDollFrame.ViewButton, "OnClick", function() inspectView = true end)
 		self:UnregisterEvent("ADDON_LOADED")
+
+	elseif event == "ADDON_LOADED" and arg1 == "Narcissus" then
+		BW_DressingRoomFrame.BW_DressingRoomSwapFormButton:Hide()
 	end
 end
 
@@ -709,7 +726,6 @@ function DressingRoom:UpdateBackground()
 	end
 
 	if (addon.Profile.DR_HideBackground) then
-
 		DressUpFrame.ModelBackground:SetVertexColor(0, 0, 0)
 	end
 end
@@ -786,3 +802,7 @@ function BetterDressUpOutfitMixin:LoadOutfit(outfitID)
 	DressingRoom:Update()
 end
 
+
+function addon:DressinRoomFormSwap()
+	DressingRoom:UpdateModel("player")
+end

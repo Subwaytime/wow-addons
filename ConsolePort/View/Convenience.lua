@@ -36,7 +36,6 @@ do  local popups, visible, oldNode = {}, {};
 	end
 end
 
-
 -- Remove the need to type 'DELETE' when removing rare or better quality items
 do  local DELETE_ITEM = CopyTable(StaticPopupDialogs.DELETE_ITEM);
 	DELETE_ITEM.timeout = 5; -- also add a timeout
@@ -47,14 +46,11 @@ do  local DELETE_ITEM = CopyTable(StaticPopupDialogs.DELETE_ITEM);
 	StaticPopupDialogs.DELETE_GOOD_QUEST_ITEM = DELETE_QUEST;
 end
 
--- TODO: remove.
--- Add reload option to addon action forbidden because
--- of the many taint issues spreading in edit mode
+-- Add reload option to addon action forbidden
 do local popup = StaticPopupDialogs.ADDON_ACTION_FORBIDDEN;
 	popup.button3 = 'Reload';
 	popup.OnAlt = ReloadUI;
 end
-
 
 -- Map canvas:
 -- Disable automatic cursor scrolling.
@@ -83,20 +79,22 @@ do local MovieControls = {
 		};
 	};
 
-	local function MovieOnGamePadButtonUp(controls, self, button)
+	local function MovieOnGamePadButtonDown(controls, self, button)
 		controls.PAD1:SetText(('%s %s'):format(GetBindingText('PAD1', '_ABBR'), NO))
 		controls.PAD2:SetText(('%s %s'):format(GetBindingText('PAD2', '_ABBR'), YES))
 
+		local binding = GetBindingFromClick(button)
 		if controls[button] then
 			controls[button]:Click()
+		elseif ( binding == 'SCREENSHOT' or binding == 'TOGGLEMUSIC' or binding == 'TOGGLESOUND' ) then
+			self:SetPropagateKeyboardInput(true)
 		else
 			(self.CloseDialog or self.closeDialog):Show()
 		end
 	end
 
 	for frame, controls in pairs(MovieControls) do
-		frame:SetScript('OnGamePadButtonDown', nil)
-		frame:SetScript('OnGamePadButtonUp', GenerateClosure(MovieOnGamePadButtonUp, controls))
+		frame:HookScript('OnGamePadButtonDown', GenerateClosure(MovieOnGamePadButtonDown, controls))
 	end
 end
 
@@ -128,11 +126,11 @@ local Handler = CPAPI.CreateEventHandler({'Frame', '$parentConvenienceHandler', 
 })
 
 function Handler:MERCHANT_CLOSED()
-	self.merchantAvailable = nil;
+	CPAPI.IsMerchantAvailable = nil;
 end
 
 function Handler:MERCHANT_SHOW()
-	self.merchantAvailable = true;
+	CPAPI.IsMerchantAvailable = true;
 	if db('autoSellJunk') then
 		CPAPI.IteratePlayerInventory(self.SellJunkHelper)
 	end
@@ -140,7 +138,7 @@ end
 
 function Handler:BAG_UPDATE_DELAYED()
 	-- repeat attempt to auto-sell junk to handle server throttling
-	if self.merchantAvailable then
+	if CPAPI.IsMerchantAvailable then
 		self:MERCHANT_SHOW()
 	end
 end

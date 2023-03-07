@@ -1,10 +1,10 @@
 ## Interface: 100002
-## Version: 2.0.8
+## Version: 2.1.0
 ## Title: DynamicCam
 ## Author: mpstark, LudiusMaximus
 ## Notes: A more dynamic camera.
 
-## OptionalDeps: Ace3, LibCamera, LibEasing, LibCompress, Bartender4, GW2_UI
+## OptionalDeps: Ace3, LibCamera, LibEasing, LibCompress, Bartender4, GW2_UI, Immersion, Immersion_ExtraFade
 ## SavedVariables: DynamicCamDB, minZoomValues
 
 ## X-Curse-Project-ID: 101120

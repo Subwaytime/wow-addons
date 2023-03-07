@@ -157,7 +157,7 @@ local function SelectColor()
 					local B = colors[2][i + 2]
 
 					if R and G and B then
-						local colorDifferece = addon:CompareLAB(labA, labB, labC, ConvertRGB_to_LAB(R, G, B))
+						local colorDifferece = addon:CompareLAB(labA, labB, labC, addon:ConvertRGB_to_LAB(R, G, B))
 						
 						if colorDifferece <= 17 then
 							colorMatch = true
@@ -266,15 +266,15 @@ end
 
 
 
---[[local function xxx()
-local ColorTable = (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable2) or {}
-BTT = {}
---AceSerializer:Embed(addon)
-for index, data in pairs(ColorTable) do
+--[[local function EncodeColors()
+	local ColorTable = (_G.BetterWardrobeData and _G.BetterWardrobeData.ColorTable2) or {}
+	BTT = {}
+	--AceSerializer:Embed(addon)
+	for index, data in pairs(ColorTable) do
 
-local temp =addon:Serialize(data)
-BTT[index]= temp
-end
+		local temp =addon:Serialize(data)
+		BTT[index]= temp
+	end
 end
 
 local function yy()

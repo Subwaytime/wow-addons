@@ -150,6 +150,19 @@ function E:OnInitialize()
 								type = "toggle",
 								name = L["MOUSEOVER_TOOLTIPS"],
 							},
+							up_and_down = {
+								order = 5,
+								type = "toggle",
+								name = L["SCROLL_BUTTONS"],
+								get = function()
+									return C.db.profile.chat.buttons.up_and_down
+								end,
+								set = function(_, value)
+									C.db.profile.chat.buttons.up_and_down = value
+
+									E:ToggleScrollButtons()
+								end,
+							},
 							spacer1 = {
 								order = 9,
 								type = "description",
@@ -223,6 +236,11 @@ function E:OnInitialize()
 										type = "toggle",
 										name = L["PERSISTENT"],
 									},
+									mouseover = {
+										order = 2,
+										type = "toggle",
+										name = L["MOUSEOVER"],
+									},
 									in_duration = {
 										order = 10,
 										type = "range",
@@ -236,7 +254,7 @@ function E:OnInitialize()
 										disabled = function()
 											return C.db.profile.chat.fade.persistent
 										end,
-										min = 0, max = 20, step = 1,
+										min = 0, max = 120, step = 1,
 									},
 									out_duration = {
 										order = 12,
@@ -301,7 +319,7 @@ function E:OnInitialize()
 								order = 3,
 								type = "range",
 								name = L["OFFSET"],
-								min = 2, max = 32, step = 1,
+								min = 0, max = 64, step = 1,
 								get = function()
 									return C.db.profile.dock.edit.offset
 								end,
@@ -560,7 +578,7 @@ function E:OnEnable()
 			if linkType == "battlepet" then
 				GameTooltip:SetOwner(chatFrame, "ANCHOR_CURSOR_RIGHT", 4, 2)
 				BattlePetToolTip_ShowLink(text)
-			else
+			elseif linkType ~= "trade" then
 				GameTooltip:SetOwner(chatFrame, "ANCHOR_CURSOR_RIGHT", 4, 2)
 
 				local isOK = pcall(GameTooltip.SetHyperlink, GameTooltip, link)
@@ -637,6 +655,26 @@ function E:OnEnable()
 		end
 	end)
 
+	local alertingTabs = {}
+
+	hooksecurefunc("FCFTab_UpdateAlpha", function(chatFrame)
+		local tab = _G[chatFrame:GetName() .. "Tab"]
+		if tab then
+			alertingTabs[tab] = tab.alerting and true or nil
+
+			local isAlerting = false
+			for _, v in next, alertingTabs do
+				isAlerting = isAlerting or v
+			end
+
+			if isAlerting then
+				E:FadeIn(GeneralDockManager, 0.1)
+			end
+
+			LSGlassUpdater.isAlerting = isAlerting
+		end
+	end)
+
 	-- ? consider moving it elsewhere
 	local updater = CreateFrame("Frame", "LSGlassUpdater", UIParent)
 	updater:SetScript("OnUpdate", function (self, elapsed)
@@ -662,11 +700,11 @@ function E:OnEnable()
 						E:FadeIn(GeneralDockManager, 0.1, function()
 							if self.isMouseOver then
 								E:StopFading(GeneralDockManager, 1)
-							else
+							elseif not self.isAlerting then
 								E:FadeOut(GeneralDockManager, 4, C.db.profile.dock.fade.out_duration)
 							end
 						end)
-					else
+					elseif not self.isAlerting then
 						E:FadeOut(GeneralDockManager, 4, C.db.profile.dock.fade.out_duration)
 					end
 				end

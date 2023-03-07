@@ -1,6 +1,6 @@
 ﻿
 	----------------------------------------------------------------------
-	-- 	Leatrix Maps 10.0.24 (21st December 2022)
+	-- 	Leatrix Maps 10.0.48 (7th March 2023)
 	----------------------------------------------------------------------
 
 	-- 10:Func, 20:Comm, 30:Evnt, 40:Panl
@@ -12,7 +12,7 @@
 	local LeaMapsLC, LeaMapsCB, LeaConfigList = {}, {}, {}
 
 	-- Version
-	LeaMapsLC["AddonVer"] = "10.0.24"
+	LeaMapsLC["AddonVer"] = "10.0.48"
 
 	-- Get locale table
 	local void, Leatrix_Maps = ...
@@ -52,6 +52,7 @@
 		-- the dungeon title is protected.  This is mitigated by preventing Wow from setting the dungeon title
 		-- but only if the user has 2FA enabled.  Without 2FA, users cannot set the dungeon title so Wow has to
 		-- do it for them which means the taint fix cannot be applied.
+		-- Appears fixed as setting the dungeon title no longer causes taint.
 
 		-- Report player taint: Still an issue
 		-- Follow base taint and group finder taint then use report player.
@@ -59,60 +60,13 @@
 		-- Editing mode taint: No longer an issue
 		-- Follow base taint and group finder taint but edit the group after listing it and toggle the opposite
 		-- faction checkbox.  This is mitigated by locking the checkbox in editing mode.
+		-- Appears fixed as toggling the checkbox no longer causes taint.
 
 		-- Scale map taint: Still an issue but scale map is removed now anyway
-		-- Caused by replacing WorldMapFrame.ScrollContainer.GetCursorPosition and setting map scale.
+		-- Appears fixed as replacing WorldMapFrame.ScrollContainer.GetCursorPosition is no longer needed.
 
 		-- Command taint: Still an issue
 		-- Enter /ltm map 150 during combat and click a boss button.
-
-		-- In Dragonflight, this is not needed (at the moment anyway)
-		if LeaMapsLC.ThisIsNotNeededAnymore then
-
-			if C_LFGList.IsPlayerAuthenticatedForLFG(180) then -- Iron Docks (https://wow.tools/dbc/?dbc=groupfinderactivity)
-
-				-- Replace C_LFGList.SetEntryTitle to prevent premade dungeon keystone taint
-				C_LFGList.GetPlaystyleString = function(playstyle, activityInfo)
-					if activityInfo and playstyle ~= (0 or nil) and C_LFGList.GetLfgCategoryInfo(activityInfo.categoryID).showPlaystyleDropdown then
-						local typeStr
-						if activityInfo.isMythicPlusActivity then
-							typeStr = "GROUP_FINDER_PVE_PLAYSTYLE"
-						elseif activityInfo.isRatedPvpActivity then
-							typeStr = "GROUP_FINDER_PVP_PLAYSTYLE"
-						elseif activityInfo.isCurrentRaidActivity then
-							typeStr = "GROUP_FINDER_PVE_RAID_PLAYSTYLE"
-						elseif activityInfo.isMythicActivity then
-							typeStr = "GROUP_FINDER_PVE_MYTHICZERO_PLAYSTYLE"
-						end
-						return typeStr and _G[typeStr .. tostring(playstyle)] or nil
-					else
-						return nil
-					end
-				end
-
-				-- Replace C_LFGList.SetEntryTitle to prevent premade dungeon keystone taint
-				C_LFGList.SetEntryTitle = function() end
-
-				-- Toggling the opposite faction only checkbox during editing mode also taints
-				LFGListFrame.EntryCreation:HookScript("OnShow", function()
-					if LFGListFrame.EntryCreation.ListGroupButton:GetText() == DONE_EDITING then
-						LeaMapsLC:LockItem(LFGListFrame.EntryCreation.CrossFactionGroup.CheckButton, true)
-						LFGListFrame.EntryCreation.CrossFactionGroup.Label:SetAlpha(0.3)
-					else
-						LeaMapsLC:LockItem(LFGListFrame.EntryCreation.CrossFactionGroup.CheckButton, false)
-						LFGListFrame.EntryCreation.CrossFactionGroup.Label:SetAlpha(1)
-					end
-				end)
-
-			else
-
-				-- Add 2FA advisory button
-				local PageFAlertButton = LeaMapsLC:CreateButton("PageFAlertButton", LeaMapsLC["PageF"], "You should enable 2FA!", "BOTTOMLEFT", 16, 10, 25, "Your game account does not have Two-Factor Authentication (2FA) enabled.|n|nIf you use premade group finder to make a Mythic+ dungeon group for your own key, you may see a stop error when the game tries to set the activity title to your key level.  To clear this error, reload your UI.|n|nTo avoid seeing this error, enable Two-Factor Authentication (2FA) on your game account.", true)
-				PageFAlertButton:SetPushedTextOffset(0, 0)
-
-			end
-
-		end
 
 		-- Load Battlefield addon
 		if not IsAddOnLoaded("Blizzard_BattlefieldMap") then
@@ -131,6 +85,75 @@
 		-- Hide the world map tutorial button
 		WorldMapFrame.BorderFrame.Tutorial:HookScript("OnShow", WorldMapFrame.BorderFrame.Tutorial.Hide)
 		SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_WORLD_MAP_FRAME, true)
+
+		----------------------------------------------------------------------
+		-- Scale the map
+		----------------------------------------------------------------------
+
+		if LeaMapsLC["ScaleWorldMap"] == "On" and LeaMapsLC["UseDefaultMap"] == "Off" then
+
+			-- Create configuration panel
+			local scalePanel = LeaMapsLC:CreatePanel("Scale the map", "scalePanel")
+
+			-- Add controls
+			LeaMapsLC:MakeTx(scalePanel, "Scale", 16, -72)
+			LeaMapsLC:MakeSL(scalePanel, "MapScale", "Windowed", "Drag to set the scale for the windowed map.", 0.5, 2, 0.05, 36, -112, "%.1f")
+			LeaMapsLC:MakeSL(scalePanel, "MaxMapScale", "Maximised", "Drag to set the scale for the maximised map.", 0.5, 2, 0.05, 206, -112, "%.1f")
+
+			-- Function to set map frame scale
+			local function SetMapScale()
+				LeaMapsCB["MapScale"].f:SetFormattedText("%.0f%%", LeaMapsLC["MapScale"] * 100)
+				LeaMapsCB["MaxMapScale"].f:SetFormattedText("%.0f%%", LeaMapsLC["MaxMapScale"] * 100)
+				if not WorldMapFrame:IsMaximized() then
+					WorldMapFrame:SetScale(LeaMapsLC["MapScale"])
+				else
+					if LeaMapsLC["UseDefaultMap"] == "Off" then
+						WorldMapFrame:SetScale(LeaMapsLC["MaxMapScale"])
+					else
+						WorldMapFrame:SetScale(1)
+					end
+				end
+			end
+
+			-- Set scale properties when controls are changed and on startup
+			LeaMapsCB["MapScale"]:HookScript("OnValueChanged", SetMapScale)
+			LeaMapsCB["MaxMapScale"]:HookScript("OnValueChanged", SetMapScale)
+			SetMapScale()
+
+			-- Set scale when map size is toggled
+			hooksecurefunc(WorldMapFrame, "SynchronizeDisplayState", SetMapScale)
+
+			-- Back to Main Menu button click
+			scalePanel.b:HookScript("OnClick", function()
+				scalePanel:Hide()
+				LeaMapsLC["PageF"]:Show()
+			end)
+
+			-- Reset button click
+			scalePanel.r:HookScript("OnClick", function()
+				-- Reset map scale
+				LeaMapsLC["MapScale"] = 1.0
+				LeaMapsLC["MaxMapScale"] = 1.0
+				SetMapScale()
+				-- Refresh panel
+				scalePanel:Hide(); scalePanel:Show()
+			end)
+
+			-- Show scale panel when configuration button is clicked
+			LeaMapsCB["ScaleWorldMapBtn"]:HookScript("OnClick", function()
+				if IsShiftKeyDown() and IsControlKeyDown() then
+					-- Preset profile
+					LeaMapsLC["MapScale"] = 1.0
+					LeaMapsLC["MaxMapScale"] = 0.9
+					SetMapScale()
+					if scalePanel:IsShown() then scalePanel:Hide(); scalePanel:Show(); end
+				else
+					scalePanel:Show()
+					LeaMapsLC["PageF"]:Hide()
+				end
+			end)
+
+		end
 
 		----------------------------------------------------------------------
 		-- Enhance battlefield map
@@ -1544,6 +1567,7 @@
 				-- Lock some incompatible options
 				LeaMapsLC:LockItem(LeaMapsCB["NoMapBorder"], true)
 				LeaMapsLC:LockItem(LeaMapsCB["UnlockMap"], true)
+				LeaMapsLC:LockItem(LeaMapsCB["ScaleWorldMap"], true)
 			end
 
 		end
@@ -1572,7 +1596,7 @@
 			subTitle:ClearAllPoints()
 			subTitle:SetPoint("BOTTOM", 0, 72)
 
-			local slashTitle = LeaMapsLC:MakeTx(interPanel, "/run leamaps()", 0, 0)
+			local slashTitle = LeaMapsLC:MakeTx(interPanel, "/ltm", 0, 0)
 			slashTitle:SetFont(slashTitle:GetFont(), 72)
 			slashTitle:ClearAllPoints()
 			slashTitle:SetPoint("BOTTOM", subTitle, "TOP", 0, 40)
@@ -1600,7 +1624,7 @@
 		-- Show first run message
 		if not LeaMapsDB["FirstRunMessageSeen"] then
 			C_Timer.After(1, function()
-				LeaMapsLC:Print(L["Enter"] .. " |cff00ff00" .. "/run leamaps()" .. "|r " .. L["or click the minimap button to open Leatrix Maps."])
+				LeaMapsLC:Print(L["Enter"] .. " |cff00ff00" .. "/ltm" .. "|r " .. L["or click the minimap button to open Leatrix Maps."])
 				LeaMapsDB["FirstRunMessageSeen"] = true
 			end)
 		end
@@ -1652,9 +1676,7 @@
 		Side.t:SetColorTexture(0.05, 0.05, 0.05, 0.9)
 
 		-- Add a close Button (LeaMapsLC: Custom template)
-		Side.c = CreateFrame("Button", nil, Side, "LeaMapsUIPanelCloseButtonNoScripts")
-		Side.c:SetSize(30, 30)
-		Side.c:SetPoint("TOPRIGHT", 0, 0)
+		Side.c = LeaMapsLC:CreateCloseButton(Side, 30, 30, "TOPRIGHT", 0, 0)
 		Side.c:SetScript("OnClick", function() Side:Hide() end)
 
 		-- Add reset, help and back buttons
@@ -1732,6 +1754,18 @@
 		for k, v in pairs(LeaConfigList) do
 			v:Hide()
 		end
+	end
+
+	-- Create a close button without using a template
+	function LeaMapsLC:CreateCloseButton(parent, w, h, anchor, x, y)
+		local btn = CreateFrame("BUTTON", nil, parent)
+		btn:SetSize(w, h)
+		btn:SetPoint(anchor, x, y)
+		btn:SetNormalTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Up")
+		btn:SetHighlightTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight")
+		btn:SetPushedTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Down")
+		btn:SetDisabledTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Disabled")
+		return btn
 	end
 
 	-- Find out if Leatrix Maps is showing (main panel or config panel)
@@ -1852,6 +1886,7 @@
 
 	-- Set lock state for configuration buttons
 	function LeaMapsLC:SetDim()
+		LeaMapsLC:LockOption("ScaleWorldMap", "ScaleWorldMapBtn", true) 		-- Scale the map
 		LeaMapsLC:LockOption("RevealMap", "RevTintBtn", true)					-- Shiw unexplored areas
 		LeaMapsLC:LockOption("UnlockMap", "UnlockMapBtn", true)					-- Unlock map frame
 		LeaMapsLC:LockOption("ShowCoords", "ShowCoordsBtn", false)				-- Show coordinates
@@ -1904,6 +1939,7 @@
 		if	(LeaMapsLC["NoMapBorder"] ~= LeaMapsDB["NoMapBorder"])				-- Remove map border
 		or	(LeaMapsLC["UnlockMap"] ~= LeaMapsDB["UnlockMap"])					-- Unlock map
 		or	(LeaMapsLC["UseDefaultMap"] ~= LeaMapsDB["UseDefaultMap"])			-- Use default map
+		or	(LeaMapsLC["ScaleWorldMap"] ~= LeaMapsDB["ScaleWorldMap"])			-- Scale the map
 		or	(LeaMapsLC["RevealMap"] ~= LeaMapsDB["RevealMap"])					-- Show unexplored areas
 		or	(LeaMapsLC["ShowIcons"] ~= LeaMapsDB["ShowIcons"])					-- Show dungeons and raids
 		or	(LeaMapsLC["HideTownCity"] ~= LeaMapsDB["HideTownCity"])			-- Hide town and city icons
@@ -2090,64 +2126,6 @@
 	end
 
 	----------------------------------------------------------------------
-	-- Stop error frame
-	----------------------------------------------------------------------
-
-	-- Create stop error frame
-	local stopFrame = CreateFrame("FRAME", nil, UIParent)
-	stopFrame:ClearAllPoints()
-	stopFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
-	stopFrame:SetSize(370, 150)
-	stopFrame:SetFrameStrata("FULLSCREEN_DIALOG")
-	stopFrame:SetFrameLevel(500)
-	stopFrame:SetClampedToScreen(true)
-	stopFrame:EnableMouse(true)
-	stopFrame:SetMovable(true)
-	stopFrame:Hide()
-	stopFrame:RegisterForDrag("LeftButton")
-	stopFrame:SetScript("OnDragStart", stopFrame.StartMoving)
-	stopFrame:SetScript("OnDragStop", function()
-		stopFrame:StopMovingOrSizing()
-		stopFrame:SetUserPlaced(false)
-	end)
-
-	-- Add background color
-	stopFrame.t = stopFrame:CreateTexture(nil, "BACKGROUND")
-	stopFrame.t:SetAllPoints()
-	stopFrame.t:SetColorTexture(0.05, 0.05, 0.05, 0.9)
-
-	-- Add textures
-	stopFrame.mt = stopFrame:CreateTexture(nil, "BORDER")
-	stopFrame.mt:SetTexture("Interface\\ACHIEVEMENTFRAME\\UI-GuildAchievement-Parchment-Horizontal-Desaturated.png")
-	stopFrame.mt:SetSize(370, 103)
-	stopFrame.mt:SetPoint("TOPRIGHT")
-	stopFrame.mt:SetVertexColor(0.5, 0.5, 0.5, 1.0)
-
-	stopFrame.ft = stopFrame:CreateTexture(nil, "BORDER")
-	stopFrame.ft:SetTexture("Interface\\ACHIEVEMENTFRAME\\UI-GuildAchievement-Parchment-Horizontal-Desaturated.png")
-	stopFrame.ft:SetSize(370, 48)
-	stopFrame.ft:SetPoint("BOTTOM")
-	stopFrame.ft:SetVertexColor(0.5, 0.5, 0.5, 1.0)
-
-	LeaMapsLC:MakeTx(stopFrame, "Leatrix Maps", 16, -12)
-	LeaMapsLC:MakeWD(stopFrame, "A stop error has occurred but no need to worry.  It can happen from time to time.  Click the reload button to resolve it.", 16, -32, 338)
-
-	-- Add reload UI Button
-	local stopRelBtn = LeaMapsLC:CreateButton("StopReloadButton", stopFrame, "Reload", "BOTTOMRIGHT", -16, 10, 25, "")
-	stopRelBtn:SetScript("OnClick", ReloadUI)
-	stopRelBtn.f = stopRelBtn:CreateFontString(nil, 'ARTWORK', 'GameFontNormalSmall')
-	stopRelBtn.f:SetHeight(32)
-	stopRelBtn.f:SetPoint('RIGHT', stopRelBtn, 'LEFT', -10, 0)
-	stopRelBtn.f:SetText(L["Your UI needs to be reloaded."])
-	stopRelBtn:Hide(); stopRelBtn:Show()
-
-	-- Add close Button (LeaMapsLC:Custom template)
-	local stopFrameClose = CreateFrame("Button", nil, stopFrame, "LeaMapsUIPanelCloseButtonNoScripts")
-	stopFrameClose:SetSize(30, 30)
-	stopFrameClose:SetPoint("TOPRIGHT", 0, 0)
-	stopFrameClose:SetScript("OnClick", function() stopFrame:Hide() end)
-
-	----------------------------------------------------------------------
 	-- L20: Commands
 	----------------------------------------------------------------------
 
@@ -2243,6 +2221,9 @@
 				LeaMapsDB["EnableMovement"] = "On"
 				LeaMapsDB["UseDefaultMap"] = "Off"
 				LeaMapsDB["StickyMapFrame"] = "Off"
+				LeaMapsDB["ScaleWorldMap"] = "Off"
+				LeaMapsDB["MapScale"] = 1.0
+				LeaMapsDB["MaxMapScale"] = 0.9
 				LeaMapsDB["NoMapFade"] = "On"
 				LeaMapsDB["NoMapEmote"] = "On"
 				LeaMapsDB["MapPosA"] = "TOPLEFT"
@@ -2310,19 +2291,12 @@
 	end
 
 	-- Add slash commands
-	--_G.SLASH_Leatrix_Maps1 = "/ltm"
-	--_G.SLASH_Leatrix_Maps2 = "/leamaps"
-
-	_G.SLASH_Leatrix_Maps1 = "/ztm" -- temp
+	_G.SLASH_Leatrix_Maps1 = "/ltm"
+	_G.SLASH_Leatrix_Maps2 = "/leamaps"
 
 	SlashCmdList["Leatrix_Maps"] = function(self)
 		-- Run slash command function
 		SlashFunc(self)
-	end
-
-	-- Replacement for broken slash command system
-	function leamaps(self)
-		SlashFunc(self or "")
 	end
 
 	----------------------------------------------------------------------
@@ -2346,6 +2320,9 @@
 			LeaMapsLC:LoadVarChk("EnableMovement", "On")				-- Enable frame movement
 			LeaMapsLC:LoadVarChk("UseDefaultMap", "Off")				-- Use default map
 			LeaMapsLC:LoadVarChk("StickyMapFrame", "Off")				-- Sticky map frame
+			LeaMapsLC:LoadVarChk("ScaleWorldMap", "Off")				-- Scale the map
+			LeaMapsLC:LoadVarNum("MapScale", 1.0, 0.5, 2)				-- Map scale
+			LeaMapsLC:LoadVarNum("MaxMapScale", 1.0, 0.5, 2)			-- Maximised map scale
 			LeaMapsLC:LoadVarChk("NoMapFade", "On")						-- Disable map fade
 			LeaMapsLC:LoadVarChk("NoMapEmote", "On")					-- Disable map emote
 			LeaMapsLC:LoadVarAnc("MapPosA", "TOPLEFT")					-- Windowed map anchor
@@ -2418,6 +2395,9 @@
 			LeaMapsDB["EnableMovement"] = LeaMapsLC["EnableMovement"]
 			LeaMapsDB["UseDefaultMap"] = LeaMapsLC["UseDefaultMap"]
 			LeaMapsDB["StickyMapFrame"] = LeaMapsLC["StickyMapFrame"]
+			LeaMapsDB["ScaleWorldMap"] = LeaMapsLC["ScaleWorldMap"]
+			LeaMapsDB["MapScale"] = LeaMapsLC["MapScale"]
+			LeaMapsDB["MaxMapScale"] = LeaMapsLC["MaxMapScale"]
 			LeaMapsDB["NoMapFade"] = LeaMapsLC["NoMapFade"]
 			LeaMapsDB["NoMapEmote"] = LeaMapsLC["NoMapEmote"]
 			LeaMapsDB["MapPosA"] = LeaMapsLC["MapPosA"]
@@ -2461,16 +2441,6 @@
 			LeaMapsDB["MainPanelR"] = LeaMapsLC["MainPanelR"]
 			LeaMapsDB["MainPanelX"] = LeaMapsLC["MainPanelX"]
 			LeaMapsDB["MainPanelY"] = LeaMapsLC["MainPanelY"]
-
-		elseif event == "ADDON_ACTION_FORBIDDEN" and arg1 == "Leatrix_Maps" then
-			-- Stop error has occured
-			StaticPopup_Hide("ADDON_ACTION_FORBIDDEN")
-			stopFrame:Show()
-
-		elseif event == "ADDON_ACTION_BLOCKED" and arg1 == "Leatrix_Maps" and arg2 and arg2 == "SetEntryTitle()" then
-			-- Addon blocked error due to SetEntryTitle taint
-			ScriptErrorsFrame:Hide()
-			stopFrame:Show()
 
 		end
 	end)
@@ -2554,9 +2524,7 @@
 	reloadb.f:Hide()
 
 	-- Add close Button (LeaMapsLC: Custom template)
-	local CloseB = CreateFrame("Button", nil, PageF, "LeaMapsUIPanelCloseButtonNoScripts")
-	CloseB:SetSize(30, 30)
-	CloseB:SetPoint("TOPRIGHT", 0, 0)
+	local CloseB = LeaMapsLC:CreateCloseButton(PageF, 30, 30, "TOPRIGHT", 0, 0)
 	CloseB:SetScript("OnClick", function() PageF:Hide() end)
 
 	-- Add content
@@ -2566,6 +2534,7 @@
 	LeaMapsLC:MakeTx(PageF, "System", 16, -132)
 	LeaMapsLC:MakeCB(PageF, "UnlockMap", "Unlock map frame", 16, -152, true, "If checked, you will be able to move the map.|n|nThe map position will be saved separately for the maximised and windowed maps.")
 	LeaMapsLC:MakeCB(PageF, "UseDefaultMap", "Use default map", 16, -172, true, "If checked, the default fullscreen map will be used for the maximised map.|n|nNote that enabling this option will lock out some of the other options.")
+	LeaMapsLC:MakeCB(PageF, "ScaleWorldMap", "Scale the map", 16, -192, true, "If checked, you will be able to scale the map.")
 
 	LeaMapsLC:MakeTx(PageF, "Elements", 225, -72)
 	LeaMapsLC:MakeCB(PageF, "RevealMap", "Show unexplored areas", 225, -92, true, "If checked, unexplored areas of the map will be shown on the world map and the battlefield map.")
@@ -2579,6 +2548,7 @@
 	LeaMapsLC:MakeCB(PageF, "NoMapEmote", "Disable reading emote", 225, -252, false, "If checked, your character will not perform the reading emote when you open the map.")
 	LeaMapsLC:MakeCB(PageF, "ShowMinimapIcon", "Show minimap button", 225, -272, false, "If checked, the minimap button will be shown.")
 
+	LeaMapsLC:CfgBtn("ScaleWorldMapBtn", LeaMapsCB["ScaleWorldMap"])
 	LeaMapsLC:CfgBtn("RevTintBtn", LeaMapsCB["RevealMap"])
 	LeaMapsLC:CfgBtn("UnlockMapBtn", LeaMapsCB["UnlockMap"])
 	LeaMapsLC:CfgBtn("ShowCoordsBtn", LeaMapsCB["ShowCoords"])

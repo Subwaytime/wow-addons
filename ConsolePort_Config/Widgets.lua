@@ -81,7 +81,19 @@ function Widget:OnLeave()
 end
 
 function Widget:OnShow()
-	self:OnValueChanged(self:Get())
+	local value = {self:Get()}
+	local valueExists = next(value) ~= nil;
+	self:SetAlpha(valueExists and 1 or .5)
+	self:SetEnabled(valueExists)
+	if valueExists then
+		tinsert(value, valueExists)
+		self:OnValueChanged(unpack(value))
+	else
+		self:OnValueChanged(nil, false)
+	end
+	if self.Input then
+		self.Input:EnableMouse(valueExists)
+	end
 end
 
 function Widget:OnValueChanged(...)
@@ -287,10 +299,13 @@ local Range = CreateWidget('Range', Number, {
 	};
 })
 
-function Range:OnValueChanged(value)
+function Range:OnValueChanged(value, valueExists)
+	value = tonumber(value)
 	local step = self.controller:GetStep()
-	self.Input:SetValue(value)
-	self.Input.Text:SetText(Round(value / step) * step)
+	if ( valueExists ~= false ) then
+		self.Input:SetValue(value)
+		self.Input.Text:SetText(Round(value / step) * step)
+	end
 end
 
 ---------------------------------------------------------------
@@ -368,7 +383,13 @@ function String:OnClick()
 	end
 end
 
-function String:OnValueChanged(value)
+function String:OnValueChanged(value, valueExists)
+	-- subvert default widget behavior for strings
+	if not valueExists then
+		self:SetAlpha(1)
+		self:SetEnabled(true)
+		self.Input:EnableMouse(true)
+	end
 	self.Input:SetText(value or '')
 end
 

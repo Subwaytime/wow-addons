@@ -1,5 +1,5 @@
 --[[
-Created by Slothpala 
+    Created by Slothpala 
 --]]
 HealthBarColor = LibStub("AceAddon-3.0"):NewAddon("HealthBarColor", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 local AC = LibStub("AceConfig-3.0")
@@ -72,7 +72,22 @@ local defaults = {
         },
         Textures = {
             custom = false,
-            statusbar = "Solid",
+            healthbar = "Solid",
+            powerbar = "Solid",
+            excludepowerbar = false,
+        },
+        DebuffColor = {
+            enabled = false,
+            Curse   = {r=0.6,g=0.0,b=1.0},
+            Disease = {r=0.6,g=0.4,b=0.0},
+            Magic   = {r=0.2,g=0.6,b=1.0},
+            Poison  = {r=0.0,g=0.6,b=0.0},
+            ignoreMagic = false,
+        },
+        BackgroundTexture = {
+            enabled = false,
+            color = {r=0,g=0,b=0},
+            texture = "Solid",
         },
     },
 }
@@ -452,28 +467,184 @@ local options = {
             
         },
         },
-        Textures = {
-            order = 2,
-            name = "Textures",
+        Modules = {
+            order = 3,
+            name = "Modules",
             type = "group",
             args = {
-                custom = {
+                Textures = {
                     order = 1,
-                    name = "Use custom texture",
-                    desc = "if you uncheck this /reload to get back to the original texture",
-                    type = "toggle",
-                    get = "Get",
-                    set = "Set",
+                    name = "Textures",
+                    type = "group",
+                    inline = true,
+                    args = {
+                        custom = {
+                            order = 1,
+                            name = "Enable",
+                            desc = "/reload after disabling it",
+                            type = "toggle",
+                            get = "Get",
+                            set = "Set",
+                            width = 4,
+                        },
+                        healthbar = {
+                            order = 2,
+                            type = "select",
+                            dialogControl = "LSM30_Statusbar", 
+                            name = "Health Bar", 
+                            values = media:HashTable("statusbar"), 
+                            get = "Get",
+                            set = "Set",
+                            disabled = function() return not HealthBarColor.db.profile.Textures.custom end,
+                            width = 1.2,
+                        },
+                        powerbar = {
+                            order = 3,
+                            type = "select",
+                            dialogControl = "LSM30_Statusbar", 
+                            name = "Power Bar", 
+                            values = media:HashTable("statusbar"), 
+                            get = "Get",
+                            set = "Set",
+                            disabled = function() return not HealthBarColor.db.profile.Textures.custom or HealthBarColor.db.profile.Textures.excludepowerbar end,
+                            width = 1.2,
+                        },
+                        excludepowerbar = {
+                            order = 4,
+                            name = "Exclude Power Bar",
+                            desc = "/reload after disabling it",
+                            type = "toggle",
+                            get = "Get",
+                            set = "Set",
+                            disabled = function() return not HealthBarColor.db.profile.Textures.custom end,
+                            width = 1,
+                        },
+                    },
                 },
-                statusbar = {
+                DebuffColor = {
                     order = 2,
-                    type = "select",
-                    dialogControl = "LSM30_Statusbar", 
-                    name = 'Health Bar Texture', 
-                    values = media:HashTable("statusbar"), 
-                    get = "Get",
-                    set = "Set",
-                    disabled = function() return not HealthBarColor.db.profile.Textures.custom end,
+                    name = "Dispellable Debuff Color",
+                    type = "group",
+                    inline = true,
+                    args = {
+                        enabled = {
+                            order = 1,
+                            name = "Enable",
+                            desc = "color the player health bar by debuff type if you can dispel yourself",
+                            type = "toggle",
+                            get = "Get",
+                            set = "Set",
+                        },
+                        newline = {
+                            order = 1.1,
+                            type = "description",
+                            name = "",
+                        },
+                        Curse = {
+                            order = 2,
+                            name = "Curse",
+                            type = "color",
+                            get = "GetColor",
+                            set = "SetColor",
+                            disabled = function () return not HealthBarColor.db.profile.DebuffColor.enabled end,
+                            width = 0.5,
+                        },
+                        Disease = {
+                            order = 3,
+                            name = "Disease",
+                            type = "color",
+                            get = "GetColor",
+                            set = "SetColor",
+                            disabled = function () return not HealthBarColor.db.profile.DebuffColor.enabled end,
+                            width = 0.5,
+                        },
+                        Magic = {
+                            order = 4,
+                            name = "Magic",
+                            type = "color",
+                            get = "GetColor",
+                            set = "SetColor",
+                            disabled = function () return not HealthBarColor.db.profile.DebuffColor.enabled end,
+                            width = 0.5,
+                        },
+                        Poison = {
+                            order = 5,
+                            name = "Poison",
+                            type = "color",
+                            get = "GetColor",
+                            set = "SetColor",
+                            disabled = function () return not HealthBarColor.db.profile.DebuffColor.enabled end,
+                            width = 0.5,
+                        },
+                        ignoreMagic = {
+                            order = 5.1,
+                            name = "Ignore Magic",
+                            desc = "ignore magic debuffs",
+                            type = "toggle",
+                            get = "Get",
+                            set = "Set",
+                        },
+                        newline2 = {
+                            order = 6,
+                            type = "description",
+                            name = "",
+                        },
+                        ResetColors = {
+                            order = 8,
+                            name = "reset",
+                            desc = "to default",
+                            type = "execute",
+                            width = 0.4,
+                            func = 
+                            function() 
+                                HealthBarColor.db.profile.DebuffColor.Curse   = {r=0.6,g=0.0,b=1.0}
+                                HealthBarColor.db.profile.DebuffColor.Disease = {r=0.6,g=0.4,b=0.0}
+                                HealthBarColor.db.profile.DebuffColor.Magic   = {r=0.2,g=0.6,b=1.0}
+                                HealthBarColor.db.profile.DebuffColor.Poison  = {r=0.0,g=0.6,b=0.0}
+                            end,
+                            disabled = function () return not HealthBarColor.db.profile.DebuffColor.enabled end,
+                        },
+                    },
+                },
+                BackgroundTexture = {
+                    order = 2,
+                    name = "Background Texture",
+                    type = "group",
+                    inline = true,
+                    args = {
+                        enabled = {
+                            order = 1,
+                            name = "Enable",
+                            desc = "Create a background texture beneath your health bar",
+                            type = "toggle",
+                            get = "Get",
+                            set = "Set",
+                        },
+                        newline = {
+                            order = 1.1,
+                            type = "description",
+                            name = "",
+                        },
+                        texture = {
+                            order = 2,
+                            type = "select",
+                            dialogControl = "LSM30_Statusbar", 
+                            name = "Texture", 
+                            values = media:HashTable("statusbar"), 
+                            get = "Get",
+                            set = "Set",
+                            width = 1.2,
+                        },
+                        color = {
+                            order = 3,
+                            name = "Color",
+                            type = "color",
+                            get = "GetColor",
+                            set = "SetColor",
+                            --disabled = function () return not HealthBarColor.db.profile.DebuffColor.enabled end,
+                            width = 0.5,
+                        },
+                    },
                 },
             },
         },
@@ -490,8 +661,8 @@ function HealthBarColor:OnInitialize()
     local profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db) 
     AC:RegisterOptionsTable("HealthBarColor_Profiles", profiles)
     ACD:AddToBlizOptions("HealthBarColor_Profiles", "Profiles", "HealthBarColor")
-    HealthBarColor:InitialStatusBarSetup()
-    HealthBarColor:LoadConfig()
+    self:InitialStatusBarSetup()
+    self:LoadConfig()
     self:RegisterChatCommand("hbc", "SlashCommand")
 end
 
@@ -500,8 +671,8 @@ function HealthBarColor:SlashCommand()
 end
 
 function HealthBarColor:LoadConfig()
-    HealthBarColor:PlayerColor()
-    HealthBarColor:TargetColor()
+    self:PlayerColor()
+    self:TargetColor()
     HealthBarColor:FocusColor()
     HealthBarColor:BossColor()
     HealthBarColor:PetColor()
@@ -511,17 +682,25 @@ function HealthBarColor:LoadConfig()
         useclassIcons = true
     end
     if self.db.profile.Textures.custom then
-        HealthBarColor:EnableModule("Textures")
-        local Textures = HealthBarColor:GetModule("Textures")
-        Textures:ApplyAll()
-        if IsAddOnLoaded("BiggerHealthBar") then
-            PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.HealthBarArea.HealthBar:SetStatusBarTexture(media:Fetch("statusbar", HealthBarColor.db.profile.Textures.statusbar)) 
-        end
+        self:EnableModule("Textures")
+        local textureModule = HealthBarColor:GetModule("Textures")
+        textureModule:FetchTextures()
+        textureModule:ApplyAll()
     end
     if self.db.profile.PartyColor.active then
         HealthBarColor:EnableModule("PartyColor")
     else
         HealthBarColor:DisableModule("PartyColor")
+    end
+    if self.db.profile.BackgroundTexture.enabled then
+        HealthBarColor:EnableModule("BackgroundTexture")
+    else
+        HealthBarColor:DisableModule("BackgroundTexture")
+    end
+    if self.db.profile.DebuffColor.enabled then
+        HealthBarColor:EnableModule("DebuffColor")
+    else
+        HealthBarColor:DisableModule("DebuffColor")
     end
 end
 
@@ -930,4 +1109,6 @@ end
 HealthBarColor:RegisterEvent("PLAYER_TARGET_CHANGED","TargetColor")
 HealthBarColor:RegisterEvent("PLAYER_FOCUS_CHANGED","FocusColor")
 HealthBarColor:RegisterEvent("UNIT_TARGET","UnitTargetHandler")
+HealthBarColor:RegisterEvent("PLAYER_ENTERING_WORLD","LoadConfig")
+
 

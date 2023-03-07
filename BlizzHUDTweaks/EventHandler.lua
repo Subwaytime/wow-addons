@@ -74,7 +74,9 @@ local eventsToRegister = {
   "UNIT_QUEST_LOG_CHANGED",
   "UPDATE_SHAPESHIFT_COOLDOWN",
   "UPDATE_BONUS_ACTIONBAR",
-  "UNIT_HEALTH"
+  "UNIT_HEALTH",
+  "ZONE_CHANGED_NEW_AREA",
+  "PLAYER_MOUNT_DISPLAY_CHANGED"
 }
 
 local registeredEvents = {}
@@ -303,5 +305,22 @@ end
 function EventHandler:UNIT_HEALTH(_, unit)
   if unit == "player" then
     MouseoverFrameFading:RefreshFrameAlphas()
+  end
+end
+
+function EventHandler:ZONE_CHANGED_NEW_AREA()
+  if addon:IsEnabled() then
+    local profile = addon:GetProfileDB()
+
+    if Miscellaneous:IsEnabled() then
+      Miscellaneous:RestoreAll(profile)
+      Miscellaneous:UpdateActionbar1UnusedButtons()
+    end
+  end
+end
+
+function EventHandler:PLAYER_MOUNT_DISPLAY_CHANGED()
+  if addon:IsEnabled() then
+    restoreMouseoverFade()
   end
 end

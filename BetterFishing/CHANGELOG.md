@@ -1,3 +1,21 @@
+### 1.1.11
+- Fixed Enhanced Sound not getting properly reset when ice fishing.
+- Added option to allow recasting fishing for double click
+
+### 1.1.10
+- Patch 10.0.5 update
+
+### 1.1.9
+- Currently Keybind range on Wrath for bobber is limited on Blizzards side, you have to use your mouse to hook if keybind fails.
+- Double Click to cast works now on all classes in wrath
+
+### 1.1.8
+- Wrath support
+
+### 1.1.7
+- Option to allow Fishing while the Looking for Lunkers buff is active.
+- Partial ice fishing support, you can not use key to interact with fishing hole but you can use the bound key to hook.
+
 ### 1.1.6
 - Shouldn't break the 'looking for lunkers' spell anymore.
 

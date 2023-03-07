@@ -1,5 +1,5 @@
-# Release 1.30.2 ~ 21.12.2022 - 08:34:32
-## Bugfixes (1)
- - ([2b193c8](https://github.com/PhenomDevel/BlizzHUDTweaks/commit/2b193c8)) Be able to select global in `copy from` again
+# Release 1.32.2 ~ 16.02.2023 - 11:18:14
+## Misc (1)
+ - ([0803737](https://github.com/PhenomDevel/BlizzHUDTweaks/commit/0803737)) [#47] Make sure that mouseover fade is always the number one prio
 
 

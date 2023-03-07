@@ -1,18 +1,24 @@
-tag 3523d0eb3c86a5831b7a2c3d46bd857a2ec1ea8d 1.1.5
+tag a508dfccba0d8cdbd4deb2b08deeb5a668ed4a5c 1.1.6
 Author:	Kyle Buller <bullerk@gmail.com>
-Date:	Mon Nov 28 00:47:57 2022 -0600
+Date:	Tue Jan 24 11:44:25 2023 -0600
 
-Tagging as 1.1.5
+Tagging as 1.1.6
 
-commit 800402dcc7762ae9eea08d982049029af2da5754
+commit d4e9926273ab76e858c704f31c9c27d737953082
 Author: Kyle Buller <bullerk@gmail.com>
-Date:   Mon Nov 28 00:47:25 2022 -0600
+Date:   Tue Jan 24 11:38:26 2023 -0600
 
-    Tweak
+    Update TOC for 3.4.1
 
-commit 957f346e00d0f475ac08cc0efccba104c906cbd6
+commit a6d143ebe8a202f93894605ae9ed041e20884c29
 Author: Kyle Buller <bullerk@gmail.com>
-Date:   Mon Nov 28 00:47:05 2022 -0600
+Date:   Tue Jan 24 11:36:47 2023 -0600
 
-    Fix changing the "Okay" button to "Reload" on changes
+    Fix Classic
+
+commit 47c95dab07d228a9d0df1c5d6f8aa4310e8ab9cc
+Author: Kyle Buller <bullerk@gmail.com>
+Date:   Mon Nov 28 00:51:35 2022 -0600
+
+    Retail tweaks
 

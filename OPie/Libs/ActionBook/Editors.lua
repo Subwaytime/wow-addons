@@ -110,7 +110,7 @@ do -- .macrotext
 			local forceRank, tname = token == "spellr"
 			for id in sid:gmatch("%d+") do
 				local name, sr = GetSpellInfo(tonumber(id)), GetSpellSubtext(tonumber(id))
-				if sr and sr ~= "" and (forceRank or MODERN) then name = name .. " (" .. sr .. ")" end
+				if sr and sr ~= "" and (forceRank or MODERN) then name = name .. "(" .. sr .. ")" end
 				if name and names[name] ~= tag then
 					names[name], tname = tag, (tname and (tname .. " / ") or "") .. name
 				end
@@ -163,7 +163,7 @@ do -- .macrotext
 		return isEmptyLine
 	end
 	bg.editBox, bg.scrollFrame = bg, eb
-	hooksecurefunc("ChatEdit_InsertLink", function(link, ...)
+	hooksecurefunc("ChatEdit_InsertLink", function(link)
 		if GetCurrentKeyBoardFocus() == eb then
 			if link:match("item:") then
 				eb:Insert((isCursorOnEmptyLine(eb) and (GetItemSpell(link) and SLASH_USE1 or SLASH_EQUIP1) or "") .. " " .. GetItemInfo(link))

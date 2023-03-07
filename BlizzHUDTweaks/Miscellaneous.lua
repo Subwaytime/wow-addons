@@ -247,6 +247,10 @@ function Miscellaneous:UpdateActionbar1UnusedButtons(forcedAlpha)
       end
     end
   end
+
+  if MainMenuBar.Background:IsShown() and addon:GetProfileDB()["MiscellaneousActionbar1HideUnbindActionbuttons"] then
+    MainMenuBar.Background:Hide()
+  end
 end
 
 function Miscellaneous:RestoreOriginal()
@@ -269,7 +273,7 @@ function Miscellaneous:RestoreAll(profile)
         if option.type == "actionbarpaddinggroup" then
           Miscellaneous:RestoreActionbarPadding(addon:GetProfileDB(), option, value)
           Miscellaneous:RestoreActionbarSize(addon:GetProfileDB(), option, value)
-        else
+        elseif value ~= nil then -- Only apply setfn if the value has been changed since profile creation
           if option.setFn then
             option.setFn(option, nil, value)
           end

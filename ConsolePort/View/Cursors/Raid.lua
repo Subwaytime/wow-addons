@@ -12,15 +12,31 @@ local Cursor = db:Register('Raid', db.Pager:RegisterHeader(db.Securenav(ConsoleP
 ---------------------------------------------------------------
 -- Frame refs, init scripts, click handlers
 ---------------------------------------------------------------
+Cursor.SetTarget:SetAttribute(CPAPI.ActionTypeRelease, 'target')
+Cursor.SetFocus:SetAttribute(CPAPI.ActionTypeRelease, 'focus')
 Cursor:SetFrameRef('SetFocus', Cursor.SetFocus)
 Cursor:SetFrameRef('SetTarget', Cursor.SetTarget)
-Cursor:WrapScript(Cursor.Toggle, 'OnClick', [[
+Cursor:SetFrameRef('Toggle', Cursor.Toggle)
+Cursor:WrapScript(Cursor.Toggle, 'PreClick', [[
 	control:RunAttribute('ToggleCursor', not enabled)
+	if control:GetAttribute('usefocus') then
+		if enabled then
+			self:SetAttribute('type', 'focus')
+			self:SetAttribute('unit', control:GetAttribute('cursorunit'))
+		else
+			self:SetAttribute('type', 'macro')
+			self:SetAttribute('macrotext', '/clearfocus')
+		end
+	else
+		self:SetAttribute('type', nil)
+		self:SetAttribute('unit', nil)
+		self:SetAttribute('macrotext', nil)
+	end
 ]])
 
 Cursor:Wrap('PreClick', [[
 	self::SelectNewNode(button)
-	if self:GetAttribute('noroute') then
+	if self:GetAttribute('usefocus') or not self:GetAttribute('useroute') then
 		self:SetAttribute('unit', self:GetAttribute('cursorunit'))
 	else
 		self:SetAttribute('unit', nil)
@@ -32,9 +48,13 @@ Cursor:Execute([[
 	ACTIONS = newtable();
 	HELPFUL = newtable();
 	HARMFUL = newtable();
+	BUTTONS = newtable();
 	---------------------------------------
 	Focus  = self:GetFrameRef('SetFocus')
 	Target = self:GetFrameRef('SetTarget')
+	Toggle = self:GetFrameRef('Toggle')
+	---------------------------------------
+	CACHE[Toggle] = true;
 ]])
 
 ---------------------------------------------------------------
@@ -47,7 +67,7 @@ Cursor:CreateEnvironment({
 			local action = node:GetAttribute('action')
 
 			if unit and not action then
-				if node:GetRect() and self:Run(filter) then
+				if node:GetRect() and self::IsValidNode() then
 					NODES[node] = true;
 					CACHE[node] = true;
 				end
@@ -59,6 +79,13 @@ Cursor:CreateEnvironment({
 	]];
 	FilterOld = [[
 		return UnitExists(oldnode:GetAttribute('unit'));
+	]];
+	SetBaseBindings = [[
+		local modifier = ...;
+		modifier = modifier and modifier or '';
+		for buttonID, keyID in pairs(BUTTONS) do
+			self:SetBindingClick(self:GetAttribute('priorityoverride'), modifier..keyID, self, buttonID)
+		end
 	]];
 	RefreshActions = [[
 		HELPFUL = wipe(HELPFUL)
@@ -82,7 +109,7 @@ Cursor:CreateEnvironment({
 		Target:SetAttribute('unit', nil)
 	]];
 	PrepareReroute = [[
-		local reroute = not self:GetAttribute('noroute')
+		local reroute = self:GetAttribute('useroute')
 		if reroute then
 			for action, unit in pairs(ACTIONS) do
 				action:SetAttribute('unit', unit)
@@ -173,19 +200,55 @@ Cursor:CreateEnvironment({
 			self::SelectNewNode(0)
 		end
 	]];
+	IsHelpfulMacro = [[
+		local body = ...
+		if body then
+			local condition = body:match('#raidcursor (%[.+%])')
+			return condition and condition:match('help')
+		end
+	]];
+	IsHarmfulMacro = [[
+		local body = ...
+		if body then
+			local condition = body:match('#raidcursor (%[.+%])')
+			return condition and condition:match('harm')
+		end
+	]];
 })
 
 ---------------------------------------------------------------
 -- Settings
 ---------------------------------------------------------------
+Cursor.Modes = {
+	Redirect = 1;
+	Focus    = 2;
+	Target   = 3;
+}
+
+Cursor.Directions = {
+	PADDUP    = 'raidCursorUp';
+	PADDDOWN  = 'raidCursorDown';
+	PADDLEFT  = 'raidCursorLeft';
+	PADDRIGHT = 'raidCursorRight';
+};
+
 function Cursor:OnDataLoaded()
 	local modifier = db('raidCursorModifier')
 	modifier = modifier:match('<none>') and '' or modifier..'-';
-	self:SetAttribute('noroute', db('raidCursorDirect'))
 	self:SetAttribute('navmodifier', modifier)
-	self:SetAttribute('filter', 'return ' .. (db('raidCursorFilter') or 'true') .. ';') 
+
+	local mode = db('raidCursorMode')
+	self:SetAttribute('useroute', mode ~= self.Modes.Target)
+	self:SetAttribute('usefocus', mode == self.Modes.Focus)
+	self:SetAttribute('type', mode == self.Modes.Focus and 'focus' or 'target')
+
+	self:SetAttribute('IsValidNode', 'return ' .. (db('raidCursorFilter') or 'true') .. ';') 
 	self:SetScale(db('raidCursorScale'))
-	self:Execute([[filter = self:GetAttribute('filter')]])
+
+	self:Execute('wipe(BUTTONS)')
+	for direction, varID in pairs(self.Directions) do
+		self:Execute(('BUTTONS[%q] = %q'):format(direction, db(varID)))
+	end 
 
 	if CPAPI.IsRetailVersion then
 		self.Arrow:SetAtlas('Navigation-Tracked-Arrow', true)
@@ -201,11 +264,18 @@ function Cursor:OnUpdateOverrides(isPriority)
 	end
 end
 
-db:RegisterSafeCallback('Settings/raidCursorScale', Cursor.OnDataLoaded, Cursor)
-db:RegisterSafeCallback('Settings/raidCursorDirect', Cursor.OnDataLoaded, Cursor)
-db:RegisterSafeCallback('Settings/raidCursorModifier', Cursor.OnDataLoaded, Cursor)
-db:RegisterSafeCallback('Settings/raidCursorScale', Cursor.OnDataLoaded, Cursor)
-db:RegisterSafeCallback('Settings/raidCursorFilter', Cursor.OnDataLoaded, Cursor)
+db:RegisterSafeCallbacks(Cursor.OnDataLoaded, Cursor, 
+	'Settings/raidCursorScale',
+	'Settings/raidCursorMode',
+	'Settings/raidCursorAutoFocus',
+	'Settings/raidCursorModifier',
+	'Settings/raidCursorScale',
+	'Settings/raidCursorFilter',
+	'Settings/raidCursorUp',
+	'Settings/raidCursorDown',
+	'Settings/raidCursorLeft',
+	'Settings/raidCursorRight'
+);
 db:RegisterSafeCallback('OnUpdateOverrides', Cursor.OnUpdateOverrides, Cursor)
 
 ---------------------------------------------------------------

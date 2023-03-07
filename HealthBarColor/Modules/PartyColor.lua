@@ -1,5 +1,5 @@
 --[[
-Created by Slothpala 
+    Created by Slothpala 
 --]]
 local PartyColor = HealthBarColor:NewModule("PartyColor")
 local playersclasscolor

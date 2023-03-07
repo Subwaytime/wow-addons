@@ -218,7 +218,7 @@ do  -- Create input proxy for basic controls
 	local DpadRepeater = function(self, elapsed)
 		self.timer = self.timer + elapsed
 		if self.timer >= self.UIControlTickNext and self.state then
-			local func = self:GetAttribute('type')
+			local func = self:GetAttribute(CPAPI.ActionTypeRelease)
 			if ( func == 'UIControl' ) then
 				self[func](self, self.state, self:GetAttribute('id'))
 			end
@@ -676,7 +676,12 @@ function Cursor:SetTexture(texture)
 	local evaluator = self.Textures[object]
 	if ( evaluator ~= self.textureEvaluator ) then
 		if self.useAtlasIcons then
-			self.Display.Button:SetAtlas(evaluator())
+			local atlas = evaluator()
+			if atlas then
+				self.Display.Button:SetAtlas(atlas)
+			else
+				self.Display.Button:SetTexture(nil)
+			end
 		else
 			self.Display.Button:SetTexture(evaluator())
 		end

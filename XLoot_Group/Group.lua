@@ -321,7 +321,7 @@ end
 local tidx = { [0] = 1, [3] = 2, [2] = 2, [1] = 3 }
 function addon:LOOT_HISTORY_ROLL_COMPLETE()
 	-- Locate history item
-	local hid, frame, rollid, players, done, _ = 1
+	local hid, frame, rollid, players, done, _ = 1, nil, nil, nil, nil, nil
 	while true do
 		rollid, _, players, done = HistoryGetItem(hid)
 		if not rollid or (rolls[rollid] and rolls[rollid].over) then
@@ -335,7 +335,7 @@ function addon:LOOT_HISTORY_ROLL_COMPLETE()
 
 	-- Active frame found
 	frame.over = true
-	local top_type, top_roll, top_pid, top_is_me = 0, 0
+	local top_type, top_roll, top_pid, top_is_me = 0, 0, nil, nil
 	for j=1, players do
 		local name, class, rtype, roll, is_winner, is_me = HistoryGetPlayerInfo(hid, j)
 		-- roll = roll and roll or true
@@ -668,8 +668,10 @@ do
 	end
 
 	local function AddIneligibleReason(button, r, g, b)
-		GameTooltip:AddLine(string_format(_G["LOOT_ROLL_INELIGIBLE_REASON"..button.reason], button.skill), r or .6, g or .6, b or .6)
-		GameTooltip:Show()
+		if button.reason and _G["LOOT_ROLL_INELIGIBLE_REASON"..button.reason] then
+			GameTooltip:AddLine(string_format(_G["LOOT_ROLL_INELIGIBLE_REASON"..button.reason], button.skill), r or .6, g or .6, b or .6)
+			GameTooltip:Show()
+		end
 	end
 
 	local function AddTooltipLines(self, show_all, show)
@@ -934,7 +936,7 @@ do
 		frame:SetScript('OnEnter', self.OnEnter)
 		frame:SetScript('OnLeave', self.OnLeave)
 		frame:SetScript('OnClick', self.OnClick)
-		
+
 		-- Overlay (For skin border)
 		local overlay = CreateFrame('frame', nil, frame, BackdropTemplateMixin and "BackdropTemplate")
 		overlay:SetFrameLevel(frame:GetFrameLevel())
@@ -956,7 +958,7 @@ do
 		icon:SetPoint('BOTTOMRIGHT', -3, 3)
 		icon:SetTexCoord(.07,.93,.07,.93)
 		frame.icon = icon
-		
+
 		-- Timer bar
 		local bar = CreateFrame('StatusBar', nil, frame)
 		bar:SetFrameLevel(frame:GetFrameLevel())
@@ -970,7 +972,7 @@ do
 		frame.bar = bar
 		-- Reference bar for quick re-skinning when XLoot skin changes
 		table.insert(addon.bars, bar)
-		
+
 		local spark = bar:CreateTexture(nil, 'OVERLAY')
 		spark:SetWidth(14)
 		spark:SetHeight(38)
@@ -1085,4 +1087,131 @@ function addon:ApplyOptions()
 	end
 end
 
+
+---------------------------------------------------------------------------
+-- Test rolls
+---------------------------------------------------------------------------
+local preview_loot = {
+	{ 52722, false, true, true, true },
+	{ 31304, true, false, true, true, 1 },
+	{ 37254, true, false, false, true, 2, 2 },
+	{ 13262, true, false, false, false, 4, 4, 4, 69 },
+	{ 15487, false, true, true, true }
+}
+-- Activate items
+for i, t in ipairs(preview_loot) do
+	GetItemInfo(t[1])
+end
+
+local init, tests, links, StartFakeRoll = false, {}, {}, nil
+
+local deframe = CreateFrame('Frame')
+
+-- Currently only debugs one roll at a time.
+function XLootGroup.TestSettings()
+	local FakeHistory
+	local schedule = {}
+	local type_index = { 'need', 'greed', 'disenchant', [0] = 'pass' }
+	if not init then
+		print(L.debug_warning)
+		init = true
+		local tick = 0
+		deframe:SetScript('OnUpdate', function(self, elapsed)
+			tick = tick + elapsed
+			if tick > 1 then
+				tick = 0
+				local time = GetTime()
+				for k,v in pairs(schedule) do
+					if v[1] < time then
+						local e = v
+						schedule[k] = nil
+						e[2]()
+						e[3](unpack(e[4]))
+					end
+				end
+			end
+		end)
+
+		FakeHistory = {
+			rolls = {},
+			links = {},
+			items = {}
+		}
+
+		local function after(seconds, func, target, ...)
+			table.insert(schedule, { GetTime() + seconds, func, target, {...} } )
+		end
+
+		local function changed(...)
+			addon:LOOT_HISTORY_ROLL_CHANGED(...)
+		end
+
+		function GetLootRollItemInfo(id)
+			return unpack(FakeHistory.rolls[id])
+		end
+
+		function GetLootRollItemLink(id)
+			return FakeHistory.links[id]
+		end
+
+		function GetLootRollTimeLeft()
+			return 1
+		end
+
+		function RollOnLoot(rollid, rtypeid)
+			FakeHistory.items[1].players[1][3] = rtypeid
+			changed(1, 1)
+		end
+
+		function UnitGroupRolesAssigned(player)
+			local s = math.random(1, 3)
+			if s == 1 then
+				return "HEALER"
+			elseif s == 2 then
+				return "DAMAGER"
+			end
+			return "TANK"
+		end
+
+		function HistoryGetItem(hid)
+			return unpack(FakeHistory.items[hid].item)
+		end
+
+		function HistoryGetPlayerInfo(hid, pid)
+			return unpack(FakeHistory.items[hid].players[pid])
+		end
+
+		function StartFakeRoll()
+			local fake = {}
+
+			local item = preview_loot[random(1, #preview_loot)]
+			local iname, ilink, iquality, _, _, _, _, _, _, itex = GetItemInfo(item[1])
+
+			local rollid = #FakeHistory.rolls + 1
+
+			fake.item = { rollid, ilink, 5, false, nil, false }
+			fake.players = {
+				{ me, select(2, UnitClass('player')), nil, nil, false, true },
+				{ 'Player1', 'MAGE', nil, nil, false, false },
+				{ 'Player2', 'PRIEST', nil, nil, false, false },
+				{ 'Player3', 'WARRIOR', nil, nil, false, false },
+				{ 'Player4', 'SHAMAN', nil, nil, false, false }
+			}
+			FakeHistory.rolls[rollid] = { itex, iname, 1, iquality, select(2, unpack(item)) }
+			FakeHistory.links[rollid] = ilink
+
+			table.insert(FakeHistory.items, 1, fake)
+
+			addon:START_LOOT_ROLL(rollid, random(20000, 40000), true)
+			after(5, function() fake.players[2][3] = 0 end, changed, 1, 2)
+			after(7, function() fake.players[3][3] = 2 end, changed, 1, 3)
+			after(9, function() fake.players[4][3] = 3 end, changed, 1, 4)
+			after(11, function() fake.players[5][3] = 1 end, changed, 1, 5)
+		end
+
+	end
+	StartFakeRoll()
+end
+
+XLoot:SetSlashCommand('xlgd', XLootGroup.TestSettings)
 

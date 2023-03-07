@@ -1,6 +1,7 @@
 # BetterWardrobe (@project-version@)
 
-## [4.6.1](https://github.com/SLOKnightfall/BetterWardrobe/tree/4.6.1) (2022-12-21)
-[Full Changelog](https://github.com/SLOKnightfall/BetterWardrobe/compare/4.6...4.6.1) [Previous Releases](https://github.com/SLOKnightfall/BetterWardrobe/releases)
+## [4.8.2](https://github.com/SLOKnightfall/BetterWardrobe/tree/4.8.2) (2023-02-12)
+[Full Changelog](https://github.com/SLOKnightfall/BetterWardrobe/compare/4.8.1...4.8.2) [Previous Releases](https://github.com/SLOKnightfall/BetterWardrobe/releases)
 
-- packager  
+- -Fixed extra mod key code on line 6903  Issue #348  
+    -Added Elvui skin code for the new ui elements  
