@@ -1,0 +1,12 @@
+tag b85d0b93ac9dc60239a0c97035beede1c08c55d1 1.0.7
+Author:	Peter Wooley <peterwooley@gmail.com>
+Date:	Tue Jan 24 09:21:59 2023 -0800
+
+Bump version: 1.0.6 → 1.0.7
+
+commit 772fb4d56b9ac84a3ab1690138362ca28b66331c
+Author: Peter Wooley <peterwooley@gmail.com>
+Date:   Tue Jan 24 09:21:59 2023 -0800
+
+    Bump version: 1.0.6 → 1.0.7
+
