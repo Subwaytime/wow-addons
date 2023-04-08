@@ -2,7 +2,7 @@
     Created by Slothpala 
 --]]
 local DebuffColor = HealthBarColor:NewModule("DebuffColor")
-local PlayerFrame = _G.PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.HealthBarArea.HealthBar
+local Player = HealthBarColor:GetUnit("Player")
 local defaultColor = {r,g,b}
 local debuffTypeColor = {
     Curse   = {r=0.6,g=0.0,b=1.0},
@@ -12,6 +12,9 @@ local debuffTypeColor = {
 }
 local PlayerDebuffs = {}
 local ignoreMagic = false
+--lua speed reference 
+local ipairs = ipairs
+local pairs = pairs
 
 function DebuffColor:OnEnable()
     self:GetSettings()
@@ -25,21 +28,20 @@ function DebuffColor:OnDisable()
 end
 
 function DebuffColor:GetSettings()
-    if HealthBarColor.db.profile.Player.classcolor then
-        local _, englishClass = UnitClass("player")
-        defaultColor.r,defaultColor.g,defaultColor.b = GetClassColor(englishClass)
+    if HealthBarColor.db.profile.HealthBars.Player.selected == 1 then
+        defaultColor.r,defaultColor.g,defaultColor.b = Player.ClassColor:GetRGB()
     else
-        defaultColor = HealthBarColor.db.profile.Player.color
+        defaultColor = HealthBarColor.db.profile.HealthBars.Player.color
     end
     self:GetDebuffColorOverrides()
-    ignoreMagic = HealthBarColor.db.profile.DebuffColor.ignoreMagic
+    ignoreMagic = HealthBarColor.db.profile.Modules.DebuffColor.ignoreMagic
 end
 
 function DebuffColor:GetDebuffColorOverrides()
-    debuffTypeColor.Curse   = HealthBarColor.db.profile.DebuffColor.Curse
-    debuffTypeColor.Disease = HealthBarColor.db.profile.DebuffColor.Disease
-    debuffTypeColor.Magic   = HealthBarColor.db.profile.DebuffColor.Magic
-    debuffTypeColor.Poison  = HealthBarColor.db.profile.DebuffColor.Poison
+    debuffTypeColor.Curse   = HealthBarColor.db.profile.Modules.DebuffColor.Curse
+    debuffTypeColor.Disease = HealthBarColor.db.profile.Modules.DebuffColor.Disease
+    debuffTypeColor.Magic   = HealthBarColor.db.profile.Modules.DebuffColor.Magic
+    debuffTypeColor.Poison  = HealthBarColor.db.profile.Modules.DebuffColor.Poison
 end
 
 function DebuffColor:DebuffTypeFilteredOut(debuffType)
@@ -61,12 +63,14 @@ function DebuffColor:PlayerCanDispel(debuffType)
 end
 
 function DebuffColor:SetStatusBarToDebuffColor(debuffType)
-    PlayerFrame:SetStatusBarColor(debuffTypeColor[debuffType].r,debuffTypeColor[debuffType].g,debuffTypeColor[debuffType].b)
+    Player.isLocked = true
+    Player.HealthBar:SetStatusBarColor(debuffTypeColor[debuffType].r,debuffTypeColor[debuffType].g,debuffTypeColor[debuffType].b)
 end
 
 function DebuffColor:RestoreStatusBarColor()
     PlayerDebuffs = {} --clear table 
-    PlayerFrame:SetStatusBarColor(defaultColor.r,defaultColor.g,defaultColor.b)
+    Player.isLocked = false
+    Player.HealthBar:SetStatusBarColor(defaultColor.r,defaultColor.g,defaultColor.b)
 end
 
 function DebuffColor:PlayerHasNoMoreDebuffs()

@@ -1,5 +1,6 @@
-10.0.48 - 7th March 2023
-- Maintenance update.
+10.0.52 - 23rd March 2023
+- Updated for game version 10.0.7.
+- Updated sounds to game version 10.0.7.48676 (Mar 20 2023) (100007).
 
 10.0.39 - 22nd February 2023
 - Updated sounds to game version 10.0.5.48069 (Feb 10 2023) (100005).

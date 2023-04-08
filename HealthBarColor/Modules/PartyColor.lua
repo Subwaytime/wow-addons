@@ -2,46 +2,49 @@
     Created by Slothpala 
 --]]
 local PartyColor = HealthBarColor:NewModule("PartyColor")
-local playersclasscolor
-local partymembersclasscolor
-local customColor = {r=0,g=0,b=0}
+--hook stuff
+local hooked    = {}
+local Callbacks = {}
+local function donothing() end
+--
+local Player = HealthBarColor:GetUnit("Player")
+local ClassColor 
 
 function PartyColor:OnEnable()
-    partymembersclasscolor = HealthBarColor.db.profile.PartyColor.targetsclasscolor
-    playersclasscolor = HealthBarColor.db.profile.PartyColor.classcolor
-    customColor.r = HealthBarColor.db.profile.PartyColor.color.r
-    customColor.g = HealthBarColor.db.profile.PartyColor.color.g
-    customColor.b = HealthBarColor.db.profile.PartyColor.color.b
-    if not PartyColor:IsHooked("UnitFramePortrait_Update") then
-        PartyColor:SecureHook("UnitFramePortrait_Update", function(self) 
-            if self.unit:match("party") then
-                PartyColor:HealthBarColor(self.unit, self.healthbar)
+    ClassColor = HealthBarColor:GetClassColors()
+    Callbacks.Update_HealthBarColor = function(self)    
+    if not ShouldShowPartyFrames() then return end
+        if UnitExists(self.unit) then
+            self.HealthBar:SetStatusBarDesaturated(true)
+            local class = select(2,UnitClass(self.unit))
+            if class then
+                self.HealthBar:SetStatusBarColor(ClassColor[class]:GetRGB())
             end
-        end)
+        end
+    end 
+    for i=1,4 do
+        for _, PartyMemberFrame in pairs ({_G.PartyFrame["MemberFrame"..i]}) do
+            if not hooked["MemberFrame"..i] then
+                hooksecurefunc(PartyMemberFrame,"UpdateMember",function(self) Callbacks.Update_HealthBarColor(self) end)
+                hooked["MemberFrame"..i] = true
+                hooked["UpdateMember"] = true
+            end
+        end
     end
+    --[[
+        later had no time to test it properly
+    for i=1,4 do
+        for _, PartyMemberFrame in pairs ({_G.PartyFrame["MemberFrame"..i]}) do
+            PartyMemberFrame:UpdateMember()
+        end
+    end
+    ]]--
 end
 
 function PartyColor:OnDisable()
-    if PartyColor:IsHooked("UnitFramePortrait_Update") then
-        PartyColor:Unhook("UnitFramePortrait_Update")
+    if hooked["UpdateMember"] and not HealthBarColor.db.profile.Settings.Modules.PartyColor then
+        --unhook workaround
+        Callbacks.Update_HealthBarColor = donothing
     end
 end
 
-function PartyColor:HealthBarColor(unit, healthbar)
-    if partymembersclasscolor then
-        if UnitIsPlayer(unit) then
-            local _, englishClass = UnitClass(unit);
-            local r, g, b = GetClassColor(englishClass)
-            healthbar:SetStatusBarDesaturated(true)
-            healthbar:SetStatusBarColor(r, g, b)
-        end
-    elseif playersclasscolor then
-        local _, englishClass = UnitClass("player");
-        local r, g, b = GetClassColor(englishClass)
-        healthbar:SetStatusBarDesaturated(true)
-        healthbar:SetStatusBarColor(r, g, b)
-    else
-        healthbar:SetStatusBarDesaturated(true)
-        healthbar:SetStatusBarColor(customColor.r,customColor.g,customColor.b)
-    end
-end

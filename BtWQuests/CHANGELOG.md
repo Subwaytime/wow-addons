@@ -1,3 +1,16 @@
+# v2.28.2
+
+- Updated for 10.0.7
+- Updated some 10.0.7 quest lines
+
+# v2.28.1
+
+- Added multiple quest chains for 10.0.7
+
+# v2.28.0
+
+- Fixed an issue where opening a menu could break Afenars weakauras along with potentially other
+
 # v2.27.0
 
 - Updated The Spark of Ingenuity questline with the rest of the quests

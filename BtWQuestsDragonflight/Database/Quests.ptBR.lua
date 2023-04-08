@@ -786,8 +786,44 @@ BtWQuestsDatabase:UpdateQuestsTable({
     [66177] = {
         name = "Nenhum anão fica para trás",
     },
+    [66179] = {
+        name = "Sementes para o futuro",
+    },
+    [66180] = {
+        name = "Acorde os antigos",
+    },
+    [66181] = {
+        name = "Defensor frenético",
+    },
+    [66182] = {
+        name = "Pesquisa de Gerithus",
+    },
+    [66183] = {
+        name = "Lágrimas de esmeralda",
+    },
+    [66184] = {
+        name = "Âncoras da vida",
+    },
+    [66185] = {
+        name = "Através do bosque",
+    },
+    [66186] = {
+        name = "O preço",
+    },
     [66187] = {
         name = "Mordigan louco e o cristal do Rei",
+    },
+    [66188] = {
+        name = "Repouso da tempestade",
+    },
+    [66189] = {
+        name = "Adentrar na vida",
+    },
+    [66190] = {
+        name = "Tão perto",
+    },
+    [66191] = {
+        name = "Tão perto, mas tão longe",
     },
     [66196] = {
         name = "Um grasnido de ajuda",
@@ -984,8 +1020,62 @@ BtWQuestsDatabase:UpdateQuestsTable({
     [66391] = {
         name = "Para as ruínas!",
     },
+    [66392] = {
+        name = "Convocando os aliados da natureza",
+    },
+    [66393] = {
+        name = "Ao Somnikus",
+    },
+    [66394] = {
+        name = "Enfraqueça o véu",
+    },
+    [66395] = {
+        name = "As rochas tirinantes",
+    },
+    [66396] = {
+        name = "Gratidão protegida",
+    },
+    [66397] = {
+        name = "Nossa força total",
+    },
+    [66398] = {
+        name = "A revoada dragônica esmeralda",
+    },
+    [66399] = {
+        name = "Cruzaremos aquela ponte",
+    },
+    [66400] = {
+        name = "A queda no inverno",
+    },
+    [66401] = {
+        name = "A Sonhadora",
+    },
+    [66409] = {
+        name = "Questões urgentes",
+    },
+    [66410] = {
+        name = "Piores impressões",
+    },
+    [66411] = {
+        name = "Águas agitadas",
+    },
     [66412] = {
         name = "Avante, Basilton!",
+    },
+    [66413] = {
+        name = "Calor Envolvente",
+    },
+    [66414] = {
+        name = "Todos, menos um",
+    },
+    [66415] = {
+        name = "Pra frente é que se anda",
+    },
+    [66417] = {
+        name = "Resgate de suprimentos",
+    },
+    [66418] = {
+        name = "Testando o Morsanarsenal",
     },
     [66422] = {
         name = "A expedição continua!",
@@ -1005,6 +1095,9 @@ BtWQuestsDatabase:UpdateQuestsTable({
     [66429] = {
         name = "Eu me lembrarei",
     },
+    [66431] = {
+        name = "De luto",
+    },
     [66435] = {
         name = "Local de resgate",
     },
@@ -1020,8 +1113,17 @@ BtWQuestsDatabase:UpdateQuestsTable({
     [66439] = {
         name = "Planos acelerados",
     },
+    [66440] = {
+        name = "Conclusão",
+    },
     [66441] = {
         name = "Esforço destilado",
+    },
+    [66443] = {
+        name = "Chamando o grupo de caça",
+    },
+    [66444] = {
+        name = "Enquanto o ferro está quente",
     },
     [66447] = {
         name = "Além da barreira",
@@ -1143,8 +1245,14 @@ BtWQuestsDatabase:UpdateQuestsTable({
     [66612] = {
         name = "O dilema da caranguejeira",
     },
+    [66620] = {
+        name = "Evocações esmeraldinas",
+    },
     [66622] = {
         name = "Ferramentas desgarradas",
+    },
+    [66635] = {
+        name = "Juntos novamente",
     },
     [66646] = {
         name = "Causalidades Supressoras",
@@ -1449,6 +1557,9 @@ BtWQuestsDatabase:UpdateQuestsTable({
     [68639] = {
         name = "Perigosos predadores polares",
     },
+    [68640] = {
+        name = "Isolamento súbito",
+    },
     [68641] = {
         name = "Marcas de musgo",
     },
@@ -1475,6 +1586,9 @@ BtWQuestsDatabase:UpdateQuestsTable({
     },
     [68799] = {
         name = "Volte ao Santuário da Vida Rubi",
+    },
+    [68863] = {
+        name = "Uma tribo perdida",
     },
     [69093] = {
         name = "Um novo mistério",
@@ -1571,6 +1685,9 @@ BtWQuestsDatabase:UpdateQuestsTable({
     },
     [69938] = {
         name = "Frenesi de Pesca!",
+    },
+    [69942] = {
+        name = "Mistérios em Courambaia",
     },
     [69946] = {
         name = "Um mestre em seu ofício",
@@ -2010,17 +2127,170 @@ BtWQuestsDatabase:UpdateQuestsTable({
     [72269] = {
         name = "Thaldraszus",
     },
+    [72375] = {
+        name = "Ajudando o Acordo: o chamado das Ilhas",
+    },
     [72397] = {
         name = "Orientação: Acampamento Escama de Dragão",
     },
     [72406] = {
         name = "Orientação: Valdrakken",
     },
+    [72545] = {
+        name = "Tombados no abrigo",
+    },
+    [72546] = {
+        name = "Apoio acadêmico",
+    },
+    [72547] = {
+        name = "Aquisições acadêmicas",
+    },
+    [72588] = {
+        name = "Primevistas pilhadores",
+    },
+    [72589] = {
+        name = "Honre seus sacrifícios",
+    },
+    [72591] = {
+        name = "Uma dívida a ser paga",
+    },
+    [72592] = {
+        name = "Cicatrizes do passado",
+    },
+    [72593] = {
+        name = "Um início \"Tomultuoso\"",
+    },
+    [72594] = {
+        name = "Dando as más notícias",
+    },
+    [72595] = {
+        name = "À procura de Bovan Totem do Vento",
+    },
+    [72599] = {
+        name = "Operação \"resgate em dobro\"",
+    },
+    [72600] = {
+        name = "Aviso Shikaar à moda antiga",
+    },
+    [72601] = {
+        name = "A última esperança de Bovan",
+    },
+    [72602] = {
+        name = "Místico otimista",
+    },
+    [72603] = {
+        name = "O valor das palavras",
+    },
+    [72604] = {
+        name = "Resgate desesperado",
+    },
+    [72605] = {
+        name = "Salvando Bovan Totem do Vento",
+    },
+    [72606] = {
+        name = "O tauren sabe onde arromba a cerca",
+    },
+    [72607] = {
+        name = "Velhos ódios",
+    },
+    [72609] = {
+        name = "Caso encerrado",
+    },
+    [72611] = {
+        name = "Aceitação",
+    },
+    [72662] = {
+        name = "Suprindo suprimentos",
+    },
+    [72663] = {
+        name = "A trilha do pinho",
+    },
+    [72712] = {
+        name = "O melhor que temos",
+    },
+    [72713] = {
+        name = "Herança",
+    },
+    [72714] = {
+        name = "Uma abordagem interdisciplinar",
+    },
+    [72715] = {
+        name = "Mantendo a chama à distância",
+    },
+    [72717] = {
+        name = "Um abrigo dividido",
+    },
     [72773] = {
         name = "Aprendendo a ingenuidade",
     },
     [72783] = {
         name = "Pedidos de criação",
+    },
+    [72953] = {
+        name = "Câmara de Zskera: Az",
+    },
+    [73076] = {
+        name = "Retorno ao Recôndito",
+    },
+    [73089] = {
+        name = "O que há atrás da porta seguinte?",
+    },
+    [73094] = {
+        name = "Ajudar a Expedição",
+    },
+    [73107] = {
+        name = "Pedra de envio: relatório inicial",
+    },
+    [73137] = {
+        name = "Perseguindo a chama",
+    },
+    [73155] = {
+        name = "O anel esquecido",
+    },
+    [73156] = {
+        name = "Fale novamente com Virídia",
+    },
+    [73157] = {
+        name = "Asas da misericórdia",
+    },
+    [73159] = {
+        name = "Explorando o nosso passado",
+    },
+    [73160] = {
+        name = "Mão e garra amigas",
+    },
+    [74355] = {
+        name = "Ornamentação primordial",
+    },
+    [74381] = {
+        name = "Legados escondidos",
+    },
+    [74442] = {
+        name = "A tralha de um dragão...",
+    },
+    [74443] = {
+        name = "É o tesouro de outro?",
+    },
+    [74447] = {
+        name = "Arqueologia verbal",
+    },
+    [74769] = {
+        name = "Detendo a Maré-férrea",
+    },
+    [74847] = {
+        name = "Brasathal aguarda",
+    },
+    [74946] = {
+        name = "Um local de refúgio",
+    },
+    [74983] = {
+        name = "Autorização autêntica",
+    },
+    [75050] = {
+        name = "Um acordo eclético",
+    },
+    [75258] = {
+        name = "Uma palavra final",
     },
 })
 ]])()

@@ -1189,7 +1189,7 @@ function BetterWardrobeCollectionFrameMixin:ClickTab(tab)
 	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
 end
 
-
+local tempSorting
 function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 	PanelTemplates_SetTab(self, tabID)
 	local atTransmogrifier = C_Transmog.IsAtTransmogNPC()
@@ -1242,12 +1242,12 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 				BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown:SetPoint("TOPRIGHT", -42, -10)
 				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, 0)
 				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
-				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -50,-50)
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -17,-45)
 			else 
 				BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown:SetPoint("TOPRIGHT", -30, -7)
-				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", -10, 0)
+				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, 0)
 				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
-				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -62,-50)
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -12,-50)
 			end
 
 		else
@@ -1255,11 +1255,11 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 			if ElvUI then 
 				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", -55, yOffset)
 				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
-				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -15,-45)
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -13,-55)
 			else 
 				BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropDown, "BOTTOMLEFT", 0, yOffset)
 				BetterWardrobeCollectionFrame.AlteredFormSwapButton:ClearAllPoints()
-				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -19,-45)
+				BetterWardrobeCollectionFrame.AlteredFormSwapButton:SetPoint("TOPRIGHT",self:GetParent(), "TOPRIGHT", -19,-65)
 			end
 		end
 
@@ -1270,6 +1270,7 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 		self.ItemsCollectionFrame:Hide()
 		self.SearchBox:ClearAllPoints()
 		BW_SortDropDown:Show()
+		self.SearchBox:Show()
 		BW_SortDropDown:ClearAllPoints()
 		if ( atTransmogrifier )  then
 			self.TransmogOptionsButton:Show()
@@ -1304,16 +1305,33 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 		self.SearchBox:SetEnabled(true)
 		self.SetsCollectionFrame:SetShown(not atTransmogrifier)
 		self.SetsTransmogFrame:SetShown(atTransmogrifier)
-			if tabID == TAB_SAVED_SETS then 
+		local sortValue
+		if tabID == TAB_SAVED_SETS then 
 			BW_DBSavedSetDropdown:Show()
 			--BW_SortDropDown:SetPoint("TOPLEFT", BetterWardrobeVisualToggle, "TOPRIGHT", 5, 0)
+			BW_SortDropDown:ClearAllPoints()
+			BW_SortDropDown:SetPoint("TOPRIGHT", self.SearchBox, "TOPRIGHT",20, 0)
+			BW_SortDropDown:Show()
+			self.FilterButton:Hide()
+			self.SearchBox:Hide()
 
-
-			BW_SortDropDown:Hide()
+			--BW_SortDropDown:Hide()
 			local savedCount = #addon.GetSavedList()
 			--WardrobeCollectionFrame_UpdateProgressBar(savedCount, savedCount)
 
+			--tempSorting = BW_SortDropDown.selectedValue
+			--addon.setdb.profile.sorting = BW_SortDropDown.selectedValue
+
+			sortValue = addon.setdb.profile.sorting
+
+
+		else
+			--db.sortDropdown = BW_SortDropDown.selectedValue;
+			sortValue = db.sortDropdown
 		end
+
+		BW_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, sortValue)
+		BW_UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[sortValue])
 	end
 	--xx-WardrobeResetFiltersButton_UpdateVisibility();
 
@@ -1573,7 +1591,6 @@ function BetterWardrobeCollectionFrameMixin:OpenTransmogLink(link)
 
 	elseif ( linkType == "BW_transmogset-extra") then
 		local setID = tonumber(id)
-
 		addon:RegisterMessage("BW_TRANSMOG_EXTRASETSHOWN", function(self) 
 			addon:UnregisterMessage("BW_TRANSMOG_EXTRASETSHOWN")
 			BetterWardrobeCollectionFrame.SetsCollectionFrame:DisplaySet(setID)
@@ -1583,15 +1600,21 @@ function BetterWardrobeCollectionFrameMixin:OpenTransmogLink(link)
 		local setInfo = addon.GetSetInfo(setID)
 		local armorType = setInfo.armorType;
 		if armorType ~= addon.selectedArmorType then 
-			addon.selectedArmorType = armorType;
 			self:SetTab(TAB_EXTRASETS)
+			addon.selectedArmorType = armorType;
+
 		else 
 			self:SetTab(TAB_ITEMS)
 			self:SetTab(TAB_EXTRASETS)
 		end
 		self.SetsCollectionFrame:SelectSet(setID)
 
-		C_Timer.After(0.7, function() BetterWardrobeCollectionFrame:SetTab(TAB_EXTRASETS) end)
+		C_Timer.After(0.7, function() 
+			--BetterWardrobeCollectionFrame:SetTab(TAB_EXTRASETS);
+			--BetterWardrobeCollectionFrame.SetsCollectionFrame:SelectSet(setID);
+			--BetterWardrobeCollectionFrame.SetsCollectionFrame:DisplaySet(setID)
+			--BetterWardrobeCollectionFrame.SetsCollectionFrame:ScrollToSet(setID)
+		end)
 		
 	end
 end
@@ -1621,7 +1644,33 @@ function BetterWardrobeCollectionFrameMixin:SetAppearanceTooltip(contentFrame, s
 	local showUseError = true;
 	local inLegionArtifactCategory = TransmogUtil.IsCategoryLegionArtifact(self.ItemsCollectionFrame:GetActiveCategory())
 	local subheaderString = nil;
+
+	local index = 1
+	if selectedIndex then
+		index = selectedIndex - 1
+	end 
+
+	local itemID = sources[index] and sources[index].itemID
+	local visualID = sources[index] and sources[index].visualID
 	self.tooltipSourceIndex, self.tooltipCycle = CollectionWardrobeUtil.SetAppearanceTooltip(GameTooltip, sources, primarySourceID, selectedIndex, showUseError, inLegionArtifactCategory, subheaderString, warningString);	
+	
+	if addon.Profile.ShowItemIDTooltips and itemID then
+		GameTooltip_AddNormalLine(GameTooltip, "ItemID: " .. itemID);
+		GameTooltip:Show()
+	end
+
+	if addon.Profile.ShowVisualIDTooltips and visualID then
+		GameTooltip_AddNormalLine(GameTooltip, "VisualID: " .. visualID);
+		GameTooltip:Show()
+	end
+
+	if addon.Profile.ShowILevelTooltips and itemID then 
+	local ilevel = select(4, GetItemInfo(itemID))
+		if ilevel then 
+			GameTooltip_AddNormalLine(GameTooltip, "ILevel: " .. ilevel);
+			GameTooltip:Show()
+		end
+	end
 end
 
 function BetterWardrobeCollectionFrameMixin:HideAppearanceTooltip()
@@ -1987,6 +2036,7 @@ end
 
 function BetterWardrobeItemsCollectionMixin:OnMouseWheel(delta)
 	self.PagingFrame:OnMouseWheel(delta)
+
 end
 
 function BetterWardrobeItemsCollectionMixin:CanHandleKey(key)
@@ -2610,7 +2660,7 @@ function BetterWardrobeItemsCollectionMixin:UpdateItems()
 				model.NewGlow:Hide()
 			end
 			-- favorite
-			local isFavorite = addon:IsFavoriteItem(visualInfo.visualID)
+			local isFavorite = visualInfo.isFavorite or addon:IsFavoriteItem(visualInfo.visualID)
 			model.Favorite.Icon:SetShown(isFavorite)
 			-- hide visual option
 			model.HideVisual.Icon:SetShown(isAtTransmogrifier and visualInfo.isHideVisual)
@@ -2884,6 +2934,10 @@ end
 
 
 local function GetVisibilityWarning(model, transmogLocation)
+	local _, raceFilename = UnitRace("player");
+	
+	if not (raceFilename == "Dracthyr" ) then return nil end
+	
 	if transmogLocation and model then
 		local slotID = transmogLocation.slotID;
 		if model:IsGeoReady() and not model:IsSlotAllowed(slotID) and not model:IsSlotVisible(slotID) then
@@ -3410,15 +3464,11 @@ local function ToggleHidden(model, isHidden)
 			--self:UpdateWardrobe()
 end
 
-
-
 function BetterWardrobeCollectionFrameRightClickDropDown_Init(self)
 	local appearanceID = self.activeFrame.visualInfo.visualID;
 	local info = BW_UIDropDownMenu_CreateInfo()
 	-- Set Favorite
-	--if ( C_TransmogCollection.GetIsAppearanceFavorite(appearanceID) ) then
-	if ( addon:IsFavoriteItem(appearanceID) ) then
-
+	if ( C_TransmogCollection.GetIsAppearanceFavorite(appearanceID) or addon:IsFavoriteItem(appearanceID) ) then
 		info.text = BATTLE_PET_UNFAVORITE;
 		info.arg1 = appearanceID;
 		info.arg2 = 0;
@@ -3763,7 +3813,7 @@ end
 
 -- ***** FILTER
 
-local FILTER_SOURCES = {L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Set"], L["Recolor"], L["PvP"],L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Covenants"]}
+local FILTER_SOURCES = {L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Set"], L["Recolor"], L["PvP"],L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Covenants"], L["Trading Post"]}
 local EXPANSIONS = {EXPANSION_NAME0, EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3, EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8, EXPANSION_NAME9}
 
 
@@ -4714,6 +4764,7 @@ function BetterWardrobeSetsDataProviderMixin:GetVariantSets(baseSetID)
 	return variantSets;
 end
 
+ 
 function BetterWardrobeSetsDataProviderMixin:GetSetSourceData(setID)
 	if ( not self.sourceData ) then
 		self.sourceData = { }
@@ -4751,7 +4802,7 @@ function BetterWardrobeSetsDataProviderMixin:GetSetSourceData(setID)
 			local sources, unavailable = addon.GetSetsources(setID)
 			local numCollected = 0;
 			local numTotal = 0;
-			if sources then
+			if sources  then
 				for sourceID, collected in pairs(sources) do
 					if (collected) then
 						numCollected = numCollected + 1;
@@ -4767,10 +4818,14 @@ function BetterWardrobeSetsDataProviderMixin:GetSetSourceData(setID)
 	end
 end
 
+local sourceCounts = {}
 function BetterWardrobeSetsDataProviderMixin:GetSetSourceCounts(setID)
-	local sourceData = self:GetSetSourceData(setID)
+	local sourceData = sourceCounts[setID] or self:GetSetSourceData(setID)
 
 	if sourceData then 
+		if not sourceCounts[setID] then
+			sourceCounts[setID] = {numCollected = sourceData.numCollected, numTotal = sourceData.numTotal }
+		end
 		return sourceData.numCollected, sourceData.numTotal;
 	else
 		return 0,0;
@@ -4823,8 +4878,10 @@ end
 local setsByExpansion = {}
 local setsByFilter = {}
 local filterinprogress = false;
-
+counter = 0
 function BetterWardrobeSetsDataProviderMixin:GetSetSourceTopCounts(setID)
+	counter = counter + 1
+	--print("GetCount "..counter)
 	local baseSetData = self:GetBaseSetData(setID)
 	if ( baseSetData ) then
 		return baseSetData.topCollected, baseSetData.topTotal;
@@ -5008,8 +5065,8 @@ function BetterWardrobeSetsDataProviderMixin:ClearSets()
 	self.usableExtraSets = nil;
 	self.usableSavedSets = nil;
 
-	self.sourceData = nil;
-	self.sourceExtraData = nil;
+	--self.sourceData = nil;
+	--self.sourceExtraData = nil;
 end
 
 
@@ -6313,6 +6370,7 @@ end
 BetterWardrobeSetsScrollFrameButtonMixin = {}
 
 function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
+	----print("init")
 	local displayData = elementData;
 	-- if the base set is hiddenUntilCollected and not collected, it's showing up because one of its variant sets is collected
 	-- in that case use any variant set to populate the info in the list
@@ -6356,9 +6414,8 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 
 	if BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then
 		isInList = addon.CollectionList:IsInList(displayData.setID, "extraset")
-
-		 isFavorite = addon.favoritesDB.profile.extraset[displayData.setID]
-				 isHidden = addon.HiddenAppearanceDB.profile.extraset[displayData.setID]
+		isFavorite = addon.favoritesDB.profile.extraset[displayData.setID]
+		isHidden = addon.HiddenAppearanceDB.profile.extraset[displayData.setID]
 	end
 
 	self.Favorite:SetShown(isFavorite)
@@ -7952,13 +8009,17 @@ local ALPHABETIC = addon.Globals.ALPHABETIC;
 local ITEM_SOURCE = addon.Globals.ITEM_SOURCE;
 local EXPANSION = addon.Globals.EXPANSION;
 local COLOR = addon.Globals.COLOR;
+local ILEVEL = 8
+local ITEMID = 9
 local ARTIFACT = 7;
 local TAB_ITEMS = addon.Globals.TAB_ITEMS;
 local TAB_SETS = addon.Globals.TAB_SETS;
 local TAB_EXTRASETS = addon.Globals.TAB_EXTRASETS;
 local TAB_SAVED_SETS = addon.Globals.TAB_SAVED_SETS;
 --local TABS_MAX_WIDTH = addon.Globals.TABS_MAX_WIDTH;
-local dropdownOrder = {DEFAULT, ALPHABETIC, APPEARANCE, COLOR, EXPANSION, ITEM_SOURCE};
+--local dropdownOrder = {DEFAULT, ALPHABETIC, APPEARANCE, COLOR, EXPANSION, ITEM_SOURCE};
+local dropdownOrder = {DEFAULT, ALPHABETIC, APPEARANCE, COLOR, EXPANSION, ITEM_SOURCE}
+
 local locationDrowpDown = addon.Globals.locationDrowpDown;
 
 --= {INVTYPE_HEAD, INVTYPE_SHOULDER, INVTYPE_CLOAK, INVTYPE_CHEST, INVTYPE_WAIST, INVTYPE_LEGS, INVTYPE_FEET, INVTYPE_WRIST, INVTYPE_HAND}
@@ -7983,12 +8044,24 @@ function addon.Init.SortDropDown_Initialize()
 		local selectedValue = BW_UIDropDownMenu_GetSelectedValue(self)
 
 		info.func = function(self)
-				db.sortDropdown = self.value;
-				BW_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, self.value)
-				BW_UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[self.value])
-				db.reverse = IsModifierKeyDown()
-				addon.SetSortOrder(db.reverse)
 				local tabID = addon.GetTab()
+				--print(tabID)
+				local sortValue
+				if tabID ==4 then
+					addon.setdb.profile.sorting = self.value
+					sortValue = addon.setdb.profile.sorting
+
+				else
+					db.sortDropdown = self.value;
+					sortValue = db.sortDropdown
+				end
+				
+				--print (self.value)
+				--print(sortValue)
+				BW_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, sortValue)
+				BW_UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[sortValue])
+				--db.reverse = IsModifierKeyDown()
+
 				if tabID == 1 then
 					--Wardrobe:OnShow()
 					Wardrobe:RefreshVisualsList()
@@ -7998,20 +8071,39 @@ function addon.Init.SortDropDown_Initialize()
 					RefreshLists()
 				elseif tabID == 3 then
 					RefreshLists()
+				elseif tabID == 4 then
+					--RefreshLists()
+										
+
+					BetterWardrobeCollectionFrame:SetTab(3)
+					BetterWardrobeCollectionFrame:SetTab(4)
 
 				end
 			end
 
-			for _, id in pairs(dropdownOrder) do
+			local tabID = addon.GetTab()
+			for index, id in pairs(dropdownOrder) do
 				if id == ITEM_SOURCE and (tabID == 2 or tabID == 3) then
-				else
+				elseif (tabID == 4 and index <= 2) or tabID ~= 4 then 
 					info.value, info.text = id, L[id]
 					info.checked = (id == selectedValue)
 					BW_UIDropDownMenu_AddButton(info)
 				end
 			end
 
-			local tabID = addon.GetTab()
+
+			if tabID == 1 then
+				info.value = ILEVEL;
+				info.text = L[ILEVEL]
+				info.checked = (8 == selectedValue)
+				BW_UIDropDownMenu_AddButton(info)
+
+				info.value = ITEMID;
+				info.text = L[ITEMID]
+				info.checked = (9 == selectedValue)
+				BW_UIDropDownMenu_AddButton(info)
+			end
+
 			if tabID == 1 and( Wardrobe.activeCategory and Wardrobe.activeCategory >= 13) then
 				info.value = ARTIFACT;
 				info.text = L[ARTIFACT]
@@ -8020,8 +8112,16 @@ function addon.Init.SortDropDown_Initialize()
 			end
 
 		end)
-
-	BW_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, db.sortDropdown)
+	local tabID = addon.GetTab()
+	local sortValue
+	----print(tabID)
+	if tabID ==4 then
+		sortValue = addon.setdb.profile.sorting
+	else
+		sortValue = db.sortDropdown
+	end
+	
+	BW_UIDropDownMenu_SetSelectedValue(BW_SortDropDown, sortValue)
 	-----BW_UIDropDownMenu_SetText(BW_SortDropDown, COMPACT_UNIT_FRAME_PROFILE_SORTBY.." "..L[db.sortDropdown])
 
 	--[[--Repositions sort dropown if Legion Wardrobe is loaded;

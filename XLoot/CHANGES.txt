@@ -1,12 +1,10 @@
-tag f81b75cae2fa8494cb51e7d6d5bcaf60ac457324 10.0.0.5-2
+lightweight tag d011343a078226c2836a5317794ba1cba74d5308 10.0.0.5-3
 Author:	Xuerian <xuerian@gmail.com>
-Date:	Wed Feb 22 14:05:00 2023 -0500
+Date:	Thu Mar 16 14:18:50 2023 -0400
 
-TOC bump
-
-commit a098d60f1d48cb8a5ff5c82eb2a90a7c16dd0127
+commit d011343a078226c2836a5317794ba1cba74d5308
 Author: Xuerian <xuerian@gmail.com>
-Date:   Wed Feb 22 14:04:46 2023 -0500
+Date:   Thu Mar 16 14:18:50 2023 -0400
 
-    TOC bump
+    Group: Only disenchant roll if it's possible
 

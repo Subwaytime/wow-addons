@@ -1,6 +1,6 @@
-## Interface: 100005
+## Interface: 100007
 ## Title: BtWQuests: Dragonflight
-## Version: 1.5
+## Version: 2.1
 ## Notes: Dragonflight quest data for BtWQuests
 ## Author: Breen
 ## Dependencies: BtWQuests
@@ -78,6 +78,7 @@ Database/Index.zhCN.lua
 Database/Index.zhTW.lua
 
 General.lua
+10.0.7.lua
 FriendOfTheDragonIsles.lua
 TheWakingShores.lua
 OhnahranPlains.lua

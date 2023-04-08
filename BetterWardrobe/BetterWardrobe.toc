@@ -1,6 +1,6 @@
-## Interface: 100005
-## Title: BetterWardrobe (4.8.2)
-## Version: 4.8.2
+## Interface: 100007
+## Title: BetterWardrobe (4.9.2)
+## Version: 4.9.2
 ## Author: SLOKnightfall
 ## Notes: 
 ## OptionalDeps: MogIt, CanIMogIt, LegionWardrobe, WardrobeEnhanced, Rarity, TransmogOutfits, ExtendedSets, ElvUI
@@ -26,6 +26,8 @@ Libs\LibAppropriateitems-1.0\lib.xml
 #Libs\LibTextDump-1.0\LibTextDump-1.0.lua
 Libs\UIDropDownMenu\UIDropDownMenu.xml
 Libs\AceSerializer-3.0\AceSerializer-3.0.xml
+Libs\Poncho-2.0\Poncho-2.0.xml
+Libs\Sushi-3.1\Sushi-3.1.xml
 
 #Locale
 Locale\enUS.lua
@@ -44,6 +46,7 @@ Data\CameraData.lua
 Data\AppearanceData.lua
 Data\ArtifactData.lua
 #Data\SourceData.lua
+Patrons.lua
 
 Data\DataBase.lua
 Data\CLOTH.lua

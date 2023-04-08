@@ -6,7 +6,8 @@
 --
 --
 --	///////////////////////////////////////////////////////////////////////////////////////////
-
+	local CONFIG = ...
+	local ADDON, Addon = CONFIG:match('[^_]+'), _G[CONFIG:match('[^_]+')]
 local addonName, addon = ...
 ---addon = LibStub("AceAddon-3.0"):NewAddon(addon, addonName, "AceEvent-3.0", "AceConsole-3.0", "AceHook-3.0")
 addon = LibStub("AceAddon-3.0"):GetAddon(addonName)
@@ -343,6 +344,18 @@ local options = {
 						ShowItemIDTooltips = {
 							order = 7,
 							name = L["Show Item ID"],
+							type = "toggle",
+							width = "full",
+						},
+						ShowVisualIDTooltips = {
+							order = 7.1,
+							name = L["Show Item Visual ID"],
+							type = "toggle",
+							width = "full",
+						},
+						ShowILevelTooltips = {
+							order = 7.1,
+							name = L["Show ILevel"],
 							type = "toggle",
 							width = "full",
 						},
@@ -970,8 +983,9 @@ local DB_Defaults = {
 	},
 
 	savedsets_defaults = {
-		profile = {autoHideSlot = {},},
+		profile = {autoHideSlot = {}, sorting = 1,},
 		global = {sets={}, itemsubstitute = {}, outfits = {}, updates = {},},
+
 	},
 
 	collectionList_defaults = {	
@@ -999,6 +1013,10 @@ local DB_Defaults = {
 			lastTransmogOutfitIDSpec = {},
 			listUpdate = false,
 		}
+	},
+	collection_cache_defaults = {
+		global = {sets={}, },
+
 	},
 }
 
@@ -1212,6 +1230,9 @@ function addon:OnInitialize()
 	self.HiddenAppearanceDB =  LibStub("AceDB-3.0"):New(listDB.HiddenAppearanceDB, DB_Defaults.list_defaults)
 	self.char_savedOutfits = LibStub("AceDB-3.0"):New("BetterWardrobe_SavedOutfitData", charSavedOutfits_defaults, true)
 
+	self.collectionCache = LibStub("AceDB-3.0"):New("BetterWardrobe_CollectionCache", collection_cache_defaults, true)
+
+
 	local profile = self.setdb:GetCurrentProfile()
 	--self.setdb.global[profile] = self.setdb.char
 	addon.SelecteSavedList = false
@@ -1244,6 +1265,11 @@ function addon:OnInitialize()
 	self.db.RegisterCallback(addon, "OnProfileCopied", "RefreshConfig")
 	self.collectionListDB.RegisterCallback(addon, "OnProfileChanged", "RefreshCollectionListData")
 	self.itemsubdb.RegisterCallback(addon, "OnProfileReset", "RefreshSubItemData")	
+
+
+	local PATRONS = {{},{title = 'Patrons', people = addon.Patrons},}
+	local Credits = LibStub('Sushi-3.1').CreditsGroup(self.optionsFrame, PATRONS, 'Patrons |TInterface/Addons/BetterWardrobe/Images/Patreon:12:12|t')
+	Credits:SetSubtitle(addonName .. ' is distributed for free and supported trough donations. A massive thank you to all the supporters on Patreon and Paypal who keep development alive. You can become a patron too at |cFFF96854patreon.com/SLOKnightfall|r.', 'https://www.patreon.com/SLOKnightfall')
 
 	if firstRun then
 		listDB.lastUpdte = 1

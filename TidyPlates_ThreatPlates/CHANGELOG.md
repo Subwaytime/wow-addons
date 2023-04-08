@@ -1,5 +1,3 @@
-# 11.1.15 (2023-02-26)
+# 11.1.17 (2023-03-22)
 
-* Healer Tracker no longer is disabled in arenas and open-world [Issue #622].
-* Enabled spec-based profiles for Wrath Classic [Comment #6903].
-* Upgrade integrated libraries (LibDualSpec v1.22.0).
+* Updated TOC version for Patch 10.0.7 for WoW Mainline.

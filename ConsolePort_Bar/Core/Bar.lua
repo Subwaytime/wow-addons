@@ -93,6 +93,18 @@ function Bar:OnNewBindings(bindings)
 	self:UpdateOverrides()
 end
 
+function Bar:OnBindingIconChanged(bindingID, iconID)
+	local bindings = {env.db.Gamepad:GetBindingKey(bindingID)};
+	for _, binding in ipairs(bindings) do
+		local buttonID, modifierID = CPAPI.GetKeyChordParts(binding)
+		local cluster = Clusters:Get(buttonID)
+		if cluster and cluster[modifierID] then
+			Clusters:RefreshBinding(bindingID, cluster, cluster[modifierID], modifierID, cluster[''])
+		end
+	end
+end
+
+env.db:RegisterSafeCallback('OnBindingIconChanged', Bar.OnBindingIconChanged, Bar)
 env.db:RegisterSafeCallback('OnNewBindings', Bar.OnNewBindings, Bar)
 env.db.Pager:RegisterHeader(Bar, true)
 
@@ -121,7 +133,6 @@ function Bar:ADDON_LOADED(name)
 		if not ConsolePort_BarSetup then
 			ConsolePort_BarSetup = env:GetDefaultSettings()
 		end
-		env:CreateManifest()
 		env:SetConfig(ConsolePort_BarSetup, false)
 		self:UnregisterEvent('ADDON_LOADED')
 		self.ADDON_LOADED = nil

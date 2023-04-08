@@ -12,7 +12,7 @@ local BindingInfoMixin, BindingInfo = {}, {
 	Headers   = {};
 	Actionbar = {};
 	--------------------------------------------------------------
-	ActionInfoHandlers = {
+	ActionNameHandlers = {
 		spell        = function(id) return GetSpellInfo(id) or STAT_CATEGORY_SPELL end; -- Hack fallback: 'Spell'
 		item         = function(id) return GetItemInfo(id) or HELPFRAME_ITEM_TITLE end; -- Hack fallback: 'Item'
 		macro        = function(id) return GetMacroInfo(id) and GetMacroInfo(id) .. ' ('..MACRO..')' end;
@@ -36,7 +36,7 @@ end
 
 function BindingInfo:GetActionInfo(actionID)
 	local kind, kindID = GetActionInfo(actionID)
-	local getinfo = self.ActionInfoHandlers[kind]
+	local getinfo = self.ActionNameHandlers[kind]
 
 	if getinfo then
 		return getinfo(kindID)
@@ -62,7 +62,7 @@ do local customHeader = (' |T%s:20:20:0:-2|t %s '):format(CPAPI.GetAsset('Textur
 
 	function BindingInfo:IsReadonlyBinding(bindingID)
 		if self.Custom[bindingID] then
-			local _, info = FindInTableIf(db.Bindings, function(data)
+			local _, info = FindInTableIf(db.Bindings.Special, function(data)
 				return data.binding == bindingID;
 			end)
 			return info and info.readonly and info.readonly();
@@ -107,7 +107,7 @@ function BindingInfo:RefreshDictionary()
 		wipe(self.Custom)
 
 		-- custom
-		for i, data in db:For('Bindings') do
+		for i, data in db:For('Bindings/Special') do
 			self:AddCustomBinding(data.name, data.binding, data.readonly)
 		end
 
@@ -202,6 +202,11 @@ function BindingInfoMixin:IsReadonlyBinding(binding)
 	return BindingInfo:IsReadonlyBinding(binding)
 end
 
+-- @param binding        : bindingID
+-- @param skipActionInfo : format action as binding ID
+-- @return name          : internal name of the binding
+-- @return texture       : binding or action texture
+-- @return actionID      : formatted action ID
 function BindingInfoMixin:GetBindingInfo(binding, skipActionInfo)
 	if (not binding or binding == '') then return BindingInfo.NotBoundColor:format(NOT_BOUND) end;
 	local bindings, headers = BindingInfo:RefreshDictionary()
@@ -213,7 +218,7 @@ function BindingInfoMixin:GetBindingInfo(binding, skipActionInfo)
 	local actionID = BindingInfo:GetActionButtonID(binding)
 	if actionID and not skipActionInfo then
 		-- swap the info for current bar if offset
-		local page = db('Pager'):GetCurrentPage()
+		local page = db.Pager:GetCurrentPage()
 		actionID = actionID <= NUM_ACTIONBAR_BUTTONS and
 			actionID + ((page - 1) * 12) or actionID;
 
@@ -239,18 +244,18 @@ function BindingInfoMixin:GetBindingInfo(binding, skipActionInfo)
 		-- this binding may have an action ID, but the slot is empty, or it's just a normal binding.
 		name = header and _G[header];
 		name = name and BindingInfo.DisplayFormat:format(text, name) or text;
-		return name, nil, actionID;
+		return name, db.Bindings:GetIcon(binding), actionID;
 	end
 
 	-- check if this is a ring binding
 	name = db.Utility:ConvertBindingToDisplayName(binding)
 	if name then
-		return name, nil, actionID;
+		return name, db.Bindings:GetIcon(binding), actionID;
 	end
 	-- at this point, this is not an usual binding. this is most likely a click binding.
 	name = gsub(binding, '(.* ([^:]+).*)', '%2') -- upvalue so it doesn't return more than 1 arg
 	name = name or self:WrapAsNotBound(NOT_BOUND);
-	return name, nil, actionID;
+	return name, db.Bindings:GetIcon(binding), actionID;
 end
 
 function BindingInfoMixin:WrapAsNotBound(text)

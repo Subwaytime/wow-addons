@@ -2,7 +2,7 @@
 
 ## Title: Bagnon_ItemInfo
 ## Notes: |cff666666By Lars Norberg|r |n|n|cffffffffA simple Bagnon plugin that displays |nthe itemlevel and bind status of your equipable gear |nand a purple eye on uncollected appearances.|r|n|n|cff4488ffPayPal|r|cffffffff:|r |n|cffffffffwww.paypal.me/GoldpawsStuff|r|n|n|cff4488ffPatreon|r|cffffffff:|r |n|cffffffffwww.patreon.com/GoldpawsStuff|r
-## Version: 2.0.49-Release
+## Version: 2.0.50-Release
 ## Author: Lars Norberg
 
 ## X-Category: Inventory
