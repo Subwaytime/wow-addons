@@ -3,40 +3,45 @@
     selected 1 = units class color
     selected 2 = players class color
     selected 3 = static color
+    selected 4 = reaction color
 --]]
 local HealthBar_Focus = HealthBarColor:NewModule("HealthBar_Focus")
 
 function HealthBar_Focus:OnEnable()
-    local Focus           = HealthBarColor:GetUnit("Focus")
-    local color           = HealthBarColor.db.profile.HealthBars.Focus.color
-    local colorbyreaction = HealthBarColor.db.profile.HealthBars.Focus.reaction
-
-    local function OnFocusChanged()
-        if Focus.isPlayer then
-            Focus.HealthBar:SetStatusBarColor(Focus.ClassColor:GetRGB())
+    local Focus = HealthBarColor:GetUnit("Focus")
+    local color =  HealthBarColor.db.profile.HealthBars.Focus.color
+    local selected = HealthBarColor.db.profile.HealthBars.Focus.selected
+    local reactionColored = HealthBarColor.db.profile.HealthBars.Focus.reaction
+    local OnFocusChanged
+    if selected == 1 then
+        if reactionColored then
+            OnFocusChanged = function()
+                if Focus.isPlayer then
+                    Focus:SetStatusBarClassColored()
+                else
+                    Focus:SetStatusBarReactionColored()
+                end
+            end
         else
-            Focus.HealthBar:SetStatusBarColor(color.r,color.g,color.b)
+            OnFocusChanged = function()
+                if Focus.isPlayer then
+                    Focus:SetStatusBarClassColored()
+                else
+                    Focus.HealthBar:SetStatusBarColor(color.r,color.g,color.b)
+                end
+            end
         end
-    end
-
-    local function OnFocusChangedReaction()
-        if Focus.isPlayer then
-            Focus.HealthBar:SetStatusBarColor(Focus.ClassColor:GetRGB())
-        else
-            Focus.HealthBar:SetStatusBarColor(Focus.ReactionColor:GetRGB())
-        end
-    end
-
-    if HealthBarColor.db.profile.HealthBars.Focus.selected == 1 then
-        if colorbyreaction then
-            HealthBarColor:RegisterOnFocusChanged("HealthBar_Focus_Reaction",OnFocusChangedReaction)
-        else
-            HealthBarColor:RegisterOnFocusChanged("HealthBar_Focus",OnFocusChanged)
-        end
-    elseif HealthBarColor.db.profile.HealthBars.Focus.selected == 2 then
+        HealthBarColor:RegisterOnFocusChanged("HealthBar_Focus", OnFocusChanged)
+    elseif selected == 2 then
         local Player = HealthBarColor:GetUnit("Player")
         Focus.HealthBar:SetStatusBarColor(Player.ClassColor:GetRGB())
-    else
+    elseif selected == 3 then
         Focus.HealthBar:SetStatusBarColor(color.r,color.g,color.b)
+    else 
+        OnFocusChanged = function()
+            Focus:SetStatusBarReactionColored()
+        end
+        HealthBarColor:RegisterOnFocusChanged("HealthBar_Focus", OnFocusChanged)
     end
 end
+

@@ -1,0 +1,10 @@
+## Interface: 100002
+## Title: Rare Dragon
+## Version: v1.0.3
+## Notes: Disable the rare star and add the silver dragon
+## Author: Breen
+## X-Curse-Project-ID: 688036
+## X-WoWI-ID: 26426
+## X-Wago-ID: 0mNwEzKo
+
+RareDragon.lua

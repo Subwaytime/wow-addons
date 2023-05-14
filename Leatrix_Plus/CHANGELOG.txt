@@ -1,3 +1,15 @@
+10.1.01 - 3rd May 2023
+- Added Dragonflight cinematics 'Opening The Way' and 'Fyrakk Incinerates Loamm' (watch in Movies and listen in Various > Cinematics).
+- Fixed an issue with 'Recent chat window' ('Chat') which caused a Lua error when opening the recent chat window.
+
+10.1.00 - 3rd May 2023
+- Updated for game version 10.1.
+- Added an icon for the in-game addon listing.
+- For 'Easy item destroy' ('System'), fixed an issue which caused a Lua error when clicking outside of the destroy confirmation.
+
+10.0.59 - 22nd April 2023
+- Fixed an issue with 'Automate gossip' ('Automation') which caused some gossip options to not be automated due to an issue with the game code.
+
 10.0.52 - 23rd March 2023
 - Updated for game version 10.0.7.
 - Added movie 'Secrets of the Reach'.  Watch it in 'Movies' and listen to it in 'Various > Cinematics'.

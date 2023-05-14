@@ -1,3 +1,6 @@
+### 1.1.12
+- Version update
+
 ### 1.1.11
 - Fixed Enhanced Sound not getting properly reset when ice fishing.
 - Added option to allow recasting fishing for double click

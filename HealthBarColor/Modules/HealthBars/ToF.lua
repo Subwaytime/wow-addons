@@ -3,41 +3,45 @@
     selected 1 = units class color
     selected 2 = players class color
     selected 3 = static color
+    selected 4 = reaction color
 --]]
-local GetRGB = GetRGB
 local HealthBar_ToF = HealthBarColor:NewModule("HealthBar_ToF")
 
 function HealthBar_ToF:OnEnable()
-    local ToF             = HealthBarColor:GetUnit("ToF")
-    local color           = HealthBarColor.db.profile.HealthBars.ToF.color
-    local colorbyreaction = HealthBarColor.db.profile.HealthBars.ToF.reaction
-
-    local function OnToFChanged()
-        if ToF.isPlayer then
-            ToF.HealthBar:SetStatusBarColor(ToF.ClassColor:GetRGB())
+    local ToF = HealthBarColor:GetUnit("ToF")
+    local color =  HealthBarColor.db.profile.HealthBars.ToF.color
+    local selected = HealthBarColor.db.profile.HealthBars.ToF.selected
+    local reactionColored = HealthBarColor.db.profile.HealthBars.ToF.reaction
+    local OnToFChanged
+    if selected == 1 then
+        if reactionColored then
+            OnToFChanged = function()
+                if ToF.isPlayer then
+                    ToF:SetStatusBarClassColored()
+                else
+                    ToF:SetStatusBarReactionColored()
+                end
+            end
         else
-            ToF.HealthBar:SetStatusBarColor(color.r,color.g,color.b)
+            OnToFChanged = function()
+                if ToF.isPlayer then
+                    ToF:SetStatusBarClassColored()
+                else
+                    ToF.HealthBar:SetStatusBarColor(color.r,color.g,color.b)
+                end
+            end
         end
-    end
-
-    local function OnToFChangedReaction()
-        if ToF.isPlayer then
-            ToF.HealthBar:SetStatusBarColor(ToF.ClassColor:GetRGB())
-        else
-            ToF.HealthBar:SetStatusBarColor(ToF.ReactionColor:GetRGB())
-        end
-    end
-
-    if HealthBarColor.db.profile.HealthBars.ToF.selected == 1 then
-        if colorbyreaction then
-            HealthBarColor:RegisterOnToFChanged("HealthBar_ToF_Reaction",OnToFChangedReaction)
-        else
-            HealthBarColor:RegisterOnToFChanged("HealthBar_ToF",OnToFChanged)
-        end
-    elseif HealthBarColor.db.profile.HealthBars.ToF.selected == 2 then
+        HealthBarColor:RegisterOnToFChanged("HealthBar_ToF", OnToFChanged)
+    elseif selected == 2 then
         local Player = HealthBarColor:GetUnit("Player")
         ToF.HealthBar:SetStatusBarColor(Player.ClassColor:GetRGB())
-    else
+    elseif selected == 3 then
         ToF.HealthBar:SetStatusBarColor(color.r,color.g,color.b)
+    else 
+        OnToFChanged = function()
+            ToF:SetStatusBarReactionColored()
+        end
+        HealthBarColor:RegisterOnToFChanged("HealthBar_ToF", OnToFChanged)
     end
 end
+

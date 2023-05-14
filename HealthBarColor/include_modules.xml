@@ -6,4 +6,5 @@
   <Script file="Modules\Portraits.lua"/>
   <Script file="Modules\PartyColor.lua"/>
   <Include file="Modules\Fonts\load_fonts.xml"/>
+  <Include file="Modules\Glow\load_glow.xml"/>
 </Ui>

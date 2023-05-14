@@ -68,9 +68,9 @@ function Textures:OnEnable()
         --ToF
     })  
      do 
-        if not hooked[hbc_unit] then
-            hooksecurefunc(hbc_unit, "Update" ,function(hbc_unit) Callbacks.applyHelthBarTexture(hbc_unit.HealthBar) end)
-            hooked[hbc_unit] = true
+        if not hooked[hbc_unit.Frame] then
+            hooksecurefunc(hbc_unit.Frame, "Update" ,function() Callbacks.applyHelthBarTexture(hbc_unit.HealthBar) end)
+            hooked[hbc_unit.Frame] = true
             hooked["Update"] = true
         end
     end

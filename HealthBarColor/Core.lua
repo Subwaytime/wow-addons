@@ -4,92 +4,107 @@
 --wow api local
 local CreateColor = CreateColor
 local UnitClass = UnitClass
+local GetRGB = GetRGB
 --lua local
 local pairs = pairs
 local select = select
---
+local UnitSelectionType = UnitSelectionType
 --HeealthBarColor Units
-local Player = {}; local Target = {}; local Focus = {}; local ToT = {}; local ToF = {}; local Pet = {}; local Boss1 = {}; local Boss2 = {}; local Boss3 = {}; local Boss4 = {}; local Boss5 = {}
---define hbc_units
+local HBC_Unit = {}
+function HBC_Unit:SetStatusBarClassColored()
+    self.HealthBar:SetStatusBarColor(self.ClassColor:GetRGB())
+end
+function HBC_Unit:SetStatusBarReactionColored()
+    self.HealthBar:SetStatusBarColor(self.ReactionColor:GetRGB())
+end
+local metatable = {__index = HBC_Unit}
 --player
+local Player = {}
 Player.HealthBar    = _G.PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.HealthBarArea.HealthBar
 Player.PowerBar     = _G.PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.ManaBarArea.ManaBar
 Player.Portrait     = _G.PlayerFrame.PlayerFrameContainer.PlayerPortrait
 Player.Name         = _G.PlayerName
-Player.LeftText     = _G.PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.HealthBarArea.HealthBar.LeftText
-Player.RightText    = _G.PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.HealthBarArea.HealthBar.RightText
-Player.MiddleText   = _G.PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.HealthBarArea.HealthBar.TextString
+Player.Glow         = nil 
+Player.HealthText   = {_G.PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.HealthBarArea.HealthBar.LeftText, _G.PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.HealthBarArea.HealthBar.RightText, _G.PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.HealthBarArea.HealthBar.TextString}
+Player.PowerText    = {_G.PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.ManaBarArea.ManaBar.ManaBarText,_G.PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.ManaBarArea.ManaBar.LeftText,_G.PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.ManaBarArea.ManaBar.RightText}
 Player.isLocked     = false
 --target
-Target              = _G.TargetFrame
+local Target        = setmetatable({},metatable)
+Target.Frame        = _G.TargetFrame
 Target.HealthBar    = _G.TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar
 Target.PowerBar     = _G.TargetFrame.TargetFrameContent.TargetFrameContentMain.ManaBar
 Target.Portrait     = _G.TargetFrame.TargetFrameContainer.Portrait
 Target.Name         = _G.TargetFrame.TargetFrameContent.TargetFrameContentMain.Name
-Target.LeftText     = _G.TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.LeftText
-Target.RightText    = _G.TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.RightText
-Target.MiddleText   = _G.TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.TextString
+Target.Glow         = _G.TargetFrame.TargetFrameContent.TargetFrameContentMain.ReputationColor
+Target.HealthText   = {_G.TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.LeftText, _G.TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.RightText, _G.TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.TextString}
+Target.PowerText    = {_G.TargetFrame.TargetFrameContent.TargetFrameContentMain.ManaBar.ManaBarText,_G.TargetFrame.TargetFrameContent.TargetFrameContentMain.ManaBar.LeftText,_G.TargetFrame.TargetFrameContent.TargetFrameContentMain.ManaBar.RightText}
 --focus
-Focus               = _G.FocusFrame
+local Focus         = setmetatable({},metatable)
+Focus.Frame         = _G.FocusFrame
 Focus.HealthBar     = _G.FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar
 Focus.PowerBar      = _G.FocusFrame.TargetFrameContent.TargetFrameContentMain.ManaBar
 Focus.Portrait      = _G.FocusFrame.TargetFrameContainer.Portrait
 Focus.Name          = _G.FocusFrame.TargetFrameContent.TargetFrameContentMain.Name
-Focus.LeftText      = _G.FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.LeftText
-Focus.RightText     = _G.FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.RightText
-Focus.MiddleText    = _G.FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.TextString
+Focus.Glow          = _G.FocusFrame.TargetFrameContent.TargetFrameContentMain.ReputationColor
+Focus.HealthText    = {_G.FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.LeftText, _G.FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.RightText, _G.FocusFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.TextString}
+Focus.PowerText     = {_G.FocusFrame.TargetFrameContent.TargetFrameContentMain.ManaBar.ManaBarText,_G.FocusFrame.TargetFrameContent.TargetFrameContentMain.ManaBar.LeftText,_G.FocusFrame.TargetFrameContent.TargetFrameContentMain.ManaBar.RightText}
 --targettarget
-ToT                 = _G.TargetFrameToT
+local ToT           = setmetatable({},metatable)
+ToT.Frame           = _G.TargetFrameToT
 ToT.HealthBar       = _G.TargetFrameToT.HealthBar
 ToT.PowerBar        = _G.TargetFrameToT.ManaBar
 ToT.Portrait        = _G.TargetFrameToT.Portrait
-ToT.Name            = _G.TargetFrameToT.Name
+ToT.Name            = _G.TargetFrameToT.name
 --focustarget
-ToF                 = _G.FocusFrameToT
+local ToF           = setmetatable({},metatable)
+ToF.Frame           = _G.FocusFrameToT
 ToF.HealthBar       = _G.FocusFrameToT.HealthBar
 ToF.PowerBar        = _G.FocusFrameToT.ManaBar
 ToF.Portrait        = _G.FocusFrameToT.Portrait
-ToT.Name            = _G.FocusFrameToT.Name
+ToF.Name            = _G.FocusFrameToT.Name
 --pet
+local Pet           = {}
 Pet.HealthBar       = _G.PetFrameHealthBar
 Pet.PowerBar        = _G.PetFrameManaBar
-Pet.LeftText        = _G.PetFrameHealthBarTextLeft
-Pet.RightText       = _G.PetFrameHealthBarTextRight
-Pet.MiddleText      = _G.PetFrameHealthBarText
+Pet.Name            = _G.PetName
+Pet.HealthText      = {_G.PetFrameHealthBarTextLeft, _G.PetFrameHealthBarTextRight, _G.PetFrameHealthBarText}
+Pet.PowerText       = {_G.PetFrameManaBarText, _G.PetFrameManaBarTextLeft, _G.PetFrameManaBarTextRight}
 --boss
 --1
+local Boss1         = {}
 Boss1.HealthBar     = _G.Boss1TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar
 Boss1.PowerBar      = _G.Boss1TargetFrame.TargetFrameContent.TargetFrameContentMain.ManaBar
 Boss1.LeftText      = _G.Boss1TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.LeftText  
 Boss1.RightText     = _G.Boss1TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.RightText
 Boss1.MiddleText    = _G.Boss1TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.TextString
 --2
+local Boss2         = {}
 Boss2.HealthBar     = _G.Boss2TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar
 Boss2.PowerBar      = _G.Boss2TargetFrame.TargetFrameContent.TargetFrameContentMain.ManaBar
 Boss2.LeftText      = _G.Boss2TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.LeftText  
 Boss2.RightText     = _G.Boss2TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.RightText
 Boss2.MiddleText    = _G.Boss2TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.TextString
 --3
+local Boss3         = {}
 Boss3.HealthBar     = _G.Boss3TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar
 Boss3.PowerBar      = _G.Boss3TargetFrame.TargetFrameContent.TargetFrameContentMain.ManaBar
 Boss3.LeftText      = _G.Boss3TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.LeftText  
 Boss3.RightText     = _G.Boss3TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.RightText
 Boss3.MiddleText    = _G.Boss3TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.TextString
 --4
+local Boss4         = {}
 Boss4.HealthBar     = _G.Boss4TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar
 Boss4.PowerBar      = _G.Boss4TargetFrame.TargetFrameContent.TargetFrameContentMain.ManaBar
 Boss4.LeftText      = _G.Boss4TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.LeftText  
 Boss4.RightText     = _G.Boss4TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.RightText
 Boss4.MiddleText    = _G.Boss4TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.TextString
 --5
+local Boss5         = {}
 Boss5.HealthBar     = _G.Boss5TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar
 Boss5.PowerBar      = _G.Boss5TargetFrame.TargetFrameContent.TargetFrameContentMain.ManaBar
 Boss5.LeftText      = _G.Boss5TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.LeftText  
 Boss5.RightText     = _G.Boss5TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.RightText
 Boss5.MiddleText    = _G.Boss5TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.TextString
---globals handles
---not needed for now
---HEALTHBARCOLOR_ADDON_PLAYER = Player; HEALTHBARCOLOR_ADDON_TARGET = Target; HEALTHBARCOLOR_ADDON_FOCUS = Focus; HEALTHBARCOLOR_ADDON_TOT = ToT; HEALTHBARCOLOR_ADDON_TOF = ToF; HEALTHBARCOLOR_ADDON_PET = Pet; HEALTHBARCOLOR_ADDON_BOSS1 = Boss1; HEALTHBARCOLOR_ADDON_BOSS2 = Boss2;  HEALTHBARCOLOR_ADDON_BOSS3 = Boss3;  HEALTHBARCOLOR_ADDON_BOSS4 = Boss4;  HEALTHBARCOLOR_ADDON_BOSS5 = Boss5;  
 --Colors
 --class colors
 local ClassColor = {}
@@ -167,7 +182,7 @@ function HealthBarColor:SlashCommand()
     if ACD.OpenFrames["HealthBarColor_options"] then
         ACD:Close("HealthBarColor_options")
     else
-        ACD:SetDefaultSize("HealthBarColor_options",800,720)
+        ACD:SetDefaultSize("HealthBarColor_options",820,720)
         ACD:Open("HealthBarColor_options",GUI)
     end
 end
@@ -187,7 +202,21 @@ function HealthBarColor:LoadConfig()
     self:OnToFChanged()
 end
 
+local update_queued = nil
+function HealthBarColor:UpdateAfterCombat()
+    self:UnregisterEvent("PLAYER_REGEN_ENABLED")
+    self:ReloadConfig()
+    update_queued = false
+end
+
 function HealthBarColor:ReloadConfig()
+    if InCombatLockdown() then 
+        if update_queued then return end
+        self:RegisterEvent("PLAYER_REGEN_ENABLED","UpdateAfterCombat") 
+        self:Print("Settings will apply after combat")
+        update_queued = true
+        return 
+    end
     for _, module in self:IterateModules() do
         module:Disable()
     end
@@ -349,23 +378,31 @@ function HealthBarColor:GetUnitInformation(hbc_unit, unit)
         hbc_unit.ClassColor    = ClassColor[hbc_unit.Class]
     else
         hbc_unit.isPlayer      = false
-        hbc_unit.ReactionColor = self:GetReactionColor(unit)
     end
+    hbc_unit.ReactionColor = self:GetReactionColor(hbc_unit, unit)
 end
 
-function HealthBarColor:GetReactionColor(unit)
-    --0=hostile 2=neutral 3=firendly
-    --will add more colors later only just learned that UnitSelectionType exist
-    local reaction = UnitSelectionType(unit)
+function HealthBarColor:GetReactionColor(hbc_unit, unit)
+    local reaction
     local reactionColor 
-    if reaction == 0 then 
-        reactionColor = ReactionColor["HOSTILE"]
-    elseif reaction == 2 then
-        reactionColor = ReactionColor["NEUTRAL"]
-    elseif reaction == 3 then
-        reactionColor = ReactionColor["FRIENDLY"]
+    if hbc_unit.isPlayer then
+        reaction = UnitReaction("player", unit)
+        if reaction == 2 then 
+            reactionColor = ReactionColor["HOSTILE"]
+        else
+            reactionColor = ReactionColor["FRIENDLY"]
+        end
     else
-        reactionColor = CreateColor(UnitSelectionColor(unit, true))
+        reaction = UnitSelectionType(unit)
+        if reaction == 0 then 
+            reactionColor = ReactionColor["HOSTILE"]
+        elseif reaction == 2 then
+            reactionColor = ReactionColor["NEUTRAL"]
+        elseif reaction == 3 then
+            reactionColor = ReactionColor["FRIENDLY"]
+        else
+            reactionColor = CreateColor(UnitSelectionColor(unit, true))
+        end
     end
     return reactionColor
 end

@@ -1,5 +1,5 @@
 ﻿----------------------------------------------------------------------
--- 	Leatrix Plus 10.0.56 (2nd April 2023)
+-- 	Leatrix Plus 10.1.02 (10th May 2023)
 ----------------------------------------------------------------------
 
 --	01:Functns, 02:Locks, 03:Restart, 20:Live, 30:Isolated, 40:Player
@@ -18,7 +18,7 @@
 	local void
 
 	-- Version
-	LeaPlusLC["AddonVer"] = "10.0.56"
+	LeaPlusLC["AddonVer"] = "10.1.02"
 
 	-- Get locale table
 	local void, Leatrix_Plus = ...
@@ -1128,28 +1128,32 @@
 					StaticPopup1EditBox:Hide()
 					StaticPopup1Button1:Enable()
 					local link = select(3, GetCursorInfo())
-					-- Custom link for battle pets
-					local linkType, linkOptions, name = LinkUtil.ExtractLink(link)
-					if linkType == "battlepet" then
-						local speciesID, level, breedQuality = strsplit(":", linkOptions)
-						local qualityColor = BAG_ITEM_QUALITY_COLORS[tonumber(breedQuality)]
-						link = qualityColor:WrapTextInColorCode(name .. " |n" .. L["Level"] .. " " .. level .. L["Battle Pet"])
+					if link then
+						-- Custom link for battle pets
+						local linkType, linkOptions, name = LinkUtil.ExtractLink(link)
+						if linkType == "battlepet" then
+							local speciesID, level, breedQuality = strsplit(":", linkOptions)
+							local qualityColor = BAG_ITEM_QUALITY_COLORS[tonumber(breedQuality)]
+							link = qualityColor:WrapTextInColorCode(name .. " |n" .. L["Level"] .. " " .. level .. L["Battle Pet"])
+						end
+						StaticPopup1Text:SetText(gsub(StaticPopup1Text:GetText(), gsub(TypeDeleteLine, "@", ""), "") .. "|n" .. link)
 					end
-					StaticPopup1Text:SetText(gsub(StaticPopup1Text:GetText(), gsub(TypeDeleteLine, "@", ""), "") .. "|n" .. link)
 				else
 					-- Item does not require player to type delete so just show item link
 					StaticPopup1:SetHeight(StaticPopup1:GetHeight() + 40)
 					StaticPopup1EditBox:Hide()
 					StaticPopup1Button1:Enable()
 					local link = select(3, GetCursorInfo())
-					-- Custom link for battle pets
-					local linkType, linkOptions, name = LinkUtil.ExtractLink(link)
-					if linkType == "battlepet" then
-						local speciesID, level, breedQuality = strsplit(":", linkOptions)
-						local qualityColor = BAG_ITEM_QUALITY_COLORS[tonumber(breedQuality)]
-						link = qualityColor:WrapTextInColorCode(name .. " |n" .. L["Level"] .. " " .. level .. L["Battle Pet"])
+					if link then
+						-- Custom link for battle pets
+						local linkType, linkOptions, name = LinkUtil.ExtractLink(link)
+						if linkType == "battlepet" then
+							local speciesID, level, breedQuality = strsplit(":", linkOptions)
+							local qualityColor = BAG_ITEM_QUALITY_COLORS[tonumber(breedQuality)]
+							link = qualityColor:WrapTextInColorCode(name .. " |n" .. L["Level"] .. " " .. level .. L["Battle Pet"])
+						end
+						StaticPopup1Text:SetText(gsub(StaticPopup1Text:GetText(), gsub(TypeDeleteLine, "@", ""), "") .. "|n|n" .. link)
 					end
-					StaticPopup1Text:SetText(gsub(StaticPopup1Text:GetText(), gsub(TypeDeleteLine, "@", ""), "") .. "|n|n" .. link)
 				end
 			end)
 
@@ -2215,8 +2219,13 @@
 			local function SkipGossip(skipAltKeyRequirement)
 				if not skipAltKeyRequirement and not IsAltKeyDown() then return end
 				local gossipInfoTable = C_GossipInfo.GetOptions()
-				if gossipInfoTable[1] and gossipInfoTable[1].gossipOptionID then
-					C_GossipInfo.SelectOption(gossipInfoTable[1].gossipOptionID)
+				if gossipInfoTable[1] then
+					if gossipInfoTable[1].gossipOptionID then
+						C_GossipInfo.SelectOption(gossipInfoTable[1].gossipOptionID)
+					else
+						-- Some gossip options dont have a gossip option ID (such as Suspicious Noble NPCs in Court of Stars, Suramar)
+						if GossipFrame and GossipFrame:IsShown() then GossipFrame:SelectGossipOption(1) end
+					end
 				end
 			end
 
@@ -8287,7 +8296,7 @@
 				end
 				titleFrame.m:SetText(L["Messages"] .. ": " .. totalMsgCount)
 				editFrame:SetVerticalScroll(0)
-				C_Timer.After(0.1, function() editFrame.ScrollBar.ScrollDownButton:Click() end)
+				editFrame.ScrollBar:ScrollToEnd()
 				editFrame:Show()
 				editBox:ClearFocus()
 			end

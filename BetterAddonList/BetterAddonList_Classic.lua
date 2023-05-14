@@ -611,13 +611,6 @@ do
 	local updater = CreateFrame("Frame", nil, AddonList)
 	updater:SetScript("OnShow", function(self)
 		UpdateAddOnMemoryUsage()
-		if not self.timer then
-			self.timer = C_Timer.NewTicker(30, function() UpdateAddOnMemoryUsage() end)
-		end
-	end)
-	updater:SetScript("OnHide", function(self)
-		self.timer:Cancel()
-		self.timer = nil
 	end)
 
 	hooksecurefunc("AddonList_LoadAddOn", function(self)
@@ -651,7 +644,7 @@ do
 			GameTooltip:SetText(ADDON_BANNED_TOOLTIP)
 		else
 			local version = GetAddOnMetadata(index, "Version")
-			if version and version ~= "1.1.6" then
+			if version and version ~= "1.1.7" then
 				GameTooltip:AddDoubleLine(title or name, version)
 			else
 				GameTooltip:AddLine(title or name)

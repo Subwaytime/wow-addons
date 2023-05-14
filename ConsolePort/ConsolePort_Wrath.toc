@@ -1,7 +1,9 @@
 ## Interface: 30401
+## IconTexture: Interface\AddOns\ConsolePort\Assets\Textures\Logo\CP_Thumb
 ## Title: Console Port
 ## Notes: Game controller addon
-## Version: 2.6.2
+## AddonCompartmentFunc: ConsolePort
+## Version: 2.6.5
 
 ## Author: Sebastian Lindfors
 ## X-Website: https://github.com/seblindfors/ConsolePort

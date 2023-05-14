@@ -320,10 +320,11 @@ function BetterFishing:CreateSettings()
     if not keyInfo.minExpansion or LE_EXPANSION_LEVEL_CURRENT >= keyInfo.minExpansion then
       local checkButton = makeCheckButton(keyInfo.detail)
       if not prevCheckButton then
-        checkButton:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 0, -16)
+        checkButton:SetPoint("TOPLEFT", header, "TOPLEFT", 0, -16)
       else
         checkButton:SetPoint("TOPLEFT", prevCheckButton, "BOTTOMLEFT", 0, 0)
       end
+      checkButton.HoverBackground = nil
       checkButton:SetChecked(BetterFishingDB[keyInfo.option])
       checkButton:SetScript("OnClick", function()
         BetterFishingDB[keyInfo.option] = not BetterFishingDB[keyInfo.option]

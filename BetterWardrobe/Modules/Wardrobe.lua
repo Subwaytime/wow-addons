@@ -18,7 +18,7 @@ local playerInv_DB;
 local Profile;
 local playerNme;
 local realmName;
-local playerClass, classID, _;
+local playerClass, classID, playerClassName;
 
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName);
 
@@ -1486,7 +1486,7 @@ local function resetFilters()
 end
 
 function BetterWardrobeCollectionFrameMixin:OnShow()
-	_,playerClass, classID = UnitClass("player")
+	playerClassName,playerClass, classID = UnitClass("player")
 	CollectionsJournal:SetPortraitToAsset("Interface\\Icons\\inv_chest_cloth_17")
 	local level = CollectionsJournal:GetFrameLevel()
 	--BetterWardrobeCollectionFrame:SetFrameLevel(level+10)
@@ -1883,7 +1883,7 @@ function BetterWardrobeItemsCollectionMixin:CheckLatestAppearance(changeTab)
 		self.jumpToLatestCategoryID = latestAppearanceCategoryID;
 
 		if ( changeTab and not CollectionsJournal:IsShown() ) then
-			CollectionsJournal_SetTab(CollectionsJournal, 5)
+			securecall(function() CollectionsJournal_SetTab(CollectionsJournal, 5) end)
 		end
 	end
 end
@@ -4769,15 +4769,14 @@ function BetterWardrobeSetsDataProviderMixin:GetSetSourceData(setID)
 	if ( not self.sourceData ) then
 		self.sourceData = { }
 	end
-	local sourceData = self.sourceData[setID]
 
 	if ( not self.sourceExtraData ) then
 		self.sourceExtraData = { }
 	end
-	local sourceExtraData = self.sourceExtraData[setID]
-	--(addon.GetSetType(setID))
+
 	local setType = addon.GetSetType(setID)
-	if (setType == nil) then
+	if (setType == nil or setType == "BlizzardSet") then
+		local sourceData = self.sourceData[setID]
 		if ( not sourceData ) then
 			local primaryAppearances = C_TransmogSets.GetSetPrimaryAppearances(setID)
 			local numCollected = 0;
@@ -4794,11 +4793,11 @@ function BetterWardrobeSetsDataProviderMixin:GetSetSourceData(setID)
 			self.sourceData[setID] = sourceData;
 		end
 
-		return sourceData;
-	else
-		if ( not sourceExtraData ) then
+		return sourceData
 
-		--elseif BetterWardrobeCollectionFrame:CheckTab(3) then
+	else
+		local sourceExtraData = self.sourceExtraData[setID]
+		if ( not sourceExtraData ) then
 			local sources, unavailable = addon.GetSetsources(setID)
 			local numCollected = 0;
 			local numTotal = 0;
@@ -4809,8 +4808,8 @@ function BetterWardrobeSetsDataProviderMixin:GetSetSourceData(setID)
 					end
 					numTotal = numTotal + 1;
 				end
-				sourceExtraData = {numCollected = numCollected, numTotal = numTotal, sources = sources, unavailable = unavailable }
-				self.sourceExtraData[setID] = sourceData;
+				sourceExtraData = { numCollected = numCollected, numTotal = numTotal, sources = sources, unavailable = unavailable }
+				self.sourceExtraData[setID] = sourceExtraData
 			end
 		end
 		return sourceExtraData;
@@ -4818,14 +4817,9 @@ function BetterWardrobeSetsDataProviderMixin:GetSetSourceData(setID)
 	end
 end
 
-local sourceCounts = {}
 function BetterWardrobeSetsDataProviderMixin:GetSetSourceCounts(setID)
-	local sourceData = sourceCounts[setID] or self:GetSetSourceData(setID)
-
+	local sourceData = self:GetSetSourceData(setID);
 	if sourceData then 
-		if not sourceCounts[setID] then
-			sourceCounts[setID] = {numCollected = sourceData.numCollected, numTotal = sourceData.numTotal }
-		end
 		return sourceData.numCollected, sourceData.numTotal;
 	else
 		return 0,0;
@@ -4836,11 +4830,13 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSetData(setID)
 	if ( not self.baseSetsData ) then
 		self.baseSetsData = { }
 	end
+
 	if ( not self.baseExtraSetsData ) then
 		self.baseExtraSetsData = { }
 	end
 	
-	if (BetterWardrobeCollectionFrame:CheckTab(2)) then
+	local setType = addon.GetSetType(setID)
+	if (setType == nil or setType == "BlizzardSet") then
 		if ( not self.baseSetsData[setID] ) then
 			local baseSetID = C_TransmogSets.GetBaseSetID(setID)
 			if ( baseSetID ~= setID ) then
@@ -4859,7 +4855,7 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSetData(setID)
 			self.baseSetsData[setID] = setInfo;
 		end
 		return self.baseSetsData[setID]
-	----elseif BetterWardrobeCollectionFrame:CheckTab(3) then
+
 	else	
 		if ( not self.baseExtraSetsData[setID] ) then
 			local baseSetID = setID;
@@ -4868,7 +4864,7 @@ function BetterWardrobeSetsDataProviderMixin:GetBaseSetData(setID)
 			end
 			local topCollected, topTotal = self:GetSetSourceCounts(setID)
 			local setInfo = {topCollected = topCollected, topTotal = topTotal, completed = (topCollected == topTotal) }
-			self.baseSetsData[setID] = setInfo;
+			self.baseExtraSetsData[setID] = setInfo;
 		end
 		return self.baseExtraSetsData[setID]
 	end
@@ -4878,10 +4874,7 @@ end
 local setsByExpansion = {}
 local setsByFilter = {}
 local filterinprogress = false;
-counter = 0
 function BetterWardrobeSetsDataProviderMixin:GetSetSourceTopCounts(setID)
-	counter = counter + 1
-	--print("GetCount "..counter)
 	local baseSetData = self:GetBaseSetData(setID)
 	if ( baseSetData ) then
 		return baseSetData.topCollected, baseSetData.topTotal;
@@ -4926,34 +4919,38 @@ function BetterWardrobeSetsDataProviderMixin:ResetBaseSetNewStatus(baseSetID)
 	end
 end
 
-local ScanTooltip = CreateFrame( "GameTooltip", "BW_ScanGameTooltip", nil, "GameTooltipTemplate" )
-ScanTooltip:SetOwner( UIParent, "ANCHOR_NONE" )
--- Allow tooltip SetX() methods to dynamically add new lines based on these
-ScanTooltip:AddFontStrings(
-	ScanTooltip:CreateFontString( "$parentTextLeft1", nil, "GameTooltipText" ),
-	ScanTooltip:CreateFontString( "$parentTextRight1", nil, "GameTooltipText" ) 
-	)
-	
---Helper function. Makes an invisible tooltip for the item and parses it to see if it has 
---red error text related to class requirements.
 local classGlobal = strsplit(" ", ITEM_CLASSES_ALLOWED)
+local ClassSetCache = {}
 local function CheckClass(itemLink)
-  ScanTooltip:ClearLines()
-  ScanTooltip:SetHyperlink(itemLink)
-  for i = 1,ScanTooltip:NumLines() do
-	local text = _G["BW_ScanGameTooltipTextLeft"..i]
-	
-	if text and text:GetText() then
-	  local r,g,b = text:GetTextColor()
-	  if math.floor(r*256) == 255 and math.floor(g*256) == 32 and math.floor(b*256) == 32 then
-		if string.find(text:GetText(), classGlobal) then
-		  return false;
+	local itemID = GetItemInfoInstant(itemLink) 
+	if not ClassSetCache[itemID] then
+		--Calls twice since the first time usually does not contain actual data
+		local tooltipData = C_TooltipInfo.GetHyperlink(itemLink) 
+		tooltipData = C_TooltipInfo.GetHyperlink(itemLink) 
+
+		TooltipUtil.SurfaceArgs(tooltipData)
+
+		for _, line in ipairs(tooltipData.lines) do
+			TooltipUtil.SurfaceArgs(line)
 		end
-	  end
+
+		for i=1,#tooltipData.lines do  
+			local text = tooltipData.lines[i].leftText
+			if text and string.find(text, classGlobal) and not string.find(text, playerClassName) then
+				ClassSetCache[itemID] = false
+				break
+			elseif text and string.find(text, classGlobal) and string.find(text, playerClassName) then
+ 				ClassSetCache[itemID] = true
+ 				break
+			end
+		end
+
+		ClassSetCache[itemID] = true
 	end
-  end
-  return true;
+
+	return ClassSetCache[itemID]
 end
+
 
 
 
@@ -4994,11 +4991,11 @@ local function CheckCollectionStatus(sources)
 		local link = select(6, C_TransmogCollection.GetAppearanceSourceInfo(sourceInfo.sourceID))
 		local classSet = CheckClass(link)
 		
-		if true and not characterCollectable and classSet then
+		if not characterCollectable and classSet then
 			characterCollectable = true;
 		end
 
-		if true and not characterUseable and classSet and sourceInfo.isCollected then
+		if not characterUseable and classSet and sourceInfo.isCollected then
 			characterUseable = true;
 		end
 		

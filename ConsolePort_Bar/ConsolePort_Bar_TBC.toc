@@ -1,4 +1,5 @@
 ## Interface: 20504
+## IconTexture: Interface\AddOns\ConsolePort\Assets\Textures\Logo\CP_Thumb
 ## Title: Console Port |cff69ccf0Action Bar|r
 ## Notes: Action bar module
 ## RequiredDeps: ConsolePort

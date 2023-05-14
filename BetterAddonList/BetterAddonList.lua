@@ -4,6 +4,7 @@
 -- luacheck: globals AddonList AddonCharacterDropDown AddonCharacterDropDownButton AddonListForceLoad AddonListOkayButton
 -- luacheck: globals AddonList_Enable AddonList_SetSecurityIcon AddonList_SetStatus AddonList_HasAnyChanged AddonTooltip_Update
 -- luacheck: globals SOUNDKIT
+-- luacheck: globals C_AddOns
 
 local ADDON_NAME, ns = ...
 BetterAddonListDB = BetterAddonListDB or {}
@@ -11,6 +12,7 @@ BetterAddonListDB = BetterAddonListDB or {}
 local LibDialog = LibStub("LibDialog-1.0")
 
 local _G = _G
+local GetAddOnMetadata = C_AddOns.GetAddOnMetadata
 
 local L = ns.L
 L.LOAD_ADDON = GetLocale() == "ruRU" and "Загрузить" or _G.LOAD_ADDON
@@ -595,13 +597,6 @@ do
 	local updater = CreateFrame("Frame", nil, AddonList)
 	updater:SetScript("OnShow", function(self)
 		UpdateAddOnMemoryUsage()
-		if not self.timer then
-			self.timer = C_Timer.NewTicker(30, function() UpdateAddOnMemoryUsage() end)
-		end
-	end)
-	updater:SetScript("OnHide", function(self)
-		self.timer:Cancel()
-		self.timer = nil
 	end)
 
 	local function buildDeps(...)
@@ -630,7 +625,7 @@ do
 			GameTooltip:SetText(ADDON_BANNED_TOOLTIP)
 		else
 			local version = GetAddOnMetadata(index, "Version")
-			if version and version ~= "1.1.6" then
+			if version and version ~= "1.1.7" then
 				GameTooltip:AddDoubleLine(title or name, version)
 			else
 				GameTooltip:AddLine(title or name)
@@ -657,6 +652,12 @@ do
 		local checkbox = entry.Enabled
 		local title = entry.Title
 		local status = entry.Status
+
+		local iconTexture = GetAddOnMetadata(addonIndex, "IconTexture")
+		local iconAtlas = GetAddOnMetadata(addonIndex, "IconAtlas")
+		if not iconTexture and not iconAtlas then
+			title:SetText(title:GetText():gsub([[^|TInterface\ICONS\INV_Misc_QuestionMark:20:20|t ]], "")) -- "|T982414:20:20|t" ..
+		end
 
 		local lockIcon = entry.Protected
 		if not lockIcon then
