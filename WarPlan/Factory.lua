@@ -1,6 +1,7 @@
 local Factory, _, T = {}, ...
 local EV, W, L, C = T.Evie, T.WrappedAPI, T.L, C_Garrison
 local CreateEdge = T.CreateEdge
+local GameTooltip = T.NotGameTooltip or GameTooltip
 
 local function CreateObject(otype, ...)
 	return Factory[otype](...)

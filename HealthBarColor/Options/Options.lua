@@ -40,7 +40,7 @@ local options = {
                             type = "color",
                             get = "GetColor",
                             set = "SetColor",
-                            --hidden = function() if HealthBarColor.db.profile.HealthBars.Player.selected == 2 then return false end return true end,
+                            hidden = function() if HealthBarColor.db.profile.HealthBars.Player.selected == 2 then return false end return true end,
                             width = colorWidth,
                         },  
                         classicon = {
@@ -72,12 +72,12 @@ local options = {
                         },  
                         color = {
                             order = 2,
-                            name = "color",
+                            name = function() if HealthBarColor.db.profile.HealthBars.Target.selected == 3 then return "color" end return "NPC color" end,
                             desc = "",
                             type = "color",
                             get = "GetColor",
                             set = "SetColor",
-                            hidden = function() if HealthBarColor.db.profile.HealthBars.Target.selected == 2 then return true end return false end,
+                            hidden = function() if ( HealthBarColor.db.profile.HealthBars.Target.selected == 2 or HealthBarColor.db.profile.HealthBars.Target.selected == 4 ) or ( HealthBarColor.db.profile.HealthBars.Target.selected == 1 and HealthBarColor.db.profile.HealthBars.Target.reaction ) then return true end return false end,
                             width = colorWidth,
                         },  
                         reaction = {
@@ -117,12 +117,12 @@ local options = {
                         },  
                         color = {
                             order = 2,
-                            name = "color",
+                            name = function() if HealthBarColor.db.profile.HealthBars.ToT.selected == 3 then return "color" end return "NPC color" end,
                             desc = "",
                             type = "color",
                             get = "GetColor",
                             set = "SetColor",
-                            hidden = function() if HealthBarColor.db.profile.HealthBars.ToT.selected == 2 then return true end return false end,
+                            hidden = function() if ( HealthBarColor.db.profile.HealthBars.ToT.selected == 2 or HealthBarColor.db.profile.HealthBars.ToT.selected == 4 ) or ( HealthBarColor.db.profile.HealthBars.ToT.selected == 1 and HealthBarColor.db.profile.HealthBars.ToT.reaction ) then return true end return false end,
                             width = colorWidth,
                         },  
                         reaction = {
@@ -162,12 +162,12 @@ local options = {
                         },  
                         color = {
                             order = 2,
-                            name = "color",
+                            name = function() if HealthBarColor.db.profile.HealthBars.Focus.selected == 3 then return "color" end return "NPC color" end,
                             desc = "",
                             type = "color",
                             get = "GetColor",
                             set = "SetColor",
-                            hidden = function() if HealthBarColor.db.profile.HealthBars.Focus.selected == 2 then return true end return false end,
+                            hidden = function() if ( HealthBarColor.db.profile.HealthBars.Focus.selected == 2 or HealthBarColor.db.profile.HealthBars.Focus.selected == 4 ) or ( HealthBarColor.db.profile.HealthBars.Focus.selected == 1 and HealthBarColor.db.profile.HealthBars.Focus.reaction ) then return true end return false end,
                             width = colorWidth,
                         },  
                         reaction = {
@@ -207,12 +207,12 @@ local options = {
                         },  
                         color = {
                             order = 2,
-                            name = "color",
+                            name = function() if HealthBarColor.db.profile.HealthBars.ToF.selected == 3 then return "color" end return "NPC color" end,
                             desc = "",
                             type = "color",
                             get = "GetColor",
                             set = "SetColor",
-                            hidden = function() if HealthBarColor.db.profile.HealthBars.ToF.selected == 2 then return true end return false end,
+                            hidden = function() if ( HealthBarColor.db.profile.HealthBars.ToF.selected == 2 or HealthBarColor.db.profile.HealthBars.ToF.selected == 4 ) or ( HealthBarColor.db.profile.HealthBars.ToF.selected == 1 and HealthBarColor.db.profile.HealthBars.ToF.reaction ) then return true end return false end,
                             width = colorWidth,
                         },  
                         reaction = {

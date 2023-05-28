@@ -1,5 +1,5 @@
 ﻿----------------------------------------------------------------------
--- 	Leatrix Plus 10.1.02 (10th May 2023)
+-- 	Leatrix Plus 10.1.04 (27th May 2023)
 ----------------------------------------------------------------------
 
 --	01:Functns, 02:Locks, 03:Restart, 20:Live, 30:Isolated, 40:Player
@@ -18,7 +18,7 @@
 	local void
 
 	-- Version
-	LeaPlusLC["AddonVer"] = "10.1.02"
+	LeaPlusLC["AddonVer"] = "10.1.04"
 
 	-- Get locale table
 	local void, Leatrix_Plus = ...
@@ -3619,6 +3619,8 @@
 				elseif event == "UI_ERROR_MESSAGE" then
 					if arg1 == 46 then
 						StopSelling() -- Vendor refuses to buy items
+					elseif arg1 == 635 then
+						StopSelling() -- At gold limit
 					end
 				end
 			end)
@@ -13702,20 +13704,6 @@
 						LeaPlusLC:Print("Secure: |cffffffff" .. issecure)
 						LeaPlusLC:Print("Tainted: |cffffffff" .. tainted)
 					end
-				end
-				return
-			elseif str == "queue" then
-				-- Queue
-				if LeaPlusLC.QueueEnabled then
-					LeaPlusLC.QueueEnabled = nil
-					LFGDungeonReadyDialogEnterDungeonButton:SetScript("OnShow", function() end)
-					LeaPlusLC:Print("Queue disabled.")
-				else
-					LeaPlusLC.QueueEnabled = true
-					LFGDungeonReadyDialogEnterDungeonButton:SetScript("OnShow", function()
-						LFGDungeonReadyDialogEnterDungeonButton:Click()
-					end)
-					LeaPlusLC:Print("Queue enabled.")
 				end
 				return
 			elseif str == "arrow" then

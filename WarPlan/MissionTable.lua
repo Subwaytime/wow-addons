@@ -1,5 +1,6 @@
 local _, T = ...
 local EV, W, L, C, CreateObject = T.Evie, T.WrappedAPI, T.L, C_Garrison, T.CreateObject
+local GameTooltip = T.NotGameTooltip or GameTooltip
 
 local manualMemberSet, manualMemberCount = {}, 0
 local function toggleFollowerFocus(followerID, removeOnly, audible)

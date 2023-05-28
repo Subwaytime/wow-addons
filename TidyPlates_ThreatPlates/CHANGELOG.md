@@ -1,3 +1,3 @@
-# 11.1.19 (2023-05-03)
+# 11.1.22 (2023-05-21)
 
-* Updated TOC version and API for Patch 10.1 for WoW Mainline.
+* Fixed a Lua error related to nameplate visibility introduced with the bugfix for mind-control of Priests [GH-455].

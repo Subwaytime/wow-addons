@@ -176,7 +176,6 @@ local activetheme = Addon.Theme
 local function IsPlateShown(plate) return plate and plate:IsShown() end
 
 -- Queueing
-local function SetUpdateMe(plate) plate.UpdateMe = true end
 local function SetUpdateAll() UpdateAll = true end
 
 -- Style
@@ -222,7 +221,8 @@ local function SetNameplateVisibility(plate, unitid)
   -- ! Interactive objects do also have nameplates. We should not mess with the visibility the of these objects.
   if not UnitExists(unitid) then return end
 
-  local unit_reaction = UnitReaction(unitid, "player") or 0
+  -- We cannot use unit.reaction here as it is not guaranteed that it's update whenever this function is called (see UNIT_FACTION).
+  local unit_reaction = UnitReaction("player", unitid) or 0
   if unit_reaction > 4 then
     if SettingsShowFriendlyBlizzardNameplates then
       plate.UnitFrame:Show()
@@ -503,8 +503,8 @@ do
 
 		--Addon:UpdateUnitIdentity(plate.TPFrame, unitid)
     Addon:UpdateUnitContext(unit, unitid)
-		ProcessUnitChanges()
-		OnUpdateCastMidway(plate, unitid)
+    ProcessUnitChanges()
+    OnUpdateCastMidway(plate, unitid)
 	end
 
 	-- OnHealthUpdate
@@ -1030,8 +1030,8 @@ local function FrameOnShow(UnitFrame)
     return
   end
 
+  -- Don't show ThreatPlates for widget-only nameplates (since Shadowlands)
   if UnitNameplateShowsWidgetsOnly(unitid) then
-    -- Don't show ThreatPlates for widget-only nameplates (since Shadowlands)
     return
   end
 
@@ -1177,7 +1177,7 @@ function CoreEvents:NAME_PLATE_UNIT_REMOVED(unitid)
   frame.stylename = nil
 
   -- Remove anything from the function queue
-  frame.UpdateMe = false
+  plate.UpdateMe = false
 end
 
 function CoreEvents:UNIT_NAME_UPDATE(unitid)
@@ -1550,16 +1550,29 @@ function CoreEvents:UNIT_FACTION(unitid)
   if unitid == "target" then
     return
   elseif unitid == "player" then
+    -- We first need to if TP is active or not on a nameplate. As this does - currently - not use unit.reaction, but 
+    -- directly queries UnitReaction, we can do that before SetUpdateAll (which would call UpdateUnitCondition which 
+    -- updates unit.reaction)
+    -- Not sure if it would make sense to move this to SetUpdateAll
+    for plate, plate_unitid in pairs(PlatesVisible) do
+      SetNameplateVisibility(plate, plate_unitid)
+    end
     SetUpdateAll() -- Update all plates
   else
-    -- Update just the unitid's plate
+    -- It seems that (at least) in solo shuffles, the UNIT_FACTION event is fired in between the events
+    -- NAME_PLATE_UNIT_REMOVE and NAME_PLATE_UNIT_ADDED. As SetNameplateVisibility sets the TPFrame Active, this results 
+    -- in Lua errors, so basically we cannot use it here to check if the plate is active.
     local plate = GetNamePlateForUnit(unitid)
-    if plate and plate.TPFrame.Active then
+    if plate and PlatesVisible[plate] then
+      -- If Blizzard-style nameplates are used, we also need to check if TP plates are disabled/enabled now
+      -- This also needs to be done no matter if the plate is Active or not as units with
+      -- mindcontrolled
       UpdateReferences(plate)
       Addon:UpdateUnitCondition(unit, unitid)
-      -- If Blizzard-style nameplates are used, we also need to check if TP plates are disabled/enabled now
       SetNameplateVisibility(plate, unitid)
-      ProcessUnitChanges()
+      if plate.TPFrame.Active then
+        ProcessUnitChanges()
+      end
     end
   end
 end
