@@ -48,7 +48,7 @@ end
 
 -- ElvUI
 local function ElvUI_SetSupport()
-    if KT:CheckAddOn("ElvUI", "13.23", true) then
+    if KT:CheckAddOn("ElvUI", "13.38", true) then
         local E = unpack(_G.ElvUI)
         local B = E:GetModule("Blizzard")
         B.SetObjectiveFrameHeight = function() end    -- preventive

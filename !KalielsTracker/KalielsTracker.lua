@@ -363,9 +363,6 @@ local function SetFrames()
 				end
 			end
 			KT:ToggleEmptyTracker(added)
-		elseif event == "TRACKED_ACHIEVEMENT_LIST_CHANGED" then
-			local id, added = ...
-			KT:ToggleEmptyTracker(added)
 		elseif event == "SCENARIO_UPDATE" then
 			local newStage = ...
 			if newStage == nil then
@@ -446,7 +443,6 @@ local function SetFrames()
 	KTF:RegisterEvent("PLAYER_ENTERING_WORLD")
 	KTF:RegisterEvent("PLAYER_LEAVING_WORLD")
 	KTF:RegisterEvent("QUEST_WATCH_LIST_CHANGED")
-	KTF:RegisterEvent("TRACKED_ACHIEVEMENT_LIST_CHANGED")
 	KTF:RegisterEvent("SCENARIO_UPDATE")
 	KTF:RegisterEvent("SCENARIO_COMPLETED")
 	KTF:RegisterEvent("QUEST_AUTOCOMPLETE")
@@ -721,7 +717,7 @@ local function SetHooks()
 	end)
 
 	local bck_KT_ObjectiveTracker_Update = KT_ObjectiveTracker_Update
-	KT_ObjectiveTracker_Update = function(reason, id, moduleWhoseCollapseChanged)
+	KT_ObjectiveTracker_Update = function(reason, id, moduleWhoseCollapseChanged, subInfo)
 		if KT.stopUpdate then return end
 		local dbgReason
 		if reason == KT_OBJECTIVE_TRACKER_UPDATE_ALL then
@@ -730,7 +726,7 @@ local function SetHooks()
 			dbgReason = reason and format("%x", reason) or ""
 		end
 		_DBG("|cffffff00Update ... "..dbgReason, true)
-		bck_KT_ObjectiveTracker_Update(reason, id, moduleWhoseCollapseChanged)
+		bck_KT_ObjectiveTracker_Update(reason, id, moduleWhoseCollapseChanged, subInfo)
 		FixedButtonsReanchor()
 		if dbChar.collapsed then
 			local title = ""
@@ -1664,13 +1660,13 @@ local function SetHooks()
 
 	hooksecurefunc("KT_AutoQuestPopupTracker_Update", function(owningModule)
 		KT.hiddenQuestPopUps = SplashFrame:IsShown()
-		if KT.hiddenQuestPopUps then return end
+		if KT.hiddenQuestPopUps or not KT.initialized then return end
 		for i = 1, GetNumAutoQuestPopUps() do
 			local questID, popUpType = GetAutoQuestPopUp(i)
 			if AutoQuestPopupTracker_ShouldDisplayQuest(questID, owningModule) then
 				local questTitle = C_QuestLog.GetTitleForQuestID(questID)
 				if questTitle and questTitle ~= "" then
-					local block = owningModule.usedBlocks["KT_AutoQuestPopUpBlockTemplate"][questID]
+					local block = owningModule.usedBlocks["KT_AutoQuestPopUpBlockTemplate"][questID..popUpType]
 					local blockContents = block.ScrollChild
 					blockContents.QuestName:SetFont(KT.font, 14, "")
 					blockContents.BottomText:SetPoint("BOTTOM", 0, 7)
@@ -1802,6 +1798,31 @@ local function SetHooks()
 		end
 	end
 
+	-- ContentTrackingManager.lua
+	local function OnContentTrackingUpdate(self, trackableType, id, isTracked)
+		if trackableType == Enum.ContentTrackingType.Achievement then
+			if isTracked then
+				KT_ObjectiveTracker_Update(KT_OBJECTIVE_TRACKER_UPDATE_ACHIEVEMENT_ADDED, id)
+			else
+				KT_ObjectiveTracker_Update(KT_OBJECTIVE_TRACKER_UPDATE_ACHIEVEMENT)
+			end
+		elseif trackableType == Enum.ContentTrackingType.Appearance or trackableType == Enum.ContentTrackingType.Mount then
+			KT_ObjectiveTracker_Update(KT_OBJECTIVE_TRACKER_UPDATE_MODULE_ADVENTURE)
+		end
+	end
+
+	local function OnTrackingTargetInfoUpdate(self, targetType, targetID)
+		KT_ObjectiveTracker_Update(KT_OBJECTIVE_TRACKER_UPDATE_TARGET_INFO, targetID, nil, targetType)
+	end
+
+	local function OnContentTrackingToggled(self, isEnabled)
+		KT_ObjectiveTracker_Update(KT_OBJECTIVE_TRACKER_UPDATE_MODULE_ADVENTURE)
+	end
+
+	EventRegistry:RegisterFrameEventAndCallback("CONTENT_TRACKING_UPDATE", OnContentTrackingUpdate, KT)
+	EventRegistry:RegisterFrameEventAndCallback("TRACKING_TARGET_INFO_UPDATE", OnTrackingTargetInfoUpdate, KT)
+	EventRegistry:RegisterFrameEventAndCallback("CONTENT_TRACKING_IS_ENABLED_UPDATE", OnContentTrackingToggled, KT)
+
 	-- GossipFrame.lua
 	hooksecurefunc(GossipFrame, "HandleShow", function(self, textureKit)
 		local gossipQuests = C_GossipInfo.GetAvailableQuests()
@@ -1824,15 +1845,15 @@ local function SetHooks()
 		QuestMapFrame_ShowQuestDetails(questID);
 	end
 
-	-- QuestPOI.lua (taint)
-	local bck_QuestPOI_GetButton = QuestPOI_GetButton
-	QuestPOI_GetButton = function(parent, questID, style, index)
-		local poiButton = bck_QuestPOI_GetButton(parent, questID, style, index)
-		if poiButton then
-			poiButton.Glow.SetShown = function() end
+	-- POIButton.lua
+	hooksecurefunc(POIButtonMixin, "UpdateButtonStyle", function(self)
+		self.Glow:SetShown(false)
+
+		-- fix Blizz bug
+		if self.style == POIButtonUtil.Style.Numeric then
+			self.Display:SetIconShown(true)
 		end
-		return poiButton
-	end
+	end)
 
 	-- QuestUtils.lua
 	function QuestUtils_AddQuestCurrencyRewardsToTooltip(questID, tooltip, currencyContainerTooltip)  -- RO
@@ -2304,6 +2325,58 @@ local function SetHooks()
 			info.checked = false;
 			MSA_DropDownMenu_AddButton(info, MSA_DROPDOWN_MENU_LEVEL);
 		end
+	end
+
+	function KT_ADVENTURE_TRACKER_MODULE:OnBlockHeaderClick(block, mouseButton)  -- R
+		if not ContentTrackingUtil.ProcessChatLink(block.trackableType, block.trackableID) then
+			if mouseButton ~= "RightButton" then
+				MSA_CloseDropDownMenus();
+
+				if ContentTrackingUtil.IsTrackingModifierDown() then
+					C_ContentTracking.StopTracking(block.trackableType, block.trackableID);
+				elseif (block.trackableType == Enum.ContentTrackingType.Appearance) and IsModifiedClick("DRESSUP") then
+					DressUpVisual(block.trackableID);
+				elseif block.targetType == Enum.ContentTrackingTargetType.Achievement then
+					OpenAchievementFrameToAchievement(block.targetID);
+				elseif block.targetType == Enum.ContentTrackingTargetType.Profession then
+					KT_AdventureObjectiveTracker_ClickProfessionTarget(block.targetID);
+				else
+					ContentTrackingUtil.OpenMapToTrackable(block.trackableType, block.trackableID);
+				end
+
+				PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+			else
+				KT_ObjectiveTracker_ToggleDropDown(block, KT_AdventureObjectiveTracker_OnOpenDropDown);
+			end
+		end
+	end
+
+	function KT_AdventureObjectiveTracker_OnOpenDropDown(self)  -- R
+		local block = self.activeFrame;
+
+		local info = MSA_DropDownMenu_CreateInfo();
+		info.text = block.name;
+		info.isTitle = 1;
+		info.notCheckable = 1;
+		MSA_DropDownMenu_AddButton(info, MSA_DROPDOWN_MENU_LEVEL);
+
+		info = MSA_DropDownMenu_CreateInfo();
+		info.notCheckable = 1;
+
+		if block.trackableType == Enum.ContentTrackingType.Appearance then
+			info.text = CONTENT_TRACKING_OPEN_JOURNAL_OPTION;
+			info.func = KT_AdventureObjectiveTracker_OpenToAppearance;
+			info.arg1 = block.trackableID;
+			info.checked = false;
+			MSA_DropDownMenu_AddButton(info, MSA_DROPDOWN_MENU_LEVEL);
+		end
+
+		info.text = OBJECTIVES_STOP_TRACKING;
+		info.func = KT_AdventureObjectiveTracker_Untrack;
+		info.arg1 = block.trackableType;
+		info.arg2 = block.trackableID;
+		info.checked = false;
+		MSA_DropDownMenu_AddButton(info, MSA_DROPDOWN_MENU_LEVEL);
 	end
 
 	-- Headers
@@ -2815,12 +2888,13 @@ end
 function KT:IsTrackerEmpty(noaddon)
 	local result = (KT.GetNumQuestWatches() == 0 and
 			(GetNumAutoQuestPopUps() == 0 or self.hiddenQuestPopUps) and
-			GetNumTrackedAchievements() == 0 and
+			self.GetNumTrackedAchievements() == 0 and
 			self.IsTableEmpty(self.activeTasks) and
 			C_QuestLog.GetNumWorldQuestWatches() == 0 and
 			not self.inScenario and
 			self.GetNumTrackedRecipes() == 0 and
-			self.GetNumTrackedActivities() == 0)
+			self.GetNumTrackedActivities() == 0 and
+			self.GetNumTrackedCollectibles() == 0)
 	if not noaddon then
 		result = (result and not self.AddonPetTracker:IsShown())
 	end
@@ -2937,7 +3011,7 @@ function KT:OnInitialize()
 	self:SetupOptions()
 	db = self.db.profile
 	dbChar = self.db.char
-	KT:Alert_ResetIncompatibleProfiles("6.0.0")
+	KT:Alert_ResetIncompatibleProfiles("6.3.0")
 
 	-- Blizzard frame resets
 	ObjectiveTrackerFrame:Hide()

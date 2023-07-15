@@ -1,5 +1,5 @@
 ﻿----------------------------------------------------------------------
--- 	Leatrix Plus 10.1.04 (27th May 2023)
+-- 	Leatrix Plus 10.1.10 (12th July 2023)
 ----------------------------------------------------------------------
 
 --	01:Functns, 02:Locks, 03:Restart, 20:Live, 30:Isolated, 40:Player
@@ -18,7 +18,7 @@
 	local void
 
 	-- Version
-	LeaPlusLC["AddonVer"] = "10.1.04"
+	LeaPlusLC["AddonVer"] = "10.1.10"
 
 	-- Get locale table
 	local void, Leatrix_Plus = ...
@@ -33,6 +33,9 @@
 				print(L["LEATRIX PLUS: WRONG VERSION INSTALLED!"])
 			end)
 			return
+		end
+		if gametocversion and gametocversion == 100107 then -- 10.1.7
+			LeaPlusLC.NewPatch = true
 		end
 	end
 
@@ -121,7 +124,7 @@
 	function LeaPlusLC:CheckIfQuestIsSharedAndShouldBeDeclined()
 		if LeaPlusLC["NoSharedQuests"] == "On" then
 			local npcName = UnitName("questnpc")
-			if npcName then
+			if npcName and UnitIsPlayer(npcName) then
 				if UnitInParty(npcName) or UnitInRaid(npcName) then
 					if not LeaPlusLC:FriendCheck(npcName) then
 						DeclineQuest()
@@ -584,7 +587,7 @@
 		LeaPlusLC:LockOption("AutomateQuests", "AutomateQuestsBtn", false)			-- Automate quests
 		LeaPlusLC:LockOption("AutoAcceptRes", "AutoAcceptResBtn", false)			-- Accept resurrection
 		LeaPlusLC:LockOption("AutoReleasePvP", "AutoReleasePvPBtn", false)			-- Release in PvP
-		LeaPlusLC:LockOption("AutoSellJunk", "AutoSellJunkBtn", false)				-- Sell junk automatically
+		LeaPlusLC:LockOption("AutoSellJunk", "AutoSellJunkBtn", true)				-- Sell junk automatically
 		LeaPlusLC:LockOption("AutoRepairGear", "AutoRepairBtn", false)				-- Repair automatically
 		LeaPlusLC:LockOption("InviteFromWhisper", "InvWhisperBtn", false)			-- Invite from whispers
 		LeaPlusLC:LockOption("NoChatButtons", "NoChatButtonsBtn", true)				-- Hide chat buttons
@@ -601,8 +604,6 @@
 		LeaPlusLC:LockOption("ShowWowheadLinks", "ShowWowheadLinksBtn", true)		-- Show Wowhead links
 		LeaPlusLC:LockOption("ManageWidgetTop", "ManageWidgetTopButton", true)		-- Manage widget top
 		LeaPlusLC:LockOption("ManageControl", "ManageControlButton", true)			-- Manage control
-		LeaPlusLC:LockOption("ManageTimer", "ManageTimerButton", true)				-- Manage timer
-		LeaPlusLC:LockOption("ManageVehicle", "ManageVehicleButton", true)			-- Manage vehicle
 		LeaPlusLC:LockOption("ClassColFrames", "ClassColFramesBtn", true)			-- Class colored frames
 		LeaPlusLC:LockOption("SetWeatherDensity", "SetWeatherDensityBtn", false)	-- Set weather density
 		LeaPlusLC:LockOption("MuteGameSounds", "MuteGameSoundsBtn", false)			-- Mute game sounds
@@ -619,8 +620,11 @@
 	-- Set the reload button state
 	function LeaPlusLC:ReloadCheck()
 
+		-- Automation
+		if	(LeaPlusLC["AutoSellJunk"]			~= LeaPlusDB["AutoSellJunk"])			-- Sell junk automatically
+
 		-- Chat
-		if	(LeaPlusLC["UseEasyChatResizing"]	~= LeaPlusDB["UseEasyChatResizing"])	-- Use easy resizing
+		or	(LeaPlusLC["UseEasyChatResizing"]	~= LeaPlusDB["UseEasyChatResizing"])	-- Use easy resizing
 		or	(LeaPlusLC["NoCombatLogTab"]		~= LeaPlusDB["NoCombatLogTab"])			-- Hide the combat log
 		or	(LeaPlusLC["NoChatButtons"]			~= LeaPlusDB["NoChatButtons"])			-- Hide chat buttons
 		or	(LeaPlusLC["NoSocialButton"]		~= LeaPlusDB["NoSocialButton"])			-- Hide social button
@@ -671,8 +675,6 @@
 		-- Frames
 		or	(LeaPlusLC["ManageWidgetTop"]		~= LeaPlusDB["ManageWidgetTop"])		-- Manage widget top
 		or	(LeaPlusLC["ManageControl"]			~= LeaPlusDB["ManageControl"])			-- Manage control
-		or	(LeaPlusLC["ManageTimer"]			~= LeaPlusDB["ManageTimer"])			-- Manage timer
-		or	(LeaPlusLC["ManageVehicle"]			~= LeaPlusDB["ManageVehicle"])			-- Manage vehicle
 		or	(LeaPlusLC["ClassColFrames"]		~= LeaPlusDB["ClassColFrames"])			-- Class colored frames
 
 		or	(LeaPlusLC["NoAlerts"]				~= LeaPlusDB["NoAlerts"])				-- Hide alerts
@@ -3116,10 +3118,15 @@
 		end
 
 		----------------------------------------------------------------------
-		--	Sell junk automatically (no reload required)
+		--	Sell junk automatically
 		----------------------------------------------------------------------
 
-		do
+		if LeaPlusLC["AutoSellJunk"] == "On" then
+
+			-- 10.1.7: Hide the sell all junk items button (it does not take exclusions, special items or transmog items into account and does not print vendor summaries)
+			if MerchantSellAllJunkButton then
+				hooksecurefunc(MerchantSellAllJunkButton, "Show", function() MerchantSellAllJunkButton:Hide() end)
+			end
 
 			-- Create sell junk banner
 			local StartMsg = CreateFrame("FRAME", nil, MerchantFrame)
@@ -3581,22 +3588,9 @@
 
 			end
 
-			-- Function to setup events
-			local function SetupEvents()
-				if LeaPlusLC["AutoSellJunk"] == "On" then
-					SellJunkFrame:RegisterEvent("MERCHANT_SHOW");
-					SellJunkFrame:RegisterEvent("MERCHANT_CLOSED");
-				else
-					SellJunkFrame:UnregisterEvent("MERCHANT_SHOW")
-					SellJunkFrame:UnregisterEvent("MERCHANT_CLOSED")
-				end
-			end
-
-			-- Setup events when option is clicked and on startup (if option is enabled)
-			LeaPlusCB["AutoSellJunk"]:HookScript("OnClick", SetupEvents)
-			if LeaPlusLC["AutoSellJunk"] == "On" then SetupEvents() end
-
 			-- Event handler
+			SellJunkFrame:RegisterEvent("MERCHANT_SHOW")
+			SellJunkFrame:RegisterEvent("MERCHANT_CLOSED")
 			SellJunkFrame:SetScript("OnEvent", function(self, event, arg1)
 				if event == "MERCHANT_SHOW" then
 					-- Check for vendors that refuse to buy items
@@ -3988,7 +3982,7 @@
 			local QuestTextPanel = LeaPlusLC:CreatePanel("Resize quest text", "QuestTextPanel")
 
 			LeaPlusLC:MakeTx(QuestTextPanel, "Text size", 16, -72)
-			LeaPlusLC:MakeSL(QuestTextPanel, "LeaPlusQuestFontSize", "Drag to set the font size of quest text.", 10, 36, 1, 16, -92, "%.0f")
+			LeaPlusLC:MakeSL(QuestTextPanel, "LeaPlusQuestFontSize", "Drag to set the font size of quest text.", 10, 30, 1, 16, -92, "%.0f")
 
 			-- Function to update the font size
 			local function QuestSizeUpdate()
@@ -4048,7 +4042,7 @@
 			local MailTextPanel = LeaPlusLC:CreatePanel("Resize mail text", "MailTextPanel")
 
 			LeaPlusLC:MakeTx(MailTextPanel, "Text size", 16, -72)
-			LeaPlusLC:MakeSL(MailTextPanel, "LeaPlusMailFontSize", "Drag to set the font size of mail text.", 10, 36, 1, 16, -92, "%.0f")
+			LeaPlusLC:MakeSL(MailTextPanel, "LeaPlusMailFontSize", "Drag to set the font size of mail text.", 10, 30, 1, 16, -92, "%.0f")
 
 			-- Function to set the text size
 			local function MailSizeUpdate()
@@ -4568,201 +4562,6 @@
 
 		if LeaPlusLC["NoRestedSleep"] == "On" and not LeaLockList["NoRestedSleep"] then
 			PlayerFrame.PlayerFrameContent.PlayerFrameContentContextual.PlayerRestLoop.RestTexture:SetTexture("")
-		end
-
-		----------------------------------------------------------------------
-		-- Manage vehicle
-		----------------------------------------------------------------------
-
-		if LeaPlusLC["ManageVehicle"] == "On" and not LeaLockList["ManageVehicle"] then
-
-			-- Create and manage container for VehicleSeatIndicator
-			local vehicleHolder = CreateFrame("Frame", nil, UIParent)
-			vehicleHolder:SetPoint("TOP", UIParent, "TOP", 0, -15)
-			vehicleHolder:SetSize(128, 128)
-
-			local vehicleContainer = _G.VehicleSeatIndicator
-			vehicleContainer:ClearAllPoints()
-			vehicleContainer:SetPoint('CENTER', vehicleHolder)
-			vehicleContainer:SetIgnoreParentScale(true) -- Needed to keep drag frame position when scaled
-
-			hooksecurefunc(vehicleContainer, 'SetPoint', function(self, void, b)
-				if b and (b ~= vehicleHolder) then
-					-- Reset parent if it changes from vehicleHolder
-					self:ClearAllPoints()
-					self:SetPoint('TOPRIGHT', vehicleHolder) -- Has to be TOPRIGHT (drag frame while moving between subzones)
-					self:SetParent(vehicleHolder)
-				end
-			end)
-
-			-- Allow vehicle frame to be moved
-			vehicleHolder:SetMovable(true)
-			vehicleHolder:SetUserPlaced(true)
-			vehicleHolder:SetDontSavePosition(true)
-			vehicleHolder:SetClampedToScreen(false)
-
-			-- Set vehicle frame position at startup
-			vehicleHolder:ClearAllPoints()
-			vehicleHolder:SetPoint(LeaPlusLC["VehicleA"], UIParent, LeaPlusLC["VehicleR"], LeaPlusLC["VehicleX"], LeaPlusLC["VehicleY"])
-			vehicleHolder:SetScale(LeaPlusLC["VehicleScale"])
-			VehicleSeatIndicator:SetScale(LeaPlusLC["VehicleScale"])
-
-			-- Create drag frame
-			local dragframe = CreateFrame("FRAME", nil, nil, "BackdropTemplate")
-			dragframe:SetPoint("CENTER", vehicleHolder, "CENTER", 0, 1)
-			dragframe:SetBackdropColor(0.0, 0.5, 1.0)
-			dragframe:SetBackdrop({edgeFile = "Interface/Tooltips/UI-Tooltip-Border", tile = false, tileSize = 0, edgeSize = 16, insets = { left = 0, right = 0, top = 0, bottom = 0}})
-			dragframe:SetToplevel(true)
-			dragframe:Hide()
-			dragframe:SetScale(LeaPlusLC["VehicleScale"])
-
-			dragframe.t = dragframe:CreateTexture()
-			dragframe.t:SetAllPoints()
-			dragframe.t:SetColorTexture(0.0, 1.0, 0.0, 0.5)
-			dragframe.t:SetAlpha(0.5)
-
-			dragframe.f = dragframe:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
-			dragframe.f:SetPoint('CENTER', 0, 0)
-			dragframe.f:SetText(L["Vehicle"])
-
-			-- Click handler
-			dragframe:SetScript("OnMouseDown", function(self, btn)
-				-- Start dragging if left clicked
-				if btn == "LeftButton" then
-					vehicleHolder:StartMoving()
-				end
-			end)
-
-			dragframe:SetScript("OnMouseUp", function()
-				-- Save frame position
-				vehicleHolder:StopMovingOrSizing()
-				LeaPlusLC["VehicleA"], void, LeaPlusLC["VehicleR"], LeaPlusLC["VehicleX"], LeaPlusLC["VehicleY"] = vehicleHolder:GetPoint()
-				vehicleHolder:SetMovable(true)
-				vehicleHolder:ClearAllPoints()
-				vehicleHolder:SetPoint(LeaPlusLC["VehicleA"], UIParent, LeaPlusLC["VehicleR"], LeaPlusLC["VehicleX"], LeaPlusLC["VehicleY"])
-			end)
-
-			-- Snap-to-grid
-			do
-				local frame, grid = dragframe, 10
-				local w, h = 120, 128
-				local xpos, ypos, scale, uiscale
-				frame:RegisterForDrag("RightButton")
-				frame:HookScript("OnDragStart", function()
-					frame:SetScript("OnUpdate", function()
-						scale, uiscale = frame:GetScale(), UIParent:GetScale()
-						xpos, ypos = GetCursorPosition()
-						xpos = floor((xpos / scale / uiscale) / grid) * grid - w / 2
-						ypos = ceil((ypos / scale / uiscale) / grid) * grid + h / 2
-						vehicleHolder:ClearAllPoints()
-						vehicleHolder:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", xpos, ypos)
-					end)
-				end)
-				frame:HookScript("OnDragStop", function()
-					frame:SetScript("OnUpdate", nil)
-					frame:GetScript("OnMouseUp")()
-				end)
-			end
-
-			-- Create configuration panel
-			local VehiclePanel = LeaPlusLC:CreatePanel("Manage vehicle", "VehiclePanel")
-
-			LeaPlusLC:MakeTx(VehiclePanel, "Scale", 16, -72)
-			LeaPlusLC:MakeSL(VehiclePanel, "VehicleScale", "Drag to set the vehicle seat indicator frame scale.", 0.5, 2, 0.05, 16, -92, "%.2f")
-
-			-- Set scale when slider is changed
-			LeaPlusCB["VehicleScale"]:HookScript("OnValueChanged", function()
-				vehicleHolder:SetScale(LeaPlusLC["VehicleScale"])
-				VehicleSeatIndicator:SetScale(LeaPlusLC["VehicleScale"])
-				dragframe:SetScale(LeaPlusLC["VehicleScale"])
-				-- Show formatted slider value
-				LeaPlusCB["VehicleScale"].f:SetFormattedText("%.0f%%", LeaPlusLC["VehicleScale"] * 100)
-			end)
-
-			-- Hide frame alignment grid with panel
-			VehiclePanel:HookScript("OnHide", function()
-				LeaPlusLC.grid:Hide()
-			end)
-
-			-- Toggle grid button
-			local VehicleToggleGridButton = LeaPlusLC:CreateButton("VehicleToggleGridButton", VehiclePanel, "Toggle Grid", "TOPLEFT", 16, -72, 0, 25, true, "Click to toggle the frame alignment grid.")
-			LeaPlusCB["VehicleToggleGridButton"]:ClearAllPoints()
-			LeaPlusCB["VehicleToggleGridButton"]:SetPoint("LEFT", VehiclePanel.h, "RIGHT", 10, 0)
-			LeaPlusCB["VehicleToggleGridButton"]:SetScript("OnClick", function()
-				if LeaPlusLC.grid:IsShown() then LeaPlusLC.grid:Hide() else LeaPlusLC.grid:Show() end
-			end)
-			VehiclePanel:HookScript("OnHide", function()
-				if LeaPlusLC.grid then LeaPlusLC.grid:Hide() end
-			end)
-
-			-- Help button tooltip
-			VehiclePanel.h.tiptext = L["Drag the frame overlay with the left button to position it freely or with the right button to position it using snap-to-grid."]
-
-			-- Back button handler
-			VehiclePanel.b:SetScript("OnClick", function()
-				VehiclePanel:Hide(); LeaPlusLC["PageF"]:Show(); LeaPlusLC["Page6"]:Show()
-				return
-			end)
-
-			-- Reset button handler
-			VehiclePanel.r:SetScript("OnClick", function()
-
-				-- Reset position and scale
-				LeaPlusLC["VehicleA"] = "TOPRIGHT"
-				LeaPlusLC["VehicleR"] = "TOPRIGHT"
-				LeaPlusLC["VehicleX"] = -100
-				LeaPlusLC["VehicleY"] = -192
-				LeaPlusLC["VehicleScale"] = 1
-				vehicleHolder:ClearAllPoints()
-				vehicleHolder:SetPoint(LeaPlusLC["VehicleA"], UIParent, LeaPlusLC["VehicleR"], LeaPlusLC["VehicleX"], LeaPlusLC["VehicleY"])
-
-				-- Refresh configuration panel
-				VehiclePanel:Hide(); VehiclePanel:Show()
-				dragframe:Show()
-
-				-- Show frame alignment grid
-				LeaPlusLC.grid:Show()
-
-			end)
-
-			-- Show configuration panel when options panel button is clicked
-			LeaPlusCB["ManageVehicleButton"]:SetScript("OnClick", function()
-				if IsShiftKeyDown() and IsControlKeyDown() then
-					-- Preset profile
-					LeaPlusLC["VehicleA"] = "TOPRIGHT"
-					LeaPlusLC["VehicleR"] = "TOPRIGHT"
-					LeaPlusLC["VehicleX"] = -100
-					LeaPlusLC["VehicleY"] = -192
-					LeaPlusLC["VehicleScale"] = 1
-					vehicleHolder:ClearAllPoints()
-					vehicleHolder:SetPoint(LeaPlusLC["VehicleA"], UIParent, LeaPlusLC["VehicleR"], LeaPlusLC["VehicleX"], LeaPlusLC["VehicleY"])
-					vehicleHolder:SetScale(LeaPlusLC["VehicleScale"])
-					VehicleSeatIndicator:SetScale(LeaPlusLC["VehicleScale"])
-				else
-					-- Find out if the UI has a non-standard scale
-					if GetCVar("useuiscale") == "1" then
-						LeaPlusLC["gscale"] = GetCVar("uiscale")
-					else
-						LeaPlusLC["gscale"] = 1
-					end
-
-					-- Set drag frame size according to UI scale
-					dragframe:SetWidth(128 * LeaPlusLC["gscale"])
-					dragframe:SetHeight(128 * LeaPlusLC["gscale"])
-
-					-- Show configuration panel
-					VehiclePanel:Show()
-					LeaPlusLC:HideFrames()
-					dragframe:Show()
-
-					-- Show frame alignment grid
-					LeaPlusLC.grid:Show()
-				end
-			end)
-
-			-- Hide drag frame when configuration panel is closed
-			VehiclePanel:HookScript("OnHide", function() dragframe:Hide() end)
-
 		end
 
 		----------------------------------------------------------------------
@@ -5868,180 +5667,6 @@
 				end
 
 			end)
-
-		end
-
-		----------------------------------------------------------------------
-		-- Manage timer
-		----------------------------------------------------------------------
-
-		if LeaPlusLC["ManageTimer"] == "On" and not LeaLockList["ManageTimer"] then
-
-			-- Allow timer frame to be moved
-			MirrorTimer1:SetMovable(true)
-			MirrorTimer1:SetUserPlaced(true)
-			MirrorTimer1:SetDontSavePosition(true)
-			MirrorTimer1:SetClampedToScreen(true)
-
-			-- Set timer frame position at startup
-			MirrorTimer1:ClearAllPoints()
-			MirrorTimer1:SetPoint(LeaPlusLC["TimerA"], UIParent, LeaPlusLC["TimerR"], LeaPlusLC["TimerX"], LeaPlusLC["TimerY"])
-			MirrorTimer1:SetScale(LeaPlusLC["TimerScale"])
-
-			-- Create drag frame
-			local dragframe = CreateFrame("FRAME", nil, nil, "BackdropTemplate")
-			dragframe:SetPoint("TOPRIGHT", MirrorTimer1, "TOPRIGHT", 0, 2.5)
-			dragframe:SetBackdropColor(0.0, 0.5, 1.0)
-			dragframe:SetBackdrop({edgeFile = "Interface/Tooltips/UI-Tooltip-Border", tile = false, tileSize = 0, edgeSize = 16, insets = { left = 0, right = 0, top = 0, bottom = 0 }})
-			dragframe:SetToplevel(true)
-			dragframe:Hide()
-			dragframe:SetScale(LeaPlusLC["TimerScale"])
-
-			dragframe.t = dragframe:CreateTexture()
-			dragframe.t:SetAllPoints()
-			dragframe.t:SetColorTexture(0.0, 1.0, 0.0, 0.5)
-			dragframe.t:SetAlpha(0.5)
-
-			dragframe.f = dragframe:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
-			dragframe.f:SetPoint('CENTER', 0, 0)
-			dragframe.f:SetText(L["Timer"])
-
-			-- Click handler
-			dragframe:SetScript("OnMouseDown", function(self, btn)
-				-- Start dragging if left clicked
-				if btn == "LeftButton" then
-					MirrorTimer1:StartMoving()
-				end
-			end)
-
-			dragframe:SetScript("OnMouseUp", function()
-				-- Save frame positions
-				MirrorTimer1:StopMovingOrSizing()
-				LeaPlusLC["TimerA"], void, LeaPlusLC["TimerR"], LeaPlusLC["TimerX"], LeaPlusLC["TimerY"] = MirrorTimer1:GetPoint()
-				MirrorTimer1:SetMovable(true)
-				MirrorTimer1:ClearAllPoints()
-				MirrorTimer1:SetPoint(LeaPlusLC["TimerA"], UIParent, LeaPlusLC["TimerR"], LeaPlusLC["TimerX"], LeaPlusLC["TimerY"])
-			end)
-
-			-- Snap-to-grid
-			do
-				local frame, grid = dragframe, 10
-				local w, h = 180, 20
-				local xpos, ypos, scale, uiscale
-				frame:RegisterForDrag("RightButton")
-				frame:HookScript("OnDragStart", function()
-					frame:SetScript("OnUpdate", function()
-						scale, uiscale = frame:GetScale(), UIParent:GetScale()
-						xpos, ypos = GetCursorPosition()
-						xpos = floor((xpos / scale / uiscale) / grid) * grid - w / 2
-						ypos = ceil((ypos / scale / uiscale) / grid) * grid + h / 2
-						MirrorTimer1:ClearAllPoints()
-						MirrorTimer1:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", xpos, ypos)
-					end)
-				end)
-				frame:HookScript("OnDragStop", function()
-					frame:SetScript("OnUpdate", nil)
-					frame:GetScript("OnMouseUp")()
-				end)
-			end
-
-			-- Create configuration panel
-			local TimerPanel = LeaPlusLC:CreatePanel("Manage timer", "TimerPanel")
-
-			LeaPlusLC:MakeTx(TimerPanel, "Scale", 16, -72)
-			LeaPlusLC:MakeSL(TimerPanel, "TimerScale", "Drag to set the timer bar scale.", 0.5, 2, 0.05, 16, -92, "%.2f")
-
-			-- Set scale when slider is changed
-			LeaPlusCB["TimerScale"]:HookScript("OnValueChanged", function()
-				MirrorTimer1:SetScale(LeaPlusLC["TimerScale"])
-				dragframe:SetScale(LeaPlusLC["TimerScale"])
-				-- Show formatted slider value
-				LeaPlusCB["TimerScale"].f:SetFormattedText("%.0f%%", LeaPlusLC["TimerScale"] * 100)
-			end)
-
-			-- Hide frame alignment grid with panel
-			TimerPanel:HookScript("OnHide", function()
-				LeaPlusLC.grid:Hide()
-			end)
-
-			-- Toggle grid button
-			local TimerToggleGridButton = LeaPlusLC:CreateButton("TimerToggleGridButton", TimerPanel, "Toggle Grid", "TOPLEFT", 16, -72, 0, 25, true, "Click to toggle the frame alignment grid.")
-			LeaPlusCB["TimerToggleGridButton"]:ClearAllPoints()
-			LeaPlusCB["TimerToggleGridButton"]:SetPoint("LEFT", TimerPanel.h, "RIGHT", 10, 0)
-			LeaPlusCB["TimerToggleGridButton"]:SetScript("OnClick", function()
-				if LeaPlusLC.grid:IsShown() then LeaPlusLC.grid:Hide() else LeaPlusLC.grid:Show() end
-			end)
-			TimerPanel:HookScript("OnHide", function()
-				if LeaPlusLC.grid then LeaPlusLC.grid:Hide() end
-			end)
-
-			-- Help button tooltip
-			TimerPanel.h.tiptext = L["Drag the frame overlay with the left button to position it freely or with the right button to position it using snap-to-grid."]
-
-			-- Back button handler
-			TimerPanel.b:SetScript("OnClick", function()
-				TimerPanel:Hide(); LeaPlusLC["PageF"]:Show(); LeaPlusLC["Page6"]:Show()
-				return
-			end)
-
-			-- Reset button handler
-			TimerPanel.r:SetScript("OnClick", function()
-
-				-- Reset position and scale
-				LeaPlusLC["TimerA"] = "TOP"
-				LeaPlusLC["TimerR"] = "TOP"
-				LeaPlusLC["TimerX"] = -5
-				LeaPlusLC["TimerY"] = -96
-				LeaPlusLC["TimerScale"] = 1
-				MirrorTimer1:ClearAllPoints()
-				MirrorTimer1:SetPoint(LeaPlusLC["TimerA"], UIParent, LeaPlusLC["TimerR"], LeaPlusLC["TimerX"], LeaPlusLC["TimerY"])
-
-				-- Refresh configuration panel
-				TimerPanel:Hide(); TimerPanel:Show()
-				dragframe:Show()
-
-				-- Show frame alignment grid
-				LeaPlusLC.grid:Show()
-
-			end)
-
-			-- Show configuration panel when options panel button is clicked
-			LeaPlusCB["ManageTimerButton"]:SetScript("OnClick", function()
-				if IsShiftKeyDown() and IsControlKeyDown() then
-					-- Preset profile
-					LeaPlusLC["TimerA"] = "TOP"
-					LeaPlusLC["TimerR"] = "TOP"
-					LeaPlusLC["TimerX"] = 0
-					LeaPlusLC["TimerY"] = -120
-					LeaPlusLC["TimerScale"] = 1
-					MirrorTimer1:ClearAllPoints()
-					MirrorTimer1:SetPoint(LeaPlusLC["TimerA"], UIParent, LeaPlusLC["TimerR"], LeaPlusLC["TimerX"], LeaPlusLC["TimerY"])
-					MirrorTimer1:SetScale(LeaPlusLC["TimerScale"])
-				else
-					-- Find out if the UI has a non-standard scale
-					if GetCVar("useuiscale") == "1" then
-						LeaPlusLC["gscale"] = GetCVar("uiscale")
-					else
-						LeaPlusLC["gscale"] = 1
-					end
-
-					-- Set drag frame size according to UI scale
-					dragframe:SetWidth(206 * LeaPlusLC["gscale"])
-					dragframe:SetHeight(20 * LeaPlusLC["gscale"])
-					dragframe:SetFrameStrata("HIGH") -- MirrorTimer is medium
-
-					-- Show configuration panel
-					TimerPanel:Show()
-					LeaPlusLC:HideFrames()
-					dragframe:Show()
-
-					-- Show frame alignment grid
-					LeaPlusLC.grid:Show()
-				end
-			end)
-
-			-- Hide drag frame when configuration panel is closed
-			TimerPanel:HookScript("OnHide", function() dragframe:Hide() end)
 
 		end
 
@@ -11136,10 +10761,10 @@
 				LeaPlusLC:LoadVarChk("HideMacroText", "Off")				-- Hide macro text
 
 				LeaPlusLC:LoadVarChk("MailFontChange", "Off")				-- Resize mail text
-				LeaPlusLC:LoadVarNum("LeaPlusMailFontSize", 15, 10, 36)		-- Mail text slider
+				LeaPlusLC:LoadVarNum("LeaPlusMailFontSize", 15, 10, 30)		-- Mail text slider
 
 				LeaPlusLC:LoadVarChk("QuestFontChange", "Off")				-- Resize quest text
-				LeaPlusLC:LoadVarNum("LeaPlusQuestFontSize", 12, 10, 36)	-- Quest text slider
+				LeaPlusLC:LoadVarNum("LeaPlusQuestFontSize", 12, 10, 30)	-- Quest text slider
 
 				-- Interface
 				LeaPlusLC:LoadVarChk("MinimapModder", "Off")				-- Enhance minimap
@@ -11214,20 +10839,6 @@
 				LeaPlusLC:LoadVarNum("ControlX", 0, -5000, 5000)			-- Manage control position X
 				LeaPlusLC:LoadVarNum("ControlY", 0, -5000, 5000)			-- Manage control position Y
 				LeaPlusLC:LoadVarNum("ControlScale", 1, 0.5, 2)				-- Manage control scale
-
-				LeaPlusLC:LoadVarChk("ManageTimer", "Off")					-- Manage timer
-				LeaPlusLC:LoadVarAnc("TimerA", "TOP")						-- Manage timer anchor
-				LeaPlusLC:LoadVarAnc("TimerR", "TOP")						-- Manage timer relative
-				LeaPlusLC:LoadVarNum("TimerX", -5, -5000, 5000)				-- Manage timer position X
-				LeaPlusLC:LoadVarNum("TimerY", -96, -5000, 5000)			-- Manage timer position Y
-				LeaPlusLC:LoadVarNum("TimerScale", 1, 0.5, 2)				-- Manage timer scale
-
-				LeaPlusLC:LoadVarChk("ManageVehicle", "Off")				-- Manage vehicle
-				LeaPlusLC:LoadVarAnc("VehicleA", "TOPRIGHT")				-- Manage vehicle anchor
-				LeaPlusLC:LoadVarAnc("VehicleR", "TOPRIGHT")				-- Manage vehicle relative
-				LeaPlusLC:LoadVarNum("VehicleX", -100, -5000, 5000)			-- Manage vehicle position X
-				LeaPlusLC:LoadVarNum("VehicleY", -192, -5000, 5000)			-- Manage vehicle position Y
-				LeaPlusLC:LoadVarNum("VehicleScale", 1, 0.5, 2)				-- Manage vehicle scale
 
 				LeaPlusLC:LoadVarChk("ClassColFrames", "Off")				-- Class colored frames
 				LeaPlusLC:LoadVarChk("ClassColPlayer", "On")				-- Class colored player frame
@@ -11382,8 +10993,6 @@
 							do
 								Lock("ManageWidgetTop", reason) -- Manage widget top
 								Lock("ManageControl", reason) -- Manage control
-								Lock("ManageTimer", reason) -- Manage timer
-								Lock("ManageVehicle", reason) -- Manage vehicle
 							end
 
 						end
@@ -11583,20 +11192,6 @@
 			LeaPlusDB["ControlX"]				= LeaPlusLC["ControlX"]
 			LeaPlusDB["ControlY"]				= LeaPlusLC["ControlY"]
 			LeaPlusDB["ControlScale"]			= LeaPlusLC["ControlScale"]
-
-			LeaPlusDB["ManageTimer"]			= LeaPlusLC["ManageTimer"]
-			LeaPlusDB["TimerA"]					= LeaPlusLC["TimerA"]
-			LeaPlusDB["TimerR"]					= LeaPlusLC["TimerR"]
-			LeaPlusDB["TimerX"]					= LeaPlusLC["TimerX"]
-			LeaPlusDB["TimerY"]					= LeaPlusLC["TimerY"]
-			LeaPlusDB["TimerScale"]				= LeaPlusLC["TimerScale"]
-
-			LeaPlusDB["ManageVehicle"]			= LeaPlusLC["ManageVehicle"]
-			LeaPlusDB["VehicleA"]				= LeaPlusLC["VehicleA"]
-			LeaPlusDB["VehicleR"]				= LeaPlusLC["VehicleR"]
-			LeaPlusDB["VehicleX"]				= LeaPlusLC["VehicleX"]
-			LeaPlusDB["VehicleY"]				= LeaPlusLC["VehicleY"]
-			LeaPlusDB["VehicleScale"]			= LeaPlusLC["VehicleScale"]
 
 			LeaPlusDB["ClassColFrames"]			= LeaPlusLC["ClassColFrames"]
 			LeaPlusDB["ClassColPlayer"]			= LeaPlusLC["ClassColPlayer"]
@@ -12447,8 +12042,12 @@
 				if npcName and npcGuid then
 					local void, void, void, void, void, npcID = strsplit("-", npcGuid)
 					if npcID and npcID == "28723" then
-						for k = 1, 10 do
-							BuyMerchantItem(5)
+						local id, ida, idb = 0, GetMerchantItemID(5), GetMerchantItemID(6)
+						if ida == 1515 then id = 5 elseif idb == 1515 then id = 6 end
+						if id > 0 then
+							for k = 1, 10 do
+								BuyMerchantItem(id)
+							end
 						end
 					else
 						LeaPlusLC:Print(errmsg)
@@ -14257,20 +13856,6 @@
 				LeaPlusDB["ControlY"] = 0						-- Manage control position Y
 				LeaPlusDB["ControlScale"] = 1.00				-- Manage control scale
 
-				LeaPlusDB["ManageTimer"] = "On"					-- Manage timer
-				LeaPlusDB["TimerA"] = "TOP"						-- Manage timer anchor
-				LeaPlusDB["TimerR"] = "TOP"						-- Manage timer relative
-				LeaPlusDB["TimerX"] = 0							-- Manage timer position X
-				LeaPlusDB["TimerY"] = -120						-- Manage timer position Y
-				LeaPlusDB["TimerScale"] = 1.00					-- Manage timer scale
-
-				LeaPlusDB["ManageVehicle"] = "On"				-- Manage vehicle
-				LeaPlusDB["VehicleA"] = "TOPRIGHT"				-- Manage vehicle anchor
-				LeaPlusDB["VehicleR"] = "TOPRIGHT"				-- Manage vehicle relative
-				LeaPlusDB["VehicleX"] = -100					-- Manage vehicle position X
-				LeaPlusDB["VehicleY"] = -192					-- Manage vehicle position Y
-				LeaPlusDB["VehicleScale"] = 1.00				-- Manage vehicle scale
-
 				LeaPlusDB["ClassColFrames"] = "On"				-- Class colored frames
 
 				LeaPlusDB["NoAlerts"] = "On"					-- Hide alerts
@@ -14555,7 +14140,7 @@
 	LeaPlusLC:MakeCB(LeaPlusLC[pg], "AutoReleasePvP"			,	"Release in PvP"				, 	146, -172, 	false,	"If checked, you will release automatically after you die in Ashran, Tol Barad (PvP), Wintergrasp or any battleground.|n|nYou will not release automatically if you have the ability to self-resurrect (soulstone, reincarnation, etc).")
 
 	LeaPlusLC:MakeTx(LeaPlusLC[pg], "Vendors"					, 	340, -72)
-	LeaPlusLC:MakeCB(LeaPlusLC[pg], "AutoSellJunk"				,	"Sell junk automatically"		,	340, -92, 	false,	"If checked, all grey items in your bags will be sold automatically when you visit a merchant.|n|nYou can hold the shift key down when you talk to a merchant to override this setting.")
+	LeaPlusLC:MakeCB(LeaPlusLC[pg], "AutoSellJunk"				,	"Sell junk automatically"		,	340, -92, 	true,	"If checked, all grey items in your bags will be sold automatically when you visit a merchant.|n|nYou can hold the shift key down when you talk to a merchant to override this setting.")
 	LeaPlusLC:MakeCB(LeaPlusLC[pg], "AutoRepairGear"			, 	"Repair automatically"			,	340, -112, 	false,	"If checked, your gear will be repaired automatically when you visit a suitable merchant.|n|nYou can hold the shift key down when you talk to a merchant to override this setting.")
 
 	LeaPlusLC:CfgBtn("AutomateQuestsBtn", LeaPlusCB["AutomateQuests"])
@@ -14689,9 +14274,7 @@
 	LeaPlusLC:MakeTx(LeaPlusLC[pg], "Features"					, 	146, -72)
 	LeaPlusLC:MakeCB(LeaPlusLC[pg], "ManageWidgetTop"			,	"Manage widget top"				, 	146, -92, 	true,	"If checked, you will be able to change the position and scale of the widget top frame.|n|nThe widget top frame is commonly used for showing PvP scores and tracking objectives.")
 	LeaPlusLC:MakeCB(LeaPlusLC[pg], "ManageControl"				,	"Manage control"				, 	146, -112, 	true,	"If checked, you will be able to change the position and scale of the loss of control frame.")
-	LeaPlusLC:MakeCB(LeaPlusLC[pg], "ManageTimer"				,	"Manage timer"					, 	146, -132, 	true,	"If checked, you will be able to change the position and scale of the timer bar.|n|nThe timer bar is used for showing remaining breath when underwater as well as other things.")
-	LeaPlusLC:MakeCB(LeaPlusLC[pg], "ManageVehicle"				,	"Manage vehicle"				, 	146, -152, 	true,	"If checked, you will be able to change the position and scale of the vehicle seat indicator frame.")
-	LeaPlusLC:MakeCB(LeaPlusLC[pg], "ClassColFrames"			, 	"Class colored frames"			,	146, -172, 	true,	"If checked, class coloring will be used in the player frame, target frame and focus frame.")
+	LeaPlusLC:MakeCB(LeaPlusLC[pg], "ClassColFrames"			, 	"Class colored frames"			,	146, -132, 	true,	"If checked, class coloring will be used in the player frame, target frame and focus frame.")
 
 	LeaPlusLC:MakeTx(LeaPlusLC[pg], "Visibility"				, 	340, -72)
 	LeaPlusLC:MakeCB(LeaPlusLC[pg], "NoAlerts"					,	"Hide alerts"					, 	340, -92, 	true,	"If checked, alert frames will not be shown.")
@@ -14706,8 +14289,6 @@
 
 	LeaPlusLC:CfgBtn("ManageWidgetTopButton", LeaPlusCB["ManageWidgetTop"])
 	LeaPlusLC:CfgBtn("ManageControlButton", LeaPlusCB["ManageControl"])
-	LeaPlusLC:CfgBtn("ManageTimerButton", LeaPlusCB["ManageTimer"])
-	LeaPlusLC:CfgBtn("ManageVehicleButton", LeaPlusCB["ManageVehicle"])
 	LeaPlusLC:CfgBtn("ClassColFramesBtn", LeaPlusCB["ClassColFrames"])
 
 ----------------------------------------------------------------------

@@ -105,7 +105,7 @@ local clssSetSpells = {
     [10] = {    --Monk
         {405539, 405540},   --Brewmaster 268
         {405541, 405542},   --Mistweaver 270
-        {405543, 405544},   --Windwalker 269
+        {405543, 411375},   --Windwalker 269
     },
 
     [11] = {    --Druid
@@ -123,6 +123,7 @@ local clssSetSpells = {
     [13] = {    --Evoker
         {405518, 405519},   --Devastation 1467
         {405520, 405522},   --Preservation 1468
+        {414877, 414878},   --Augmentation 1473
     },
 };
 

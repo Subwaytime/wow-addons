@@ -30,6 +30,8 @@ do
 
         if C_ContentTracking.StartTracking then
             AddTrackedAchievement = function(id)
+                AchievementFrame_LoadUI();  --Due to the change of Objective Tracker in 10.1.5;
+
                 local trackingError = C_ContentTracking.StartTracking(TRACKING_TYPE_ACHV, id);
                 if trackingError then
                 	ContentTrackingUtil.DisplayTrackingError(trackingError);

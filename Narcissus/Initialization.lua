@@ -1,7 +1,7 @@
-local NARCI_VERSION_INFO = "1.4.1";
+local NARCI_VERSION_INFO = "1.4.2";
 
-local VERSION_DATE = 1684142261;
-local CURRENT_VERSION = 10401;
+local VERSION_DATE = 1689255859;
+local CURRENT_VERSION = 10402;
 local PREVIOUS_VERSION = CURRENT_VERSION;
 local TIME_SINCE_LAST_UPDATE = 0;
 
@@ -103,6 +103,9 @@ local DefaultValues = {
     --Quest
     AutoDisplayQuestItem = false,
     QuestCardTheme = 1,
+
+    --Dragonriding
+    DragonridingTourWorldMapPin = true,         --Show Dragonriding Race location on continent map
 
     --# Initializationd in other files
     --["MinimapIconStyle = 1,                     --Change the icon of minimap button (Main.lua)
@@ -250,15 +253,24 @@ end
 
 
 local CallbackList = {};
+CallbackList.PLAYER_ENTERING_WORLD = {};
+CallbackList.LOADING_SCREEN_DISABLED = {};
+
 local function AddFunctionToCallbackList(callback)
-    table.insert(CallbackList, callback);
+    table.insert(CallbackList.PLAYER_ENTERING_WORLD, callback);
 end
 addon.AddInitializationCallback = AddFunctionToCallbackList;
+
+local function AddFunctionToCallbackList_LoadingComplete(callback)
+    table.insert(CallbackList.LOADING_SCREEN_DISABLED, callback);
+end
+addon.AddLoadingCompleteCallback = AddFunctionToCallbackList_LoadingComplete;
 
 
 local Initialization = CreateFrame("Frame");
 Initialization:RegisterEvent("ADDON_LOADED");
 Initialization:RegisterEvent("PLAYER_ENTERING_WORLD");
+Initialization:RegisterEvent("LOADING_SCREEN_DISABLED");
 
 Initialization:SetScript("OnEvent",function(self,event,...)
     if event == "ADDON_LOADED" then
@@ -267,15 +279,29 @@ Initialization:SetScript("OnEvent",function(self,event,...)
             self:UnregisterEvent(event);
             LoadDatabase();
         end
+        return
+
     elseif event == "PLAYER_ENTERING_WORLD" then
         self:UnregisterEvent(event);
-        self:SetScript("OnEvent", nil);
         LoadSettings();
 
-        for i, callback in ipairs(CallbackList) do
+        for i, callback in ipairs(CallbackList.PLAYER_ENTERING_WORLD) do
             callback();
         end
-        CallbackList = nil;
+
+        CallbackList.PLAYER_ENTERING_WORLD = nil;
+
+    elseif event == "LOADING_SCREEN_DISABLED" then
+        self:UnregisterEvent(event);
+
+        C_Timer.After(1, function()
+            for i, callback in ipairs(CallbackList.LOADING_SCREEN_DISABLED) do
+                callback();
+            end
+
+            self:SetScript("OnEvent", nil);
+            CallbackList = nil;
+        end)
     end
 end);
 
@@ -321,7 +347,7 @@ do
     local expansionID = string.match(version, "(%d+)%.");
 	local isDF = (tonumber(expansionID) or 1) >= 10;
 
-    tocVersion = tonumber(tocVersion)
+    tocVersion = tonumber(tocVersion);
 
     local function IsDragonflight()
         return isDF
@@ -344,4 +370,107 @@ do
         return tooltipInfoVersion
     end
     addon.GetTooltipInfoVersion = GetTooltipInfoVersion;
+end
+
+
+do
+    -- Module activated in specific zones:
+    ---- Primodial Stones: Auto Socket
+    ---- Soridormi Friendship Bar
+
+    local GetBestMapForUnit = C_Map.GetBestMapForUnit;
+    local controller;
+    local modules;
+    local lastMapID, total;
+
+    local ZoneTriggeredModuleMixin = {};
+
+    ZoneTriggeredModuleMixin.validMaps = {};
+    ZoneTriggeredModuleMixin.enabled = false;
+
+    local function DoNothing()
+    end
+
+    ZoneTriggeredModuleMixin.onEnabledCallback = DoNothing;
+    ZoneTriggeredModuleMixin.onDisabledCallback = DoNothing;
+
+    function ZoneTriggeredModuleMixin:IsZoneValid(uiMapID)
+        return self.validMaps[uiMapID]
+    end
+
+    function ZoneTriggeredModuleMixin:SetValidZones(...)
+        self.validMaps = {};
+        for i = 1, select("#", ...) do
+            local uiMapID = select(i, ...);
+            self.validMaps[uiMapID] = true;
+        end
+    end
+
+    function ZoneTriggeredModuleMixin:EnableModule()
+        if not self.enabled then
+            self.enabled = true;
+            self.onEnabledCallback();
+        end
+    end
+
+    function ZoneTriggeredModuleMixin:DisableModule()
+        if self.enabled then
+            self.enabled = false;
+            self.onDisabledCallback();
+        end
+    end
+
+    function ZoneTriggeredModuleMixin:SetOnEnabledCallback(callback)
+        self.onEnabledCallback = callback;
+    end
+
+    function ZoneTriggeredModuleMixin:SetOnDisabledCallback(callback)
+        self.onDisabledCallback = callback;
+    end
+
+    local function AddZoneModules(module)
+        if not controller then
+            controller = CreateFrame("Frame");
+            modules = {};
+            total = 0;
+
+            controller:SetScript("OnEvent", function(f, event, ...)
+                local mapID = GetBestMapForUnit("player");
+
+                if mapID and mapID ~= lastMapID then
+                    lastMapID = mapID;
+                else
+                    return
+                end
+
+                for i = 1, total do
+                    if modules[i]:IsZoneValid(mapID) then
+                        modules[i]:EnableModule();
+                    else
+                        modules[i]:DisableModule();
+                    end
+                end
+            end);
+
+            controller:RegisterEvent("ZONE_CHANGED_NEW_AREA");
+            controller:RegisterEvent("PLAYER_ENTERING_WORLD");
+        end
+
+        table.insert(modules, module);
+        total = total + 1;
+    end
+
+    local function CreateZoneTriggeredModule()
+        local module = {};
+
+        for k, v in pairs(ZoneTriggeredModuleMixin) do
+            module[k] = v;
+        end
+
+        AddZoneModules(module);
+
+        return module
+    end
+
+    addon.CreateZoneTriggeredModule = CreateZoneTriggeredModule;
 end

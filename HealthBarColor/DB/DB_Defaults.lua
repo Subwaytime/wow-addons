@@ -7,31 +7,26 @@ local defaults = {
             Player = {
                 selected  = 1,
                 color     = {r=0,g=1,b=0},
-                classicon = false,
             },
             Target = {
                 selected  = 1,
                 color     = {r=0,g=1,b=0},
                 reaction  = true,
-                classicon = false,
             },
             Focus = {
                 selected  = 1,
                 color     = {r=0,g=1,b=0},
                 reaction  = true,
-                classicon = false,
             },
             ToT = {
                 selected  = 1,
                 color     = {r=0,g=1,b=0},
                 reaction  = true,
-                classicon = false,
             },
             ToF = {
                 selected  = 1,
                 color     = {r=0,g=1,b=0},
                 reaction  = true,
-                classicon = false,
             },
             Pet = {
                 selected  = 1,
@@ -96,6 +91,7 @@ local defaults = {
                 DebuffColor        = false,
                 PartyColor         = false,
                 Glow               = false,
+                HideClassPowerBar  = false,
                 ['*']              = true,
             },
             ClassColorOverwrites = {

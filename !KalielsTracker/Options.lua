@@ -160,7 +160,7 @@ local options = {
 							order = 0.12,
 						},
 						slashCmd = {
-							name = cBold.." /kt|r  |cff808080...............|r  Toggle (expand/collapse) the tracker\n"..
+							name = cBold.." /kt|r  |cff808080..............|r  Toggle (expand/collapse) the tracker\n"..
 									cBold.." /kt config|r  |cff808080...|r  Show this config window\n",
 							type = "description",
 							width = "double",

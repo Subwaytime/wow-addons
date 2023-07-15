@@ -1,7 +1,7 @@
 
 KT_SCENARIO_CONTENT_TRACKER_MODULE = KT_ObjectiveTracker_GetModuleInfoTable("KT_SCENARIO_CONTENT_TRACKER_MODULE");
 KT_SCENARIO_CONTENT_TRACKER_MODULE.updateReasonModule = KT_OBJECTIVE_TRACKER_UPDATE_MODULE_SCENARIO;
-KT_SCENARIO_CONTENT_TRACKER_MODULE.updateReasonEvents = KT_OBJECTIVE_TRACKER_UPDATE_SCENARIO + KT_OBJECTIVE_TRACKER_UPDATE_SCENARIO_NEW_STAGE + KT_OBJECTIVE_TRACKER_UPDATE_SCENARIO_SPELLS + KT_OBJECTIVE_TRACKER_UPDATE_MOVED;
+KT_SCENARIO_CONTENT_TRACKER_MODULE.updateReasonEvents = KT_OBJECTIVE_TRACKER_UPDATE_SCENARIO + KT_OBJECTIVE_TRACKER_UPDATE_SCENARIO_NEW_STAGE + KT_OBJECTIVE_TRACKER_UPDATE_SCENARIO_SPELLS  -- + KT_OBJECTIVE_TRACKER_UPDATE_MOVED;  -- MSA
 KT_SCENARIO_CONTENT_TRACKER_MODULE:SetHeader(KT_ObjectiveTrackerFrame.BlocksFrame.ScenarioHeader, TRACKER_HEADER_SCENARIO, nil);	-- never anim-in the header
 KT_SCENARIO_CONTENT_TRACKER_MODULE:AddBlockOffset(KT_SCENARIO_CONTENT_TRACKER_MODULE.blockTemplate, -20, 0);
 KT_SCENARIO_CONTENT_TRACKER_MODULE.fromHeaderOffsetY = -2;
@@ -295,6 +295,7 @@ function KT_ScenarioObjectiveStageBlock_OnEnter(self)
 		GameTooltip_AddNormalLine(GameTooltip, description);
 		GameTooltip:Show();
 	end
+	EventRegistry:TriggerEvent("Scenario.ObjectTracker_OnEnter", GameTooltip);
 end
 
 -- *****************************************************************************************************
@@ -1122,11 +1123,29 @@ function KT_SCENARIO_CONTENT_TRACKER_MODULE:Update()
 
 	self:EndLayout();
 
-	if ( KT_OBJECTIVE_TRACKER_UPDATE_REASON == KT_OBJECTIVE_TRACKER_UPDATE_MOVED ) then
+	if isInScenario then
+		-- IMPORTANT:
+		--	If isInScenario is true then KT_TopScenarioWidgetContainerBlock and KT_BottomScenarioWidgetContainerBlock were added above.
+		--	In this case we need to ensure that UpdateWidgetLayout is called once on each widget container AFTER EndLayout is called
+		--	The reason for this is that depending on the widget data source setup UpdateWidgetLayout may have been called BEFORE the player was actually in a scenario.
+		--	If that is the case then the size of the widget container (and the block) will be incorrect
+		if not KT_TopScenarioWidgetContainerBlock.widgetsInitialized then
+			KT_TopScenarioWidgetContainerBlock.WidgetContainer:UpdateWidgetLayout();
+			KT_TopScenarioWidgetContainerBlock.widgetsInitialized = true;
+		end
+
+		if not KT_BottomScenarioWidgetContainerBlock.widgetsInitialized then
+			KT_BottomScenarioWidgetContainerBlock.WidgetContainer:UpdateWidgetLayout();
+			KT_BottomScenarioWidgetContainerBlock.widgetsInitialized = true;
+		end
+	end
+
+	-- MSA
+	--[[if ( KT_OBJECTIVE_TRACKER_UPDATE_REASON == KT_OBJECTIVE_TRACKER_UPDATE_MOVED ) then
 		if ( shouldShowMawBuffs ) then
 			KT_SCENARIO_TRACKER_MODULE.BlocksFrame.MawBuffsBlock.Container:UpdateAlignment();
 		end
-	end
+	end]]
 end
 
 function KT_SCENARIO_CONTENT_TRACKER_MODULE:UpdateWeightedProgressCriteria(stageDescription, stageBlock, objectiveBlock, BlocksFrame)

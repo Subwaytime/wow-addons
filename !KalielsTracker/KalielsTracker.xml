@@ -92,6 +92,15 @@
                         <Texture parentKey="SelectedGlow" alphaMode="ADD" />
                     </Layer>
                 </Layers>
+                <Frames>
+                    <!-- Same frame as inside Quest POI button -->
+                    <Frame parentKey="Display">
+                        <Size x="1" y="1"/>
+                        <Anchors>
+                            <Anchor point="CENTER"/>
+                        </Anchors>
+                    </Frame>
+                </Frames>
                 <Scripts>
                     <OnLoad>
                         self:RegisterForClicks("LeftButtonUp", "RightButtonUp");

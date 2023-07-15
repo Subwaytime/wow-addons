@@ -238,7 +238,7 @@ function M:OnInitialize()
 	_DBG("|cffffff00Init|r - "..self:GetName(), true)
 	db = KT.db.profile
 	dbChar = KT.db.char
-	self.isLoaded = (KT:CheckAddOn("PetTracker", "10.0.1") and db.addonPetTracker)
+	self.isLoaded = (KT:CheckAddOn("PetTracker", "10.1") and db.addonPetTracker)
 
 	if self.isLoaded then
 		KT:Alert_IncompatibleAddon("PetTracker", "10.0")

@@ -103,23 +103,31 @@ db:Register('Variables', {
 		name = 'Always Show Mouse Cursor';
 		desc = 'Always keep cursor centered and visible when controlling camera.';
 	};
-	mouseAutoClearCenter = {Number(2.0, 0.25);
+	mouseAutoClearCenter = {Number(2.0, 0.25, true);
 		head = MOUSE_LABEL;
 		sort = 7;
 		name = 'Automatic Cursor Timeout';
 		desc = 'Time in seconds to automatically hide centered cursor.';
 		advd = true;
 	};
-	doubleTapTimeout = {Number(0.25, 0.05, true);
+	mouseFreeCursorEnableTime = {Number(0.15, 0.05, true);
 		head = MOUSE_LABEL;
 		sort = 8;
+		name = 'Free Cursor Timein';
+		desc = 'Time in seconds to enable free cursor.';
+		note = 'Needs to be long enough to press and release the button.';
+		advd = true;
+	};
+	doubleTapTimeout = {Number(0.25, 0.05, true);
+		head = MOUSE_LABEL;
+		sort = 9;
 		name = 'Double Tap Timeframe';
 		desc = 'Timeframe to toggle the mouse cursor when double-tapping a selected modifier.';
 		advd = true;
 	};
 	doubleTapModifier = {Select('<none>', '<none>', unpack(MODID_SELECT));
 		head = MOUSE_LABEL;
-		sort = 9;
+		sort = 10;
 		name = 'Double Tap Modifier';
 		desc = 'Which modifier to use to toggle the mouse cursor when double-tapped.';
 	};
@@ -424,7 +432,6 @@ db:Register('Variables', {
 		name = 'Show Gauge';
 		desc = 'Display power level for the current active gamepad.';
 		note = 'This will not work with Xbox controllers connected via bluetooth. The Xbox Adapter is required.';
-		hide = CPAPI.IsClassicEraVersion;
 	};
 	powerLevelShowIcon = {Bool(true);
 		head = 'Power Level';
@@ -432,7 +439,6 @@ db:Register('Variables', {
 		name = 'Show Type Icon';
 		desc = 'Display icon next to the power level for the current active gamepad.';
 		note = 'Types are PlayStation, Xbox, or Generic.';
-		hide = CPAPI.IsClassicEraVersion;
 	};
 	powerLevelShowText = {Bool(true);
 		head = 'Power Level';
@@ -440,7 +446,6 @@ db:Register('Variables', {
 		name = 'Show Status Text';
 		desc = 'Display power level status text for the current active gamepad.';
 		note = 'Critical, Low, Medium, High, Wired/Charging, or Unknown/Disconnected.';
-		hide = CPAPI.IsClassicEraVersion;
 	};
 	--------------------------------------------------------------------------------------------------------
 	-- Bindings:

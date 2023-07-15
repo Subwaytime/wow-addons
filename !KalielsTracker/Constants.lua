@@ -12,6 +12,7 @@ KT.BLIZZARD_MODULES = {
     "KT_UI_WIDGET_TRACKER_MODULE",
     "KT_CAMPAIGN_QUEST_TRACKER_MODULE",
     "KT_QUEST_TRACKER_MODULE",
+    "KT_ADVENTURE_TRACKER_MODULE",
     "KT_BONUS_OBJECTIVE_TRACKER_MODULE",
     "KT_WORLD_QUEST_TRACKER_MODULE",
     "KT_ACHIEVEMENT_TRACKER_MODULE",
@@ -30,7 +31,8 @@ KT.ALL_BLIZZARD_MODULES = {
     "KT_SCENARIO_TRACKER_MODULE",
     "KT_UI_WIDGET_TRACKER_MODULE",
     "KT_PROFESSION_RECIPE_TRACKER_MODULE",
-    "KT_MONTHLY_ACTIVITIES_TRACKER_MODULE"
+    "KT_MONTHLY_ACTIVITIES_TRACKER_MODULE",
+    "KT_ADVENTURE_TRACKER_MODULE"
 }
 
 KT.QUEST_DASH = "- "
@@ -63,15 +65,15 @@ KT.WORLD_QUEST_REWARD_TYPE_FLAG_REPUTATION = 0x0020
 KT.WORLD_QUEST_REWARD_TYPE_FLAG_OTHERS = 0x10000
 
 -- Blizzard Constants
-KT_OBJECTIVE_TRACKER_COLOR["Header"] = { r = 1, g = 0.5, b = 0 }					-- orange
-KT_OBJECTIVE_TRACKER_COLOR["Complete"] = { r = 0.1, g = 0.85, b = 0.1 }			-- green
-KT_OBJECTIVE_TRACKER_COLOR["CompleteHighlight"] = { r = 0, g = 1, b = 0 }			-- green
-KT_OBJECTIVE_TRACKER_COLOR["TimeLeft2"] = { r = 0, g = 0.5, b = 1 }				-- blue
-KT_OBJECTIVE_TRACKER_COLOR["TimeLeft2Highlight"] = { r = 0.3, g = 0.65, b = 1 }	-- blue
-KT_OBJECTIVE_TRACKER_COLOR["Label"] = { r = 0.5, g = 0.5, b = 0.5 }				-- gray
-KT_OBJECTIVE_TRACKER_COLOR["LabelHighlight"] = { r = 0.6, g = 0.6, b = 0.6 }	    -- gray
-KT_OBJECTIVE_TRACKER_COLOR["Zone"] = { r = 0.1, g = 0.65, b = 1 }					-- blue
-KT_OBJECTIVE_TRACKER_COLOR["ZoneHighlight"] = { r = 0.3, g = 0.8, b = 1 }			-- blue
+KT_OBJECTIVE_TRACKER_COLOR["Header"] = { r = 1, g = 0.5, b = 0 }                 -- orange
+KT_OBJECTIVE_TRACKER_COLOR["Complete"] = { r = 0.1, g = 0.85, b = 0.1 }          -- green
+KT_OBJECTIVE_TRACKER_COLOR["CompleteHighlight"] = { r = 0, g = 1, b = 0 }        -- green
+KT_OBJECTIVE_TRACKER_COLOR["TimeLeft2"] = { r = 0, g = 0.5, b = 1 }              -- blue
+KT_OBJECTIVE_TRACKER_COLOR["TimeLeft2Highlight"] = { r = 0.3, g = 0.65, b = 1 }  -- blue
+KT_OBJECTIVE_TRACKER_COLOR["Label"] = { r = 0.5, g = 0.5, b = 0.5 }              -- gray
+KT_OBJECTIVE_TRACKER_COLOR["LabelHighlight"] = { r = 0.6, g = 0.6, b = 0.6 }     -- gray
+KT_OBJECTIVE_TRACKER_COLOR["Zone"] = { r = 0.1, g = 0.65, b = 1 }                -- blue
+KT_OBJECTIVE_TRACKER_COLOR["ZoneHighlight"] = { r = 0.3, g = 0.8, b = 1 }        -- blue
 KT_OBJECTIVE_TRACKER_COLOR["Header"].reverse = KT_OBJECTIVE_TRACKER_COLOR["HeaderHighlight"]
 KT_OBJECTIVE_TRACKER_COLOR["HeaderHighlight"].reverse = KT_OBJECTIVE_TRACKER_COLOR["Header"]
 KT_OBJECTIVE_TRACKER_COLOR["Complete"].reverse = KT_OBJECTIVE_TRACKER_COLOR["CompleteHighlight"]

@@ -6,7 +6,10 @@ local _G = getfenv(0)
 
 -- Mine
 E.CHANGELOG = [[
-## Version 100100.01
+- Added 10.1.5 support.
 
-- Added 10.1.0 support.
+### Known Issues
+
+I'm still in the process of rewriting the addon, so for the time being I'm not fixing any bugs. It takes time because
+real life keeps getting in the way.
 ]]

@@ -250,16 +250,15 @@ local function SetupTutorials()
 		},
 		{	-- 12
 			text = cTitle.."         What's New|r\n\n"..
-					cTitle.."Version 6.2.0|r\n"..
-					cBold.."Quick compatibility update, more updates will follow.|r\n"..
-					"- ADDED - Support for WoW 10.1.0\n"..
-					"- ADDED - Support for WoW 10.0.7\n"..
-					"- UPDATED - Addon support - PetTracker 10.0.1\n"..
-					"- UPDATED - Addon support - Masque 10.1.1\n"..
-					"- UPDATED - Addon support - TomTom 3.3.9-release\n"..
-					"- UPDATED - Help - Supporters (Patreon)\n\n"..
+					cTitle.."Version 6.3.0|r\n"..
+					"All profiles have been reset, because the new version is not compatible with stored settings.\n\n"..
+                    "- ADDED - Support for WoW 10.1.5\n"..
+                    "- UPDATED - Addon support - PetTracker 10.1\n"..
+                    "- UPDATED - Addon support - TomTom 3.5.1-release\n"..
+                    "- UPDATED - Addon support - ElvUI 13.38\n"..
+                    "- UPDATED - Libs\n\n"..
 
-					cTitle.."WoW 10.1.0 - Known issues w/o solution|r\n"..
+					cTitle.."WoW 10.1.5 - Known issues w/o solution|r\n"..
 					"- Clicking on tracked quests or achievements has no response during combat.\n"..
 					"- Header buttons Q and A don't work during combat.\n\n"..
 
@@ -304,7 +303,7 @@ local function SetupTutorials()
 					local questID = C_QuestLog.GetQuestIDForQuestWatchIndex(j)
 					local block = KT_QUEST_TRACKER_MODULE:GetExistingBlock(questID)
 					if block and (QuestHasPOIInfo(questID) or block.questCompleted) then
-						self[i].shine = QuestPOI_FindButton(KT_ObjectiveTrackerFrame.BlocksFrame, questID)
+						self[i].shine = KT_ObjectiveTrackerFrame.BlocksFrame:FindButtonByQuestID(questID)
 						break
 					end
 				end

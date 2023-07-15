@@ -5,6 +5,7 @@ local SetModelLight = addon.TransitionAPI.SetModelLight;
 local GetModelLight = addon.TransitionAPI.GetModelLight;
 local SetGradient = addon.TransitionAPI.SetGradient;
 local SetModelByUnit = addon.TransitionAPI.SetModelByUnit;
+local SetModelCameraPosition = addon.TransitionAPI.SetCameraPosition;
 
 local GetAlternateFormInfo = C_PlayerInfo.GetAlternateFormInfo or HasAlternateForm;
 
@@ -732,9 +733,13 @@ local function InitializeModel(model)
 	model:SetPortraitZoom(zoomLevel)
 	model:SetPosition(0, 0, defaultZ);
 	model:PlayAnimation(0, 0);
-	After(0, function()
-		model:ResetCameraPosition();
-	end)
+
+	if model.isCameraDirty then
+		model.isCameraDirty = false;
+		After(0, function()
+			model:ResetCameraPosition();
+		end)
+	end
 end
 
 local EntranceAnimation;
@@ -864,6 +869,7 @@ local function HideAllModels()
 	for i, model in ipairs(ModelPool) do
 		model:ClearModel();
 		model.animationID = nil;
+		model.isCameraDirty = true;
 	end
 end
 
@@ -911,7 +917,7 @@ Smooth_Zoom:Hide();
 
 local function UpdateCameraPosition(model)
 	--Spherical Coordinates since 1.0.7
-	model:SetCameraPosition(model.cameraDistance*sin(model.cameraPitch), 0, model.cameraDistance*cos(model.cameraPitch) + 0.8);
+	SetModelCameraPosition(model, model.cameraDistance*sin(model.cameraPitch), 0, model.cameraDistance*cos(model.cameraPitch) + 0.8);
 end
 
 local function UpdateCameraPitch(model, pitch)
@@ -2673,10 +2679,10 @@ function NarciGenericModelMixin:ResetCameraPosition()
 	local d = self:GetCameraDistance();
 	local radian = GLOBAL_CAMERA_PITCH;
 	self:MakeCurrentCameraCustom();
-	self:SetCameraPosition(d*sin(radian), 0, d*cos(radian) + 0.8);
-	self:SetCameraTarget(0, 0, 0.8);
 	self.cameraDistance = d;
 	self.cameraPitch = radian;
+	SetModelCameraPosition(self, d*sin(radian), 0, d*cos(radian) + 0.8);
+	TransitionAPI.SetCameraTarget(self, 0, 0, 0.8);
 end
 
 function NarciGenericModelMixin:StartPanning()
@@ -3484,6 +3490,7 @@ local function RemoveActor(actorIndex)
 		model.isItemLoaded = false;
 		model:ClearModel();
 		model.isVirtual = false;
+		model.isCameraDirty = true;
 		model:Hide();
 
 		model.creatureID = nil;

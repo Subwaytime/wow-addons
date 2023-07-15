@@ -37,6 +37,10 @@ function BackgroundTextures:OnEnable()
         --creating texture
         self:SetupTexture(unit)
     end
+    if IsAddOnLoaded("BiggerHealthBar") then 
+        Player.BackgroundTexture:RemoveMaskTexture(Player.BackgroundTexture:GetMaskTexture(1))
+        Player.Background:SetHeight(31)
+    end
 end
 
 function BackgroundTextures:OnDisable()
@@ -64,8 +68,7 @@ function BackgroundTextures:SetupFrame(unit)
         unit.Background = CreateFrame("Frame",nil, unit.HealthBar)
     end
     unit.BackgroundTexture = unit.Background:CreateTexture()
-    unit.Background:SetFrameStrata(unit.HealthBar:GetFrameStrata())
-    unit.Background:SetFrameLevel(unit.HealthBar:GetFrameLevel()-1)
+    unit.Background:SetFrameStrata("BACKGROUND")
     unit.Background:SetWidth(unit.HealthBar:GetWidth()) 
     unit.Background:SetHeight(unit.HealthBar:GetHeight()) 
 end

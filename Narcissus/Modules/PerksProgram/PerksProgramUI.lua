@@ -181,7 +181,9 @@ local function PerksProgramTooltip_ProcessInfo(f, info)
     local owner = f:GetOwner();
     if not owner then return end;
 
-    if owner.perksVendorItemID then
+    local viid = owner.perksVendorItemID;
+
+    if viid then
         --PerksProgramProductButtonTemplate
 
         --[[
@@ -202,7 +204,7 @@ local function PerksProgramTooltip_ProcessInfo(f, info)
 
         if not owner.purchased then
             --Show "unavailable" for historical items
-            local seconds = C_PerksProgram.GetTimeRemaining(owner.perksVendorItemID);
+            local seconds = C_PerksProgram.GetTimeRemaining(viid);
             if seconds and seconds <= 0 then
                 f:AddLine(L["Perks Program Item Unavailable"], 0.6, 0.6, 0.6, true);
                 f:Show();
@@ -210,9 +212,11 @@ local function PerksProgramTooltip_ProcessInfo(f, info)
         end
 
         --Show month name for returning items
-        local displayMonthName = DataProvider:GetCurrentDisplayMonthName();
-        f:AddLine(" ");
-        f:AddLine(string.format(L["Perks Program Item Added In Format"], displayMonthName), 1, 0.82, 0, true);
+        local displayMonthName, isNewItem = DataProvider:GetVendorItemAddedMonthName(viid);
+        if (not isNewItem) and displayMonthName then
+            f:AddLine(" ");
+            f:AddLine(string.format(L["Perks Program Item Added In Format"], displayMonthName), 1, 0.82, 0, true);
+        end
     end
 end
 

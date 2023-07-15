@@ -1,3 +1,9 @@
+### 1.1.14
+- Version update
+
+### 1.1.13
+- Fixed cvars not being correctly restored on logout
+
 ### 1.1.12
 - Version update
 

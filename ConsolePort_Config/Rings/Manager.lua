@@ -45,7 +45,7 @@ local FIXED_OFFSET = 8;
 ---------------------------------------------------------------
 local function GetRingOptions()
 	local options = {};
-	for key in pairs(db.Utility.Data) do
+	for key in db.table.spairs(db.Utility.Data) do
 		tinsert(options, key == DEFAULT_RING_ID and DEFAULT or tostring(key))
 	end
 	return options;
@@ -80,7 +80,7 @@ local function GetSelectedRingID()
 	local index = controller:Get()
 	local options = controller:GetOptions()
 	local selectedOption = options and index and options[index];
-	return selectedOption == DEFAULT and 1 or tonumber(selectedOption) or selectedOption;
+	return selectedOption == DEFAULT and DEFAULT_RING_ID or tonumber(selectedOption) or selectedOption;
 end
 
 local function GetKindAndAction(info)
@@ -366,7 +366,7 @@ function Mapper:OnShow()
 end
 
 function Mapper:OnRingSelectionChanged(value)
-	local bindingID = db.Utility:GetBindingForSet(value)
+	local bindingID = db.Utility:GetBindingForSet(GetSelectedRingID())
 	if bindingID then
 		self.IconMapper:SetBinding(bindingID, true)
 	end

@@ -30,28 +30,31 @@ KT_OBJECTIVE_TRACKER_COLOR = {
 
 
 -- these are generally from events
-KT_OBJECTIVE_TRACKER_UPDATE_QUEST						= 0x00001;
-KT_OBJECTIVE_TRACKER_UPDATE_QUEST_ADDED					= 0x00002;
-KT_OBJECTIVE_TRACKER_UPDATE_TASK_ADDED					= 0x00004;
-KT_OBJECTIVE_TRACKER_UPDATE_WORLD_QUEST_ADDED			= 0x00008;
-KT_OBJECTIVE_TRACKER_UPDATE_SCENARIO					= 0x00010;
-KT_OBJECTIVE_TRACKER_UPDATE_SCENARIO_NEW_STAGE			= 0x00020;
-KT_OBJECTIVE_TRACKER_UPDATE_ACHIEVEMENT					= 0x00040;
-KT_OBJECTIVE_TRACKER_UPDATE_ACHIEVEMENT_ADDED			= 0x00080;
-KT_OBJECTIVE_TRACKER_UPDATE_SCENARIO_BONUS_DELAYED		= 0x00100;
-KT_OBJECTIVE_TRACKER_UPDATE_SUPER_TRACK_CHANGED			= 0x00200;
-KT_OBJECTIVE_TRACKER_UPDATE_MOVED						= 0x80000;
+KT_OBJECTIVE_TRACKER_UPDATE_QUEST						= 0x000001;
+KT_OBJECTIVE_TRACKER_UPDATE_QUEST_ADDED					= 0x000002;
+KT_OBJECTIVE_TRACKER_UPDATE_TASK_ADDED					= 0x000004;
+KT_OBJECTIVE_TRACKER_UPDATE_WORLD_QUEST_ADDED			= 0x000008;
+KT_OBJECTIVE_TRACKER_UPDATE_SCENARIO					= 0x000010;
+KT_OBJECTIVE_TRACKER_UPDATE_SCENARIO_NEW_STAGE			= 0x000020;
+KT_OBJECTIVE_TRACKER_UPDATE_ACHIEVEMENT					= 0x000040;
+KT_OBJECTIVE_TRACKER_UPDATE_ACHIEVEMENT_ADDED			= 0x000080;
+KT_OBJECTIVE_TRACKER_UPDATE_SCENARIO_BONUS_DELAYED		= 0x000100;
+KT_OBJECTIVE_TRACKER_UPDATE_SUPER_TRACK_CHANGED			= 0x000200;
+--KT_OBJECTIVE_TRACKER_UPDATE_MOVED						= 0x080000;  -- MSA
 -- these are for the specific module ONLY!
-KT_OBJECTIVE_TRACKER_UPDATE_MODULE_QUEST				= 0x00400;
-KT_OBJECTIVE_TRACKER_UPDATE_MODULE_AUTO_QUEST_POPUP		= 0x00800;
-KT_OBJECTIVE_TRACKER_UPDATE_MODULE_BONUS_OBJECTIVE		= 0x01000;
-KT_OBJECTIVE_TRACKER_UPDATE_MODULE_WORLD_QUEST			= 0x02000;
-KT_OBJECTIVE_TRACKER_UPDATE_MODULE_SCENARIO				= 0x04000;
-KT_OBJECTIVE_TRACKER_UPDATE_MODULE_ACHIEVEMENT			= 0x08000;
-KT_OBJECTIVE_TRACKER_UPDATE_SCENARIO_SPELLS				= 0x10000;
-KT_OBJECTIVE_TRACKER_UPDATE_MODULE_UI_WIDGETS			= 0x20000;
-KT_OBJECTIVE_TRACKER_UPDATE_MODULE_PROFESSION_RECIPE	= 0x40000;
-KT_OBJECTIVE_TRACKER_UPDATE_MODULE_MONTHLY_ACTIVITIES	= 0x100000;  -- fix Blizz bug (0x80000)
+KT_OBJECTIVE_TRACKER_UPDATE_MODULE_QUEST				= 0x000400;
+KT_OBJECTIVE_TRACKER_UPDATE_MODULE_AUTO_QUEST_POPUP		= 0x000800;
+KT_OBJECTIVE_TRACKER_UPDATE_MODULE_BONUS_OBJECTIVE		= 0x001000;
+KT_OBJECTIVE_TRACKER_UPDATE_MODULE_WORLD_QUEST			= 0x002000;
+KT_OBJECTIVE_TRACKER_UPDATE_MODULE_SCENARIO				= 0x004000;
+KT_OBJECTIVE_TRACKER_UPDATE_MODULE_ACHIEVEMENT			= 0x008000;
+KT_OBJECTIVE_TRACKER_UPDATE_SCENARIO_SPELLS				= 0x010000;
+KT_OBJECTIVE_TRACKER_UPDATE_MODULE_UI_WIDGETS			= 0x020000;
+KT_OBJECTIVE_TRACKER_UPDATE_MODULE_PROFESSION_RECIPE	= 0x040000;
+KT_OBJECTIVE_TRACKER_UPDATE_MODULE_MONTHLY_ACTIVITIES	= 0x080000;  -- Blizz bug (same as KT_OBJECTIVE_TRACKER_UPDATE_MOVED)
+KT_OBJECTIVE_TRACKER_UPDATE_MODULE_ADVENTURE			= 0x100000;
+KT_OBJECTIVE_TRACKER_UPDATE_TARGET_INFO					= 0x200000;
+KT_OBJECTIVE_TRACKER_UPDATE_TRANSMOG_COLLECTED			= 0x400000;
 
 -- special updates
 KT_OBJECTIVE_TRACKER_UPDATE_STATIC						= 0x0000;
@@ -59,6 +62,7 @@ KT_OBJECTIVE_TRACKER_UPDATE_ALL							= 0xFFFFFFFF;
 
 KT_OBJECTIVE_TRACKER_UPDATE_REASON = KT_OBJECTIVE_TRACKER_UPDATE_ALL;		-- default
 KT_OBJECTIVE_TRACKER_UPDATE_ID = 0;
+KT_OBJECTIVE_TRACKER_UPDATE_SUB_INFO = nil; -- included for completeness
 
 -- speed optimizations
 local floor = math.floor;
@@ -794,7 +798,8 @@ function KT_ObjectiveTracker_OnLoad(self)
 	self:RegisterEvent("PLAYER_ENTERING_WORLD");
 
 	--UIDropDownMenu_Initialize(self.BlockDropDown, nil, "MENU");
-	QuestPOI_Initialize(self.BlocksFrame, function(self) self:SetScale(0.9); self:RegisterForClicks("LeftButtonUp", "RightButtonUp"); end );
+
+	self.BlocksFrame:Init(function(self) self:SetScale(0.9); self:RegisterForClicks("LeftButtonUp", "RightButtonUp"); end);
 end
 
 function KT_ObjectiveTracker_UpdateOpacity()
@@ -818,11 +823,13 @@ function KT_ObjectiveTracker_Initialize(self)
 						KT_ACHIEVEMENT_TRACKER_MODULE,
 						KT_PROFESSION_RECIPE_TRACKER_MODULE,
 						KT_MONTHLY_ACTIVITIES_TRACKER_MODULE,
+						KT_ADVENTURE_TRACKER_MODULE,
 	};
 	self.MODULES_UI_ORDER = {	KT_SCENARIO_CONTENT_TRACKER_MODULE,
 								KT_UI_WIDGET_TRACKER_MODULE,
 								KT_CAMPAIGN_QUEST_TRACKER_MODULE,
 								KT_QUEST_TRACKER_MODULE,
+								KT_ADVENTURE_TRACKER_MODULE,
 								KT_BONUS_OBJECTIVE_TRACKER_MODULE,
 								KT_WORLD_QUEST_TRACKER_MODULE,
 								KT_ACHIEVEMENT_TRACKER_MODULE,
@@ -831,7 +838,6 @@ function KT_ObjectiveTracker_Initialize(self)
 	};
 
 	self:RegisterEvent("QUEST_LOG_UPDATE");
-	self:RegisterEvent("TRACKED_ACHIEVEMENT_LIST_CHANGED");
 	self:RegisterEvent("PERKS_ACTIVITIES_TRACKED_UPDATED");
 	self:RegisterEvent("PERKS_ACTIVITY_COMPLETED");
 	self:RegisterEvent("QUEST_WATCH_LIST_CHANGED");
@@ -851,6 +857,7 @@ function KT_ObjectiveTracker_Initialize(self)
 	self:RegisterEvent("PLAYER_MONEY");
 	self:RegisterEvent("CVAR_UPDATE");
 	self:RegisterEvent("WAYPOINT_UPDATE");
+	self:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED");
 	self.watchMoneyReasons = 0;
 
 	WorldMapFrame:RegisterCallback("SetFocusedQuestID", KT_ObjectiveTracker_OnFocusedQuestChanged, self);
@@ -893,13 +900,6 @@ function KT_ObjectiveTracker_OnEvent(self, event, ...)
 				end
 			end
 		end
-	elseif ( event == "TRACKED_ACHIEVEMENT_LIST_CHANGED" ) then
-		local achievementID, added = ...;
-		if ( added ) then
-			KT_ObjectiveTracker_Update(KT_OBJECTIVE_TRACKER_UPDATE_ACHIEVEMENT_ADDED, achievementID);
-		else
-			KT_ObjectiveTracker_Update(KT_OBJECTIVE_TRACKER_UPDATE_ACHIEVEMENT);
-		end
 	elseif ( event == "QUEST_WATCH_LIST_CHANGED" ) then
 		local questID, added = ...;
 		if ( added ) then
@@ -924,7 +924,7 @@ function KT_ObjectiveTracker_OnEvent(self, event, ...)
 	elseif ( event == "SCENARIO_BONUS_VISIBILITY_UPDATE") then
 		KT_ObjectiveTracker_Update(KT_OBJECTIVE_TRACKER_UPDATE_MODULE_BONUS_OBJECTIVE);
 	elseif ( event == "SUPER_TRACKING_CHANGED" ) then
-		KT_ObjectiveTracker_UpdateSuperTrackedQuest(self);
+		KT_ObjectiveTracker_UpdateSuperTracking(self);
 	elseif ( event == "ZONE_CHANGED" ) then
 		local lastMapID = C_Map.GetBestMapForUnit("player");
 		if ( lastMapID ~= self.lastMapID ) then
@@ -955,10 +955,7 @@ function KT_ObjectiveTracker_OnEvent(self, event, ...)
 			KT_ObjectiveTracker_Initialize(self);
 		end
 		KT_ObjectiveTracker_Update();
-
-		if not KT_QuestSuperTracking_IsSuperTrackedQuestValid() then
-			KT_QuestSuperTracking_ChooseClosestQuest();
-		end
+		KT_QuestSuperTracking_CheckSelection();
 
 		self.lastMapID = C_Map.GetBestMapForUnit("player");
 	elseif ( event == "CVAR_UPDATE" ) then
@@ -970,6 +967,9 @@ function KT_ObjectiveTracker_OnEvent(self, event, ...)
 		KT_ObjectiveTracker_Update();
 	elseif ( event == "WAYPOINT_UPDATE" ) then
 		KT_ObjectiveTracker_Update();
+	elseif ( event == "TRANSMOG_COLLECTION_SOURCE_ADDED") then
+		local transmogSourceId = ...;
+		KT_ObjectiveTracker_Update(KT_OBJECTIVE_TRACKER_UPDATE_TRANSMOG_COLLECTED, transmogSourceId);
 	end
 end
 
@@ -997,6 +997,16 @@ end
 function KT_ObjectiveTrackerHeaderMixin:PlayAddAnimation()
 	self.animating = true;
 	self.HeaderOpenAnim:Restart();
+end
+
+KT_ObjectiveTrackerLineMixin = {};
+
+function KT_ObjectiveTrackerLineMixin:OnLoad()
+	self.Text:SetWidth(KT_OBJECTIVE_TRACKER_TEXT_WIDTH);
+end
+
+function KT_ObjectiveTrackerLineMixin:OnHyperlinkClick(link, text, button)
+	SetItemRef(link, text, button);
 end
 
 -- *****************************************************************************************************
@@ -1357,13 +1367,11 @@ local function ObjectiveTracker_AnimateHeaders(previouslyVisibleHeaders)
 	end
 end
 
-function KT_ObjectiveTracker_UpdateSuperTrackedQuest(self)
-	local questID = C_SuperTrack.GetSuperTrackedQuestID();
-	KT_ObjectiveTracker_Update(KT_OBJECTIVE_TRACKER_UPDATE_SUPER_TRACK_CHANGED, questID);
-	QuestPOI_SelectButtonByQuestID(self.BlocksFrame, questID);
+function KT_ObjectiveTracker_UpdateSuperTracking(self)
+	KT_ObjectiveTracker_Update(KT_OBJECTIVE_TRACKER_UPDATE_SUPER_TRACK_CHANGED);
 end
 
-function KT_ObjectiveTracker_Update(reason, id, moduleWhoseCollapseChanged)
+function KT_ObjectiveTracker_Update(reason, id, moduleWhoseCollapseChanged, subInfo)
 	local tracker = KT_ObjectiveTrackerFrame;
 
 	if tracker.isUpdating then
@@ -1388,6 +1396,7 @@ function KT_ObjectiveTracker_Update(reason, id, moduleWhoseCollapseChanged)
 
 	KT_OBJECTIVE_TRACKER_UPDATE_REASON = reason or KT_OBJECTIVE_TRACKER_UPDATE_ALL;
 	KT_OBJECTIVE_TRACKER_UPDATE_ID = id;
+	KT_OBJECTIVE_TRACKER_UPDATE_SUB_INFO = subInfo;
 
 	tracker.BlocksFrame.currentBlock = nil;
 	tracker.BlocksFrame.contentsHeight = 0;
@@ -1561,11 +1570,10 @@ function KT_ObjectiveTracker_UpdatePOIs()
 	end
 
 	local blocksFrame = KT_ObjectiveTrackerFrame.BlocksFrame;
-	QuestPOI_ResetUsage(blocksFrame);
+	blocksFrame:ResetUsage();
 
 	local showPOIs = GetCVarBool("questPOI");
 	if ( not showPOIs ) then
-		QuestPOI_HideUnusedButtons(blocksFrame);
 		return;
 	end
 
@@ -1576,8 +1584,7 @@ function KT_ObjectiveTracker_UpdatePOIs()
 		end
 	end
 
-	QuestPOI_SelectButtonByQuestID(blocksFrame, C_SuperTrack.GetSuperTrackedQuestID());
-	QuestPOI_HideUnusedButtons(blocksFrame);
+	blocksFrame:SelectSuperTrackedButton();
 end
 
 KT_QuestHeaderMixin = {};

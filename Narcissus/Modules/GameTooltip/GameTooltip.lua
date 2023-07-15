@@ -664,6 +664,13 @@ function NarciEquipmentTooltipMixin:DisplayItemData(link, itemData, slotID, visu
             levelSubtext = format("%s/%s", itemData.upgradeLevel[1], itemData.upgradeLevel[2]);
         end
 
+        if levelSubtext and itemData.fullyUpgradedItemLevel then
+            local level1, level2 = match(levelSubtext, "(%d)/(%d)");
+            if level1 and level2 and level1 ~= level2 then
+                levelSubtext = levelSubtext.." |cff808080("..itemData.fullyUpgradedItemLevel..")|r";
+            end
+        end
+
         self.HeaderFrame.LevelSubText:SetText(levelSubtext);
 
         if itemData.craftingQuality then

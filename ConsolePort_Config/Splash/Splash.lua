@@ -277,17 +277,14 @@ function Splash:OnFirstShow()
 				FX = {
 					_Type = 'PlayerModel';
 					_Fill = true;
-					_Alpha = 0.25;
+					_Alpha = 0.5;
 					_Level = 1;
 					_SetDisplayInfo = 43022;
 					_SetCamDistanceScale = 8;
 					_OnLoad = function(self)
 						local rW, gW, bW = CPAPI.GetWebColor(CPAPI.GetClassFile()):GetRGB()
 						local rC, gC, bC = CPAPI.GetClassColor()
-						if CPAPI.IsClassicEraVersion then
-							return self:SetLight(true, false, -1, 1, -100, 1, rW, gW, bW, 0.5, rC, gC, bC)
-						end
-						self:SetLight(true, {
+						CPAPI.SetModelLight(self, true, {
 							omnidirectional = false;
 							point = CreateVector3D(-1, 1, -100);
 							ambientIntensity = 1;

@@ -401,7 +401,7 @@ local function SetFollowerInfo(t)
 	if um > 10 then T.config.goldRewardThreshold = 0 end
 	for k,v in pairs(dropFollowers) do
 		local f = ft[k]
-		if not f.missionEndTime then
+		if f and not f.missionEndTime then
 			f.status, f.missionEndTime = GARRISON_FOLLOWER_ON_MISSION, missionEndTime[v]
 		end
 	end
@@ -608,8 +608,8 @@ function api.GetFMLevel(fmInfo, mentor)
 	return fmInfo and (mentor and mentor >= fmInfo.iLevel and mentor or fmInfo.level == FOLLOWER_LEVEL_CAP and fmInfo.iLevel > 600 and fmInfo.iLevel or fmInfo.level) or 0
 end
 function api.GetLevelEfficiency(fLevel, mLevel)
-	local ld, md = (mLevel or 0) - fLevel, mLevel and (mLevel > 600 and 15 or 3) or 0
-	return ld <= 0 and 1 or ld < md and (md-ld)/md or 0
+	local ld, md, fl = (mLevel or 0) - fLevel, mLevel and (mLevel > 600 and 15 or 3) or 0, T.XP_EFFICIENCY_FLOOR or 0
+	return ld <= 0 and 1 or ld < md and math.max(fl, (md-ld)/md) or fl
 end
 function api.GetFollowerLevelDescription(fid, mlvl, fi, mentor, mid, gi)
 	local fi = fi or api.GetFollowerInfo()[fid]
@@ -1599,6 +1599,7 @@ do -- api.GetSuggestedGroupsMenu(mi, f1, f2, f3)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 		api.SetGroupTooltip(GameTooltip, g, mi)
 		GameTooltip:Show()
+		return T.HideOwnedGameTooltip
 	end
 	local function addToMenu(mm, groups, mi, primary)
 		for i=1,#groups do

@@ -1,9 +1,9 @@
-## Interface: 100100
+## Interface: 100105
 ## Title: |cffeee4aeBetter|r |cff0080ffIce|r |cffeee4aeFishing|r
 ## Notes: |cff58c6faIce Fishing with a single Keybind and Enhanced Sounds in Dragonflight!|r|n|n|cffffc700Slash command: /bif, /bettericefishing|r
 ## Author: fuba
 ## IconTexture: Interface\AddOns\BetterIceFishing\fubaLogo
-## Version: 100100.04-Release
+## Version: 100105.01-Release
 ## SavedVariables: BetterIceFishingDB
 
 ## X-Curse-Project-ID: 807204

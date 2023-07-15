@@ -228,6 +228,7 @@ CPAPI.LeaveParty = C_PartyInfo and C_PartyInfo.LeaveParty or LeaveParty;
 CPAPI.PickupContainerItem = C_Container and C_Container.PickupContainerItem or PickupContainerItem;
 CPAPI.PutActionInSlot = C_ActionBar and C_ActionBar.PutActionInSlot or PlaceAction;
 CPAPI.RequestLoadQuestByID = C_QuestLog and C_QuestLog.RequestLoadQuestByID or nop;
+CPAPI.SplitContainerItem = C_Container and C_Container.SplitContainerItem or SplitContainerItem;
 CPAPI.UseContainerItem = C_Container and C_Container.UseContainerItem or UseContainerItem;
 
 end
@@ -238,4 +239,23 @@ end
 
 function CPAPI.SetGradient(...)
 	return LibStub('Carpenter'):SetGradient(...)
+end
+
+function CPAPI.SetModelLight(self, enabled, lightValues)
+	if (pcall(self.SetLight, self, enabled, lightValues)) then
+		return
+	end
+
+	local dirX, dirY, dirZ = lightValues.point:GetXYZ()
+	local ambR, ambG, ambB = lightValues.ambientColor:GetRGB()
+	local difR, difG, difB = lightValues.diffuseColor:GetRGB()
+
+	return (pcall(self.SetLight, self, enabled,
+		lightValues.omnidirectional,
+		dirX, dirY, dirZ,
+		lightValues.diffuseIntensity,
+		difR, difG, difB,
+		lightValues.ambientIntensity,
+		ambR, ambG, ambB
+	))
 end

@@ -71,6 +71,13 @@ local function Hack_EditMode()
     end)
 end
 
+-- EncounterJournal (from 10.1.0)
+-- Affects Encounter Journal (Adventure Guide) and remove taint errors.
+-- Negative impacts are currently unknown.
+local function Hack_EncounterJournal()
+    C_EncounterJournal.OnOpen = function() end
+end
+
 function M:OnInitialize()
     _DBG("|cffffff00Init|r - "..self:GetName(), true)
     db = KT.db.profile
@@ -80,4 +87,5 @@ function M:OnEnable()
     _DBG("|cff00ff00Enable|r - "..self:GetName(), true)
     Hack_LFG()
     Hack_EditMode()
+    Hack_EncounterJournal()
 end

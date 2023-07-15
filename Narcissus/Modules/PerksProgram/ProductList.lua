@@ -47,7 +47,7 @@ local function EncounterJournal_TabChanged(_, _, id)
 end
 
 do
-    if DataProvider:DoesPerksProgramExist() or true then
+    if DataProvider:DoesPerksProgramExist() then
         if EncounterJournal_LoadUI then
             hooksecurefunc("EncounterJournal_LoadUI", SetupEncounterJournal);
             --EventRegistry:RegisterCallback("EncounterJournal.TabSet", EncounterJournal_TabChanged, MainFrame);
@@ -723,7 +723,7 @@ function NarciPerksProgramProductListButtonMixin:SetCategoryID(perksVendorCatego
     self.Container.Price:SetText("");
 end
 
-
+--[[
 if true then return end;
 
 do
@@ -858,6 +858,8 @@ do
         end
     end
 end
+
+--]]
 --[[
     /script for k, v in pairs(GetMouseFocus()) do print(k) end
 

@@ -11,6 +11,7 @@ KT.title = GetAddOnMetadata(addonName, "Title")
 local floor = math.floor
 local fmod = math.fmod
 local format = string.format
+local ipairs = ipairs
 local next = next
 local strfind = string.find
 local strlen = string.len
@@ -70,6 +71,18 @@ function KT.GetNumTrackedActivities()
     return #C_PerksActivities.GetTrackedPerksActivities().trackedIDs
 end
 
+-- Collectibles
+-- - Appearance (only this works in 10.1.5)
+-- - Mount
+-- - Achievement
+function KT.GetNumTrackedCollectibles()
+    local numCollectibles = 0
+    for _, trackableType in ipairs(C_ContentTracking.GetCollectableSourceTypes()) do
+        numCollectibles = numCollectibles + #C_ContentTracking.GetTrackedIDs(trackableType)
+    end
+    return numCollectibles
+end
+
 -- Map
 function KT.GetMapContinents()
     return C_Map.GetMapChildrenInfo(946, Enum.UIMapType.Continent, true)
@@ -124,6 +137,23 @@ end
 function KT.GetQuestRewardSpells(questID)
     local spellRewards = C_QuestInfoSystem.GetQuestRewardSpells(questID) or {}
     return #spellRewards, spellRewards
+end
+
+-- Achievements
+function KT.GetNumTrackedAchievements()
+    return #C_ContentTracking.GetTrackedIDs(Enum.ContentTrackingType.Achievement)
+end
+
+function KT.GetTrackedAchievements()
+    return C_ContentTracking.GetTrackedIDs(Enum.ContentTrackingType.Achievement)
+end
+
+function KT.AddTrackedAchievement(id)
+    C_ContentTracking.StartTracking(Enum.ContentTrackingType.Achievement, id)
+end
+
+function KT.RemoveTrackedAchievement(id)
+    C_ContentTracking.StopTracking(Enum.ContentTrackingType.Achievement, id)
 end
 
 -- RGB to Hex

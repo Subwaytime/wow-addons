@@ -2,15 +2,22 @@
     Created by Slothpala 
 --]]
 local Media     = LibStub("LibSharedMedia-3.0")
-Media:HashTable("statusbar")
+local statusbars =  LibStub("LibSharedMedia-3.0"):List("statusbar")
+
 local lastEntry = 6
 local selectedWidth, colorWidth, statusBarWidth = 1, 0.4, 1.8
 local options = {
     name = "HealthBarColor",
     handler = HealthBarColor,
     type = "group",
-    childGroups = "tab",
     args = {
+        Version = {
+            order = 0,
+            name = "            v10.1.5-2.3.9",
+            type = "group",
+            disabled = true,
+            args = {},
+        },
         HealthBars = {
             order = 1,
             name = "Health Bars",
@@ -43,14 +50,6 @@ local options = {
                             hidden = function() if HealthBarColor.db.profile.HealthBars.Player.selected == 2 then return false end return true end,
                             width = colorWidth,
                         },  
-                        classicon = {
-                            order = 3,
-                            name = "Class Icon",
-                            desc = "Use a class icons instead of a portrait.",
-                            type = "toggle",
-                            get = "GetStatus",
-                            set = "SetStatus",
-                        },
                     },
                 },
                 Target = {
@@ -87,14 +86,6 @@ local options = {
                             get = "GetStatus",
                             set = "SetStatus",
                             hidden = function() if HealthBarColor.db.profile.HealthBars.Target.selected == 1 then return false end return true end,
-                        },
-                        classicon = {
-                            order = 4,
-                            name = "Class Icon",
-                            desc = "Use a class icons instead of a portrait.",
-                            type = "toggle",
-                            get = "GetStatus",
-                            set = "SetStatus",
                         },
                     },
                 },
@@ -133,14 +124,6 @@ local options = {
                             set = "SetStatus",
                             hidden = function() if HealthBarColor.db.profile.HealthBars.ToT.selected == 1 then return false end return true end,
                         },
-                        classicon = {
-                            order = 4,
-                            name = "Class Icon",
-                            desc = "Use a class icons instead of a portrait.",
-                            type = "toggle",
-                            get = "GetStatus",
-                            set = "SetStatus",
-                        },
                     },
                 },
                 Focus = {
@@ -178,14 +161,6 @@ local options = {
                             set = "SetStatus",
                             hidden = function() if HealthBarColor.db.profile.HealthBars.Focus.selected == 1 then return false end return true end,
                         },
-                        classicon = {
-                            order = 4,
-                            name = "Class Icon",
-                            desc = "Use a class icons instead of a portrait.",
-                            type = "toggle",
-                            get = "GetStatus",
-                            set = "SetStatus",
-                        },
                     },
                 },
                 ToF = {
@@ -222,14 +197,6 @@ local options = {
                             get = "GetStatus",
                             set = "SetStatus",
                             hidden = function() if HealthBarColor.db.profile.HealthBars.ToF.selected == 1 then return false end return true end,
-                        },
-                        classicon = {
-                            order = 4,
-                            name = "Class Icon",
-                            desc = "Use a class icons instead of a portrait.",
-                            type = "toggle",
-                            get = "GetStatus",
-                            set = "SetStatus",
                         },
                     },
                 },
@@ -301,7 +268,7 @@ local options = {
             args = {
                 General = {
                     order = 0,
-                    name = "General",
+                    name = "Font Settings",
                     type = "group",
                     inline = true,
                     args = {
@@ -708,7 +675,7 @@ local options = {
                             type = "toggle",
                             get = "GetStatus",
                             set = "SetStatus",
-                            width = 0.45,
+                            width = 0.5,
                         },
                         BackgroundTextures = {
                             order = 3,
@@ -745,6 +712,15 @@ local options = {
                             get = "GetStatus",
                             set = "SetStatus",
                             width = 0.36,
+                        },
+                        HideClassPowerBar = {
+                            order = 7,
+                            name = "HideClassPowerBar",
+                            desc = "Hide the class power bar.",
+                            type = "toggle",
+                            get = "GetStatus",
+                            set = "SetStatus",
+                            width = 0.9,
                         },
                     },
                 },
@@ -1006,23 +982,37 @@ local options = {
                         healthbar = {
                             order = 1,
                             type = "select",
-                            dialogControl = "LSM30_Statusbar", 
-                            name = "Health Bar", 
-                            values = Media:HashTable("statusbar"), 
-                            get = "GetStatus",
-                            set = "SetStatus",
-                            width = statusBarWidth,
+                            name = "Health Bar",
+                            values = statusbars,
+                            get = function()
+                                for i, v in next, statusbars do
+                                    if v == HealthBarColor.db.profile.Modules.Textures.healthbar then return i end
+                                end
+                            end,
+                            set = function(_, value)
+                                HealthBarColor.db.profile.Modules.Textures.healthbar  = statusbars[value]
+                                HealthBarColor:ReloadConfig()
+                            end,
+                          itemControl = "DDI-Statusbar",
+                          width = statusBarWidth,
                         },
                         powerbar = {
                             order = 2,
                             type = "select",
-                            dialogControl = "LSM30_Statusbar", 
-                            name = "Power Bar", 
-                            values = Media:HashTable("statusbar"), 
-                            get = "GetStatus",
-                            set = "SetStatus",
-                            width = statusBarWidth,
-                            disabled  = function() return HealthBarColor.db.profile.Modules.Textures.excludep end,
+                            name = "Power Bar",
+                            values = statusbars,
+                            get = function()
+                                for i, v in next, statusbars do
+                                    if v == HealthBarColor.db.profile.Modules.Textures.powerbar then return i end
+                                end
+                            end,
+                            set = function(_, value)
+                                HealthBarColor.db.profile.Modules.Textures.powerbar  = statusbars[value]
+                                HealthBarColor:ReloadConfig()
+                            end,
+                          itemControl = "DDI-Statusbar",
+                          width = statusBarWidth,
+                          disabled  = function() return HealthBarColor.db.profile.Modules.Textures.excludep end,
                         },
                         excludep = {
                             order = 3,
@@ -1045,12 +1035,19 @@ local options = {
                         texture = {
                             order = 1,
                             type = "select",
-                            dialogControl = "LSM30_Statusbar", 
-                            name = "Texture", 
-                            values = Media:HashTable("statusbar"), 
-                            get = "GetStatus",
-                            set = "SetStatus",
-                            width = statusBarWidth,
+                            name = "Texture",
+                            values = statusbars,
+                            get = function()
+                                for i, v in next, statusbars do
+                                    if v == HealthBarColor.db.profile.Modules.BackgroundTextures.texture then return i end
+                                end
+                            end,
+                            set = function(_, value)
+                                HealthBarColor.db.profile.Modules.BackgroundTextures.texture  = statusbars[value]
+                                HealthBarColor:ReloadConfig()
+                            end,
+                          itemControl = "DDI-Statusbar",
+                          width = statusBarWidth,
                         },
                         color = {
                             order = 2,
@@ -1144,7 +1141,7 @@ local options = {
                             name = "Player",
                             desc = "",
                             type = "select",
-                            values = {"class/reaction color","static color","hide"},
+                            values = {"class color","static color","hide"},
                             sorting = {1,2,3},
                             get = "GetStatus",
                             set = "SetStatus",

@@ -95,10 +95,15 @@ local function SetWaypointTag(button, show)
 		if button.KTtomtom then
 			button.KTtomtom:Show()
 		else
-			button.KTtomtom = button:CreateTexture(nil, "OVERLAY", nil, 3)
+			button.KTtomtom = button.Display:CreateTexture(nil, "OVERLAY")
 			button.KTtomtom:SetTexture(mediaPath.."KT-TomTomTag")
-			button.KTtomtom:SetSize(32, 32)
 			button.KTtomtom:SetPoint("CENTER")
+		end
+
+		-- Set Waypoint Tag size, but not for WQ
+		if button.pinScale then
+			local scale = button.KTtomtom:GetParent():GetPinScale()
+			button.KTtomtom:SetSize(scale * 32, scale * 32)
 		end
 	else
 		if button.KTtomtom then
@@ -216,6 +221,10 @@ local function SetHooks()
 		SetSuperTrackedQuestWaypoint(questID)
 	end)
 
+	hooksecurefunc(C_SuperTrack, "SetSuperTrackedContent", function(trackableType, trackableID)
+		RemoveWaypoint(superTrackedQuestID)
+	end)
+
 	hooksecurefunc(C_QuestLog, "RemoveQuestWatch", function(questID)
 		if not KT.stopUpdate then
 			RemoveWaypoint(questID)
@@ -231,26 +240,27 @@ local function SetHooks()
 		RemoveWaypoint(questID)
 	end)
 
+    hooksecurefunc(POIButtonMixin, "Reset", function(self)
+		SetWaypointTag(self)  -- hide tag for non-quest POI buttons
+	end)
+
 	local bck_KT_WORLD_QUEST_TRACKER_MODULE_OnFreeBlock = KT_WORLD_QUEST_TRACKER_MODULE.OnFreeBlock
 	function KT_WORLD_QUEST_TRACKER_MODULE:OnFreeBlock(block)
 		SetWaypointTag(block.TrackedQuest)  -- hide tag for hard watched WQ
 		bck_KT_WORLD_QUEST_TRACKER_MODULE_OnFreeBlock(self, block)
 	end
 
-	local bck_QuestPOI_GetButton = QuestPOI_GetButton
-	QuestPOI_GetButton = function(parent, questID, style, index)
-		local poiButton = bck_QuestPOI_GetButton(parent, questID, style, index)
-		if poiButton then
-			SetWaypointTag(poiButton, questWaypoints[questID])
+	hooksecurefunc(POIButtonMixin, "UpdateButtonStyle", function(self)
+		if self.questID then
+			SetWaypointTag(self, questWaypoints[self.questID])
 		end
-		return poiButton
-	end
+	end)
 
 	hooksecurefunc(QuestUtil, "SetupWorldQuestButton", function(button, worldQuestType, rarity, isElite, tradeskillLineIndex, inProgress, selected, isCriteria, isSpellTarget, isEffectivelyTracked)
 		SetWaypointTag(button, questWaypoints[button.questID])
 	end)
 
-	hooksecurefunc("QuestPOIButton_OnClick", function(self)
+	hooksecurefunc(POIButtonMixin, "OnClick", function(self)
 		-- Update when click on active POI
 		KT_ObjectiveTracker_Update()
 		QuestMapFrame_UpdateAll()
@@ -292,10 +302,10 @@ end
 function M:OnInitialize()
 	_DBG("|cffffff00Init|r - "..self:GetName(), true)
 	db = KT.db.profile
-	self.isLoaded = (KT:CheckAddOn("TomTom", "v3.3.9-release") and db.addonTomTom)
+	self.isLoaded = (KT:CheckAddOn("TomTom", "v3.5.1-release") and db.addonTomTom)
 
 	if self.isLoaded then
-		KT:Alert_IncompatibleAddon("TomTom", "v3.3.5-release")
+		KT:Alert_IncompatibleAddon("TomTom", "v3.5.1-release")
 	end
 
 	local defaults = KT:MergeTables({

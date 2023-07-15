@@ -593,6 +593,9 @@
 			<Anchor point="TOPLEFT" relativeTo="UIParent" relativePoint="TOPLEFT" x="0" y="0"/>
 			<Anchor point="BOTTOMRIGHT" relativeTo="UIParent" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
 		</Anchors>
+		<KeyValues>
+			<KeyValue key="isCameraDirty" value="true" type="boolean"/>
+		</KeyValues>
 		<Frames>
 			<Frame inherits="Narci_GroundShadowFrame_Template"/>
 		</Frames>

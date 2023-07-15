@@ -160,6 +160,11 @@ local PATTERN_CLASS_REQUIREMENT = Pattern_WrapSpace(ITEM_CLASSES_ALLOWED);
 local PATTERN_AMMO_DPS = gsub(AMMO_DAMAGE_TEMPLATE, "%%s", "([%%d.]+)");
 local PATTERN_PROFESSION_QUALITY = Pattern_WrapSpace(PROFESSIONS_CRAFTING_QUALITY or "Quality: %s");
 local PATTERN_ITEM_LEVEL = ITEM_LEVEL or "Item Level";
+local PATTERN_UPGRADE_TRACK_NAME = gsub(ITEM_UPGRADE_TOOLTIP_FORMAT_STRING or "Upgrade Level: %s %d/%d", "%%s", "(%%D+)");
+
+local ITEM_UPGRADE_TRACK_LEVELS = {
+    --[TrackName] = maxItemLevel
+};
 
 local SOCKET_TYPE_TEXTURE =	{
     Yellow = "Yellow",
@@ -981,6 +986,11 @@ local function GetCompleteItemData(tooltipData, itemLink)
                             end
                             data.upgradeString = strtrim(match1);
                             anyMatch = true;
+
+                            local trackName = match(lineText, PATTERN_UPGRADE_TRACK_NAME);
+                            if trackName and ITEM_UPGRADE_TRACK_LEVELS[trackName] then
+                                data.fullyUpgradedItemLevel = ITEM_UPGRADE_TRACK_LEVELS[trackName];
+                            end
                         end
                     end
                 end
@@ -1750,5 +1760,61 @@ function TestSetProfessionQuality(quality, small)
     end
     
     TT:SetAtlas(atlas, true);
+
+    C_TooltipInfo.GetHyperlink("item:202557::::::::70:261::4:1:3524:1:28:2648")
 end
+--]]
+
+local function GetAvailableItemUpgradeTracks()
+    local bonusInfo = {
+        --{bonusID, maxItemLevel}
+        {9294, 398},  --Explorer
+        {9302, 411},  --Adventurer
+        {9313, 424},  --Veteran 1/8    --LFG
+        {9321, 437},  --Champion 1/8   --Normal
+        {9330, 441},  --Hero 1/5       --Heroic
+        {9380, 447},  --Myth 1/3       --Mythic added in 10.1.5
+    };
+
+    local tooltipData;
+    local trackName;
+    local upgradeText;
+
+    for _, info in ipairs(bonusInfo) do
+        tooltipData = C_TooltipInfo.GetHyperlink("item:2092::::::::::::1:"..info[1]);
+        if tooltipData and tooltipData.lines then
+            upgradeText = GetLineText(tooltipData.lines, 3);
+            if upgradeText and upgradeText ~= "" then
+                trackName = match(upgradeText, PATTERN_UPGRADE_TRACK_NAME);
+                if trackName then
+                    ITEM_UPGRADE_TRACK_LEVELS[trackName] = info[2];
+                end
+            end
+        end
+    end
+end
+
+GetAvailableItemUpgradeTracks();
+C_Timer.After(8, GetAvailableItemUpgradeTracks);
+
+
+local function Debug_PrintItemBonus(fromID)
+    local tooltipData, context;
+    local defaultText = _G.ITEM_BIND_ON_EQUIP or "Binds when equipped";
+
+    for bonusID = fromID, fromID + 500 do
+        tooltipData = C_TooltipInfo.GetHyperlink("item:2092::::::::::::1:"..bonusID);
+        if tooltipData and tooltipData.lines then
+            context = GetLineText(tooltipData.lines, 3);
+            if context and context ~= "" and context ~= defaultText then
+                print(bonusID, context);
+            end
+        else
+            print("Throttled");
+            break
+        end
+    end
+end
+
+NarciAPI.DebugPrintItemBonus = Debug_PrintItemBonus;
 --]]

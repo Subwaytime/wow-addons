@@ -4,6 +4,7 @@ local internal = {
   -- Defaults
   _frame = CreateFrame("frame"),
   clear_override = false,
+  cvarsChanged = false,
   DOUBLECLICK_MAX_SECONDS = 0.2,
   DOUBLECLICK_MIN_SECONDS = 0.04,
   previousClickTime = 0,
@@ -169,33 +170,50 @@ function BetterFishing:AllowFishing()
   return true
 end
 
-local cachedSoftTargetInteract = GetCVar("SoftTargetInteract");
-local cachedSoftTargetInteractArc = GetCVar("SoftTargetInteractArc");
-local cachedSoftTargetInteractRange = GetCVar("SoftTargetInteractRange");
-local cachedSoftTargetIconGameObject = GetCVar("SoftTargetIconGameObject");
-local cachedSoftTargetIconInteract= GetCVar("SoftTargetIconInteract");
+local InteractCVarTable = {
+  "SoftTargetInteract",
+  "SoftTargetInteractArc",
+  "SoftTargetInteractRange",
+  "SoftTargetIconGameObject",
+  "SoftTargetIconInteract"
+}
 
-function BetterFishing:ResetCVars()
-  BetterFishing:EnhanceSounds()
-  SetCVar("SoftTargetInteract", cachedSoftTargetInteract);
-  SetCVar("SoftTargetInteractArc", cachedSoftTargetInteractArc);
-  SetCVar("SoftTargetInteractRange", cachedSoftTargetInteractRange);
-  SetCVar("SoftTargetIconInteract", cachedSoftTargetIconInteract);
-  SetCVar("SoftTargetIconGameObject", cachedSoftTargetIconGameObject);
+local InteractCVars = {}
+
+do
+  for _, cvar in ipairs(InteractCVarTable) do
+    InteractCVars[string.lower(cvar)] = GetCVar(cvar)
+  end
+end
+
+hooksecurefunc(C_CVar, "SetCVar", function(cvar, value)
+	if internal.cvarsChanged then return end
+  local cvar_lower = string.lower(cvar)
+  if InteractCVars[cvar_lower] then
+    InteractCVars[cvar_lower] = value
+  end
+end)
+
+function BetterFishing:ResetCVars(logout)
+  if not logout then
+    internal.cvarsChanged = true
+  end
+  BetterFishing:EnhanceSounds(false)
+  for cvar, value in pairs(InteractCVars) do
+    SetCVar(cvar, value)
+  end
+  C_Timer.After(0.2, function() internal.cvarsChanged = false end)
 end
 
 function BetterFishing:SetCVars()
+  internal.cvarsChanged = true
   BetterFishing:EnhanceSounds(true)
-  cachedSoftTargetInteract = GetCVar("SoftTargetInteract");
-  cachedSoftTargetInteractArc = GetCVar("SoftTargetInteractArc");
-  cachedSoftTargetInteractRange = GetCVar("SoftTargetInteractRange");
-  cachedSoftTargetIconGameObject = GetCVar("SoftTargetIconGameObject");
-  cachedSoftTargetIconInteract = GetCVar("SoftTargetIconInteract");
   SetCVar("SoftTargetInteract", 3);
   SetCVar("SoftTargetInteractArc", 2);
   SetCVar("SoftTargetInteractRange", 25);
   SetCVar("SoftTargetIconGameObject", BetterFishingDB.objectIconDisabled and 0 or 1);
   SetCVar("SoftTargetIconInteract", BetterFishingDB.objectIconDisabled and 0 or 1);
+  C_Timer.After(0.2, function() internal.cvarsChanged = false end)
 end
 
 function BetterFishing:OnEvent(event, ...)
@@ -231,7 +249,7 @@ function BetterFishing:OnEvent(event, ...)
       end
     end
   elseif event == "PLAYER_LOGOUT" then
-    BetterFishing:ResetCVars()
+    BetterFishing:ResetCVars(true)
   elseif event == "CVAR_UPDATE" then
     if self:IsFishing() then return end
     for i = 1, #CVarCacheSounds do
@@ -278,17 +296,17 @@ function BetterFishing:EnhanceSounds(enable)
     SetCVar("Sound_MasterVolume", BetterFishingDB.enhanceSoundsScale)
   end
 end
-
+local NewSettings = Settings and Settings.RegisterCanvasLayoutCategory or false
 function BetterFishing:CreateSettings()
   local optionsFrame
-  if internal.isClassic then
-    optionsFrame = CreateFrame("Frame", addonName.."_OptionsFrame", InterfaceOptionsFramePanelContainer)
-    optionsFrame.name = "Better Fishing"
-  else
+  if NewSettings then
     optionsFrame = CreateFrame("Frame")
     local category, layout = Settings.RegisterCanvasLayoutCategory(optionsFrame, "Better Fishing |Tinterface/cursor/crosshair/fishing:18:18:0:0|t");
     category.ID = "Better Fishing";
     Settings.RegisterAddOnCategory(category);
+  else
+    optionsFrame = CreateFrame("Frame", addonName.."_OptionsFrame", InterfaceOptionsFramePanelContainer)
+    optionsFrame.name = "Better Fishing"
   end
 
   local header = optionsFrame:CreateFontString(nil, "ARTWORK", "GameFontHighlightHuge")
@@ -297,10 +315,10 @@ function BetterFishing:CreateSettings()
 
   local function makeCheckButton(text)
     local checkBox
-    if internal.isClassic then
-      checkBox = CreateFrame("CheckButton", addonName.."CheckBox", optionsFrame, "UICheckButtonTemplate")
-    else
+    if NewSettings then
       checkBox = CreateFrame("CheckButton", addonName.."CheckBox", optionsFrame, "SettingsCheckBoxTemplate")
+    else
+      checkBox = CreateFrame("CheckButton", addonName.."CheckBox", optionsFrame, "UICheckButtonTemplate")
     end
     checkBox.text = checkBox:CreateFontString(addonName.."CheckBoxText", "ARTWORK", "GameFontNormal")
     checkBox.text:SetText(text)
@@ -334,7 +352,22 @@ function BetterFishing:CreateSettings()
       prevCheckButton = checkButton
     end
   end
-  if internal.isClassic then
+  if NewSettings then
+    local function FormatPercentageRound(value)
+      return FormatPercentage(value, true);
+    end
+
+    local right = MinimalSliderWithSteppersMixin.Label.Right
+    local slider = CreateFrame("Slider", addonName.."Slider", optionsFrame, "MinimalSliderWithSteppersTemplate")
+    local formatters = {}
+    formatters[right] = CreateMinimalSliderFormatter(right, FormatPercentageRound);
+    slider:Init(BetterFishingDB.enhanceSoundsScale or 1, 0, 1, 20, formatters)
+    slider:SetPoint("LEFT", addonName.."CheckBoxText", "RIGHT", 10, 0)
+    local function OnValueChanged(_, value)
+      BetterFishingDB.enhanceSoundsScale = value
+    end
+    slider:RegisterCallback(MinimalSliderWithSteppersMixin.Event.OnValueChanged, OnValueChanged)
+  else
     local slider = CreateFrame("Slider", addonName.."_Slider", optionsFrame, "OptionsSliderTemplate")
     slider:SetWidth(120)
     slider:SetHeight(16)
@@ -357,30 +390,15 @@ function BetterFishing:CreateSettings()
       slider:SetValue(BetterFishingDB.enhanceSoundsScale*100 or 50)
     end)
     InterfaceOptions_AddCategory(optionsFrame)
-  else
-    local function FormatPercentageRound(value)
-      return FormatPercentage(value, true);
-    end
-
-    local right = MinimalSliderWithSteppersMixin.Label.Right
-    local slider = CreateFrame("Slider", addonName.."Slider", optionsFrame, "MinimalSliderWithSteppersTemplate")
-    local formatters = {}
-    formatters[right] = CreateMinimalSliderFormatter(right, FormatPercentageRound);
-    slider:Init(BetterFishingDB.enhanceSoundsScale or 1, 0, 1, 20, formatters)
-    slider:SetPoint("LEFT", addonName.."CheckBoxText", "RIGHT", 10, 0)
-    local function OnValueChanged(_, value)
-      BetterFishingDB.enhanceSoundsScale = value
-    end
-    slider:RegisterCallback(MinimalSliderWithSteppersMixin.Event.OnValueChanged, OnValueChanged)
   end
 end
 
 SLASH_BETTERFISHING1, SLASH_BETTERFISHING2 = '/bf', '/betterfishing'
 SlashCmdList.BETTERFISHING = function(msg)
-  if internal.isClassic then
-    InterfaceOptionsFrame_OpenToCategory("Better Fishing")
-    InterfaceOptionsFrame_OpenToCategory("Better Fishing")
-  else
+  if NewSettings then
     Settings.OpenToCategory("Better Fishing")
+  else
+    InterfaceOptionsFrame_OpenToCategory("Better Fishing")
+    InterfaceOptionsFrame_OpenToCategory("Better Fishing")
   end
 end

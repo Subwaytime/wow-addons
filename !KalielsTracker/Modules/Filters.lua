@@ -162,17 +162,22 @@ local function SetHooks()
 		end
 	end)
 
-	-- POI - QuestPOI.lua
-	local bck_QuestPOIButton_OnClick = QuestPOIButton_OnClick
-	QuestPOIButton_OnClick = function(self)
-		if not QuestUtils_IsQuestWatched(self.questID) and db.filterAuto[1] then
-			C_SuperTrack.SetSuperTrackedQuestID(self.questID)
+	-- POI - POIButton.lua
+	local bck_POIButtonMixin_OnClick = POIButtonMixin.OnClick
+	function POIButtonMixin:OnClick()
+		local questID = self:GetQuestID()
+		if questID and db.filterAuto[1] then
+			if ChatEdit_TryInsertQuestLinkForQuestID(questID) then
+				return
+			end
+
+			C_SuperTrack.SetSuperTrackedQuestID(questID)
 			if self.pingWorldMap then
-				WorldMapPing_StartPingQuest(self.questID)
+				WorldMapPing_StartPingQuest(questID)
 			end
 			return
 		end
-		bck_QuestPOIButton_OnClick(self)
+		bck_POIButtonMixin_OnClick(self)
 	end
 end
 
@@ -345,26 +350,26 @@ local function Filter_Quests(spec, idx)
 
 	C_QuestLog.SortQuestWatches()
 	KT_ObjectiveTracker_Update(KT_OBJECTIVE_TRACKER_UPDATE_MODULE_QUEST)
-	if C_SuperTrack.GetSuperTrackedQuestID() == 0 or spec == "" then
+	if not C_SuperTrack.GetSuperTrackedQuestID() or spec == "" then
 		KT_QuestSuperTracking_ChooseClosestQuest()
 	end
 end
 
 local function Filter_Achievements(spec)
 	if not spec then return end
-	local trackedAchievements = { GetTrackedAchievements() }
+	local trackedAchievements = KT.GetTrackedAchievements()
 
 	KT.stopUpdate = true
-	if GetNumTrackedAchievements() > 0 then
+	if KT.GetNumTrackedAchievements() > 0 then
 		for i=1, #trackedAchievements do
-			RemoveTrackedAchievement(trackedAchievements[i])
+			KT.RemoveTrackedAchievement(trackedAchievements[i])
 		end
 	end
 
 	if spec == "favorites" then
 		for _, id in ipairs(dbChar.achievements.favorites) do
-			AddTrackedAchievement(id)
-			if GetNumTrackedAchievements() == MAX_TRACKED_ACHIEVEMENTS then
+			KT.AddTrackedAchievement(id)
+			if KT.GetNumTrackedAchievements() == Constants.ContentTrackingConsts.MaxTrackedAchievements then
 				break
 			end
 		end
@@ -453,16 +458,16 @@ local function Filter_Achievements(spec)
 								end
 							end
 							if track then
-								AddTrackedAchievement(aId)
+								KT.AddTrackedAchievement(aId)
 							end
 						end
-						if GetNumTrackedAchievements() == MAX_TRACKED_ACHIEVEMENTS then
+						if KT.GetNumTrackedAchievements() == Constants.ContentTrackingConsts.MaxTrackedAchievements then
 							break
 						end
 					end
 				end
 			end
-			if GetNumTrackedAchievements() == MAX_TRACKED_ACHIEVEMENTS then
+			if KT.GetNumTrackedAchievements() == Constants.ContentTrackingConsts.MaxTrackedAchievements then
 				break
 			end
 			if parentID == -1 then
@@ -483,14 +488,14 @@ local function Filter_Achievements(spec)
 				for i=1, aNumItems do
 					local aId, aName, _, aCompleted, _, _, _, aDescription = GetAchievementInfo(category, i)
 					if aId and not aCompleted then
-						AddTrackedAchievement(aId)
+						KT.AddTrackedAchievement(aId)
 					end
-					if GetNumTrackedAchievements() == MAX_TRACKED_ACHIEVEMENTS then
+					if KT.GetNumTrackedAchievements() == Constants.ContentTrackingConsts.MaxTrackedAchievements then
 						break
 					end
 				end
 			end
-			if GetNumTrackedAchievements() == MAX_TRACKED_ACHIEVEMENTS then
+			if KT.GetNumTrackedAchievements() == Constants.ContentTrackingConsts.MaxTrackedAchievements then
 				break
 			end
 			if parentID == -1 then
@@ -499,7 +504,7 @@ local function Filter_Achievements(spec)
 		end
 
 		if db.messageAchievement then
-			local numTracked = GetNumTrackedAchievements()
+			local numTracked = KT.GetNumTrackedAchievements()
 			if numTracked == 0 then
 				KT:SetMessage("There is currently no World Event.", 1, 1, 0)
 			elseif numTracked > 0 then
@@ -692,7 +697,7 @@ function DropDown_Initialize(self, level)
 		MSA_DropDownMenu_AddButton(info)
 
 		info.text = "Untrack All"
-		info.disabled = (db.filterAuto[2] or GetNumTrackedAchievements() == 0)
+		info.disabled = (db.filterAuto[2] or KT.GetNumTrackedAchievements() == 0)
 		info.arg1 = ""
 		MSA_DropDownMenu_AddButton(info)
 
