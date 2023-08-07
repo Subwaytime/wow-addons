@@ -146,6 +146,8 @@ function DataProvider:GetVendorItemName(vendorItemID)
     local info = self:GetAndCacheVendorItemInfo(vendorItemID);
     if info then
         return info.name
+    else
+        return ""
     end
 end
 
@@ -153,6 +155,9 @@ function DataProvider:GetVendorItemCategory(vendorItemID)
     local info = self:GetAndCacheVendorItemInfo(vendorItemID);
     if info then
         return info.perksVendorCategoryID
+    else
+        --print("vendorItemID", vendorItemID)   --252, 255 are missing in 10.1.7 PTR
+        return 128
     end
 end
 
@@ -160,6 +165,8 @@ function DataProvider:GetVendorItemDescription(vendorItemID)
     local info = self:GetAndCacheVendorItemInfo(vendorItemID);
     if info then
         return info.description
+    else
+        return ""
     end
 end
 

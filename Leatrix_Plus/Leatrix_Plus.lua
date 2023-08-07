@@ -1,5 +1,5 @@
 ﻿----------------------------------------------------------------------
--- 	Leatrix Plus 10.1.10 (12th July 2023)
+-- 	Leatrix Plus 10.1.14 (2nd August 2023)
 ----------------------------------------------------------------------
 
 --	01:Functns, 02:Locks, 03:Restart, 20:Live, 30:Isolated, 40:Player
@@ -18,7 +18,7 @@
 	local void
 
 	-- Version
-	LeaPlusLC["AddonVer"] = "10.1.10"
+	LeaPlusLC["AddonVer"] = "10.1.14"
 
 	-- Get locale table
 	local void, Leatrix_Plus = ...
@@ -3278,7 +3278,7 @@
 			eb.Text:SetWidth(150)
 			eb.Text:SetPoint("TOPLEFT", eb.scroll)
 			eb.Text:SetPoint("BOTTOMRIGHT", eb.scroll)
-			eb.Text:SetMaxLetters(600)
+			eb.Text:SetMaxLetters(2000)
 			eb.Text:SetFontObject(GameFontNormalLarge)
 			eb.Text:SetAutoFocus(false)
 			eb.Text:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
@@ -8913,23 +8913,24 @@
 					if unitGuild and unitRank then
 						-- Unit is guilded
 						if LT["ColorBlind"] == "1" then
-							LT["GuildLine"], LT["InfoLine"] = 2, 4
+							LT["GuildLine"], LT["InfoLine"], LT["SpecLine"] = 2, 4, 5
 						else
-							LT["GuildLine"], LT["InfoLine"] = 2, 3
+							LT["GuildLine"], LT["InfoLine"], LT["SpecLine"] = 2, 3, 4
 						end
 						LT["GuildName"], LT["GuildRank"] = unitGuild, unitRank
 					else
 						-- Unit is not guilded
 						LT["GuildName"] = nil
 						if LT["ColorBlind"] == "1" then
-							LT["GuildLine"], LT["InfoLine"] = 0, 3
+							LT["GuildLine"], LT["InfoLine"], LT["SpecLine"] = 0, 3, 4
 						else
-							LT["GuildLine"], LT["InfoLine"] = 0, 2
+							LT["GuildLine"], LT["InfoLine"], LT["SpecLine"] = 0, 2, 3
 						end
 					end
-					-- Lower information line if unit is charmed
+					-- Lower information and specialisation lines if unit is charmed
 					if UnitIsCharmed(LT["Unit"]) then
 						LT["InfoLine"] = LT["InfoLine"] + 1
+						LT["SpecLine"] = LT["SpecLine"] + 1
 					end
 				end
 
@@ -9029,15 +9030,17 @@
 
 					if GameLocale == "ruRU" then
 
-						LT["InfoText"] = ""
+						LT["InfoText"], LT["SpecText"] = "", ""
 
 						-- Show race
 						if LT["PlayerRace"] then
 							LT["InfoText"] = LT["InfoText"] .. LT["PlayerRace"] .. ","
 						end
 
-						-- Show class
-						LT["InfoText"] = LT["InfoText"] .. " " .. LT["LpTipClassColor"] .. LT["Class"] .. "|r " or LT["InfoText"] .. "|r "
+						-- Show specialisation
+						-- LT["InfoText"] = LT["InfoText"] .. " " .. LT["LpTipClassColor"] .. LT["Class"] .. "|r " or LT["InfoText"] .. "|r "
+						LT["SpecText"] = _G["GameTooltipTextLeft" .. LT["SpecLine"]]:GetText()
+						_G["GameTooltipTextLeft" .. LT["SpecLine"]]:SetText(LT["LpTipClassColor"] .. LT["SpecText"] .. "|r")
 
 						-- Show level
 						if LT["Reaction"] < 5 then
@@ -9085,8 +9088,10 @@
 							LT["InfoText"] = LT["InfoText"] .. " " .. LT["PlayerRace"]
 						end
 
-						-- Show class
-						LT["InfoText"] = LT["InfoText"] .. " " .. LT["LpTipClassColor"] .. LT["Class"] or LT["InfoText"]
+						-- Show specialisation
+						-- LT["InfoText"] = LT["InfoText"] .. " " .. LT["LpTipClassColor"] .. LT["Class"] or LT["InfoText"]
+						LT["SpecText"] = _G["GameTooltipTextLeft" .. LT["SpecLine"]]:GetText()
+						_G["GameTooltipTextLeft" .. LT["SpecLine"]]:SetText(LT["LpTipClassColor"] .. LT["SpecText"] .. "|r")
 
 						-- Show information line
 						_G["GameTooltipTextLeft" .. LT["InfoLine"]]:SetText(LT["InfoText"] .. "|cffffffff|r")

@@ -37,7 +37,7 @@ function BackgroundTextures:OnEnable()
         --creating texture
         self:SetupTexture(unit)
     end
-    if IsAddOnLoaded("BiggerHealthBar") then 
+    if HealthBarColor.db.profile.Settings.Modules.BiggerHealthBar then 
         Player.BackgroundTexture:RemoveMaskTexture(Player.BackgroundTexture:GetMaskTexture(1))
         Player.Background:SetHeight(31)
     end

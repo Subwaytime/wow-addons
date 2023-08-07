@@ -709,6 +709,8 @@ local function GetCategoryText(categoryID)
 		return PERKS_VENDOR_CATEGORY_ILLUSION;
 	elseif categoryID == Enum.PerksVendorCategoryType.Transmogset then
 		return PERKS_VENDOR_CATEGORY_TRANSMOG_SET;
+    elseif categoryID == 128 then
+        return "Missing Data"
 	end
 	return "";
 end

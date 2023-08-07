@@ -17,9 +17,14 @@ end
 function HBC_Unit:SetStatusBarReactionColored()
     self.HealthBar:SetStatusBarColor(self.ReactionColor:GetRGB())
 end
+function HBC_Unit:AddAbsorbVariables()
+    self.OverAbsorbGlow = self.HealthBar.OverAbsorbGlow
+    self.TotalAbsorbBar = self.HealthBar.TotalAbsorbBar
+    self.TotalAbsorbBarOverlay = self.HealthBar.TotalAbsorbBarOverlay
+end
 local metatable = {__index = HBC_Unit}
 --player
-local Player = {}
+local Player        = setmetatable({},metatable)
 Player.HealthBar    = _G.PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.HealthBarArea.HealthBar
 Player.PowerBar     = _G.PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.ManaBarArea.ManaBar
 Player.Portrait     = _G.PlayerFrame.PlayerFrameContainer.PlayerPortrait
@@ -133,8 +138,12 @@ OptionsFrame:SetResizable(true)
 OptionsFrame:SetResizeBounds(300,200)
 OptionsFrame:SetClampedToScreen(true)
 OptionsFrame:RegisterForDrag("LeftButton")
-OptionsFrame:SetScript("OnDragStart", OptionsFrame.StartMoving)
-OptionsFrame:SetScript("OnDragStop", OptionsFrame.StopMovingOrSizing)
+OptionsFrame.TitleContainer:SetScript("OnMouseDown", function()
+    OptionsFrame:StartMoving()
+end)
+OptionsFrame.TitleContainer:SetScript("OnMouseUp", function()
+    OptionsFrame:StopMovingOrSizing()
+end)
 OptionsFrame:Hide()
 HealthBarColorOptionsPortrait:SetTexture("Interface\\AddOns\\HealthBarColor\\Textures\\Icon\\Icon.tga")
 HealthBarColorOptionsTitleText:SetText("HealthBarColor")
@@ -446,7 +455,8 @@ function HealthBarColor:GetReactionColor(hbc_unit, unit)
     return reactionColor
 end
 --tables that will be used to save registered callback functions into
-local OnTargetChanged_Callbacks = {}; local OnToTChanged_Callbacks = {}; local OnFocusChanged_Callbacks = {}; local OnToFChanged_Callbacks = {}; local OnEnteringWorld_Callbaks = {}
+local OnTargetChanged_Callbacks , OnToTChanged_Callbacks, OnFocusChanged_Callbacks, OnToFChanged_Callbacks , OnEnteringWorld_Callbaks, ToPlayerArt_Callbacks, ToVehiceleArt_Callbacks = {}, {}, {}, {}, {}, {}, {}
+local hooked = {}
 
 function HealthBarColor:OnTargetChanged()
     self:OnToTChanged()
@@ -502,7 +512,6 @@ function HealthBarColor:OnSelectionColorChanged(self, unit)
     end
 end
 
-
 --Register
 --modules will register callback functions on events
 --first parameter can be any string for debug purposes use "ModuleName.."
@@ -526,12 +535,38 @@ function HealthBarColor:RegisterOnEnteringWorld(anyname, callback)
     OnEnteringWorld_Callbaks[anyname] = callback
 end
 
+function HealthBarColor:RegisterOnToPlayerArt(callback)
+    ToPlayerArt_Callbacks[#ToPlayerArt_Callbacks+1] = callback
+    if not hooked["PlayerFrame_ToPlayerArt"] then
+        hooksecurefunc("PlayerFrame_ToPlayerArt", function() 
+            for i = 1,#ToPlayerArt_Callbacks do 
+                ToPlayerArt_Callbacks[i]()
+            end
+        end)
+        hooked["PlayerFrame_ToPlayerArt"] = true
+    end
+end
+
+function HealthBarColor:RegisterOnToVehicleArt(callback)
+    ToVehiceleArt_Callbacks[#ToVehiceleArt_Callbacks+1] = callback
+    if not hooked["PlayerFrame_ToVehicleArt"] then
+        hooksecurefunc("PlayerFrame_ToVehicleArt", function() 
+            for i = 1,#ToVehiceleArt_Callbacks do 
+                ToVehiceleArt_Callbacks[i]()
+            end
+        end)
+        hooked["PlayerFrame_ToVehicleArt"] = true
+    end
+end
+
 function HealthBarColor:EmptyTables()
     OnTargetChanged_Callbacks = {}
-    OnToTChanged_Callbacks    = {}
-    OnFocusChanged_Callbacks  = {}
-    OnToFChanged_Callbacks    = {}
-    OnEnteringWorld_Callbaks  = {}
+    OnToTChanged_Callbacks = {}
+    OnFocusChanged_Callbacks = {}
+    OnToFChanged_Callbacks = {}
+    OnEnteringWorld_Callbaks = {}
+    ToPlayerArt_Callbacks = {}
+    ToVehiceleArt_Callback = {}
 end
 
 --Addon compartment 

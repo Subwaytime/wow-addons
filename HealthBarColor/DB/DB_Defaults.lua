@@ -92,6 +92,8 @@ local defaults = {
                 PartyColor         = false,
                 Glow               = false,
                 HideClassPowerBar  = false,
+                BiggerHealthBar    = false,
+                Overabsorb         = false,
                 ['*']              = true,
             },
             ClassColorOverwrites = {

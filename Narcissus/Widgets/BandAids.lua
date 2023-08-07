@@ -130,3 +130,93 @@ do
     end
 end
 --]]
+
+--[[
+do
+    --10.1.7 (since 10.0.5?)
+    --Moonkin Form with Glyph of Stars - white model in Paperdoll
+    --Implemented as a standalone addon
+    local _, _, classID = UnitClass("player");
+    if classID ~= 11 then return end;
+
+    local SPELL_MOONKIN_FORM = 24858;
+    local SPELL_GLYPH = 114301;
+
+    local HasAttachedGlyph = HasAttachedGlyph;
+    local modelScene = CharacterModelScene;
+
+    local function UpdatePlayerModel()
+        local form = GetShapeshiftFormID();
+        if not (form == 31 and HasAttachedGlyph(SPELL_MOONKIN_FORM)) then
+            return
+        end
+
+        modelScene:ReleaseAllActors();
+        modelScene:TransitionToModelSceneID(595, 1, 2, true);   --CHARACTER_SHEET_MODEL_SCENE_ID, CAMERA_TRANSITION_TYPE_IMMEDIATE, CAMERA_MODIFICATION_TYPE_MAINTAIN
+        local actor = modelScene:GetPlayerActor();
+        if actor then
+            local hasAlternateForm, inAlternateForm = C_PlayerInfo.GetAlternateFormInfo();
+            local sheatheWeapon = GetSheathState() == 1;
+            local autodress = true;
+            local hideWeapon = false;
+            local useNativeForm = not inAlternateForm;
+            actor:SetModelByUnit("player", sheatheWeapon, autodress, hideWeapon, useNativeForm);
+            actor:SetAnimationBlendOperation(0);
+            actor:SetSpellVisualKit(23368, false);
+            actor:SetSpellVisualKit(27440, false);
+        end
+    end
+
+    if PaperDollFrame_SetPlayer and modelScene then
+        hooksecurefunc("PaperDollFrame_SetPlayer", UpdatePlayerModel);
+    end
+
+    
+    --Avoid overwriting, possible taint?
+
+    local ANIMAL_FORMS = ANIMAL_FORMS or {};
+
+    if true then return end;
+
+    function PaperDollFrame_SetPlayer()
+        CharacterModelScene:ReleaseAllActors();
+        CharacterModelScene:TransitionToModelSceneID(595, 1, 2, true);   --CHARACTER_SHEET_MODEL_SCENE_ID, CAMERA_TRANSITION_TYPE_IMMEDIATE, CAMERA_MODIFICATION_TYPE_MAINTAIN
+
+        local form = GetShapeshiftFormID();
+        local isStarry;
+
+        if form and not UnitOnTaxi("player") then
+            if form == 31 and HasAttachedGlyph(SPELL_MOONKIN_FORM) then
+                isStarry = true;
+            else
+                local actorTag = ANIMAL_FORMS[form] and ANIMAL_FORMS[form].actorTag or nil;
+                if actorTag then
+                    local actor = CharacterModelScene:GetPlayerActor(actorTag);
+                    local creatureDisplayID = C_PlayerInfo.GetDisplayID();
+                    if actor and creatureDisplayID then
+                        actor:SetModelByCreatureDisplayID(creatureDisplayID);
+                        actor:SetAnimationBlendOperation(MODEL_BLEND_OPERATION);
+                        return
+                    end
+                end
+            end
+        end
+
+        local actor = CharacterModelScene:GetPlayerActor();
+        if actor then
+            local hasAlternateForm, inAlternateForm = C_PlayerInfo.GetAlternateFormInfo();
+            local sheatheWeapon = GetSheathState() == 1;
+            local autodress = true;
+            local hideWeapon = false;
+            local useNativeForm = not inAlternateForm;
+            actor:SetModelByUnit("player", sheatheWeapon, autodress, hideWeapon, useNativeForm);
+            actor:SetAnimationBlendOperation(MODEL_BLEND_OPERATION);
+
+            if isStarry then
+                actor:SetSpellVisualKit(23368, false);
+                actor:SetSpellVisualKit(27440, false);
+            end
+        end
+    end
+end
+--]]

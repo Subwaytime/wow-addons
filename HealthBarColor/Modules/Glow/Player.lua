@@ -9,7 +9,15 @@ local Glow_Player = HealthBarColor:NewModule("Glow_Player")
 local Player = HealthBarColor:GetUnit("Player")
 local hooked = {}
 local hook_callback = {}
-local donothing = function() end
+
+
+local toPlayerArt = function()
+    Player.Glow:Show()
+end
+
+local toVehicelArt = function()
+    Player.Glow:Hide()
+end
 
 function Glow_Player:OnEnable()
     if not HealthBarColor.db.profile.Settings.Modules.Glow then return end
@@ -31,31 +39,13 @@ function Glow_Player:OnEnable()
         local color = HealthBarColor.db.profile.Modules.Glow.player_static_color 
         Player.Glow:SetVertexColor(color.r,color.g,color.b)
     end
-    hook_callback["PlayerFrame_ToPlayerArt"] = function()
-        Player.Glow:Show()
-    end
-    if not hooked["PlayerFrame_ToPlayerArt"] then
-        hooksecurefunc("PlayerFrame_ToPlayerArt",function()
-            hook_callback["PlayerFrame_ToPlayerArt"]()
-        end)
-        hooked["PlayerFrame_ToPlayerArt"] = true
-    end
-    hook_callback["PlayerFrame_ToVehicleArt"] = function()
-        Player.Glow:Hide()
-    end
-    if not hooked["PlayerFrame_ToVehicleArt"] then
-        hooksecurefunc("PlayerFrame_ToVehicleArt",function()
-            hook_callback["PlayerFrame_ToVehicleArt"]()
-        end)
-        hooked["PlayerFrame_ToVehicleArt"] = true
-    end
+    HealthBarColor:RegisterOnToPlayerArt(toPlayerArt)
+    HealthBarColor:RegisterOnToVehicleArt(toVehicelArt)
     Player.Glow:Show()
 end
 
 function Glow_Player:OnDisable()
     if Player.Glow then
         Player.Glow:Hide()
-        hook_callback["PlayerFrame_ToPlayerArt"] = donothing
-        hook_callback["PlayerFrame_ToVehicleArt"] = donothing
     end
 end

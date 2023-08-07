@@ -363,6 +363,7 @@ local lastConAngle = nil
 local function OnUpdate_Main(self, elapsed)
 	local count, offset = self.count, self.offset
 	local imode, qaid, angle, isActiveRadius, stl = PC:GetCurrentInputs()
+	local radius, miScaleAdd, frameRate = self.radius, configCache.MIScaleAdd, GetFramerate()
 
 	if qaid and count > 0 then
 		angle = (90 - offset - (qaid-1)*360/count) % 360
@@ -380,7 +381,7 @@ local function OnUpdate_Main(self, elapsed)
 	else
 		arate = 20 + 160*sin(min(90, adiff*6))
 	end
-	local abound = configCache.XTPointerSnap and 360 or (1.25*arate/GetFramerate())
+	local abound = configCache.XTPointerSnap and 360 or (1.25*arate/frameRate)
 	local arotDirection = ((oangle - angle) % 360 < (angle - oangle) % 360) and -1 or 1
 	self.angle = (adiff < abound) and angle or (oangle + arotDirection * abound) % 360
 	centerPointer:SetRotation(self.angle/180*3.1415926535898 - 90/180*3.1415926535898)
@@ -409,7 +410,7 @@ local function OnUpdate_Main(self, elapsed)
 			else
 				local jump1 = atype == "jump" and 1 or 0
 				local originAngle = 90 - 360/count*(si-1) - offset
-				local group = GhostIndication:ActivateGroup(si, nestedCount + jump1, originAngle, self.radius*(configCache.MIScale and 1.10 or 1), 1.10)
+				local group = GhostIndication:ActivateGroup(si, nestedCount + jump1, originAngle, radius*(miScaleAdd+1), 1.10)
 				for i=2-jump1, nestedCount do
 					securecall(callElementUpdate, group[i+jump1], updateSlice, si, i, 90, false)
 				end
@@ -417,43 +418,43 @@ local function OnUpdate_Main(self, elapsed)
 		end
 	end
 
-	if configCache.MIScale then
-		local limit = 2^configCache.XTScaleSpeed/GetFramerate()
+	if miScaleAdd > 0 then
+		local limit = frameRate >= 40 and 10*miScaleAdd/frameRate or miScaleAdd
 		for i=1,count do
-			local s, new = Slices[i], i == si and 1.10 or 1
+			local s, new = Slices[i], i == si and miScaleAdd+1 or 1
 			local old = s:GetScale()
 			s:SetScale(old + min(limit, max(-limit, new-old)))
 		end
 	end
 end
 local function OnUpdate_ZoomIn(self, elapsed)
-	local delta = self.eleft - elapsed
-	self.eleft, delta = delta, delta > 0 and delta/configCache.XTZoomTime or 0
-	if delta == 0 then self:SetScript("OnUpdate", OnUpdate_Main) end
-	self:SetScale(configCache.RingScale/max(0.20,cos(65*delta)))
-	self:SetAlpha(delta < 1 and 1-delta or 0)
+	local r = self.eleft - elapsed
+	self.eleft, r = r, r > 0 and r/configCache.XTZoomTime or 0
+	if r == 0 then self:SetScript("OnUpdate", OnUpdate_Main) end
+	self:SetScale(configCache.RingScale/max(0.20,cos(65*r)))
+	self:SetAlpha(r < 1 and 1-r or 0)
 	return OnUpdate_Main(self, elapsed)
 end
 local function OnUpdate_ZoomOut(self, elapsed)
-	local delta = self.eleft - elapsed
-	self.eleft, delta = delta, delta > 0 and delta/configCache.XTZoomTime or 0
-	if delta <= 0 then
+	local r = self.eleft - elapsed
+	self.eleft, r = r, r > 0 and r/configCache.XTZoomTime or 0
+	if r <= 0 then
 		self:Hide()
 		self:SetScript("OnUpdate", nil)
 	elseif configCache.MISpinOnHide then
 		local count = self.count
 		if count > 0 then
-			local baseAngle, angleStep, radius, prog = 45 - self.offset + 45*delta, 360/count, self.radius, (1-delta)*150*max(0.5, min(1, GetFramerate()/60))
+			local baseAngle, angleStep, radius, prog = 45 - self.offset + 45*r, 360/count, self.radius, (1-r)*150*max(0.5, min(1, GetFramerate()/60))
 			for i=1,count do
 				Slices[i]:SetPoint("CENTER", cos(baseAngle)*radius + cos(baseAngle-90)*prog, sin(baseAngle)*radius + sin(baseAngle-90)*prog)
 				baseAngle = baseAngle - angleStep
 			end
 		end
-		self:SetScale(configCache.RingScale*(1.75 - .75*delta))
+		self:SetScale(configCache.RingScale*(1.75 - .75*r))
 	else
-		self:SetScale(configCache.RingScale*delta)
+		self:SetScale(configCache.RingScale*r)
 	end
-	self:SetAlpha(delta > 1 and 1 or delta)
+	self:SetAlpha(r > 1 and 1 or r)
 end
 mainFrame:SetScript("OnHide", function(self)
 	if self:IsShown() and self:GetScript("OnUpdate") == OnUpdate_ZoomOut then
@@ -464,12 +465,14 @@ end)
 
 function iapi:Show(_, _, fastOpen)
 	lastConAngle, _, mainFrame.count, mainFrame.offset = nil, PC:GetOpenRing(configCache)
+	configCache.XTZoomTime = configCache.XTAnimation and 0.3 or 0
 	SwitchIndicatorFactory(configCache.IndicatorFactory)
 
 	local baseSize = 48 + 48*configCache.MIButtonMargin
 	mainFrame.radius = CalculateRingRadius(mainFrame.count or 3, baseSize, baseSize, 100, 90-(mainFrame.offset or 0))
 	mainFrame.eleft, mainFrame.oldSlice, mainFrame.angle, mainFrame.omState, mainFrame.oldIsGlowing = configCache.XTZoomTime * (fastOpen and 0.5 or 1), -1
 	mainFrame.rotPeriod = nil
+	configCache.MIScaleAdd = configCache.MIScale and (mainFrame.radius > 200 and 0.05 or 0.10) or 0
 	GhostIndication:Reset()
 
 	local astep, radius, usedMI = mainFrame.count == 0 and 0 or -360/mainFrame.count, mainFrame.radius, mainFrame.count
@@ -525,7 +528,7 @@ end
 function api:RegisterIndicatorConstructor(key, info)
 	assert(type(key) == "string" and type(info) == "table", 'Syntax: OPieUI:RegisterIndicatorConstructor("key", infoTable)', 2)
 	local func, apiLevel, iname, reqAPILevel = info.CreateIndicator, info.apiLevel, info.name, info.reqAPILevel
-	assert(IndicatorFactories[key] == nil, 'RegisterIndicatorConstructor: an indicator constructor with the specified key is already registered', 2)
+	assert(key ~= "_" and IndicatorFactories[key] == nil, 'RegisterIndicatorConstructor: an indicator constructor with the specified key is already registered', 2)
 	assert(type(func) == "function", 'RegisterIndicatorConstructor: info.CreateIndicator must be a function', 2)
 	assert(type(apiLevel) == "number" and apiLevel < math.huge, 'RegisterIndicatorConstructor: info.apiLevel must be a finite number', 2)
 	assert(type(iname) == "string", 'RegisterIndicatorConstructor: info.name must be a string', 2)
@@ -533,7 +536,7 @@ function api:RegisterIndicatorConstructor(key, info)
 
 	local mainPool = ValidateIndicator(apiLevel, reqAPILevel, info, 3)
 	LastRegisteredIndicatorFactory, IndicatorFactories[key] = key, {
-		name = iname:gsub("|", ""),
+		name = iname:gsub("|+", ""),
 		apiLevel = apiLevel,
 		CreateIndicator = func,
 		mainPool = mainPool,
@@ -543,10 +546,10 @@ function api:RegisterIndicatorConstructor(key, info)
 	}
 end
 
-for k,v in pairs({ShowCooldowns=false, ShowRecharge=false, UseGameTooltip=true, ShowKeys=true, ShowOneCount=false, ShowShortLabels=true,
+for k,v in pairs({IndicatorFactory="_",
+	ShowCooldowns=false, ShowRecharge=false, UseGameTooltip=true, ShowKeys=true, ShowOneCount=false, ShowShortLabels=true,
 	MIScale=true, MISpinOnHide=true, MIButtonMargin=0.1, GhostMIRings=true,
-	IndicatorFactory="_",
-	XTPointerSnap=false, XTScaleSpeed=0, XTZoomTime=0.3, XTRotationPeriod=4, GhostShowDelay=0.25}) do
+	XTPointerSnap=false, XTAnimation=true, XTRotationPeriod=4, GhostShowDelay=0.25}) do
 	PC:RegisterOption(k,v)
 end
 api:RegisterIndicatorConstructor("mirage", T.Mirage)
