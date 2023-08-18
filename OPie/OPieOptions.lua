@@ -1,6 +1,6 @@
 local config, COMPAT, _, T = {}, select(4,GetBuildInfo()), ...
 local MODERN, CF_WRATH = COMPAT >= 10e4, COMPAT < 10e4 and COMPAT >= 3e4
-local L, EV, XU, frame = T.L, T.Evie, T.exUI, nil
+local L, EV, TS, XU, frame = T.L, T.Evie, T.TenSettings, T.exUI, nil
 local GameTooltip = T.NotGameTooltip or GameTooltip
 T.config = config
 
@@ -14,7 +14,7 @@ do -- /opie
 	end
 	addSuffix(function()
 		print("|cff0080ffOPie|r |cffffffff" .. GetAddOnMetadata("OPie", "Version") .. "|r")
-	end, "version")
+	end, "version", "v")
 	T.AddSlashSuffix = addSuffix
 
 	SLASH_OPIE1, SLASH_OPIE2 = "/opie", "/op"
@@ -28,8 +28,8 @@ do -- /opie
 	end
 end
 
-if T.TenSettings.Localize then
-	T.TenSettings:Localize({
+if TS and TS.Localize then
+	TS:Localize({
 		REVERT=L"Revert...",
 		REVERT_OPTION_LABEL=L"%d |4minute:minutes; ago (%s)",
 		RESET_QUESTION=L"Do you want to reset all %s settings to their defaults, or only the settings in the %s category?",
@@ -42,9 +42,6 @@ end
 local KR, PC = T.ActionBook:compatible("Kindred",1,0), T.OPieCore
 local CreateEdge = T.CreateEdge
 
-function config.createPanel(...)
-	return T.TenSettings:CreateOptionsPanel(...)
-end
 do -- config.ui
 	config.ui = {}
 	do -- multilineInput
@@ -81,9 +78,6 @@ do -- config.ui
 			input.scroll, scroller.input = scroller, input
 			return input, scroller
 		end
-	end
-	function config.ui.lineInput(parent, common, width)
-		return T.TenSettings:CreateLineInputBox(parent, common, width)
 	end
 	function config.ui.HideTooltip(self)
 		if GameTooltip:IsOwned(self) then
@@ -333,7 +327,6 @@ do -- config.bind
 		return btn
 	end
 end
-config.undo = T.TenSettings:CreateUndoHandle()
 do -- config.pulseDropdown
 	local function cloneTex(tex)
 		local l, sl = tex:GetDrawLayer()
@@ -373,6 +366,7 @@ do -- config.pulseDropdown
 		pulse()
 	end
 end
+config.undo = TS:CreateUndoHandle()
 
 local function CallSwitchProfile(msg, ...)
 	if msg == "archive-unwind" then
@@ -407,7 +401,7 @@ end
 
 function config.checkSVState(frame)
 	if not PC:GetSVState() then
-		T.TenSettings:ShowAlertOverlay(frame, L"Changes will not be saved", L"World of Warcraft could not load OPie's saved variables due to a lack of memory. Try disabling other addons.\n\nAny changes you make now will not be saved.", L"Understood; edit anyway")
+		TS:ShowAlertOverlay(frame, L"Changes will not be saved", L"World of Warcraft could not load OPie's saved variables due to a lack of memory. Try disabling other addons.\n\nAny changes you make now will not be saved.", L"Understood; edit anyway")
 	end
 end
 
@@ -437,12 +431,12 @@ local OPC_OptionSets = {
 	}, { L"Animation",
 		{"bool", "XTAnimation", caption=L"Animate transitions"},
 		{"bool", "MISpinOnHide", caption=L"Outward spiral on hide", depOn="XTAnimation", depValue=true, otherwise=false},
-		{"bool", "MIScale", caption=L"Enlarge selected slice"},
 		{"bool", "XTPointerSnap", caption=L"Snap pointer to mouse cursor"},
+		{"bool", "MIScale", caption=L"Enlarge selected slice"},
 	}
 }
 
-frame = config.createPanel("OPie", nil, {forceRootVersion=true})
+frame = TS:CreateOptionsPanel("OPie", nil, {forceRootVersion=true})
 	frame.version:SetFormattedText("%s", PC:GetVersion() or "")
 	frame.desc:SetText(L"Customize OPie's appearance and behavior. Right clicking a checkbox restores it to its default state."
 		.. (MODERN and "\n" .. L"Profiles activate automatically when you switch character specializations." or ""))
@@ -490,7 +484,7 @@ do -- Widget construction
 		self:SetPoint("TOPRIGHT", r, "TOPRIGHT", 0, y)
 	end
 	function build.bool(v, ofsY, halfpoint, rowHeight, rframe)
-		local b = T.TenSettings:CreateOptionsCheckButton(nil, frame)
+		local b = TS:CreateOptionsCheckButton(nil, frame)
 		b:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 		b:SetMotionScriptsWhileDisabled(true)
 		b.id, b.text, b.desc = v[2], b.Text, v
@@ -503,7 +497,7 @@ do -- Widget construction
 		if halfpoint then
 			ofsY = ofsY - rowHeight
 		end
-		local s, leftMargin, centerLine = T.TenSettings:CreateOptionsSlider(frame, nil, 212)
+		local s, leftMargin, centerLine = TS:CreateOptionsSlider(frame, nil, 212)
 		s:SetPoint("TOPLEFT", rframe, "TOPLEFT", 319-leftMargin, ofsY-5)
 		s.text:SetPoint("LEFT", rframe, "TOPLEFT", 44, ofsY-5-centerLine)
 		s.text:Show()
@@ -682,7 +676,7 @@ do -- OPC_Profile:initialize
 		return true
 	end
 	local function OPC_Profile_new(_, _, frame)
-		T.TenSettings:ShowPromptOverlay(frame, L"Create a New Profile", L"New profile name:", L"Profiles save options and ring bindings.", L"Create Profile", OPC_Profile_new_callback)
+		TS:ShowPromptOverlay(frame, L"Create a New Profile", L"New profile name:", L"Profiles save options and ring bindings.", L"Create Profile", OPC_Profile_new_callback)
 	end
 	local function OPC_Profile_delete()
 		config.undo:saveActiveProfile()

@@ -137,7 +137,7 @@ local function GetPositiveFileIDFromPath(path)
 end
 
 local ringContainer, ringDetail, sliceDetail, newSlice, newRing, editorHost
-local panel = config.createPanel(L"Custom Rings", "OPie")
+local panel = TS:CreateOptionsPanel(L"Custom Rings", "OPie")
 	panel.desc:SetText(L"Customize OPie by modifying existing rings, or creating your own.")
 local ringDropDown = CreateFrame("Frame", "RKC_RingSelectionDropDown", panel, "UIDropDownMenuTemplate")
 	ringDropDown:SetPoint("TOP", -70, -60)
@@ -158,7 +158,7 @@ newRing = CreateFrame("Frame") do
 	newRing:Hide()
 	local title = newRing:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	local toggle1, toggle2 = CreateToggleButton(newRing), CreateToggleButton(newRing)
-	local name, snap = config.ui.lineInput(newRing, true, 240), config.ui.lineInput(newRing, true, 240)
+	local name, snap = TS:CreateLineInputBox(newRing, true, 240), TS:CreateLineInputBox(newRing, true, 240)
 	local nameLabel, snapLabel = newRing:CreateFontString(nil, "OVERLAY", "GameFontHighlight"), snap:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	local accept, cancel = CreateButton(newRing, 125), CreateButton(newRing, 125)
 	local importNested = TS:CreateOptionsCheckButton(nil, newRing)
@@ -594,7 +594,7 @@ sliceDetail = CreateFrame("Frame", nil, ringContainer) do
 		s.label:SetPoint("TOPLEFT", sliceDetail, "TOPLEFT", 10, -47)
 		s.label:SetText(L"Show this slice for:")
 	end
-	sliceDetail.showConditional = config.ui.lineInput(sliceDetail, true, 260) do
+	sliceDetail.showConditional = TS:CreateLineInputBox(sliceDetail, true, 260) do
 		local c = sliceDetail.showConditional
 		c:SetPoint("TOPLEFT", 274, -oy)
 		oy = oy + 23
@@ -613,7 +613,7 @@ sliceDetail = CreateFrame("Frame", nil, ringContainer) do
 		end)
 		c:SetScript("OnLeave", config.ui.HideTooltip)
 	end
-	sliceDetail.color = config.ui.lineInput(sliceDetail, true, 85) do
+	sliceDetail.color = TS:CreateLineInputBox(sliceDetail, true, 85) do
 		local c = sliceDetail.color
 		c:SetPoint("TOPLEFT", 274, -oy)
 		oy = oy + 23
@@ -694,7 +694,7 @@ sliceDetail = CreateFrame("Frame", nil, ringContainer) do
 		f:SetScript("OnClick", function() frame:SetShown(not frame:IsShown()) PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON) end)
 		frame:SetScript("OnHide", frame.Hide)
 		do
-			local ed = config.ui.lineInput(frame, false, 280)
+			local ed = TS:CreateLineInputBox(frame, false, 280)
 			local hint = ed:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 			hint:SetPoint("CENTER")
 			hint:SetText("|cffa0a0a0" .. L"(enter an icon name or path here)")
@@ -885,10 +885,10 @@ sliceDetail = CreateFrame("Frame", nil, ringContainer) do
 		f:SetPoint("BOTTOMRIGHT", -10, 36)
 		f.optionsColumnOffset = 256
 		function f:OnActionChanged(ed)
-			return editorHost:IsCurrentEditor(ed) and api.setSliceProperty("*")
+			return editorHost:IsCurrentEditor(ed) and api.setSliceAction()
 		end
 		function f:SaveAction() -- DEPRECATED [2303/Y8]
-			api.setSliceProperty("*")
+			api.setSliceAction()
 		end
 		function f:SetVerticalOffset(ofsY)
 			f:SetPoint("TOPLEFT", sliceDetail.fastClick.label, "BOTTOMLEFT", 0, -6-ofsY)
@@ -948,7 +948,7 @@ newSlice = CreateFrame("Frame", nil, ringContainer) do
 		end
 	end
 	do -- newSlice.search
-		local s = config.ui.lineInput(newSlice, true, 153)
+		local s = TS:CreateLineInputBox(newSlice, true, 153)
 		s:SetPoint("TOPLEFT", 7, -1) s:SetTextInsets(16, 0, 0, 0)
 		local i = s:CreateTexture(nil, "OVERLAY")
 		i:SetSize(14, 14) i:SetPoint("LEFT", 0, -1)
@@ -1551,6 +1551,11 @@ function api.setRingProperty(name, value)
 	end
 	api.saveRing(currentRingName, currentRing)
 end
+function api.setSliceAction()
+	if currentRing and currentSliceIndex then
+		api.setSliceProperty("*")
+	end
+end
 function api.setSliceProperty(prop, ...)
 	local slice = assert(currentRing[currentSliceIndex], "Setting a slice property on an unknown slice")
 	if prop == "color" then
@@ -1827,6 +1832,10 @@ ringDetail:SetScript("OnShow", function()
 	ringDetail.restore:SetShown(isDefaultAvailable and isDefaultOverriden)
 end)
 
+local function resetView()
+	currentRingName, currentRing, currentSliceIndex, ringNames = nil
+	ringContainer:Hide()
+end
 function panel:refresh()
 	local oRingName, oBaseIndex, oSliceIndex = currentRingName, sliceBaseIndex, currentSliceIndex
 	local oSliceToken = currentRing and currentRing[currentSliceIndex] and currentRing[currentSliceIndex].sliceToken
@@ -1867,11 +1876,11 @@ function panel:default()
 	RK:RestoreDefaults()
 	panel:refresh()
 end
-local function resetView()
-	currentRingName, currentRing, currentSliceIndex, ringNames = nil
+function panel:okay()
 	ringContainer:Hide()
+	resetView()
 end
-panel.okay, panel.cancel = resetView, resetView
+panel.cancel = resetView
 panel:SetScript("OnShow", config.checkSVState)
 
 SLASH_OPIE_CUSTOM_RINGS1 = "/rk"

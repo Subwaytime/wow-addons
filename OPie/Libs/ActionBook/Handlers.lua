@@ -925,7 +925,7 @@ do -- petspell: spell ID
 end
 if MODERN then -- toy: item ID, forceShow
 	local map, lastUsability, uq, whinedAboutGIIR = {}, {}, {}
-	local IGNORE_TOY_USABILITY = {
+	local OVERRIDE_TOY_ACQUIRED, IGNORE_TOY_USABILITY = {}, {
 		[129149]=1, [129279]=1, [129367]=1, [130157]="[in:broken isles]", [130158]=1, [130170]=1,
 		[130191]=1, [130199]=1, [130232]=1, [131812]=1, [131814]=1, [140325]=1, [147708]=1,
 		[165021]=1,
@@ -936,11 +936,18 @@ if MODERN then -- toy: item ID, forceShow
 		[85500]="[fish5]",
 		[182773]="[coven:necro][acoven80:necro]", [184353]="[coven:kyrian][acoven80:kyrian]", [180290]="[coven:fae][acoven80:fae]", [183716]="[coven:venthyr][acoven80:venthyr]", [190237] = 1,
 	}
+	local function playerHasToy(id)
+		local f = OVERRIDE_TOY_ACQUIRED[id]
+		if f then
+			return f == true or f(id)
+		end
+		return f == nil and PlayerHasToy(id)
+	end
 	function toyHint(iid)
 		local _, name, icon = C_ToyBox.GetToyInfo(iid)
 		local cdStart, cdLength = (MODERN_CONTAINERS and C_Container.GetItemCooldown or GetItemCooldown)(iid)
 		local ignUse, usable = IGNORE_TOY_USABILITY[iid]
-		if not PlayerHasToy(iid) then
+		if not playerHasToy(iid) then
 			usable = false
 		elseif ignUse == nil then
 			usable = C_ToyBox.IsToyUsable(iid) ~= false
@@ -970,7 +977,7 @@ if MODERN then -- toy: item ID, forceShow
 	end
 	local function createToy(id, forceShow)
 		local mid, ignUse = map[id], IGNORE_TOY_USABILITY[id]
-		if not (mid or ignUse or type(id) == "number") or not (forceShow or PlayerHasToy(id)) then
+		if not (mid or ignUse or type(id) == "number") or not (forceShow or playerHasToy(id)) then
 			return
 		end
 		local isUsable = ignUse or C_ToyBox.IsToyUsable(id)
@@ -1003,6 +1010,13 @@ if MODERN then -- toy: item ID, forceShow
 			end
 		end
 	end)
+	function AB.HUM:SetPlayerHasToyOverride(id, filter)
+		local tf = type(filter)
+		if not (type(id) == "number" and tf == "nil" or tf == "boolean" or tf == "function") then
+			return error('SetPlayerHasToyOverride: invalid arguments', 2)
+		end
+		OVERRIDE_TOY_ACQUIRED[id] = filter
+	end
 end
 do -- disenchant: iid
 	local map, DISENCHANT_SID = {}, 13262

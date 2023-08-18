@@ -20,8 +20,8 @@ if COMPAT >= 10e4 then
 		end
 	end
 	function T.TenSABT(self)
-		self[self:GetScript("PreClick") and "HookScript" or "SetScript"](self, "PreClick", PreClick)
-		self[self:GetScript("PostClick") and "HookScript" or "SetScript"](self, "PostClick", PostClick)
+		self:HookScript("PreClick", PreClick)
+		self:HookScript("PostClick", PostClick)
 		return self
 	end
 else

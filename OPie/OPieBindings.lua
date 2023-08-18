@@ -1,7 +1,8 @@
-local _, T = ...
-local L, EV, PC, XU, config, KR = T.L, T.Evie, T.OPieCore, T.exUI, T.config, OPie.ActionBook:compatible("Kindred", 1, 0)
+local COMPAT, _, T = select(4,GetBuildInfo()), ...
+local L, EV, PC, TS, XU, config, KR = T.L, T.Evie, T.OPieCore, T.TenSettings, T.exUI, T.config, OPie.ActionBook:compatible("Kindred", 1, 0)
+local MODERN = COMPAT >= 10e4
 
-local frame = config.createPanel(L"Ring Bindings", "OPie")
+local frame = TS:CreateOptionsPanel(L"Ring Bindings", "OPie")
 	frame.desc:SetText(L"Customize OPie key bindings below. Hover over a binding button for additional information and options."
 		.. (MODERN and "\n" .. L"Profiles activate automatically when you switch character specializations." or ""))
 local OBC_Profile = CreateFrame("Frame", "OBC_Profile", frame, "UIDropDownMenuTemplate")
@@ -107,7 +108,7 @@ function ringBindings:altClick() -- self is the binding button
 end
 function ringBindings:shiftClick()
 	local name, key, macro = PC:GetRingInfo(ringBindings.map[self:GetID()])
-	T.TenSettings:ShowPromptOverlay(frame, name or key, (L"The following macro command opens this ring:"):format("|cffFFD029" .. (name or key) .. "|r"), false, false, nil, 0.90, nil, macro)
+	TS:ShowPromptOverlay(frame, name or key, (L"The following macro command opens this ring:"):format("|cffFFD029" .. (name or key) .. "|r"), false, false, nil, 0.90, nil, macro)
 end
 
 local subBindings = { name=L"In-Ring Bindings", caption=L"Action",
