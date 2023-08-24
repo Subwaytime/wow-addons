@@ -1,6 +1,9 @@
 --[[
     Created by Slothpala 
 --]]
+local _, addonTable = ...
+local HealthBarColor = addonTable.HealthBarColor
+
 local PartyColor = HealthBarColor:NewModule("PartyColor")
 --hook stuff
 local hooked    = {}

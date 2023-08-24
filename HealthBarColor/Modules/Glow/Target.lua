@@ -4,6 +4,9 @@
     selected 2 = static color
     selected 3 = hide
 --]]
+local _, addonTable = ...
+local HealthBarColor = addonTable.HealthBarColor
+
 local Glow_Target = HealthBarColor:NewModule("Glow_Target")
 local Target = HealthBarColor:GetUnit("Target")
 local hooked = nil

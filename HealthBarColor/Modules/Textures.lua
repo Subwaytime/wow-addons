@@ -1,6 +1,9 @@
 --[[
     Created by Slothpala 
 --]]
+local _, addonTable = ...
+local HealthBarColor = addonTable.HealthBarColor
+
 local Textures = HealthBarColor:NewModule("Textures")
 local media = LibStub("LibSharedMedia-3.0")
 --txtures

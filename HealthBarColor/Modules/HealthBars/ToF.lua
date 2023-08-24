@@ -5,6 +5,9 @@
     selected 3 = static color
     selected 4 = reaction color
 --]]
+local _, addonTable = ...
+local HealthBarColor = addonTable.HealthBarColor
+
 local HealthBar_ToF = HealthBarColor:NewModule("HealthBar_ToF")
 
 function HealthBar_ToF:OnEnable()

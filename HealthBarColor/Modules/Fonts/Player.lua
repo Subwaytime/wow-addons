@@ -3,6 +3,9 @@
     selected 1 = player class color
     selected 2 = static color
 --]]
+local _, addonTable = ...
+local HealthBarColor = addonTable.HealthBarColor
+
 local Font_Player = HealthBarColor:NewModule("Font_Player")
 local Player = HealthBarColor:GetUnit("Player")
 local Media = LibStub("LibSharedMedia-3.0")

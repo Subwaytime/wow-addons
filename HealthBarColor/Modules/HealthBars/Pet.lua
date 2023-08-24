@@ -3,6 +3,9 @@
     selected 1 = player class color
     selected 2 = static color
 --]]
+local _, addonTable = ...
+local HealthBarColor = addonTable.HealthBarColor
+
 local HealthBar_Pet = HealthBarColor:NewModule("HealthBar_Pet")
 
 function HealthBar_Pet:OnEnable()

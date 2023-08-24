@@ -1,6 +1,8 @@
 --[[
     Created by Slothpala 
 --]]
+local _, addonTable = ...
+local HealthBarColor = addonTable.HealthBarColor
 
 local Overabsorb = HealthBarColor:NewModule("Overabsorb")
 local donothing = function() end

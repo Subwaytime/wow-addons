@@ -1,6 +1,9 @@
 --[[
     Created by Slothpala 
 --]]
+local _, addonTable = ...
+local HealthBarColor = addonTable.HealthBarColor
+
 local BiggerHealthBar = HealthBarColor:NewModule("BiggerHealthBar")
 --hook stuff
 local hooked = {}

@@ -1,5 +1,5 @@
 ﻿----------------------------------------------------------------------
--- 	Leatrix Plus 10.1.16 (15th August 2023)
+-- 	Leatrix Plus 10.1.17 (23rd August 2023)
 ----------------------------------------------------------------------
 
 --	01:Functns, 02:Locks, 03:Restart, 20:Live, 30:Isolated, 40:Player
@@ -18,7 +18,7 @@
 	local void
 
 	-- Version
-	LeaPlusLC["AddonVer"] = "10.1.16"
+	LeaPlusLC["AddonVer"] = "10.1.17"
 
 	-- Get locale table
 	local void, Leatrix_Plus = ...
@@ -5501,9 +5501,7 @@
 						OnTooltipShow = function(tooltip)
 							if not tooltip or not tooltip.AddLine then return end
 							tooltip:AddLine(name)
-							tooltip:AddLine(L["This is a custom button."], 1, 1, 1)
-							tooltip:AddLine(L["Please ask the addon author to use LibDBIcon."], 1, 1, 1)
-							tooltip:AddLine(L["There is a helpful guide on leatrix.com."], 1, 1, 1)
+							tooltip:AddLine(L["This addon uses a custom button."], 1, 1, 1)
 						end,
 					})
 					LeaPlusDB["CustomAddonButtons"][name] = LeaPlusDB["CustomAddonButtons"][name] or {}

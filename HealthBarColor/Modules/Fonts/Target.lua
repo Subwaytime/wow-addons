@@ -5,6 +5,9 @@
     selected 3 = my class color
     selected 4 = static color
 --]]
+local _, addonTable = ...
+local HealthBarColor = addonTable.HealthBarColor
+
 local pairs = pairs
 local Font_Target = HealthBarColor:NewModule("Font_Target")
 local Target = HealthBarColor:GetUnit("Target")

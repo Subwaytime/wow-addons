@@ -1,6 +1,9 @@
 --[[
     Created by Slothpala 
 --]]
+local _, addonTable = ...
+local HealthBarColor = addonTable.HealthBarColor
+
 local DebuffColor = HealthBarColor:NewModule("DebuffColor")
 local Player = HealthBarColor:GetUnit("Player")
 local defaultColor = {r,g,b}

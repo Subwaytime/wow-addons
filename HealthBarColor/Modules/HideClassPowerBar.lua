@@ -1,6 +1,9 @@
 --[[
     Created by Slothpala 
 --]]
+local _, addonTable = ...
+local HealthBarColor = addonTable.HealthBarColor
+
 local HideClassPowerBar = HealthBarColor:NewModule("HideClassPowerBar")
 --hook stuff
 local hooked   = {}

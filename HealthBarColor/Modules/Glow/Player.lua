@@ -5,6 +5,9 @@
     selected 3 = hide / don't create
     PlayerFrame doesn't actually have a glow texture so copy it from target/focus
 --]]
+local _, addonTable = ...
+local HealthBarColor = addonTable.HealthBarColor
+
 local Glow_Player = HealthBarColor:NewModule("Glow_Player")
 local Player = HealthBarColor:GetUnit("Player")
 local hooked = {}

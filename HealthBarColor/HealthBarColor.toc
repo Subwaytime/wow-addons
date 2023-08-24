@@ -1,5 +1,5 @@
 ## Interface: 100105
-## Version: v10.1.5-2.5.0
+## Version: v10.1.5-2.6.0
 ## Title: HealthBarColor
 ## Author: Slothpala
 ## SavedVariables: HealthBarColorDB
@@ -8,13 +8,15 @@
 ## OptionalDeps: Ace3, LibDeflate, LibSharedMedia-3.0, LibDualSpec-1.0, LibDDI-1.0
 ## X-Curse-Project-ID: 682398
 
-#Libs
+#Embeds
 embeds.xml
+locales.xml
 
 #Config
 Core.lua
 DB\DB_Defaults.lua
 Options\Options.lua
+
 
 #Modules
 include_modules.xml

@@ -3,6 +3,9 @@
     selected 1 = player class color
     selected 2 = static color
 --]]
+local _, addonTable = ...
+local HealthBarColor = addonTable.HealthBarColor
+
 local Font_Boss = HealthBarColor:NewModule("Font_Boss")
 local Boss1 = HealthBarColor:GetUnit("Boss1")
 local Boss2 = HealthBarColor:GetUnit("Boss2")

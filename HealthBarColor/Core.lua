@@ -5,10 +5,10 @@
 local CreateColor = CreateColor
 local UnitClass = UnitClass
 local GetRGB = GetRGB
+local UnitSelectionType = UnitSelectionType
 --lua local
 local pairs = pairs
 local select = select
-local UnitSelectionType = UnitSelectionType
 --HeealthBarColor Units
 local HBC_Unit = {}
 function HBC_Unit:SetStatusBarClassColored()
@@ -116,8 +116,10 @@ local ClassColor = {}
 --reaction colors
 local ReactionColor = {}
 --AddOn
+local addonName, addonTable = ...
 --create addon and get libraries
-HealthBarColor = LibStub("AceAddon-3.0"):NewAddon("HealthBarColor", "AceConsole-3.0", "AceEvent-3.0", "AceSerializer-3.0")
+addonTable.HealthBarColor = LibStub("AceAddon-3.0"):NewAddon("HealthBarColor", "AceConsole-3.0", "AceEvent-3.0", "AceSerializer-3.0")
+local HealthBarColor = addonTable.HealthBarColor
 HealthBarColor:SetDefaultModuleLibraries("AceConsole-3.0", "AceEvent-3.0")
 HealthBarColor:SetDefaultModuleState(false)
 local AC         = LibStub("AceConfig-3.0")
@@ -213,14 +215,15 @@ function HealthBarColor:OnEnable()
     --load own options table
     local options = self:GetOptionsTable()
     --create option table based on database structure and add them to options
-    options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db) 
+    options.args.ProfileSettings.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db) 
+    options.args.ProfileSettings.args.profiles.order = 1
     --register options as option table to create a gui based on it
     AC:RegisterOptionsTable("HealthBarColor_options", options) 
     --add them to blizzards settings panel for addons
     self.optionsFrame = ACD:AddToBlizOptions("HealthBarColor_options", "HealthBarColor")
     --add dual specc support 
     LDS:EnhanceDatabase(self.db, "HealthBarColor") 
-    LDS:EnhanceOptions(options.args.profile, self.db) 
+    LDS:EnhanceOptions(options.args.ProfileSettings.args.profiles, self.db) 
     self:RegisterChatCommand("hbc", "SlashCommand")
     self:RegisterEvents()
     self:LoadConfig()
@@ -390,31 +393,22 @@ end
 function HealthBarColor:GetClassColors()
     return ClassColor
 end
+local HBC_Units = {
+    ["Player"] = Player,
+    ["Target"] = Target,
+    ["Focus"] = Focus,
+    ["ToT"] = ToT,
+    ["ToF"] = ToF,
+    ["Pet"] = Pet,
+    ["Boss1"] = Boss1,
+    ["Boss2"] = Boss2,
+    ["Boss3"] = Boss3,
+    ["Boss4"] = Boss4,
+    ["Boss5"] = Boss5,
+}
 --Get Units for other modules
 function HealthBarColor:GetUnit(unit_name)
-    if     unit_name == "Player" then
-        return Player
-    elseif unit_name == "Target" then
-        return Target
-    elseif unit_name == "Focus"  then 
-        return Focus
-    elseif unit_name == "ToT"    then 
-        return ToT
-    elseif unit_name == "ToF"    then 
-        return ToF
-    elseif unit_name == "Pet"    then 
-        return Pet
-    elseif unit_name == "Boss1"  then 
-        return Boss1
-    elseif unit_name == "Boss2"  then 
-        return Boss2
-    elseif unit_name == "Boss3"  then 
-        return Boss3
-    elseif unit_name == "Boss4"  then 
-        return Boss4
-    elseif unit_name == "Boss5"  then 
-        return Boss5
-    end
+    return HBC_Units[unit_name]
 end
 --Collect data
 --store information like class color reaction color in their local unit to be always available for all modules and to not repeat the work on every module
