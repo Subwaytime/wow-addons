@@ -1,3 +1,6 @@
+### 1.1.15
+- Add support for classic
+
 ### 1.1.14
 - Version update
 
