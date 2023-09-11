@@ -250,15 +250,15 @@ local function SetupTutorials()
 		},
 		{	-- 12
 			text = cTitle.."         What's New|r\n\n"..
-					cTitle.."Version 6.3.0|r\n"..
-					"All profiles have been reset, because the new version is not compatible with stored settings.\n\n"..
-                    "- ADDED - Support for WoW 10.1.5\n"..
-                    "- UPDATED - Addon support - PetTracker 10.1\n"..
-                    "- UPDATED - Addon support - TomTom 3.5.1-release\n"..
-                    "- UPDATED - Addon support - ElvUI 13.38\n"..
+					cTitle.."Version 6.4.0|r\n"..
+                    "- ADDED - Support for WoW 10.1.7\n"..
+                    "- FIXED - Options - Masque button\n"..
+                    "- UPDATED - Addon support - Masque 10.1.7\n"..
+                    "- UPDATED - Addon support - ElvUI 13.40, Tukui 20.38\n"..
+                    "- UPDATED - Addon support - SpartanUI 6.2.21\n"..
                     "- UPDATED - Libs\n\n"..
 
-					cTitle.."WoW 10.1.5 - Known issues w/o solution|r\n"..
+					cTitle.."WoW 10.1.7 - Known issues w/o solution|r\n"..
 					"- Clicking on tracked quests or achievements has no response during combat.\n"..
 					"- Header buttons Q and A don't work during combat.\n\n"..
 

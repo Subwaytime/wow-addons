@@ -1,4 +1,4 @@
---Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.4.1
+--Coutesy of ZamestoTV. Thank you!    --Translator: ZamestoTV as of 1.4.2
 
 if not (GetLocale() == "ruRU") then
     return;
@@ -46,8 +46,8 @@ L["Format Months Ago"] = "%d месяца назад";
 L["A Year Ago"] = "1 год назад";
 L["Format Years Ago"] = "%d года назад";
 L["Version Colon"] = (GAME_VERSION_LABEL or "Версия")..": ";
+
 L["Date Colon"] = "Дата: ";
-L["Date Colon"] = "Date: ";
 L["Day Plural"] = "д.";
 L["Day Singular"] = "д.";
 L["Hour Plural"] = "ч.";
@@ -463,6 +463,8 @@ L["Points"] = "Точки";
 L["Reward"] = "Вознаграждение";
 L["Date"] = "Дата";
 L["Click And Hold"] = "Нажмите и удерживайте";								   
+L["Shadowlands Quests"] = "Миссии Темных земель";
+L["Completed: %s (%s words)  Reading: %s (%s wpm)"] = "Завершено: %s ( %s слова) Чтение: %s ( %s ppm)";														 
 
 --Barbershop--
 L["Save New Look"] = "Сохранить новый вид";
@@ -719,4 +721,4 @@ L["Perks Program Using Cache Alert"] = "Использование кеша с �
 L["Auto Display Quest Item"] = "Автоматическое отображение описаний предметов заданий";
 L["Drag To Move"] = "Перетаскивать";
 L["Middle Click Reset Position"] = "Щелкните средней кнопкой мыши, чтобы сбросить положение."
-L["Change Position"] = "Изменить позицию";																 
+L["Change Position"] = "Изменить позицию";

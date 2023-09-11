@@ -1997,9 +1997,13 @@ function NarciEquipmentSlotMixin:PostClick(button)
 			return;
 		elseif IsShiftKeyDown() and button == "LeftButton" then
 			if self.hyperlink then
-				SendChatMessage(self.hyperlink)
+				if ChatEdit_InsertLink(self.hyperlink) then
+					return
+				elseif SocialPostFrame and Social_IsShown() then
+					Social_InsertLink(self.hyperlink);
+					return
+				end
 			end
-			--ShareHyperLink()
 		else
 			PaperDollItemSlotButton_OnModifiedClick(self, button);
 			TakeOutFrames(true);
@@ -2171,8 +2175,13 @@ function NarciItemLevelFrameMixin:OnLoad()
 			end
 
 			local function UnlockOrderSort(faction1, faction2)
-				return faction1.unlockOrder < faction2.unlockOrder;
+				if faction1.uiPriority then
+					return faction1.uiPriority < faction2.uiPriority;
+				else
+					return faction1.unlockOrder < faction2.unlockOrder;
+				end
 			end
+
 			table.sort(factionList, UnlockOrderSort);
 
 			--Embedded Frame

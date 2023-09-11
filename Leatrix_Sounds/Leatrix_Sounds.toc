@@ -1,9 +1,9 @@
-## Interface: 100105
+## Interface: 100107
 
 ## Title: Leatrix Sounds
 ## Notes: Massive collection of game sounds.
 
-## Version: 10.1.17
+## Version: 10.1.19
 ## Author: Leatrix
 ## SavedVariables: LeaSoundsDB
 

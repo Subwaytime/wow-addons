@@ -656,6 +656,7 @@ function NarciPerksProgramProductListButtonMixin:OnClick()
     if self.itemID then
         local _, itemLink = GetItemInfo(self.itemID);
         local result = HandleModifiedItemClick(itemLink);
+        MainFrame:HidePreview();
     end
 end
 

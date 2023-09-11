@@ -4815,7 +4815,7 @@ function Narci.ToggleWardrobeItemModel()
 end
 
 
-local function SetChromaKeyColor(r, g, b)
+local function SetChromaKeyColor(r, g, b, a)
 	local tex = Narci_ModelContainer.ChromaKey;
 
 	if not r then
@@ -4823,9 +4823,12 @@ local function SetChromaKeyColor(r, g, b)
 		return
 	end
 
+	a = a or 1;
+
 	if type(r) == "string" then
 		local color = NarciAPI.ConvertHexColorToRGB(r);
 		r, g, b = unpack(color);
+		a = g or 1;
 	else
 		r = (r or 0)/255;
 		g = (g or 0)/255;
@@ -4833,7 +4836,8 @@ local function SetChromaKeyColor(r, g, b)
 	end
 
 	tex:SetAlpha(1);
-	tex:SetColorTexture(r, g, b);
+	tex:SetColorTexture(r, g, b, 1);
+	tex:SetAlpha(a);
 	tex:Show();
 end
 

@@ -12,6 +12,7 @@ L["outline_option_1"] = "OUTLINE"
 L["outline_option_2"] = "THICKOUTLINE"
 L["outline_option_3"] = "MONOCHROME"
 L["outline_option_4"] = "NONE"
+L["Size"] = true
 --Textures
 L["Textures"] = true
 L["Texture"] = true

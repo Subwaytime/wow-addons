@@ -48,7 +48,7 @@ end
 
 -- ElvUI
 local function ElvUI_SetSupport()
-    if KT:CheckAddOn("ElvUI", "13.38", true) then
+    if KT:CheckAddOn("ElvUI", "13.40", true) then
         local E = unpack(_G.ElvUI)
         local B = E:GetModule("Blizzard")
         B.SetObjectiveFrameHeight = function() end    -- preventive
@@ -76,7 +76,7 @@ end
 
 -- Tukui
 local function Tukui_SetSupport()
-    if KT:CheckAddOn("Tukui", "20.37", true) then
+    if KT:CheckAddOn("Tukui", "20.38", true) then
         local T = unpack(_G.Tukui)
         T.Miscellaneous.ObjectiveTracker.Enable = function() end
     end
@@ -110,28 +110,30 @@ end
 
 -- SpartanUI
 local function SpartanUI_SetSupport()
-    if KT:CheckAddOn("SpartanUI", "6.0.27", true) then
-        SUI.DB.DisabledComponents.Objectives = true
-        local module = SUI:GetModule("Component_Objectives")
-        local bck_module_OnEnable = module.OnEnable
-        function module:OnEnable()
-            if SUI.DB.DisabledComponents.Objectives then
-                local options = SUI.opt.args.ModSetting.args
-                options.Objectives = {
-                    type = "group",
-                    name = SUI.L.Objectives,
-                    disabled = true,
-                    args = {},
-                }
-                options.Components.args.Objectives.disabled = true
-                options.Components.args[addonName.."Warning"] = {
-                    name = "\n"..KTwarning,
-                    type = "description",
-                    order = 1000,
-                }
-                return
+    if KT:CheckAddOn("SpartanUI", "6.2.21", true) then
+        local module = SUI:GetModule("Module_Objectives", true)
+        if module then
+            SUI.DB.DisabledModules.Objectives = true
+            local bck_module_OnEnable = module.OnEnable
+            function module:OnEnable()
+                if SUI.DB.DisabledModules.Objectives then
+                    local options = SUI.opt.args.Modules.args
+                    options.Objectives = {
+                        type = "group",
+                        name = SUI.L.Objectives,
+                        disabled = true,
+                        args = {},
+                    }
+                    options.ModuleListing.args.Objectives.disabled = true
+                    options.ModuleListing.args[addonName.."Warning"] = {
+                        name = "\n"..KTwarning,
+                        type = "description",
+                        order = 1000,
+                    }
+                    return
+                end
+                bck_module_OnEnable(self)
             end
-            bck_module_OnEnable(self)
         end
     end
 end
@@ -143,7 +145,7 @@ end
 function M:OnInitialize()
     _DBG("|cffffff00Init|r - "..self:GetName(), true)
     db = KT.db.profile
-    self.isLoadedMasque = (KT:CheckAddOn("Masque", "10.1.1") and db.addonMasque)
+    self.isLoadedMasque = (KT:CheckAddOn("Masque", "10.1.7") and db.addonMasque)
 
     if self.isLoadedMasque then
         KT:Alert_IncompatibleAddon("Masque", "10.0.1")

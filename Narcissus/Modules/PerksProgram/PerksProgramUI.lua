@@ -521,10 +521,10 @@ function NarciPerksProgramItemDetailExtraFrameMixin:DisplayPetInfo(speciesID)
 
     if speciesID then
         local _, _, petType, _, _, _, _, canBattle = C_PetJournal.GetPetInfoBySpeciesID(speciesID);
-        local petAbilityLevelInfo = petType and C_PetJournal.GetPetAbilityListTable(speciesID);
-        if (canBattle) and (not petAbilityLevelInfo) then self:Hide(); return; end;
+        local abilities, levels = C_PetJournal.GetPetAbilityList(speciesID);
+        if (canBattle) and (not abilities) then self:Hide(); return; end;
 
-        local numItems = #petAbilityLevelInfo;
+        local numItems = #abilities;
 
         local buttonSize = 32;
         local buttonGap = 8;
@@ -547,7 +547,7 @@ function NarciPerksProgramItemDetailExtraFrameMixin:DisplayPetInfo(speciesID)
             button = self:AcquireButton(i);
             button:ClearAllPoints();
             button:SetPoint("TOPLEFT", self.HeaderText, "BOTTOM", fromOffsetX + (col - 1) * buttonUnit, -8 -row*(buttonSize + verticalGap));
-            button:SetPetAbilityInfo(petAbilityLevelInfo[i]);
+            button:SetPetAbilityInfo(abilities[i], levels[i]);
         end
 
         local petTypeName = _G["BATTLE_PET_NAME_"..petType] or "Unknown Type";
@@ -590,7 +590,16 @@ local function TransmogItemButton_OnEnter(self)
         local slotName;
         if itemID then
             local _, itemType, itemSubType, itemEquipLoc, icon, classID, subclassID = GetItemInfoInstant(itemID);
-            slotName = itemEquipLoc and _G[itemEquipLoc];
+
+            if classID == 4 then        --Armor
+                if subclassID == 6 then
+                    slotName = itemSubType;
+                else
+                    slotName = itemEquipLoc and _G[itemEquipLoc];
+                end
+            elseif classID == 2 then    --Weapon Type
+                slotName = itemSubType;
+            end
         end
         ExtraDetailFrame:SetEnsembleHeaderText(slotName);
     end
@@ -664,7 +673,7 @@ function NarciPerksProgramItemDetailButtonMixin:SetTransmogSource(sourceID)
     self:UpdateVisual();
 end
 
-function NarciPerksProgramItemDetailButtonMixin:SetPetAbilityInfo(abilityInfo)
+function NarciPerksProgramItemDetailButtonMixin:SetPetAbilityInfo(abilityID, level)
     if self.type ~= "pet" then
         self.onEnterFunc = PetAbilityButton_OnEnter;
         self.onLeaveFunc = nil;
@@ -672,11 +681,12 @@ function NarciPerksProgramItemDetailButtonMixin:SetPetAbilityInfo(abilityInfo)
         self.type = "pet";
     end
 
-    if abilityInfo.abilityID then
-        self.petAbilityID = abilityInfo.abilityID;
-        local name, icon, typeID = C_PetJournal.GetPetAbilityInfo(abilityInfo.abilityID);
+    self.petAbilityID = abilityID;
+
+    if abilityID then
+        local name, icon, typeID = C_PetJournal.GetPetAbilityInfo(abilityID);
         self.Icon:SetTexture(icon);
-        self.petAbilityLevel = abilityInfo.level;
+        self.petAbilityLevel = level;
         self:Show();
     end
 
@@ -1114,7 +1124,7 @@ local function AnimationDropDown_PlayAnimation(actor, button)
     if not actor then return end;
 
     actor:StopAnimationKit();
-    actor:SetAnimationBlendOperation(2);  --LE_MODEL_BLEND_OPERATION_ANIM
+    actor:SetAnimationBlendOperation(1);  --LE_MODEL_BLEND_OPERATION_ANIM
 
     if button.animationKitID then
         actor:PlayAnimationKit(button.animationKitID, true);

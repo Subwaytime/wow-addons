@@ -1,3 +1,12 @@
+### 1.1.18
+- Fix C_UnitAuras error on classic
+
+### 1.1.17
+- Allow Fishing when in Zen flight
+
+### 1.1.16
+- Version update
+
 ### 1.1.15
 - Add support for classic
 

@@ -2333,7 +2333,7 @@ local function SetHooks()
 				MSA_CloseDropDownMenus();
 
 				if ContentTrackingUtil.IsTrackingModifierDown() then
-					C_ContentTracking.StopTracking(block.trackableType, block.trackableID);
+					C_ContentTracking.StopTracking(block.trackableType, block.trackableID, Enum.ContentTrackingStopType.Manual);
 				elseif (block.trackableType == Enum.ContentTrackingType.Appearance) and IsModifiedClick("DRESSUP") then
 					DressUpVisual(block.trackableID);
 				elseif block.targetType == Enum.ContentTrackingTargetType.Achievement then

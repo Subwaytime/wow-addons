@@ -48,6 +48,9 @@ local defaults = {
                 healthbar_outline = 1,
                 powerbar          = "Friz Quadrata TT",
                 powerbar_outline  = 1,
+                name_size         = 10,
+                healthbar_size    = 10,
+                powerbar_size     = 10,
             },
             Player = {
                 name_choice      = 1,

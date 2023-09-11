@@ -13,7 +13,7 @@ local Font_Target = HealthBarColor:NewModule("Font_Target")
 local Target = HealthBarColor:GetUnit("Target")
 local ToT = HealthBarColor:GetUnit("ToT")
 local Media = LibStub("LibSharedMedia-3.0")
-local name_font, healthbar_font, powerbar_font, name_outline, healthbar_outline, powerbar_outline
+local name_font, healthbar_font, powerbar_font, name_outline, healthbar_outline, powerbar_outline, name_size, healthbar_size, powerbar_size
 local name_color, healthbar_color, powerbar_color = {r=0,g=0,b=0}, {r=0,g=0,b=0}, {r=0,g=0,b=0}
 
 function Font_Target:OnEnable()
@@ -23,14 +23,17 @@ function Font_Target:OnEnable()
     local selected = HealthBarColor.db.profile.Fonts.General.name_outline
     name_outline = selected == 1 and "OUTLINE"  or selected == 2 and "THICKOUTLINE"  or selected == 3 and "MONOCHROME"  or selected == 4 and "NONE" 
     name_font = Media:Fetch("font",HealthBarColor.db.profile.Fonts.General.name) 
+    name_size = HealthBarColor.db.profile.Fonts.General.name_size
     --healthbar
     selected = HealthBarColor.db.profile.Fonts.General.healthbar_outline
     healthbar_outline = selected == 1 and "OUTLINE"  or selected == 2 and "THICKOUTLINE"  or selected == 3 and "MONOCHROME"  or selected == 4 and "NONE" 
     healthbar_font = Media:Fetch("font",HealthBarColor.db.profile.Fonts.General.healthbar) 
+    healthbar_size = HealthBarColor.db.profile.Fonts.General.healthbar_size
     --powerbar
     selected = HealthBarColor.db.profile.Fonts.General.powerbar_outline
     powerbar_outline = selected == 1 and "OUTLINE"  or selected == 2 and "THICKOUTLINE"  or selected == 3 and "MONOCHROME"  or selected == 4 and "NONE"
     powerbar_font = Media:Fetch("font",HealthBarColor.db.profile.Fonts.General.powerbar) 
+    powerbar_size = HealthBarColor.db.profile.Fonts.General.powerbar_size
     self:SetFonts()
     --COLOR
     --name
@@ -174,12 +177,12 @@ function Font_Target:OnDisable()
 end
 
 function Font_Target:SetFonts()
-    Target.Name:SetFont(name_font, 10, name_outline)
-    ToT.Name:SetFont(name_font, 10, name_outline)
+    Target.Name:SetFont(name_font, name_size, name_outline)
+    ToT.Name:SetFont(name_font, name_size, name_outline)
     for _,text in pairs (Target.HealthText) do
-        text:SetFont(healthbar_font, 10,healthbar_outline)
+        text:SetFont(healthbar_font, healthbar_size, healthbar_outline)
     end
     for _,text in pairs (Target.PowerText) do
-        text:SetFont(powerbar_font, 10,powerbar_outline)
+        text:SetFont(powerbar_font, powerbar_size, powerbar_outline)
     end
 end

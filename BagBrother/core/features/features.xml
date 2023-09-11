@@ -2,8 +2,7 @@
 	<Script file="autoDisplay.lua"/>
 	<Script file="basicRules.lua"/>
 	<Script file="caching.lua"/>
-	<Script file="cacheInterface.lua"/> <!-- temp -->
-	<Script file="egg.lua"/> <!-- temp -->
+	<Script file="cacheInterface.lua"/> <!-- temp backwards compatibility -->
 	<Script file="slashCommands.lua"/>
 	<Script file="tooltipCounts.lua"/>
 </Ui>

@@ -67,16 +67,18 @@ function BiggerHealthBar:OnEnable()
 	HealthBarColor:RegisterOnToPlayerArt(toPlayerArt)
 	HealthBarColor:RegisterOnToVehicleArt(toVehicelArt)
     toPlayerArt()
-    for _,ressourcebar in pairs({
+    for _,resourcebar in pairs({
         Player.PowerBar,
         InsanityBarFrame,
     }) do
-        callbacks[ressourcebar] = function() ressourcebar:Hide() end
-        if not hooked[ressourcebar] then
-            ressourcebar:HookScript("OnShow",function() callbacks[ressourcebar]() end)
-			hooked[ressourcebar] = true
+        callbacks[resourcebar] = function() 
+			resourcebar:SetAlpha(0)
+		end
+        if not hooked[resourcebar] then
+            resourcebar:HookScript("OnShow",function() callbacks[resourcebar]() end)
+			hooked[resourcebar] = true
         end
-        ressourcebar:Hide()
+        resourcebar:SetAlpha(0)
     end
 end
 
@@ -96,12 +98,12 @@ function BiggerHealthBar:OnDisable()
 	end
     Player.HealthBar.HealthBarMask:SetAtlas("UI-HUD-UnitFrame-Player-PortraitOn-Bar-Health-Mask")
 	Player.HealthBar:SetHeight(20)
-    for _,ressourcebar in pairs({
+    for _,resourcebar in pairs({
         Player.PowerBar,
         InsanityBarFrame,
     }) do
-        callbacks[ressourcebar] = donothing
-		ressourcebar:Show()
+        callbacks[resourcebar] = donothing
+		resourcebar:SetAlpha(1)
     end
 end
 

@@ -9,7 +9,6 @@ local internal = {
   DOUBLECLICK_MIN_SECONDS = 0.04,
   previousClickTime = 0,
   isClassic = WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE,
-  isClassicEra = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 }
 
 local soundCache = {}
@@ -91,9 +90,17 @@ function BetterFishing:GetSecureButton()
   return self.secureButton
 end
 
+function BetterFishing:IsFlying()
+  -- Check for Zen Flight
+  if C_UnitAuras and C_UnitAuras.GetPlayerAuraBySpellID(125883) then
+    return false
+  else
+    return IsFlying()
+  end
+end
+
 function BetterFishing_Run()
-  if internal.isClassicEra then return end
-  if IsTaintable() or IsFlying() or GetNumLootItems() ~= 0 or BetterFishing:IsFishing() or (not BetterFishingDB.overrideLunker and BetterFishing:IsLunkerActive()) then return end
+  if IsTaintable() or BetterFishing:IsFlying() or GetNumLootItems() ~= 0 or BetterFishing:IsFishing() or (not BetterFishingDB.overrideLunker and BetterFishing:IsLunkerActive()) then return end
   local key1, key2 = GetBindingKey("BETTERFISHINGKEY")
   local localizedName = BetterFishing:GetFishingName()
   if key1 then
@@ -152,7 +159,7 @@ function BetterFishing:AllowFishing()
   or internal.isClassic and not self:IsFishingpoleEquipped()
   or IsPlayerMoving()
   or IsMounted()
-  or IsFlying()
+  or BetterFishing:IsFlying()
   or IsFalling()
   or IsStealthed()
   or IsSwimming()

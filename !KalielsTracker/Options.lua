@@ -1011,7 +1011,6 @@ local options = {
 							end,
 							func = function()
 								SlashCmdList["MASQUE"]()
-								SlashCmdList["MASQUE"]()
 							end,
 							order = 5.71,
 						},

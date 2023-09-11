@@ -1,11 +1,12 @@
-## Interface: 100005
-## Title: BetterWardrobe_SourceData (4.10)
-## Version: 4.10
+## Interface: 100107
+## Title: BetterWardrobe_SourceData (4.11.4)
+## Version: 4.11.4
 ## Author: SLOKnightfall
 ## Notes: 
 ## LoadOnDemand: 1
 ## DefaultState: enabled
 
+## IconTexture: Interface\AddOns\BetterWardrobe\Images\DerectoryIcon
 
 #Data files
 Data\ColorData.lua

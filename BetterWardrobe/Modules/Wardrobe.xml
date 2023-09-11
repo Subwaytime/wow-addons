@@ -4,7 +4,8 @@
 
 	<Button name="BW_PanelTopTabButtonTemplate" inherits="PanelTabButtonTemplate" mixin="PanelTopTabButtonMixin" virtual="true"/>
 
-	<DressUpModel name="BetterWardrobeItemsModelTemplate" mixin="BetterWardrobeItemsModelMixin" virtual="true">
+	<DressUpModel name="BetterWardrobeItemsModelTemplate" mixin="BetterWardrobeItemsModelMixin" inherits="ContentTrackingElementTemplate" virtual="true">
+
 		<Size x="78" y="104"/>
 		<Layers>
 			<Layer level="BACKGROUND">
@@ -19,8 +20,22 @@
 					</Anchors>
 				</Texture>
 			</Layer>
+				<Layer level="OVERLAY">
+					<Texture parentKey="DisabledOverlay" atlas="transmog-wardrobe-border-selected" hidden="true" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
+					<Color a="0.8"/>
+					<Size x="96" y="124"/>
+					<Anchors>
+						<Anchor point="CENTER" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
 			<Layer level="OVERLAY">
 				<Texture parentKey="TransmogStateTexture" atlas="transmog-wardrobe-border-selected" useAtlasSize="true" alphaMode="ADD" hidden="true">
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+				<Texture parentKey="SlotInvalidTexture" atlas="transmog-icon-unsupported" useAtlasSize="true" hidden="true">
 					<Anchors>
 						<Anchor point="CENTER"/>
 					</Anchors>
@@ -174,7 +189,7 @@
 			<OnLeave function="GameTooltip_Hide"/>
 		</Scripts>
 	</Button>
-	<Button name="BetterWardrobeSmallSlotButtonTemplate" parentArray="Buttons" mixin="BetterWardrobeItemsCollectionSlotButtonMixin" frameLevel="20" virtual="true">
+	<Button name="BetterWardrobeSmallSlotButtonTemplate" parentArray="Buttons" mixin="BetterWardrobeItemsCollectionSlotButtonMixin" frameLevel="75" virtual="true">
 		<KeyValues>
 			<KeyValue key="isSmallButton" value="true" type="boolean"/>
 		</KeyValues>
@@ -401,10 +416,51 @@
 			<OnMouseDown method="OnMouseDown"/>
 		</Scripts>
 	</Frame>
+		<Frame name="AlertTrackingFeatureTemplate" inherits="NewFeatureLabelTemplate" mixin="BW_AlertTrackingFeatureMixin" virtual="true">
+		<Size x="1" y="1"/>
+	</Frame>
 
-	<Frame name="BetterWardrobeCollectionFrameTemplate" parent="CollectionsJournal" mixin="BetterWardrobeCollectionFrameMixin" setAllPoints="true" hidden="true" virtual="true">
+	<Frame name="TrackingInterfaceShortcutsFrame" hidden="true">
+		<Size x="226" y="40"/>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString parentKey="HeaderText" inherits="GameFontHighlightLeft" text="WARDROBE_SHORTCUTS_TUTORIAL_2" justifyH="LEFT" justifyV="TOP">
+					<Size x="0" y="0"/>
+				</FontString>
+				<FontString parentKey="Text" inherits="GameFontHighlightLeft" text="WARDROBE_SHORTCUTS_TUTORIAL_3" justifyH="LEFT" justifyV="TOP">
+					<Size x="0" y="0"/>
+					<Anchors>
+						<Anchor point="TOP" relativeKey="$parent.HeaderText" relativePoint="BOTTOM" y="-1"/>
+						<Anchor point="LEFT" relativeKey="$parent.HeaderText" relativePoint="LEFT"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
 		<Frames>
-			<Button name="$parentTab1" parentKey="ItemsTab" inherits="BW_PanelTopTabButtonTemplate" text="WARDROBE_ITEMS" id="1" frameLevel="40">
+			<Frame parentKey="NewAlert" inherits="AlertTrackingFeatureTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.HeaderText" relativePoint="RIGHT" x="17"/>
+				</Anchors>
+			</Frame>
+		</Frames>
+	</Frame>
+
+	<Frame name="BetterWardrobeCollectionFrameTemplate" parent="CollectionsJournal" inherits="ButtonFrameTemplate" mixin="BetterWardrobeCollectionFrameMixin" setAllPoints="true" hidden="true" virtual="true" frameLevel="50">
+		<Frames>
+			<Button parentKey="InfoButton" inherits="MainHelpPlateButton" mixin="WardrobeCollectionTutorialMixin" hidden="true" frameLevel="75">
+				<Anchors>
+					<Anchor point="TOPLEFT" x="43" y="19"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad method="OnLoad"/>
+					<OnEnter method="OnEnter"/>
+					<OnLeave method="OnLeave"/>
+					<OnShow>
+	    				self:SetFrameLevel(self:GetParent().TitleContainer:GetFrameLevel()+200);
+	     			</OnShow>
+				</Scripts>
+			</Button>
+			<Button name="$parentTab1" parentKey="ItemsTab" inherits="BW_PanelTopTabButtonTemplate" text="WARDROBE_ITEMS" id="1" >
 				<KeyValues>
 					<KeyValue key="minWidth" value="2" type="number"/>
 				</KeyValues>
@@ -417,7 +473,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="$parentTab2" parentKey="SetsTab" inherits="BW_PanelTopTabButtonTemplate" text="WARDROBE_SETS" id="2" frameLevel="40" >
+			<Button name="$parentTab2" parentKey="SetsTab" inherits="BW_PanelTopTabButtonTemplate" text="WARDROBE_SETS" id="2" frameLevel="75" >
 				<KeyValues>
 					<KeyValue key="minWidth" value="2" type="number"/>
 				</KeyValues>
@@ -452,7 +508,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="$parentTab3" parentKey="ExtraSetsTab" inherits="BW_PanelTopTabButtonTemplate" text="Extra" id="3" frameLevel="40" >
+			<Button name="$parentTab3" parentKey="ExtraSetsTab" inherits="BW_PanelTopTabButtonTemplate" text="Extra" id="3" frameLevel="75" >
 				<KeyValues>
 					<KeyValue key="minWidth" value="2" type="number"/>
 				</KeyValues>
@@ -487,7 +543,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="$parentTab4" parentKey="SavedSetsTab" inherits="BW_PanelTopTabButtonTemplate" text="Saved" id="4" frameLevel="40" >
+			<Button name="$parentTab4" parentKey="SavedSetsTab" inherits="BW_PanelTopTabButtonTemplate" text="Saved" id="4" frameLevel="75" >
 				<KeyValues>
 					<KeyValue key="minWidth" value="2" type="number"/>
 				</KeyValues>
@@ -1131,6 +1187,8 @@
 					<OnHide method="OnHide"/>
 					<OnEvent method="OnEvent"/>
 					<OnMouseWheel method="OnMouseWheel"/>
+					<OnUpdate method="OnUpdate"/>
+
 				</Scripts>
 			</Frame>
 			<Frame parentKey="SetsCollectionFrame" parentArray="ContentFrames" mixin="BetterWardrobeSetsCollectionMixin" hidden="true">
@@ -1164,7 +1222,7 @@
 						<Frames>
 
 							<Frame parentKey="ScrollBox" setAllPoints="true" inherits="WowScrollBoxList"/>
-							<EventFrame parentKey="ScrollBar" inherits="WowTrimScrollBar" name="BetterWardrobeCollectionFrameScrollFrameScrollBar">
+							<EventFrame parentKey="ScrollBar" inherits="MinimalScrollBar" name="BetterWardrobeCollectionFrameScrollFrameScrollBar">
 								<Anchors>
 									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="4" y="20"/>
 									<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="4" y="8"/>
@@ -1194,10 +1252,10 @@
 							<OnModelLoaded method="OnModelLoaded"/>
 						</Scripts>
 					</DressUpModel>
-					<Frame parentKey="DetailsFrame" frameLevel="50">
+					<Frame parentKey="DetailsFrame" frameLevel="75">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeKey="$parent.RightInset" x="0" y="-3"/>
-							<Anchor point="BOTTOMRIGHT" relativeKey="$parent.RightInset" x="-3" y="2"/>
+							<Anchor point="BOTTOMRIGHT" relativeKey="$parent.RightInset" x="-3" y="-20"/>
 						</Anchors>
 						<Layers>
 							<Layer level="BACKGROUND">
@@ -1251,7 +1309,7 @@
 							</Layer>
 						</Layers>
 						<Frames>
-							<Frame parentKey="LimitedSet" inherits="ResizeLayoutFrame">
+							<Frame parentKey="LimitedSet" inherits="ResizeLayoutFrame" frameLevel="80">
 								<Anchors>
 									<Anchor point="TOPLEFT" x="6" y="-6"/>
 								</Anchors>
@@ -1309,7 +1367,7 @@
 								</Scripts>
 							</Button>
 
-							<DropDownToggleButton name="BetterWardrobeSetsCollectionVariantSetsButton" parentKey="VariantSetsButton" inherits="UIMenuButtonStretchTemplate" frameLevel="60">
+							<DropDownToggleButton name="BetterWardrobeSetsCollectionVariantSetsButton" parentKey="VariantSetsButton" inherits="UIMenuButtonStretchTemplate" frameLevel="80" >
 								<Size x="108" y="22"/>
 								<Anchors>
 									<Anchor point="TOPRIGHT" x="-38" y="-6"/>
@@ -1611,10 +1669,11 @@
 			<OnShow method="OnShow"/>
 			<OnHide method="OnHide"/>
 			<OnKeyDown method="OnKeyDown"/>
+			<OnUpdate method="OnUpdate"/>
 		</Scripts>
 	</Frame>
 	
-	<Button name="BetterWardrobeTransmogButtonTemplate" motionScriptsWhileDisabled="true" mixin="TransmogSlotButtonMixin" frameLevel="20" virtual="true">
+	<Button name="BetterWardrobeTransmogButtonTemplate" motionScriptsWhileDisabled="true" mixin="TransmogSlotButtonMixin" frameLevel="75" virtual="true">
 		<KeyValues>
 			<KeyValue key="transmogType" value="Enum.TransmogType.Appearance" type="global"/>
 			<KeyValue key="modification" value="Enum.TransmogModification.Main" type="global"/>
@@ -1700,7 +1759,7 @@
 						self.Icon:SetPoint("TOPLEFT", 0, 0);
 					</OnMouseUp>
 					<OnLeave>
-						if not self:GetParent():IsMouseOver() then
+						if ( not self:GetParent():IsMouseOver() ) then
 							self:Hide();
 						end
 					</OnLeave>
@@ -1803,7 +1862,7 @@
 		</HighlightTexture>
 	</Button>
 
-	<Button name="BetterWardrobeTransmogEnchantButtonTemplate" motionScriptsWhileDisabled="true" mixin="TransmogSlotButtonMixin" frameLevel="30" virtual="true">
+	<Button name="BetterWardrobeTransmogEnchantButtonTemplate" motionScriptsWhileDisabled="true" mixin="TransmogSlotButtonMixin" frameLevel="75" virtual="true">
 		<KeyValues>
 			<KeyValue key="transmogType" value="Enum.TransmogType.Illusion" type="global"/>
 			<KeyValue key="modification" value="Enum.TransmogModification.Main" type="global"/>
@@ -2024,7 +2083,17 @@
 							</Layer>
 						</Layers>
 					</Frame>
-
+					<Frame parentKey="OutfitDropDown" name="BetterWardrobeOutfitDropDown" inherits="BetterWardrobeOutfitDropDownTemplate" mixin="BetterWardrobeOutfitMixin">
+						<KeyValues>
+							<KeyValue key="width" value="188" type="number"/>
+							<KeyValue key="minMenuStringWidth" value="152" type="number"/>
+							<KeyValue key="maxMenuStringWidth" value="216" type="number"/>
+							<KeyValue key="replaceInvalidSources" value="false" type="boolean"/>
+						</KeyValues>
+						<Anchors>
+							<Anchor point="TOPLEFT" x="-14" y="28"/>
+						</Anchors>
+					</Frame>
 					<ModelScene parentKey="ModelScene" inherits="PanningModelSceneMixinTemplate">
 						<Size x="294" y="488"/>
 						<Anchors>

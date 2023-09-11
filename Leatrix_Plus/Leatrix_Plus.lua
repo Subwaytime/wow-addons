@@ -1,5 +1,5 @@
 ﻿----------------------------------------------------------------------
--- 	Leatrix Plus 10.1.17 (23rd August 2023)
+-- 	Leatrix Plus 10.1.19 (6th September 2023)
 ----------------------------------------------------------------------
 
 --	01:Functns, 02:Locks, 03:Restart, 20:Live, 30:Isolated, 40:Player
@@ -18,7 +18,7 @@
 	local void
 
 	-- Version
-	LeaPlusLC["AddonVer"] = "10.1.17"
+	LeaPlusLC["AddonVer"] = "10.1.19"
 
 	-- Get locale table
 	local void, Leatrix_Plus = ...
@@ -716,6 +716,26 @@
 	function LeaPlusLC:Live()
 
 		----------------------------------------------------------------------
+		--	Block duels
+		----------------------------------------------------------------------
+
+		if LeaPlusLC["NoDuelRequests"] == "On" then
+			LpEvt:RegisterEvent("DUEL_REQUESTED");
+		else
+			LpEvt:UnregisterEvent("DUEL_REQUESTED");
+		end
+
+		----------------------------------------------------------------------
+		--	Block pet battle duels
+		----------------------------------------------------------------------
+
+		if LeaPlusLC["NoPetDuels"] == "On" then
+			LpEvt:RegisterEvent("PET_BATTLE_PVP_DUEL_REQUESTED");
+		else
+			LpEvt:UnregisterEvent("PET_BATTLE_PVP_DUEL_REQUESTED");
+		end
+
+		----------------------------------------------------------------------
 		--	Automatically accept Dungeon Finder queue requests
 		----------------------------------------------------------------------
 
@@ -747,26 +767,6 @@
 		else
 			LpEvt:UnregisterEvent("CHAT_MSG_WHISPER");
 			LpEvt:UnregisterEvent("CHAT_MSG_BN_WHISPER");
-		end
-
-		----------------------------------------------------------------------
-		--	Block duels
-		----------------------------------------------------------------------
-
-		if LeaPlusLC["NoDuelRequests"] == "On" then
-			LpEvt:RegisterEvent("DUEL_REQUESTED");
-		else
-			LpEvt:UnregisterEvent("DUEL_REQUESTED");
-		end
-
-		----------------------------------------------------------------------
-		--	Block pet battle duels
-		----------------------------------------------------------------------
-
-		if LeaPlusLC["NoPetDuels"] == "On" then
-			LpEvt:RegisterEvent("PET_BATTLE_PVP_DUEL_REQUESTED");
-		else
-			LpEvt:UnregisterEvent("PET_BATTLE_PVP_DUEL_REQUESTED");
 		end
 
 		----------------------------------------------------------------------
@@ -3123,10 +3123,8 @@
 
 		if LeaPlusLC["AutoSellJunk"] == "On" then
 
-			-- 10.1.7: Hide the sell all junk items button (it does not take exclusions, special items or transmog items into account and does not print vendor summaries)
-			if MerchantSellAllJunkButton then
-				hooksecurefunc(MerchantSellAllJunkButton, "Show", function() MerchantSellAllJunkButton:Hide() end)
-			end
+			-- Hide the sell all junk items button
+			MerchantSellAllJunkButton:HookScript("OnShow", function() MerchantSellAllJunkButton:Hide() end)
 
 			-- Create sell junk banner
 			local StartMsg = CreateFrame("FRAME", nil, MerchantFrame)

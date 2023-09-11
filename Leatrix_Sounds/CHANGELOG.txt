@@ -1,3 +1,10 @@
+10.1.19 - 7th September 2023
+- Updated for game version 10.1.7.
+- Updated sounds to game version 10.1.7.51187 (Aug 31 2023) (100107).
+
+10.1.18 - 5th September 2023
+- Updated sounds to game version 10.1.5.51130 (Aug 28 2023) (100105).
+
 10.1.17 - 23rd August 2023
 - Updated sounds to game version 10.1.5.50791 (Aug 4 2023) (100105).
 

@@ -153,7 +153,7 @@ function KT.AddTrackedAchievement(id)
 end
 
 function KT.RemoveTrackedAchievement(id)
-    C_ContentTracking.StopTracking(Enum.ContentTrackingType.Achievement, id)
+    C_ContentTracking.StopTracking(Enum.ContentTrackingType.Achievement, id, Enum.ContentTrackingStopType.Manual)
 end
 
 -- RGB to Hex

@@ -19,7 +19,7 @@ function KT_ADVENTURE_TRACKER_MODULE:OnBlockHeaderClick(block, mouseButton)
 			--CloseDropDownMenus();
 
 			if ContentTrackingUtil.IsTrackingModifierDown() then
-				C_ContentTracking.StopTracking(block.trackableType, block.trackableID);
+				C_ContentTracking.StopTracking(block.trackableType, block.trackableID, Enum.ContentTrackingStopType.Manual);
 			elseif (block.trackableType == Enum.ContentTrackingType.Appearance) and IsModifiedClick("DRESSUP") then
 				DressUpVisual(block.trackableID);
 			elseif block.targetType == Enum.ContentTrackingTargetType.Achievement then
@@ -114,7 +114,7 @@ function KT_AdventureObjectiveTracker_OpenToAppearance(unused_dropDownButton, ap
 end
 
 function KT_AdventureObjectiveTracker_Untrack(unused_dropDownButton, trackableType, id)
-	C_ContentTracking.StopTracking(trackableType, id);
+	C_ContentTracking.StopTracking(trackableType, id, Enum.ContentTrackingStopType.Manual);
 end
 
 function KT_AdventureObjectiveTracker_AnimateReward(trackableID, anchor, posIndex, trackerModule)
@@ -268,7 +268,7 @@ function KT_ADVENTURE_TRACKER_MODULE:StopTrackingCollectedItems()
 
 	local removingCollectedObjective = false;
 	for trackableId, trackableType in pairs(self.collectedIds) do
-		C_ContentTracking.StopTracking(trackableType, trackableId);
+		C_ContentTracking.StopTracking(trackableType, trackableId, Enum.ContentTrackingStopType.Collected);
 		removingCollectedObjective = true;
 	end
 	if removingCollectedObjective then
@@ -289,8 +289,18 @@ function KT_ADVENTURE_TRACKER_MODULE:OnTrackableItemCollected(trackableType, tra
 		block.objective.state = "ANIMATING";
 		KT_AdventureObjectiveTracker_AnimateReward(trackableID, block, block.posIndex, self);
 		PlaySound(SOUNDKIT.CONTENT_TRACKING_ITEM_ACQUIRED_TOAST);
+	elseif C_ContentTracking.IsTracking(trackableType, trackableID) and self.lastBlock then
+		--If no block is found, but we are tracking the item, and the last block is visible, show animation at the bottom of the tracker module
+		KT_AdventureObjectiveTracker_AnimateReward(trackableID, self.lastBlock, 0, self);
+		KT_AdventureObjectiveTrackerBonusRewardsFrame:SetPoint("TOPRIGHT", self.lastBlock, "BOTTOMLEFT");
+		PlaySound(SOUNDKIT.CONTENT_TRACKING_ITEM_ACQUIRED_TOAST);
+	elseif C_ContentTracking.IsTracking(trackableType, trackableID) and (KT_ObjectiveTrackerBlocksFrame.AdventureHeader:IsShown() and self:IsCollapsed()) then
+		--If no block is found, but we are tracking the item, and the header is visible and collapsed, show animation next to the module header
+		KT_AdventureObjectiveTracker_AnimateReward(trackableID, KT_ObjectiveTrackerBlocksFrame.AdventureHeader, 0, self);
+		KT_AdventureObjectiveTrackerBonusRewardsFrame:SetPoint("TOPRIGHT", ObjectiveTrackerBlocksFrame.AdventureHeader, "TOPLEFT");
+		PlaySound(SOUNDKIT.CONTENT_TRACKING_ITEM_ACQUIRED_TOAST);
 	elseif C_ContentTracking.IsTracking(trackableType, trackableID) then
-		--If no block is found, but we are tracking the item, show animation at the bottom of the objective tracker
+		--If no block or header is found, but we are tracking the item, show animation at the bottom of the objective tracker
 		KT_AdventureObjectiveTracker_AnimateReward(trackableID, KT_ObjectiveTrackerFrame, 0, self);
 		KT_AdventureObjectiveTrackerBonusRewardsFrame:SetPoint("TOPRIGHT", KT_ObjectiveTrackerFrame, "BOTTOMLEFT", 20, 16);
 		PlaySound(SOUNDKIT.CONTENT_TRACKING_ITEM_ACQUIRED_TOAST);

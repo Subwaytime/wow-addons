@@ -212,7 +212,7 @@ end
 
 
 local ALTERNATE_FORM_SAVED_ID = "alternateForm";   --OLD:220 (number)
-local MAX_SAVES = 10;
+local MAX_SAVES = 20;
 local NUM_ACTIVE_BUTTONS = 0;
 local SCROLLFRAME_CENTER_Y;
 
