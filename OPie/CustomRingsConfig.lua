@@ -119,17 +119,27 @@ local function CreateButton(parent, width)
 	return btn
 end
 local function setIcon(self, path, ext)
-	self:SetTexture(path or "Interface/Icons/Inv_Misc_QuestionMark")
-	self:SetTexCoord(0,1,0,1)
-	if not ext then return end
-	if type(ext.iconR) == "number" and type(ext.iconG) == "number" and type(ext.iconB) == "number" then
-		self:SetVertexColor(ext.iconR, ext.iconG, ext.iconB)
+	local plainTexturePath
+	if type(path) == "string" and GetFileIDFromPath(path) == nil then
+		self:SetAtlas(path)
+	else
+		plainTexturePath = path
+		self:SetTexture(path or "Interface/Icons/Inv_Misc_QuestionMark")
+		self:SetTexCoord(0,1,0,1)
 	end
-	if type(ext.iconCoords) == "table" then
-		self:SetTexCoord(unpack(ext.iconCoords))
-	elseif type(ext.iconCoords) == "function" or type(ext.iconCoords) == "userdata" then
-		self:SetTexCoord(ext:iconCoords())
+	if ext then
+		if type(ext.iconR) == "number" and type(ext.iconG) == "number" and type(ext.iconB) == "number" then
+			self:SetVertexColor(ext.iconR, ext.iconG, ext.iconB)
+		end
+		if type(ext.iconCoords) == "table" then
+			securecall(self.SetTexCoord, self, unpack(ext.iconCoords))
+			plainTexturePath = nil
+		elseif type(ext.iconCoords) == "function" or type(ext.iconCoords) == "userdata" then
+			securecall(self.SetTexCoord, self, securecall(ext.iconCoords))
+			plainTexturePath = nil
+		end
 	end
+	return plainTexturePath
 end
 local function GetPositiveFileIDFromPath(path)
 	local id = GetFileIDFromPath(path)
@@ -343,7 +353,7 @@ ringContainer = CreateFrame("Frame", nil, panel) do
 			PlaySound(832)
 			self.source = api.resolveSliceOffset(self:GetID())
 			dragBackdrop:Show()
-			SetCursor(self.tex:GetTexture())
+			SetCursor(self.plainTex or "Interface/Icons/Temp")
 		end
 		local function dragAbort(self)
 			local src = self.source
@@ -788,8 +798,7 @@ sliceDetail = CreateFrame("Frame", nil, ringContainer) do
 			slider:SetValue(slider:GetValue()-delta*15)
 		end)
 		function f:SetIcon(ico, forced, ext)
-			setIcon(self.icon, forced or ico, ext)
-			initTexture = self.icon:GetTexture()
+			initTexture = setIcon(self.icon, forced or ico, ext)
 			self.selection = forced
 			self:SetText(forced and L"Customized icon" or L"Based on slice action")
 			if frame:IsShown() then slider:GetScript("OnValueChanged")(slider, slider:GetValue()) end
@@ -1030,13 +1039,8 @@ newSlice = CreateFrame("Frame", nil, ringContainer) do
 	TS:EscapeCallback(newSlice.close, function() api.closeActionPicker() end)
 
 	local b = newSlice.close:CreateTexture(nil, "BACKGROUND")
-	if MODERN then
-		b:SetAtlas("UI-Frame-TopCornerRight")
-		b:SetTexCoord(9/33, 1, 0, 23/33)
-	else
-		b:SetTexture("Interface/FrameGeneral/UI-Frame")
-		b:SetTexCoord(90/128, 114/128, 1/128, 24/128)
-	end
+	b:SetAtlas("UI-Frame-TopCornerRight")
+	b:SetTexCoord(9/33, 1, 0, 23/33)
 	b:SetPoint("TOPLEFT", 4, -5) b:SetPoint("BOTTOMRIGHT", -5, 4)
 	b:SetVertexColor(0.6,0.6,0.6)
 	
@@ -1064,7 +1068,7 @@ newSlice = CreateFrame("Frame", nil, ringContainer) do
 		if newSlice.disableDrag then return end
 		PlaySound(832)
 		dragBackdrop:Show()
-		SetCursor(self.ico:GetTexture())
+		SetCursor(self.plainTex or "Interface/Icons/Temp")
 		self.dragActive = true
 	end
 	local function onDragAbort(self)
@@ -1140,8 +1144,8 @@ newSlice = CreateFrame("Frame", nil, ringContainer) do
 			local e, id = actions[i], i + base
 			if id <= #selectedCategory then
 				local stype, sname, sicon, extico, tipfunc, tiparg = AB:GetActionListDescription(selectedCategory(id))
-				pcall(setIcon, e.ico, sicon, extico)
-				e.tipFunc, e.tipFuncArg = tipfunc, tiparg
+				local ok, pt = pcall(setIcon, e.ico, sicon, extico)
+				e.tipFunc, e.tipFuncArg, e.plainTex = tipfunc, tiparg, ok and pt or nil
 				e.name:SetText(sname)
 				e.sub:SetText(stype)
 				e:SetID(id)
@@ -1411,7 +1415,8 @@ function api.updateRingLine(scanForNestedRings)
 		local e = ringContainer.slices[i-sliceBaseIndex+1]
 		if not e then ringContainer.next:Enable() break end
 		local _, _, sicon, icoext = getSliceInfo(currentRing[i])
-		pcall(setIcon, e.tex, currentRing[i].icon or sicon, icoext)
+		local ok, pt = pcall(setIcon, e.tex, currentRing[i].icon or sicon, icoext)
+		e.plainTex = ok and pt or nil
 		e.check:SetShown(RK:IsRingSliceActive(currentRingName, i))
 		e.auto:SetShown(onOpen == i)
 		e:SetChecked(currentSliceIndex == i)

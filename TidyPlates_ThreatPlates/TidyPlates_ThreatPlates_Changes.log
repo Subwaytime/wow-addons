@@ -1,4 +1,9 @@
 ﻿------------------------------------------------------
+11.1.28 (2023-09-15)
+------------------------------------------------------
+* Fixed a Lua error in Wrath Classic that occurred when entering battlegrounds as an API function was used that is not available in Wrath Classic [GH-474].
+
+------------------------------------------------------
 11.1.27 (2023-09-06)
 ------------------------------------------------------
 * Fixed a bug in solo shuffle where nameplate colors where not updated correctly when a new match started [GH-472].
@@ -9,7 +14,7 @@
 ------------------------------------------------------
 * Fixed a bug where status text did not show the NPC's role when colorblind accessibility features were enabled [GH-473].
 * Fixed a bug where aura tooltips were not shown correctly for all aura types in WoW (Wrath) Classic [GH-470].
-* Updated TOC version for Classic Patch 1.4.4.
+* Updated TOC version for Classic Patch 1.14.4.
 
 ------------------------------------------------------
 11.1.25 (2023-07-15)

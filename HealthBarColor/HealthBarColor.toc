@@ -1,5 +1,5 @@
 ## Interface: 100107
-## Version: 2.7.1
+## Version: 2.8.1
 ## Title: HealthBarColor
 ## Author: Slothpala
 ## SavedVariables: HealthBarColorDB

@@ -1,5 +1,5 @@
 local configCache, _, T = {}, ...
-local PC, api, iapi, MODERN = T.OPieCore, {}, {}, select(4, GetBuildInfo()) >= 10e4
+local PC, EV, api, iapi = T.OPieCore, T.Evie, {}, {}
 local GameTooltip = T.NotGameTooltip or GameTooltip
 local max, min, abs, floor, sin, cos = math.max, math.min, math.abs, math.floor, sin, cos
 local MIN_ANIMATION_FPS, LOCKED_FRAMERATE = 20, 60 do
@@ -7,19 +7,19 @@ local MIN_ANIMATION_FPS, LOCKED_FRAMERATE = 20, 60 do
 	local function unlockTick()
 		if ticks < 2 then
 			ticks = ticks + 1
-			C_Timer.After(0.55, unlockTick)
+			EV.After(0.55, unlockTick)
 		else
 			LOCKED_FRAMERATE = nil
 		end
 	end
-	C_Timer.After(0, unlockTick)
+	EV.After(0, unlockTick)
 end
 
 local Slices, GhostIndication, IndicatorFactories = {}, {}, {}
 local CreateIndicator, ActiveIndicatorFactory, LastRegisteredIndicatorFactory = T.Mirage.CreateIndicator
 
 local function assert(condition, text, level)
-	return condition or error(text, level or 2)((0)[0])
+	return condition or error(text, (level or 1)+1)((0)[0])
 end
 
 local gfxBase = ([[Interface\AddOns\%s\gfx\]]):format((...))
@@ -203,32 +203,35 @@ do -- GhostIndication
 end
 
 local SwitchIndicatorFactory, ValidateIndicator do
-	local CURRENT_API_LEVEL, CURRENT_API_LEVEL_OOD = 2, MODERN and 2 or 1
+	local CURRENT_API_LEVEL, REQ_API_LEVEL, CURRENT_API_LEVEL_OOD = 3, 3, 3
 	local RequiredIndicatorMethods = {
 		SetPoint=0, SetScale=0, GetScale=0, SetShown=0, SetParent=0,
-		SetIcon=0, SetIconTexCoord=0, SetIconVertexColor=0, SetDominantColor=0,
+		SetIcon=0, SetIconTexCoord=0, SetIconAtlas=3, SetIconVertexColor=0, SetDominantColor=0,
 		SetOverlayIcon=0, SetOverlayIconVertexColor=1,
 		SetUsable=0, SetCount=0, SetBinding=0,
 		SetCooldown=0, SetCooldownTextShown="supportsCooldownNumbers", SetShortLabel="supportsShortLabels",
 		SetEquipState=0, SetHighlighted=0, SetActive=0, SetOuterGlow=0,
 		SetQualityOverlay=2,
 	}
-	function ValidateIndicator(apiLevel, reqAPILevel, info, errorLevel)
-		if apiLevel < 0 or (reqAPILevel or apiLevel) > CURRENT_API_LEVEL then
-			error("API level " .. apiLevel .. " is not supported (current is " .. CURRENT_API_LEVEL .. ")", errorLevel)
+	function ValidateIndicator(apiLevel, reqAPILevel, info)
+		if apiLevel < REQ_API_LEVEL or (reqAPILevel or apiLevel) > CURRENT_API_LEVEL then
+			return false, "API level " .. apiLevel .. " is not supported (current is " .. CURRENT_API_LEVEL .. ")"
 		end
 		local f = info.CreateIndicator(nil, mainFrame, 48)
 		for k,v in pairs(RequiredIndicatorMethods) do
 			local tv = type(v)
 			if type(f[k]) ~= "function" and ((tv == "number" and apiLevel >= v) or (tv == "string" and info[v])) then
-				return error(("Expected a function for indicator key %q, got %s."):format(k, type(f[k])), errorLevel)
+				return false, ("Expected a function for indicator key %q, got %s."):format(k, type(f[k]))
 			end
 		end
 		return {[f]=true}
 	end
 	function SwitchIndicatorFactory(iakey)
 		local iakey = (iakey == nil or iakey == "_") and LastRegisteredIndicatorFactory or iakey
-		local finfo = IndicatorFactories[iakey] or IndicatorFactories.mirage
+		local finfo = IndicatorFactories[iakey]
+		if not (finfo and finfo.CreateIndicator) then
+			finfo, iakey = IndicatorFactories.mirage, "mirage"
+		end
 		if finfo ~= ActiveIndicatorFactory then
 			local oldPool = ActiveIndicatorFactory and ActiveIndicatorFactory.mainPool
 			for k,v in pairs(Slices) do
@@ -244,7 +247,7 @@ local SwitchIndicatorFactory, ValidateIndicator do
 		if key == "_" then return end
 		local nk, nv = next(IndicatorFactories, key)
 		if nk then
-			return nk, nv.name, nv.apiLevel < CURRENT_API_LEVEL_OOD
+			return nk, nv.name, nv.apiLevel < CURRENT_API_LEVEL_OOD or nv.err ~= nil, nv.err
 		end
 		return "_", IndicatorFactories[LastRegisteredIndicatorFactory].name, false
 	end
@@ -253,13 +256,13 @@ local SwitchIndicatorFactory, ValidateIndicator do
 	end
 	function iapi:DoesIndicatorConstructorSupport(key, feature)
 		if key == nil or key == "_" then key = LastRegisteredIndicatorFactory end
-		if not IndicatorFactories[key] then key = LastRegisteredIndicatorFactory or "mirage" end
+		if not (IndicatorFactories[key] and IndicatorFactories[key].CreateIndicator) then key = LastRegisteredIndicatorFactory or "mirage" end
 		return not not IndicatorFactories[key]["supports" .. feature]
 	end
 	function iapi:GetIndicatorConstructorName(key)
 		if key == nil or key == "_" then key = LastRegisteredIndicatorFactory end
 		local ic = IndicatorFactories[key]
-		return ic and ic.name
+		return ic and ic.name, ic and ic.CreateIndicator and true
 	end
 	function iapi:HasMultipleIndicatorConstructors()
 		return nil ~= next(IndicatorFactories, (next(IndicatorFactories)))
@@ -272,27 +275,48 @@ local qualMap, qualMod, qualModLow = {}, 131072, 16384 do
 		qualMap[v] = v/qualModLow
 	end
 end
+local atlasRatio = setmetatable({}, {__index=function(t,k)
+	local i, r = k and C_Texture.GetAtlasInfo(k), 1
+	if i then
+		r = i.width/i.height
+		t[k] = r
+	end
+	return r
+end})
 
 local getSliceColor do
-	local col, pal = T.Niji._tex, T.Niji._palette
+	local ici, pal = T.Niji._tex, T.Niji._pal
 	function getSliceColor(token, icon, token2)
-		if tokenR[token] then return tokenR[token], tokenG[token], tokenB[token] end
-		if tokenR[token2] then return tokenR[token2], tokenG[token2], tokenB[token2] end
-		local li = col[icon] or -3
+		if tokenR[token] then
+			return tokenR[token], tokenG[token], tokenB[token]
+		elseif tokenR[token2] then
+			return tokenR[token2], tokenG[token2], tokenB[token2]
+		end
+		local li = ici[icon] or -3
 		return pal[li] or 0.7, pal[li+1] or 1, pal[li+2] or 0.6
 	end
 end
-local function extractAux(ext, v)
-	if not ext then
-	elseif v == "coord" then
-		local t = type(ext.iconCoords)
-		if t == "table" then
-			return unpack(ext.iconCoords)
-		elseif t == "function" then
-			return ext.iconCoords()
-		end
-	elseif v == "color" and type(ext.iconR) == "number" and type(ext.iconG) == "number" and type(ext.iconB) == "number" then
-		return ext.iconR, ext.iconG, ext.iconB
+local checkTipThrottle do
+	local throttleEnd, lastF, lastA = -2^40
+	function checkTipThrottle(owner, f, a, t)
+		local ret = f and a and lastF == f and lastA == a and throttleEnd > t and GameTooltip:IsOwned(owner)
+		lastF, lastA, throttleEnd = f, a, ret and throttleEnd or (t + 0.0625)
+		return ret
+	end
+end
+local function applyExtIconCoord(self, ext)
+	local t = type(ext.iconCoords)
+	if t == "table" then
+		self:SetIconTexCoord(unpack(ext.iconCoords))
+	elseif t == "function" then
+		self:SetIconTexCoord(ext.iconCoords())
+	end
+end
+local function applyExtIconVertexColor(self, ext)
+	local r,g,b = ext.iconR, ext.iconG, ext.iconB
+	if type(r) == "number" and type(g) == "number" and type(b) == "number" then
+		self:SetIconVertexColor(r,g,b)
+		return true
 	end
 end
 local function SetDefaultAnchor(tt, owner)
@@ -303,7 +327,7 @@ local function SetDefaultAnchor(tt, owner)
 	end
 end
 local function updateCentralElements(self, si, _, tok, usable, state, icon, caption, _, _, _, tipFunc, tipArg, _, stext)
-	local osi = self.oldSlice
+	local osi, time = self.oldSlice, GetTime()
 
 	if tok then
 		local r,g,b = getSliceColor(tok, tokenIcon[tok] or icon or "Interface/Icons/INV_Misc_QuestionMark")
@@ -317,19 +341,18 @@ local function updateCentralElements(self, si, _, tok, usable, state, icon, capt
 	end
 
 	if configCache.UseGameTooltip then
-		if tipFunc and tipArg then
-			SetDefaultAnchor(GameTooltip, mainFrame)
-			tipFunc(GameTooltip, tipArg)
-			GameTooltip:Show()
-		else
+		if not (tipFunc and tipArg) then
 			local text = caption and caption ~= "" and caption or stext
-			if text then
+			tipFunc, tipArg = text and GameTooltip.AddLine, text
+		end
+		if tipFunc then
+			if not checkTipThrottle(mainFrame, tipFunc, tipArg, time) then
 				SetDefaultAnchor(GameTooltip, mainFrame)
-				GameTooltip:AddLine(text)
+				tipFunc(GameTooltip, tipArg)
 				GameTooltip:Show()
-			elseif GameTooltip:IsOwned(mainFrame) then
-				GameTooltip:Hide()
 			end
+		elseif GameTooltip:IsOwned(mainFrame) then
+			GameTooltip:Hide()
 		end
 	end
 
@@ -339,7 +362,7 @@ local function updateCentralElements(self, si, _, tok, usable, state, icon, capt
 		setRingRotationPeriod(configCache.XTRotationPeriod*sm)
 	end
 
-	local gAnim, gEnd, oIG, time, usable = self.gAnim, self.gEnd, self.oldIsGlowing, GetTime(), usable or (state and usable ~= false) or false
+	local gAnim, gEnd, oIG, usable = self.gAnim, self.gEnd, self.oldIsGlowing, usable or (state and usable ~= false) or false
 	if usable ~= oIG then
 		gAnim, gEnd = usable and "in" or "out",  time + 0.3 - (gEnd and gEnd > time and (gEnd-time) or 0)
 		self.oldIsGlowing, self.gAnim, self.gEnd = usable, gAnim, gEnd
@@ -357,26 +380,25 @@ local function updateCentralElements(self, si, _, tok, usable, state, icon, capt
 	self.oldSlice = si
 end
 local function updateSlice(self, originAngle, selected, tok, usable, state, icon, _, count, cd, cd2, _tf, _ta, ext, stext)
-	local isJump, origJumpIcon, jumpOtherTok, isJumpIconOverlay = false, icon
+	local isJump, origIcon, jumpOtherTok, isJumpIconOverlay, isAtlasIcon = false, icon
 	state, usable, ext = state or 0, usable or (state and usable ~= false) or false, not tokenIcon[tok] and ext or nil
 	if state % 8192 >= 4096 then
 		icon, jumpOtherTok, isJump, count = 188515, count, true, 0
 	end
 	icon = tokenIcon[tok] or icon or "Interface/Icons/INV_Misc_QuestionMark"
-	isJumpIconOverlay = isJump and icon == 188515
-	local active, overlay, faded, usableCharge, r,g,b = state % 2 >= 1, state % 4 >= 2, not usable, usable or (state % 128 >= 64)
+	isJumpIconOverlay, isAtlasIcon = isJump and icon == 188515, icon == origIcon and state % 524288 >= 262144
+	local active, overlay, faded, usableCharge = state % 2 >= 1, state % 4 >= 2, not usable, usable or (state % 128 >= 64)
 	local isInContainer, isInInventory, isQuestStartItem = state % 256 >= 128, state % 512 >= 256, tokenQuest[tok] or (state % 64 >= 32)
 	local isDisenchanting = state % 262144 >= 131072
 	local onCooldown, noMana, noRange, qual = cd and cd > 0, state % 16 >= 8, state % 32 >= 16, state % qualMod
 	qual = qual >= qualModLow and qualMap[qual - qual % qualModLow] or 0
-	self:SetIcon(icon)
-	if ext then
-		self:SetIconTexCoord(securecall(extractAux, ext, "coord"))
-		r, g, b = securecall(extractAux, ext, "color")
+	self[isAtlasIcon and "SetIconAtlas" or "SetIcon"](self, icon, isAtlasIcon and atlasRatio[icon] or 1)
+	if ext then securecall(applyExtIconCoord, self, ext) end
+	if not (ext and securecall(applyExtIconVertexColor, self, ext)) then
+		self:SetIconVertexColor(1, 1, 1)
 	end
-	local dr, dg, db = getSliceColor(tok, isJumpIconOverlay and origJumpIcon or icon, jumpOtherTok)
+	local dr, dg, db = getSliceColor(tok, isJumpIconOverlay and origIcon or icon, jumpOtherTok)
 	self:SetUsable(usable, usableCharge, onCooldown, noMana, noRange)
-	self:SetIconVertexColor(r or 1, g or 1, b or 1)
 	self:SetDominantColor(dr, dg, db)
 	self:SetOuterGlow(overlay)
 	if isJumpIconOverlay then
@@ -388,20 +410,18 @@ local function updateSlice(self, originAngle, selected, tok, usable, state, icon
 		x3,y3 = cx + cr*cos(a1+180), cy - cr*sin(a1+180)
 		x4,y4 = cx + cr*cos(a1+270), cy - cr*sin(a1+270)
 		self:SetOverlayIcon(gfxBase .. "pointer", 40, 40, x2,y2, x3,y3, x1,y1, x4,y4)
-		if ActiveIndicatorFactory.apiLevel >= 1 then
-			self:SetOverlayIconVertexColor(dr, dg, db)
-		end
+		self:SetOverlayIconVertexColor(dr, dg, db)
 	elseif isDisenchanting then
 		self:SetOverlayIcon("Interface/Buttons/UI-GroupLoot-DE-Up", 20, 20)
+		self:SetOverlayIconVertexColor(1,1,1)
 	else
 		self:SetOverlayIcon(isQuestStartItem and "Interface\\MINIMAP\\TRACKING\\OBJECTICONS", 21, 28, 40/256, 64/256, 32/64, 1)
+		self:SetOverlayIconVertexColor(1,1,1)
 	end
 	if ActiveIndicatorFactory.supportsShortLabels then
 		self:SetShortLabel(configCache.ShowShortLabels and stext or "")
 	end
-	if ActiveIndicatorFactory.apiLevel >= 2 then
-		self:SetQualityOverlay(qual)
-	end
+	self:SetQualityOverlay(qual)
 	self:SetCooldown(cd, cd2, usableCharge)
 	self:SetEquipState(isInContainer, isInInventory)
 	local ct = configCache.ShowOneCount and 0 or 1
@@ -478,7 +498,7 @@ local function OnUpdate_Main(self, elapsed)
 	end
 	OnUpdate_CheckAlpha(self, count)
 
-	local cmState, mut = (IsShiftKeyDown() and 1 or 0) + (IsControlKeyDown() and 2 or 0) + (IsAltKeyDown() and 4 or 0) + (MODERN and IsMetaKeyDown() and 8 or 0), self.schedMultiUpdate or 0
+	local cmState, mut = (IsShiftKeyDown() and 1 or 0) + (IsControlKeyDown() and 2 or 0) + (IsAltKeyDown() and 4 or 0) + (IsMetaKeyDown() and 8 or 0), self.schedMultiUpdate or 0
 	if self.omState == cmState and mut < 0  then
 		self.schedMultiUpdate = mut + elapsed
 	else
@@ -613,17 +633,19 @@ function api:RegisterIndicatorConstructor(key, info)
 	assert(type(reqAPILevel) == "number" or reqAPILevel == nil, 'RegisterIndicatorConstructor: info.reqAPILevel, if set, must be a number', 2)
 	assert(type(onPAC) == "function" or onPAC == nil, 'RegisterIndicatorConstructor: info.onParentAlphaChanged, if set, must be a function', 2)
 
-	local mainPool = ValidateIndicator(apiLevel, reqAPILevel, info, 3)
-	LastRegisteredIndicatorFactory, IndicatorFactories[key] = key, {
+	local mainPool, err = ValidateIndicator(apiLevel, reqAPILevel, info)
+	LastRegisteredIndicatorFactory, IndicatorFactories[key] = mainPool and key or LastRegisteredIndicatorFactory, {
 		name = iname:gsub("|+", ""),
 		apiLevel = apiLevel,
-		CreateIndicator = func,
+		CreateIndicator = mainPool and func,
 		mainPool = mainPool,
 		ghostPool = {},
 		supportsCooldownNumbers = not not info.supportsCooldownNumbers,
 		supportsShortLabels = not not info.supportsShortLabels,
 		onParentAlphaChanged = onPAC,
+		err = err,
 	}
+	assert(mainPool, err, 2)
 end
 
 for k,v in pairs({IndicatorFactory="_",

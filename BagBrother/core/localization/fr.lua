@@ -61,7 +61,6 @@ L.TipWithdraw = '%s pour retirer (no remaining).'
 L.NumWithdraw = '%d |4retrait:retraits;'
 L.NumDeposit = '%d |4dépôt:dépôts;'
 L.GuildFunds = 'Guild Funds'
-L.Total = 'Total'
 
 --itemcount tooltips
 L.TipCountEquip = 'Équipé : %d'
@@ -69,4 +68,3 @@ L.TipCountBags = 'Sacs : %d'
 L.TipCountBank = 'Banque : %d'
 L.TipCountVault = 'Chambre : %d'
 L.TipCountGuild = 'Guilde : %d'
-L.TipDelimiter = '|'

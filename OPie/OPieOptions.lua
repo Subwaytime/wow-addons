@@ -360,7 +360,7 @@ do -- config.pulseDropdown
 			drop.LeftA:SetAlpha(s)
 			drop.MiddleA:SetAlpha(s)
 			drop.RightA:SetAlpha(s)
-			C_Timer.After(0, pulse)
+			EV.After(0, pulse)
 		end
 		drop.pulseFunc = pulse
 		pulse()
@@ -556,7 +556,7 @@ do -- Widget construction
 	end
 end
 local OPC_AppearanceFactory = CreateFrame("Frame", "OPC_AppearanceDropdown", frame, "UIDropDownMenuTemplate")
-OPC_AppearanceFactory:SetPoint("LEFT", OPC_OptionSets[2].label, "LEFT", 280, -2)
+OPC_AppearanceFactory:SetPoint("LEFT", OPC_OptionSets[2].label, "LEFT", 284, -1)
 UIDropDownMenu_SetWidth(OPC_AppearanceFactory, 200)
 
 T.OPC_RingScopePrefixes = {
@@ -723,13 +723,15 @@ end
 function OPC_Profile:text()
 	UIDropDownMenu_SetText(self, L"Profile" .. ": " .. OPC_Profile_FormatName(PC:GetCurrentProfile()))
 end
-function OPC_AppearanceFactory:formatText(key, outOfDate, name)
+function OPC_AppearanceFactory:formatText(key, outOfDate, name, disabled)
 	name = name or T.OPieUI:GetIndicatorConstructorName(key)
 	if not name then
 		name = "|cffa0a0a0*[" .. T.OPieUI:GetIndicatorConstructorName() .. "]|r"
 	end
-	if outOfDate then
-		name = "|cffff6060" .. name .. "|r"
+	if disabled then
+		name = "|cff909090" .. name .. "|r"
+	elseif outOfDate then
+		name = "|cffef2020" .. name .. "|r"
 	end
 	if key == "mirage" then
 		name = "|cff00e800" .. name .. "|r"
@@ -739,8 +741,15 @@ function OPC_AppearanceFactory:formatText(key, outOfDate, name)
 	return name
 end
 function OPC_AppearanceFactory:text()
-	local key, own = PC:GetOption("IndicatorFactory", OR_CurrentOptionsDomain)
-	UIDropDownMenu_SetText(self, OR_CurrentOptionsDomain and own == nil and L"Use global setting" or self:formatText(key, false))
+	local key, own, text = PC:GetOption("IndicatorFactory", OR_CurrentOptionsDomain)
+	if OR_CurrentOptionsDomain and own == nil then
+		text = L"Use global setting"
+	else
+		local name, avail = T.OPieUI:GetIndicatorConstructorName(key)
+		key, name = avail and key or nil, avail and name or nil
+		text = self:formatText(key, nil, name) .. (avail and "" or "|cff909090*")
+	end
+	UIDropDownMenu_SetText(self, text)
 end
 local function OPC_AppearanceFactory_set(_, key)
 	PC:SetOption("IndicatorFactory", key, OR_CurrentOptionsDomain)
@@ -752,19 +761,21 @@ local function OPC_AppearanceFactory_set(_, key)
 	end end
 end
 function OPC_AppearanceFactory:initialize()
-	local info = {func=OPC_AppearanceFactory_set, minWidth=UIDROPDOWNMENU_OPEN_MENU:GetWidth()-40, tooltipOnButton=true}
+	local info = {func=OPC_AppearanceFactory_set, minWidth=UIDROPDOWNMENU_OPEN_MENU:GetWidth()-40, tooltipOnButton=true, tooltipWhileDisabled=true}
 	local current, own = PC:GetOption("IndicatorFactory", OR_CurrentOptionsDomain)
-	for k, name, outOfDate in T.OPieUI:EnumerateRegisteredIndicatorConstructors() do
-		name = self:formatText(k, outOfDate, name)
+	for k, name, outOfDate, err in T.OPieUI:EnumerateRegisteredIndicatorConstructors() do
 		if k == "_" then
 			UIDropDownMenu_AddSeparator()
 		end
-		if outOfDate then
+		name = self:formatText(k, outOfDate, name, err ~= nil)
+		if err then
+			info.tooltipTitle, info.tooltipText = "|cffff2020" .. L"Update required", L"Install an updated version of this appearance to select it." .. "\n\n|cff909090" .. err
+		elseif outOfDate then
 			info.tooltipTitle, info.tooltipText = "|cffff2020" .. L"Update required", L"This appearance may not support all OPie features."
 		else
 			info.tooltipTitle, info.tooltipText = nil
 		end
-		info.arg1, info.text, info.checked = k, name, k == own or (own == nil and not OR_CurrentOptionsDomain and current == k)
+		info.arg1, info.text, info.checked, info.disabled = k, name, k == own or (own == nil and not OR_CurrentOptionsDomain and current == k), err ~= nil
 		UIDropDownMenu_AddButton(info)
 	end
 	if OR_CurrentOptionsDomain then

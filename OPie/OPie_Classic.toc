@@ -1,6 +1,6 @@
-## Interface: 11403
+## Interface: 11404
 ## Title: OPie
-## Version: Yuzu 9+3.33
+## Version: Zeta 1
 ## Author: foxlit
 ## Notes: Group abilities into rings that appear when you hold down a binding.
 ## X-Website: https://www.townlong-yak.com/addons/opie
@@ -18,6 +18,7 @@
 ## Notes-ptBR: Agrupar habilidades em anéis que aparecem quando você ativa uma ligação.
 ## SavedVariables: OneRing_Config, OPie_SavedData
 ## SavedVariablesPerCharacter: OPie_SavedDataPC
+## OptionalDeps: TaintLess
 ## X-M6-AB: OPie.ActionBook
 Libs\Evie.lua
 Libs\Niji.lua

@@ -1376,11 +1376,11 @@ function BetterWardrobeCollectionFrameMixin:OnLoad()
 
 	CollectionsJournal:SetPortraitToAsset("Interface\\Icons\\inv_misc_enggizmos_19")
 	--self.CloseButton:SetScript("OnClick", function() ToggleCollectionsJournal() end)
-	self.CloseButton:Hide()
+	--self.CloseButton:Hide()
 	-- TODO: Remove this at the next deprecation reset
 	self.searchBox = self.SearchBox;
 
-	self.Inset:Hide()
+	--self.Inset:Hide()
 end
 
 function BetterWardrobeCollectionFrameMixin:OnEvent(event, ...)
@@ -1524,7 +1524,7 @@ function BetterWardrobeCollectionFrameMixin:OnShow()
 	playerClassName,playerClass, classID = UnitClass("player")
 	CollectionsJournal:SetPortraitToAsset("Interface\\Icons\\inv_chest_cloth_17")
 	local level = CollectionsJournal:GetFrameLevel()
-	BetterWardrobeCollectionFrame.NineSlice:Hide()
+	--BetterWardrobeCollectionFrame.NineSlice:Hide()
 
 	--BetterWardrobeCollectionFrame:SetFrameLevel(level+10)
 	--CollectionsJournal.NineSlice:SetFrameLevel(level-1)
@@ -1589,6 +1589,7 @@ function BetterWardrobeCollectionFrameMixin:OnHide()
 end
 
 function BetterWardrobeCollectionFrameMixin:OnKeyDown(key)
+	if  InCombatLockdown() then return end
 	if self.tooltipCycle and key == WARDROBE_CYCLE_KEY then
 		self:SetPropagateKeyboardInput(false)
 		if IsShiftKeyDown() then
@@ -3841,7 +3842,7 @@ end
 
 -- ***** TUTORIAL
 BetterWardrobeCollectionTutorialMixin = { }
---[[
+
 function BetterWardrobeCollectionTutorialMixin:OnLoad()
 
 	self.helpTipInfo = {
@@ -3866,7 +3867,7 @@ function BetterWardrobeCollectionTutorialMixin:OnLeave()
 	HelpTip:Hide(self, WARDROBE_SHORTCUTS_TUTORIAL_1);
 	BW_TrackingInterfaceShortcutsFrame.NewAlert:ClearAlert();
 end
-]]--
+
 
 BW_AlertTrackingFeatureMixin = CreateFromMixins(NewFeatureLabelMixin);
 
@@ -3879,9 +3880,6 @@ end
 function BW_AlertTrackingFeatureMixin:ValidateIsShown()
 	self:SetShown(not GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_WARDROBE_TRACKING_INTERFACE));
 end
-
-
-
 
 -- ***** WEAPON DROPDOWN
 

@@ -178,3 +178,25 @@ if MODERN then -- missing usability conditions for certain toys
 	AB:SetPlayerHasToyOverride(collectedAndQuestCompleted(110560, 34378, 34586)) -- Garrison Hearthstone
 	AB:SetPlayerHasToyOverride(collectedAndQuestCompleted(140192, 44184, 44663)) -- Legion Dalaran Hearthstone
 end
+
+if MODERN then -- /ping's option parsing is silly
+	local safequote do
+		local r = {u="\\117", ["{"]="\\123", ["}"]="\\125"}
+		function safequote(s)
+			return s and (("%q"):format(s):gsub("[{}u]", r)) or "nil"
+		end
+	end
+	local f, init = CreateFrame("Frame", nil, nil, "SecureHandlerBaseTemplate"), [[--
+		PING_COMMAND, TOKENS = %s, newtable()
+		TOKENS.assist, TOKENS.attack, TOKENS.onmyway, TOKENS.warning = %s, %s, %s, %s
+	]]
+	f:Execute(init:format(safequote(SLASH_PING1 .. " "), safequote(PING_TYPE_ASSIST), safequote(PING_TYPE_ATTACK), safequote(PING_TYPE_ON_MY_WAY), safequote(PING_TYPE_WARNING)))
+	f:SetAttribute("RunSlashCmd", [[--
+		local cmd, v, target, s = ...
+		if v then
+			target = target and target ~= "cursor" and "[@" .. target .. "] " or ""
+			return PING_COMMAND .. target .. (TOKENS[v and v:lower()] or v)
+		end
+	]])
+	RW:RegisterCommand(SLASH_PING1, true, false, f)
+end

@@ -1,4 +1,4 @@
-local MAJ, REV, COMPAT, _, T = 1, 3, select(4,GetBuildInfo()), ...
+local MAJ, REV, COMPAT, _, T = 1, 4, select(4,GetBuildInfo()), ...
 if T.SkipLocalActionBook then return end
 
 local EV, AB, RW = T.Evie, T.ActionBook:compatible(2,34), T.ActionBook:compatible("Rewire", 1,27)
@@ -22,9 +22,13 @@ local commandType, addCommandType = {["#show"]=0, ["#showtooltip"]=0, ["#imp"]=-
 	for n, ct in ("CAST:1 USE:1 CASTSEQUENCE:2 CASTRANDOM:3 USERANDOM:3"):gmatch("(%a+):(%d+)") do
 		addCommandType(n, ct+0)
 	end
+	if MODERN then
+		addCommandType("PING", 4)
+	end
 end
 
 local toMacroText, quantizeMacro, formatMacro, formatToken, setMountPreference do
+	local COMMA_LIST_COMMAND_TYPES, CAST_ESCAPE_COMMAND_TYPES = {[2]=1, [3]=1}, {[0]=1, [1]=1, [3]=1}
 	local genParser do
 		local doRewrite, replaceFunc, critFail, critLine
 		local function replaceAlternatives(ctype, args)
@@ -114,7 +118,7 @@ local toMacroText, quantizeMacro, formatMacro, formatToken, setMountPreference d
 		end
 	end
 	local function replaceSpellID(ctype, sidlist, prefix, tk)
-		local noEscapes, sr, ar = ctype == 2
+		local noEscapes, sr, ar = not CAST_ESCAPE_COMMAND_TYPES[ctype]
 		for id, sn in sidlist:gmatch("%d+") do
 			id = id + 0
 			sn, sr = GetSpellInfo(id), GetSpellSubtext(id)
@@ -195,12 +199,23 @@ local toMacroText, quantizeMacro, formatMacro, formatToken, setMountPreference d
 			return gmPref, fmPref, drPref
 		end
 	end
+	local pingTextMap, pingTokenMap = {}, {
+		assist=PING_TYPE_ASSIST,
+		attack=PING_TYPE_ATTACK,
+		onmyway=PING_TYPE_ON_MY_WAY,
+		warning=PING_TYPE_WARNING,
+	}
+	for k,v in pairs(pingTokenMap) do
+		pingTextMap[v:lower()], pingTextMap[k] = k, k
+	end
 	toMacroText = genParser(function(ctype, value)
 		local prefix, tkey, tval = value:match("^%s*(!?){{(%a+):([%a%d/]+)}}%s*$")
 		if tkey == "spell" or tkey == "spellr" then
 			return replaceSpellID(ctype, tval, prefix, tkey)
 		elseif tkey == "mount" then
 			return replaceMountTag(ctype, tval, prefix)
+		elseif tkey == "ping" and ctype == 4 then
+			return pingTokenMap[tval] or value
 		elseif value:match('^%s*!?|Hiptok|h|h%s*$') then
 			return '-'
 		end
@@ -213,11 +228,17 @@ local toMacroText, quantizeMacro, formatMacro, formatToken, setMountPreference d
 			if type(ctx) == "number" and ctx > 0 then
 				return nil, ctx-1
 			end
-			local noEscapes, cc, pre, name, tws = ctype == 2, 0, value:match("^(%s*!?)(.-)(%s*)$")
+			local commaList, noEscapes = COMMA_LIST_COMMAND_TYPES[ctype], not CAST_ESCAPE_COMMAND_TYPES[ctype]
+			local cc, pre, name, tws = 0, value:match("^(%s*!?)(.-)(%s*)$")
 			repeat
 				local lowname = name:lower()
 				local sid, peek, cnpos = spells[lowname]
-				if sid and noEscapes and RW:IsCastEscape(lowname, true) then
+				if ctype == 4 then
+					name = pingTextMap[lowname]
+					if name then
+						return pre .. "{{ping:" .. name.. "}}" .. tws
+					end
+				elseif sid and noEscapes and RW:IsCastEscape(lowname, true) then
 					-- Don't tokenize escapes in contexts they wont't work in
 				elseif sid then
 					if not MODERN then
@@ -233,7 +254,7 @@ local toMacroText, quantizeMacro, formatMacro, formatToken, setMountPreference d
 				elseif name:match("^{{.*}}$") then
 					return pre .. name .. tws, cc
 				end
-				if ctype >= 2 and args then
+				if commaList and args then
 					peek, cnpos = args:match("^([^,]+),?()", cpos)
 					if peek then
 						cc, cpos, name, tws = cc + 1, cnpos, (name .. "," .. peek):match("^(.-)(%s*)$")
@@ -338,6 +359,7 @@ local toMacroText, quantizeMacro, formatMacro, formatToken, setMountPreference d
 					end
 				end
 			end
+			spells[""], spells["()"] = nil
 		end
 	end
 	function quantizeMacro(macro, skipCacheRefresh)
@@ -373,6 +395,11 @@ local toMacroText, quantizeMacro, formatMacro, formatToken, setMountPreference d
 					end
 				elseif token == "mount" then
 					return mountTokens[targ]
+				elseif token == "ping" then
+					local tname = pingTokenMap[targ]
+					if tname then
+						return "|cff71d5ff|Hilt" .. token .. ":" .. targ .. "|h" .. tname .. "|h|r"
+					end
 				end
 				return '{{' .. token .. ':' .. targ .. '}}'
 			end

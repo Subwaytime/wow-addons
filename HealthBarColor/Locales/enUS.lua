@@ -38,6 +38,9 @@ L["HideClassPowerBar"] = true
 L["BiggerHealthBar"] = true
 --Overabsorb
 L["Overabsorb"] = true
+--DarkFrames
+L["Dark Frames"] = true
+L["dark_frames_desc"] = "Use dark unit frame textures."
 --Settings/Module Selection
 L["Enabled Modules"] = true
 L["Modules"] = true

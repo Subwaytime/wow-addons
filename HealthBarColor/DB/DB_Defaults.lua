@@ -100,6 +100,7 @@ local defaults = {
                 HideClassPowerBar  = false,
                 BiggerHealthBar    = false,
                 Overabsorb         = false,
+                DarkFrames         = false,
                 ['*']              = true,
             },
             ClassColorOverwrites = {

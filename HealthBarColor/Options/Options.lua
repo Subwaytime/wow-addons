@@ -16,7 +16,7 @@ local options = {
     args = {
         Version = {
             order = 0,
-            name = "            2.7.1",
+            name = "            2.8.1",
             type = "group",
             disabled = true,
             args = {},
@@ -762,9 +762,17 @@ local options = {
                             set = "SetStatus",
                         },
                         Overabsorb = {
-                            order = 8,
+                            order = 9,
                             name = L["Overabsorb"],
                             desc = L["overabsorb_desc"],
+                            type = "toggle",
+                            get = "GetStatus",
+                            set = "SetStatus",
+                        },
+                        DarkFrames = {
+                            order = 10,
+                            name = L["Dark Frames"],
+                            desc = L["dark_frames_desc"],
                             type = "toggle",
                             get = "GetStatus",
                             set = "SetStatus",

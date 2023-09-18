@@ -325,14 +325,12 @@ local function RK_SanitizeDescription(name, props, isLaxInput)
 				end
 			end
 			v.show = v.show ~= "" and v.show or nil
-			local sliceToken = v.sliceToken or (uprefix and type(v._u) == "string" and (uprefix .. v._u))
+			local sliceToken = v.sliceToken or uprefix and type(v._u) == "string" and (uprefix .. v._u) or v.sliceToken
 			local tokenOK = marks[sliceToken] == nil and sliceToken and AB:ReserveToken(sliceToken, NS, name, colID)
 			if not tokenOK then
 				if not isLaxInput then
 					-- Persistent, globally-unique slice tokens are required for rings created/persisted by external code
-					local msg = string.format("desc[%d].sliceToken value is missing, invalid, or not [globally] unique (%s)", i, type(sliceToken))
-					-- DEPRECATED[2306/Y11]: deterministic error() after 2023-08-29
-					PC:FutureDeprecationError(msg, 5, 1688169600,1689379200, 1692057600,1693267200)
+					assert(false, string.format("desc[%d].sliceToken value is missing, invalid, or not [globally] unique (%s)", i, type(sliceToken)), 4)
 				end
 				sliceToken = AB:CreateToken()
 			end
@@ -394,7 +392,7 @@ local function svInitializer(event, _name, sv)
 		local onOpenFlush = storageVersion < 2
 		RK_FlagStore.StoreVersion, RK_FlagStore.FlushedDefaultColors = 2, nil
 
-		loadLock = 1; C_Timer.After(0, unlockSync)
+		loadLock = 1; EV.After(0, unlockSync)
 		for k, v in pairs(queue) do
 			if v.hotkey then v.hotkey = v.hotkey:gsub("[^-; ]+", mousemap) end
 			if deleted[k] == nil and SV[k] == nil then

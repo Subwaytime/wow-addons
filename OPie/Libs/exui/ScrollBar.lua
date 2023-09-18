@@ -4,7 +4,6 @@ local assert, getWidgetData, newWidgetData, setWidgetData, AddObjectMethods, Cal
 
 local HOLD_ACTION_DELAY, PAGE_DELAY, STEPPER_REPEAT_DELAY = 0.15, 0.25, 0.4
 local MIN_ANIMATION_FRAMERATE, ANIMATION_TARGET_DURATION = 45, 0.2
-local MODERN_UI = C_Texture.GetAtlasInfo("minimal-scrollbar-thumb-top") ~= nil -- LEGACY[1.14.3]
 local ScrollBarData, scrollBarProps = {}, {
 	api=ScrollBar,
 	scripts={"OnMinMaxChanged", "OnValueChanged"},
@@ -83,9 +82,8 @@ function ScrollBar:SetStepperButtonsShown(shown)
 	local d = assert(getWidgetData(self, ScrollBarData), "Invalid object type")
 	d.StepUp:SetShown(shown)
 	d.StepDown:SetShown(shown)
-	local shownGap = MODERN_UI and 20 or 18
-	d.Track:SetPoint("TOP", 0, shown and -shownGap or -1)
-	d.Track:SetPoint("BOTTOM", 0, shown and shownGap or 1)
+	d.Track:SetPoint("TOP", 0, shown and -20 or -1)
+	d.Track:SetPoint("BOTTOM", 0, shown and 20 or 1)
 	iSB.SetInteractionState(d, "NONE")
 	iSB.UpdateTrackTextures(d)
 	iSB.UpdateThumbSizeAndPosition(d)
@@ -380,53 +378,6 @@ function iSB:UpdateStepButtonTextures(variant)
 	dt:SetDesaturated(true)
 	dt:SetVertexColor(0.5, 0.5, 0.5)
 end
-if not MODERN_UI then
-	function iSB.UpdateTrackTextures(d)
-		local bg, showStepper = d.TrackBG, d.StepUp:IsShown()
-		local t, m, b = bg[1], bg[2], bg[3]
-		local ct, cb = showStepper and 0 or 20, showStepper and 0 or 21
-		t:SetTexture("Interface/PaperDollInfoFrame/UI-Character-ScrollBar")
-		t:SetTexCoord(2/64, 29/64, ct/256, 32/256)
-		t:SetSize(22, 22/27*(32-ct))
-		m:SetTexture("Interface/PaperDollInfoFrame/UI-Character-ScrollBar")
-		m:SetTexCoord(2/64, 29/64, 28/256, 1)
-		b:SetTexture("Interface/PaperDollInfoFrame/UI-Character-ScrollBar")
-		b:SetTexCoord(35/64, 62/64, 228/256, (255-cb)/256)
-		b:SetSize(22, 22/27*(27-cb))
-	end
-	function iSB.UpdateThumbTextures(d, tsz)
-		local n, p = d.ThumbTexN, d.ThumbTexP
-		tsz = tsz or d.Thumb:GetHeight()
-		n[1]:SetAtlas("UI-ScrollBar-Knob-EndCap-Top", true)
-		n[2]:SetAtlas("UI-ScrollBar-Knob-Center", true)
-		n[3]:SetAtlas("UI-ScrollBar-Knob-EndCap-Bottom", true)
-		p[1]:SetAtlas("UI-ScrollBar-Knob-EndCap-Top", true)
-		p[2]:SetAtlas("UI-ScrollBar-Knob-Center", true)
-		p[3]:SetAtlas("UI-ScrollBar-Knob-EndCap-Bottom", true)
-		d.ThumbTexM:SetTexCoord(0, 1, 0, tsz < 1022 and tsz/1022 or 1)
-	end
-	function iSB:UpdateStepButtonTextures(variant)
-		local normal, hover, pushed, disabled
-		if variant == "TOP" then
-			normal, hover, pushed, disabled = "Interface/Buttons/UI-ScrollBar-ScrollUpButton-Up", "Interface/Buttons/UI-ScrollBar-ScrollUpButton-Highlight", "Interface/Buttons/UI-ScrollBar-ScrollUpButton-Down", "Interface/Buttons/UI-ScrollBar-ScrollUpButton-Disabled"
-		elseif variant == "BOTTOM" then
-			normal, hover, pushed, disabled = "Interface/Buttons/UI-ScrollBar-ScrollDownButton-Up", "Interface/Buttons/UI-ScrollBar-ScrollDownButton-Highlight", "Interface/Buttons/UI-ScrollBar-ScrollDownButton-Down", "Interface/Buttons/UI-ScrollBar-ScrollDownButton-Disabled"
-		else
-			error('invalid variant')
-		end
-		self:SetNormalTexture(normal)
-		self:SetHighlightTexture(hover)
-		self:SetPushedTexture(pushed)
-		self:SetDisabledTexture(disabled)
-		self:GetNormalTexture():SetTexCoord(0.20, 0.80, 0.25, 0.75)
-		self:GetHighlightTexture():SetTexCoord(0.20, 0.80, 0.25, 0.75)
-		self:GetPushedTexture():SetTexCoord(0.20, 0.80, 0.25, 0.75)
-		self:GetDisabledTexture():SetTexCoord(0.20, 0.80, 0.25, 0.75)
-		self:GetHighlightTexture():SetBlendMode("ADD")
-		self:SetSize(18, 16)
-	end
-end
-
 
 local function createTexTrio(parent, layer, startGap, endGap, xShift, yShift)
 	local oy, ox, a,b,c = yShift or 0, xShift or 0
@@ -456,26 +407,23 @@ local function createStepButton(parent, d, ...)
 	t:SetPushedTexture('')
 	t:SetDisabledTexture('')
 	local a,b,c,d = t:GetNormalTexture(), t:GetHighlightTexture(), t:GetPushedTexture(), t:GetDisabledTexture()
-	if MODERN_UI then
-		b:SetBlendMode('BLEND')
-		for i=1,4 do
-			a:ClearAllPoints()
-			a:SetPoint("CENTER")
-			a:SetShown(i < 3)
-			a,b,c,d=b,c,d,a
-		end
+	b:SetBlendMode('BLEND')
+	for i=1,4 do
+		a:ClearAllPoints()
+		a:SetPoint("CENTER")
+		a:SetShown(i < 3)
+		a,b,c,d=b,c,d,a
 	end
 	return t, b
 end
-local function noop() end
 local function CreateScrollBar(name, parent, outerTemplate, id)
 	local f, d, t = CreateFrame("Frame", name, parent, outerTemplate, id)
 	d = newWidgetData(f, ScrollBarData, scrollBarProps)
 	f:SetWidth(20)
 	t = CreateFrame("Frame", nil, f)
-	t:SetWidth(MODERN_UI and 10 or 20)
-	t:SetPoint("TOP", 0, MODERN_UI and -20 or -18)
-	t:SetPoint("BOTTOM", 0, MODERN_UI and 20 or 18)
+	t:SetWidth(10)
+	t:SetPoint("TOP", 0, -20)
+	t:SetPoint("BOTTOM", 0, 20)
 	t:SetScript("OnMouseDown", iSB.OnTrackMouseDown)
 	t:SetScript("OnMouseUp", iSB.OnTrackMouseUp)
 	t:SetScript("OnShow", iSB.OnShow)
@@ -483,13 +431,10 @@ local function CreateScrollBar(name, parent, outerTemplate, id)
 	setWidgetData(t, ScrollBarData, d)
 	t, d.Track = CreateFrame("Frame", nil, t), t
 	t:SetPoint("TOP", 0, -50)
-	t:SetSize(MODERN_UI and 8 or 16, 20)
-	if t.EnableMouseMotion == nil then -- LEGACY[1.14.3]
-		t.EnableMouseMotion = noop
-	end
+	t:SetSize(8, 20)
 	t:EnableMouseMotion(true)
 	d.Thumb = t
-	local sp, sx = MODERN_UI and 8 or 10, not MODERN_UI and 0.5 or 0
+	local sp, sx = 8, 0
 	d.ThumbTexN = createTexTrio(t, "BACKGROUND", sp, sp, sx)
 	d.ThumbTexH = createTexTrio(t, "HIGHLIGHT", sp, sp, sx)
 	d.ThumbTexP = createTexTrio(t, "BACKGROUND", sp, sp, sx)
@@ -497,25 +442,13 @@ local function CreateScrollBar(name, parent, outerTemplate, id)
 	d.ThumbTexP:SetShown(false)
 	local etw = (d.Track:GetWidth()-t:GetWidth())/2
 	d.Thumb:SetHitRectInsets(-etw, -etw, 0, 0)
-	d.StepUp, d.StepUpH = createStepButton(f, d, "TOP", 0, MODERN_UI and -2 or -1)
-	d.StepDown, d.StepDownH = createStepButton(f, d, "BOTTOM", 0, MODERN_UI and 2 or 1)
+	d.StepUp, d.StepUpH = createStepButton(f, d, "TOP", 0, -2)
+	d.StepDown, d.StepDownH = createStepButton(f, d, "BOTTOM", 0, 2)
 	iSB.UpdateStepButtonTextures(d.StepUp, "TOP")
 	iSB.UpdateStepButtonTextures(d.StepDown, "BOTTOM")
 	d.TrackBG = createTexTrio(d.Track, "BACKGROUND", nil, nil, nil, 1)
-	if MODERN_UI then
-		d.StepUp:GetPushedTexture():SetPoint("CENTER", 0, 2)
-		d.StepDown:GetPushedTexture():SetPoint("CENTER", 0, -2)
-	else
-		local g, bg, t, b = d.Track:CreateTexture(nil, "BACKGROUND", nil, -2), d.TrackBG
-		t, b, bg[4] = bg[1], bg[3], g
-		g:SetColorTexture(0,0,0,0.35)
-		g:SetPoint("TOPLEFT", t, 2, -1)
-		g:SetPoint("BOTTOMRIGHT", b, -2, 1)
-		b:SetPoint("BOTTOM", d.StepDown, 0, -1)
-		t:SetPoint("TOP", d.StepUp, 0, 1)
-		d.ThumbTexN:SetWidth(17)
-		d.ThumbTexP:SetWidth(17)
-	end
+	d.StepUp:GetPushedTexture():SetPoint("CENTER", 0, 2)
+	d.StepDown:GetPushedTexture():SetPoint("CENTER", 0, -2)
 	iSB.UpdateTrackTextures(d)
 	iSB.UpdateThumbTextures(d)
 	return f

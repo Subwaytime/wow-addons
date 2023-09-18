@@ -36,6 +36,8 @@ L["Custom Reaction Colors"] = "Custom Reaction Colors"
 --[[Translation missing --]]
 L["custom_class_color_desc"] = "don't like a class color? change it!"
 --[[Translation missing --]]
+L["dark_frames_desc"] = "Use dark unit frame textures."
+--[[Translation missing --]]
 L["debuff_color_name"] = "Dispellable Debuff Color"
 --[[Translation missing --]]
 L["debuff_desc"] = "color the player health bar by debuff type if you can dispel yourself"
