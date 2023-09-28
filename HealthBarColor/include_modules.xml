@@ -1,11 +1,11 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-  <Include file="Modules\HealthBars\load_healthbars.xml"/>
+  <Include file="Modules\HealthBars\_retail_\load_healthbars.xml"/>
   <Script file="Modules\DebuffColor.lua"/>
   <Script file="Modules\BackgroundTextures.lua"/>
   <Script file="Modules\Textures.lua"/>
   <Script file="Modules\PartyColor.lua"/>
   <Script file="Modules\HideClassPowerBar.lua"/>
-  <Include file="Modules\Fonts\load_fonts.xml"/>
+  <Include file="Modules\Fonts\_retail_\load_fonts.xml"/>
   <Include file="Modules\Glow\load_glow.xml"/>
   <Script file="Modules\BiggerHealthBar.lua"/>
   <Script file="Modules\Overabsorb.lua"/>

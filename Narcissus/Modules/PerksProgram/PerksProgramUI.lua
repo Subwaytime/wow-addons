@@ -715,23 +715,6 @@ function NarciPerksProgramItemDetailButtonMixin:UpdateVisual()
     end
 end
 
-function PerksProgramTryOnItems()
-    --local items = {190904, 190905, 190906, 190907};
-    local items = {190161, 190163, 190193, 190160, 190158, 190159, 190156, 190162, 190157}
-    local actor = BlizzardFrame.ModelSceneContainerFrame.playerActor;
-    actor:Undress();
-    for _, itemID in pairs(items) do
-        actor:TryOn("item:"..itemID);
-    end
-
-    local button = GetMouseFocus();
-    local name = GetSpellInfo(368307);
-    button.ContentsContainer.Label:SetText(name);
-
-    local f = BlizzardFrame.ProductsFrame.PerksProgramProductDetailsContainerFrame.DetailsFrame;
-    f.ProductNameText:SetText(name);
-end
-
 
 --Small Button (etc. Rotate Left/Right);
 NarciPerksProgramSquareButtonMixin = {};

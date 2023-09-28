@@ -1,8 +1,11 @@
 # BetterWardrobe (@project-version@)
 
-## [4.12](https://github.com/SLOKnightfall/BetterWardrobe/tree/4.12) (2023-09-17)
-[Full Changelog](https://github.com/SLOKnightfall/BetterWardrobe/compare/4.11.6...4.12) [Previous Releases](https://github.com/SLOKnightfall/BetterWardrobe/releases)
+## [4.13](https://github.com/SLOKnightfall/BetterWardrobe/tree/4.13) (2023-09-25)
+[Full Changelog](https://github.com/SLOKnightfall/BetterWardrobe/compare/4.12.3...4.13) [Previous Releases](https://github.com/SLOKnightfall/BetterWardrobe/releases)
 
-- -Reworked the Patron list and removed the dependencies for Sushi since it was causing errors  
-    -Reworked a bunch of the frames to hopefully reduce the taint issues.  After the updates I am no longer seeing taint issues related to the addon in the taint logs.  
-    -Added a few in combat checks to reduce any combat related taint issues.  
+- -Updated Patron list  
+- -Added debug ability to add test sets  
+    -Added Additional Holiday Sets  
+    -Added a 'Holiday' source filter  
+    -Fixed an issue where the set preview item tooltip was showing wrong info  
+    -Added a Show in Dressing Room button to open the dressing room and load the viewed set  

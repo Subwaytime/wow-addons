@@ -77,6 +77,7 @@ L.Vehicle = 'Entrando em um Veículo'
 -- colors
 L.ColorOptions = 'Cores'
 L.ColorOptionsDesc = 'Estas preferências permitem controlar a aparência dos espaços dos itens para melhor visiblidade.'
+
 L.GlowQuality = 'Realçar por Qualidade'
 L.GlowQuest = 'Realçar Itens de Missão'
 L.GlowUnusable = 'Realçar Inutilizáveis'

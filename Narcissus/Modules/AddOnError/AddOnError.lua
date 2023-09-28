@@ -27,16 +27,6 @@ local HIGH_PRIORITY_ERROR = {
     --/script local a = C_Container.UseContainerItem; C_Container.UseContainerItem = a;
 };
 
-function TogggleLeaderboard()
-    local tooltip = ItemRefTooltip;
-    if not tooltip then return end;
-
-    --tooltip:Hide();
-    tooltip:SetText("Errors Over The Last 7 Days")
-    tooltip:AddDoubleLine("Narcissus", 14);
-    tooltip:Show();
-end
-
 local function ClearDatedData()
     if NarciStatisticsDB and NarciStatisticsDB.AddOnActionForbidden then
         ErrorDB = NarciStatisticsDB.AddOnActionForbidden;

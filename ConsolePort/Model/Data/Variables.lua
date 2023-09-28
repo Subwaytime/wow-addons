@@ -166,9 +166,16 @@ db:Register('Variables', {
 		desc = 'Scale of all radial menus, relative to UI scale.';
 		advd = true;
 	};
-	radialActionDeadzone = {Range(0.5, 0.05, 0, 1);
+	radialPreferredSize = {Number(500, 25, true);
 		head = 'Radial Menus';
 		sort = 4;
+		name = 'Ring Size';
+		desc = 'Preferred size of radial menus, in pixels.';
+		advd = true;
+	};
+	radialActionDeadzone = {Range(0.5, 0.05, 0, 1);
+		head = 'Radial Menus';
+		sort = 5;
 		name = 'Deadzone';
 		desc = 'Deadzone for simple point-to-select rings.';
 	};
@@ -189,7 +196,7 @@ db:Register('Variables', {
 	};
 	radialRemoveButton = {Button('PADRSHOULDER');
 		head = 'Radial Menus';
-		sort = 9;
+		sort = 8;
 		name = 'Remove Button';
 		desc = 'Button used to remove a selected item from an editable ring.';
 	};
@@ -259,6 +266,13 @@ db:Register('Variables', {
 		name = 'Filter Condition';
 		desc = 'Filter condition to find raid cursor frames.';
 		note = BLUE_FONT_COLOR:WrapTextInColorCode('node') .. ' is the current frame under scrutinization.';
+		advd = true;
+	};
+	raidCursorWrapDisable = {Bool(false);
+		head = 'Raid Cursor';
+		sort = 9;
+		name = 'Disable Raid Cursor Wrapping';
+		desc = 'Prevent raid cursor from wrapping when navigating.';
 		advd = true;
 	};
 	--------------------------------------------------------------------------------------------------------
@@ -369,6 +383,13 @@ db:Register('Variables', {
 		desc = 'Which modifier to use for modified commands';
 		note = 'The modifier can be used to scroll together with the directional pad.';
 		opts = MODID_SELECT;
+	};
+	UIWrapDisable = {Bool(false);
+		head = 'Interface Cursor';
+		sort = 16;
+		name = 'Disable Interface Cursor Wrapping';
+		desc = 'Prevent interface cursor from wrapping when navigating.';
+		advd = true;
 	};
 	--------------------------------------------------------------------------------------------------------
 	-- Unit hotkeys:

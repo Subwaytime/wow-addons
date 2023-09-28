@@ -120,12 +120,22 @@ local addonName, addonTable = ...
 --create addon and get libraries
 addonTable.HealthBarColor = LibStub("AceAddon-3.0"):NewAddon("HealthBarColor", "AceConsole-3.0", "AceEvent-3.0", "AceSerializer-3.0")
 local HealthBarColor = addonTable.HealthBarColor
+HealthBarColor.isClassic = false
+HealthBarColor.isWrath = false
+HealthBarColor.isRetail = false
+local tocversion = select(4,GetBuildInfo())
+if tocversion < 30000 then
+    HealthBarColor.isClassic = true
+elseif tocversion > 30000 and tocversion < 100000 then
+    HealthBarColor.isWrath = true
+else
+    HealthBarColor.isRetail = true
+end
 HealthBarColor:SetDefaultModuleLibraries("AceConsole-3.0", "AceEvent-3.0")
 HealthBarColor:SetDefaultModuleState(false)
 local AC         = LibStub("AceConfig-3.0")
 local ACD        = LibStub("AceConfigDialog-3.0")
 local AceGUI     = LibStub("AceGUI-3.0")
-local LibDeflate = LibStub:GetLibrary("LibDeflate")
 local LDS        = LibStub("LibDualSpec-1.0")
 
 --GUI Shared xml template with AceGUI widgets 
@@ -283,70 +293,7 @@ function HealthBarColor:RegisterEvents()
     --currently not needed  by any module
     --self:RegisterEvent("PLAYER_ENTERING_WORLD","OnEnteringWorld")
 end
---getter/setter functions that will save and call settings into/from the db
---status
-function HealthBarColor:GetStatus(info)
-    return self.db.profile[info[#info-2]][info[#info-1]][info[#info]]
-end
-function HealthBarColor:SetStatus(info,value)
-    self.db.profile[info[#info-2]][info[#info-1]][info[#info]] = value
-    --will reload the config each time the settings have been adjusted
-    self:ReloadConfig()
-end
---color
-function HealthBarColor:GetColor(info)
-    return self.db.profile[info[#info-2]][info[#info-1]][info[#info]].r, self.db.profile[info[#info-2]][info[#info-1]][info[#info]].g, self.db.profile[info[#info-2]][info[#info-1]][info[#info]].b
-end
-function HealthBarColor:SetColor(info, r,g,b)
-    self.db.profile[info[#info-2]][info[#info-1]][info[#info]].r = r 
-    self.db.profile[info[#info-2]][info[#info-1]][info[#info]].g = g
-    self.db.profile[info[#info-2]][info[#info-1]][info[#info]].b = b
-    self:ReloadConfig()
-end
---profile import / export functions
---[[
-    the method to share and import profiles is based on:
-    https://github.com/brittyazel/EnhancedRaidFrames/blob/main/EnhancedRaidFrames.lua
-]]--
-function HealthBarColor:ShareProfile()
-    --AceSerialize
-	local serialized_profile = self:Serialize(self.db.profile) 
-    --LibDeflate
-	local compressed_profile = LibDeflate:CompressZlib(serialized_profile) 
-	local encoded_profile    = LibDeflate:EncodeForPrint(compressed_profile)
-	return encoded_profile
-end
 
-function HealthBarColor:ImportProfile(input)
-    --validate input
-    --empty?
-    if input == "" then
-        self:Print("No import string provided. Abort")
-        return
-    end
-    --LibDeflate decode
-    local decoded_profile = LibDeflate:DecodeForPrint(input)
-    if decoded_profile == nil then
-        self:Print("Decoding failed. Abort")
-        return
-    end
-    --LibDefalte uncompress
-    local uncompressed_profile = LibDeflate:DecompressZlib(decoded_profile)
-    if uncompressed_profile == nil then
-        self:Print("Uncompressing failed. Abort")
-        return
-    end
-    --AceSerialize
-    --deserialize the profile and overwirte the current values
-    local valid, imported_Profile = self:Deserialize(uncompressed_profile)
-    if valid and imported_Profile then
-		for i,v in pairs(imported_Profile) do
-			self.db.profile[i] = CopyTable(v)
-		end
-    else
-        self:Print("Invalid profile. Abort")
-    end
-end
 --Color functions
 function HealthBarColor:CreateColors()
     ClassColor["DEATHKNIGHT"] = C_ClassColor.GetClassColor("DEATHKNIGHT")

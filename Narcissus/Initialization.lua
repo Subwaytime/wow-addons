@@ -1,7 +1,7 @@
-local NARCI_VERSION_INFO = "1.4.3";
+local NARCI_VERSION_INFO = "1.4.4";
 
-local VERSION_DATE = 1693930527;
-local CURRENT_VERSION = 10403;
+local VERSION_DATE = 1695258614;
+local CURRENT_VERSION = 10404;
 local PREVIOUS_VERSION = CURRENT_VERSION;
 local TIME_SINCE_LAST_UPDATE = 0;
 
@@ -29,6 +29,7 @@ NarciAPI = {};
 NarciViewUtil = {};
 
 local DefaultValues = {
+    -- Character UI --
     DetailedIlvlInfo = true,
     IsSortedByCategory = true,                  --Title Sorting
     FontHeightItemName = 10,
@@ -45,43 +46,51 @@ local DefaultValues = {
     LetterboxRatio = 2,
     AFKScreen = false,
     AKFScreenDelay = false,                     --Ope Narcissus when you go afk with a delay. Move to cancel.
-    GemManager = true,                          --Enable gem manager for Blizzard item socketing frame
+    UseEscapeButton = true,                     --Use Escape button to exit
+    BaseLineOffset = 0,                         --Ultra-wide, adjust UI layout
+    CameraTransition = true,                    --(2nd you use the Character Pane) Camera moves smoothly bewtween presets
+    UseBustShot = true,                         --Zoom in to the upper torso
+    ItemTooltipStyle = 1,
+    ShowItemID = false,                         --Show itemID on equipment tooltip
+    MissingEnchantAlert = false,                --Show alert if the item isn't enchanted
+
+    -- Photo Mode --
+    HideTextsWithUI = true,                     --Hide all texts when UI is hidden
+    UseEntranceVisual = true,
+    ModelPanelScale = 1,
+    ShrinkArea = 0,                             --Reduce the width of the area where you can control the model
+    AutoPlayAnimation = false,                  --Play recommended animation when clicking a spell visual entry
+    OutfitSortMethod = "name",                  --Filter for sorting outfits: (name alphabet/recently visited)
+    LoopAnimation = false,                      --Photo Mode Loop Animation
+
+    -- Dressing Room --
     DressingRoom = true,                        --Enable dressing room module
     DressingRoomUseTargetModel = true,          --Replace the the dressing room room with your targeted player
     DressingRoomIncludeItemID = false,          --Show Item ID in the clipboard
     DressingRoomShowIconSelect = false,         --Display a list of icons when saving a new outfit
-    UseEntranceVisual = true,
-    ModelPanelScale = 1,
-    BaseLineOffset = 0,                         --Ultra-wide
-    ShrinkArea = 0,                             --Reduce the width of the area where you can control the model
-    AutoPlayAnimation = false,                  --Play recommended animation when clicking a spell visual entry
-    UseEscapeButton = true,                     --Use Escape button to exit
+
+    -- Minimap Button --
     ShowMinimapButton = true,
     FadeButton = false,
     ShowModulePanelOnMouseOver = true,          --Mouseover to show Module panel while mouseover minimap button
     IndependentMinimapButton = false,           --Set Minimap Button Parent to Minimap or UIParent; Handle by other addons like MBB
     AnchorToMinimap = true,                     --Anchor the mini button to Minimap
-    CameraTransition = true,                    --(2nd you use the Character Pane) Camera moves smoothly bewtween presets
-    UseBustShot = true,                         --Zoom in to the upper torso
+
+    -- Misc QoL ---
+    GemManager = true,                          --Enable gem manager for Blizzard item socketing frame
+    OnlyShowOwnedUpgradeItem = true,            --Filter for gems/enchant scrolls
     ConduitTooltip = false,                     --Show conduit effects of higher ranks
     PaperDollWidget = true,                     --Show Domination/Class Set indicator on the Blizzard character pane
-    OnlyShowOwnedUpgradeItem = true,            --Filter for gems/enchant scrolls
-    ItemTooltipStyle = 1,
-    ShowItemID = false,                         --Show itemID on equipment tooltip
-    OutfitSortMethod = "name",                  --Filter for sorting outfits: (name alphabet/recently visited)
-    HideTextsWithUI = true,                     --Hide all texts when UI is hidden
 
-    MissingEnchantAlert = false,                --Show alert if the item isn't enchanted
+    -- Talent Tree --
     TalentTreeForInspection = true,
-    TalentTreeForPaperDoll = false,              --True on Beta for testing
+    TalentTreeForPaperDoll = false,             --True on Beta for testing
     TalentTreeForEquipmentManager = true,
-    TalentTreeAnchor = 1,                        --Relative Position 1.Right 2.Bottom
+    TalentTreeAnchor = 1,                       --Relative Position 1.Right 2.Bottom
     TalentTreeUseClassBackground = false,
     TalentTreeBiggerUI = false,
 
-    LoopAnimation = false,                      --Photo Mode Loop Animation
-
-    --# NPC
+    -- NPC --
     SearchRelatives = false,                    --Search for NPCs with the same last name
     TranslateName = false,                      --Show NPC localized name
     NameTranslationPosition = 1,                --Show translated name on 1.tooltip 2.nameplate
@@ -89,22 +98,21 @@ local DefaultValues = {
     NamePlateLanguage = "enUS",                 --The localized name on NamePlate  (only one)
     TooltipLanguages = {},                      --Enabled localized names on tooltip
 
-    --# Internal Hotkey
+    -- Internal Hotkey --
     SearchRelativesHotkey = "TAB",              --The key you press to begin/cycle relative search
 
-
-    --Search Suggestion
+    -- Search Suggestion --
     SearchSuggestEnable = true,
     SearchSuggestDirection = 1;                 --Below Item Search Box
     AutoFilterMail = false,
     AutoFilterAuction = false,
     AutoFilterGem = false,
 
-    --Quest
+    -- Quest --
     AutoDisplayQuestItem = false,
     QuestCardTheme = 1,
 
-    --Dragonriding
+    -- Dragonriding --
     DragonridingTourWorldMapPin = true,         --Show Dragonriding Race location on continent map
 
     --# Initializationd in other files
@@ -246,7 +254,7 @@ local function LoadSettings()
         func(nil, db);
     end
 
-    C_Timer.After(0, function()
+    C_Timer.After(0.08, function()
         collectgarbage("collect");
     end)
 end
@@ -347,6 +355,10 @@ do
     local expansionID = string.match(version, "(%d+)%.");
 	local isDF = (tonumber(expansionID) or 1) >= 10;
 
+    if not tocVersion then
+        tocVersion = 100000;
+    end
+
     tocVersion = tonumber(tocVersion);
 
     local function IsDragonflight()
@@ -370,6 +382,13 @@ do
         return tooltipInfoVersion
     end
     addon.GetTooltipInfoVersion = GetTooltipInfoVersion;
+
+
+    local function IsTOCVersionEqualOrNewerThan(v)
+        return tocVersion >= v
+    end
+
+    addon.IsTOCVersionEqualOrNewerThan = IsTOCVersionEqualOrNewerThan;
 end
 
 

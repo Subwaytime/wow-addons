@@ -16,5 +16,7 @@
   <Include file="Libs\AceGUI-3.0-SharedMediaWidgets\widget.xml"/>
   <Script file="Libs\LibDualSpec-1.0\LibDualSpec-1.0.lua"/>
   <Script file="Libs\LibDDI-1.0\lib.lua"/>
+  <Script file="Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua"/>
+  <Include file="Libs\LibDBIcon-1.0\lib.xml"/>
 <!--@end-non-debug@-->
 </Ui>

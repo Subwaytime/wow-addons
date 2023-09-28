@@ -5,15 +5,16 @@ local _, addon = ...
 
 do
     --10.1.5.50199
-    --Fix: Soridormi Reputation/Friendship Bar (uiMapID: 2199, 2025)
-    --Display friendship bar when interacting with Soridormi in the event area
+    --Auto-select "Reporting for duty"
+    --(Fixed by BLZ in 10.1.7) Fix: Soridormi Reputation/Friendship Bar (uiMapID: 2199, 2025)
 
     local f = CreateFrame("Frame");
     local UnitName = UnitName;
     local SORIDORMI;
+    local ENABLE_AUTO_REPORT = true;
 
     f:SetScript("OnEvent", function(self, event, ...)
-        if UnitName("npc") == SORIDORMI then    --or use
+        if ENABLE_AUTO_REPORT and UnitName("npc") == SORIDORMI then    --or use
             if GossipFrame and GossipFrame:IsShown() then
                 --Auto Report-in
                 local options = C_GossipInfo.GetOptions();
@@ -22,7 +23,7 @@ do
                     return
                 end
 
-                GossipFrame.FriendshipStatusBar:Update(2553);
+                --GossipFrame.FriendshipStatusBar:Update(2553);
             end
         end
     end);

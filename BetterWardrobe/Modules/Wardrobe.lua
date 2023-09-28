@@ -3206,7 +3206,7 @@ function BetterWardrobeItemsModelMixin:UpdateContentTracking()
 
 	if ( self.visualInfo ) then
 		local itemsCollectionFrame = self:GetParent();
-		if ( not itemsCollectionFrame.transmogLocation:IsIllusion() ) then
+		if ( not itemsCollectionFrame.transmogLocation:IsIllusion()  and not itemsCollectionFrame == Enum.TransmogCollectionType.Paired) then
 			local sources = CollectionWardrobeUtil.GetSortedAppearanceSources(self.visualInfo.visualID, itemsCollectionFrame:GetActiveCategory(), itemsCollectionFrame.transmogLocation);
 			for i, sourceInfo in ipairs(sources) do
 				self:AddTrackable(Enum.ContentTrackingType.Appearance, sourceInfo.sourceID);
@@ -3233,7 +3233,7 @@ function BetterWardrobeItemsModelMixin:GetSourceInfoForTracking()
 	end
 
 	local itemsCollectionFrame = self:GetParent();
-	if ( itemsCollectionFrame.transmogLocation:IsIllusion() ) then
+	if ( itemsCollectionFrame.transmogLocation:IsIllusion() or itemsCollectionFrame == Enum.TransmogCollectionType.Paired) then
 		return nil;
 	else
 		local sourceIndex = WardrobeCollectionFrame.tooltipSourceIndex or 1;
@@ -3603,7 +3603,7 @@ local function ToggleHidden(model, isHidden)
 	if tabID == 1 then
 		local visualID = model.visualInfo.visualID;
 		local _, _, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(visualID)	
-		local source = WardrobeCollectionFrame_GetSortedAppearanceSources(visualID, addon.GetItemCategory(visualID), addon.GetTransmogLocation(itemLink))[1]
+		local source = CollectionWardrobeUtil.GetSortedAppearanceSources(visualID, addon.GetItemCategory(visualID), addon.GetTransmogLocation(itemLink))[1]
 		local name, link = GetItemInfo(source.itemID)
 		addon.HiddenAppearanceDB.profile.item[visualID] = not isHidden and name;
 		--self:UpdateWardrobe()
@@ -4040,7 +4040,7 @@ end
 
 -- ***** FILTER
 
-local FILTER_SOURCES = {L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Set"], L["Recolor"], L["PvP"],L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Covenants"], L["Trading Post"]}
+local FILTER_SOURCES = {L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Set"], L["Recolor"], L["PvP"],L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Covenants"], L["Trading Post"], L["Holiday"]}
 local EXPANSIONS = {EXPANSION_NAME0, EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3, EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8, EXPANSION_NAME9}
 
 
@@ -5239,7 +5239,8 @@ function BetterWardrobeSetsDataProviderMixin:GetSortedSetSources(setID)
 
 	local sourceData = self:GetSetSourceData(setID)
 	local setType = addon.GetSetType(setID)
-	if (setType == nil) then
+
+	if (setType == nil or setType == "BlizzardSet")  then
 	--if BetterWardrobeCollectionFrame:CheckTab(2) then
 		for i, primaryAppearance in ipairs(sourceData.primaryAppearances) do
 			local sourceID = primaryAppearance.appearanceID;
@@ -5252,6 +5253,8 @@ function BetterWardrobeSetsDataProviderMixin:GetSortedSetSources(setID)
 				tinsert(returnTable, { sourceID = sourceID, collected = primaryAppearance.collected, sortOrder = sortOrder, itemID = sourceInfo.itemID, invType = sourceInfo.invType, characterUseable = characterUseable, characterCollectable = characterCollectable })
 			end
 		end
+
+
 	else
 	----elseif BetterWardrobeCollectionFrame:CheckTab(3) then
 		for sourceID, collected in pairs(sourceData.sources) do
@@ -6282,6 +6285,7 @@ function BetterWardrobeSetsCollectionMixin:SetAppearanceTooltip(frame)
 	self:RefreshAppearanceTooltip()
 end
 
+local needsRefresh = false
 function BetterWardrobeSetsCollectionMixin:RefreshAppearanceTooltip()
 	if ( not self.tooltipTransmogSlot ) then
 		return;
@@ -6304,10 +6308,9 @@ function BetterWardrobeSetsCollectionMixin:RefreshAppearanceTooltip()
 		----elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then
 		local sourceInfo = C_TransmogCollection.GetSourceInfo(self.tooltipPrimarySourceID)
 		local visualID = sourceInfo.visualID;
-		--local sources = C_TransmogCollection.GetAppearanceSources(visualID) or {} --Can return nil if no longer in game;
-		local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(self.tooltipPrimarySourceID)	
-		local sources = (self.tooltipPrimarySourceID and itemLink and C_TransmogCollection.GetAppearanceSources(self.tooltipPrimarySourceID, addon.GetItemCategory(self.tooltipPrimarySourceID), addon.GetTransmogLocation(itemLink)) ) or {} --Can return nil if no longer in game;
- 
+		local _, visualID, _, _, _, itemLink = C_TransmogCollection.GetAppearanceSourceInfo(self.tooltipPrimarySourceID)
+		local sources = (self.tooltipPrimarySourceID and itemLink and C_TransmogCollection.GetAppearanceSources(visualID, addon.GetItemCategory(self.tooltipPrimarySourceID), addon.GetTransmogLocation(itemLink)) ) or {} --Can return nil if no longer in game;
+
 		if (#sources == 0) then
 			-- can happen if a slot only has HiddenUntilCollected sources
 			local sourceInfo = C_TransmogCollection.GetSourceInfo(self.tooltipPrimarySourceID)
@@ -6385,6 +6388,8 @@ function BetterWardrobeSetsCollectionMixin:ScrollToSet(setID, alignment)
 	scrollBox:ScrollToElementDataByPredicate(FindSet, alignment, ScrollBoxConstants.NoScrollInterpolation)
 end
 
+
+
 function BetterWardrobeSetsCollectionMixin:LinkSetInChat(setID)
 	local itemTransmogInfoList = TransmogUtil.GetEmptyItemTransmogInfoList()
 
@@ -6433,6 +6438,55 @@ local function GetTab(tab)
 
 end
 addon.GetTab = GetTab;
+
+function BetterWardrobeSetsCollectionMixin:OpenInDressingRoom(setID)
+
+		if DressUpFrame:IsShown() then 
+		else
+			DressUpFrame_Show(DressUpFrame)
+			C_Timer.After(0, function() self:OpenInDressingRoom(setID) 
+			return 
+		end)
+		end
+		
+	local setType = tabType[addon.GetTab()]
+	 setInfo = addon.GetSetInfo(setID) or C_TransmogSets.GetSetInfo(setID)
+
+
+
+	
+	--local setType = addon.QueueList[1]
+	--local setID = addon.QueueList[2]
+	local playerActor = DressUpFrame.ModelScene:GetPlayerActor()
+
+	if not playerActor or not setID then
+		return false
+	end
+
+	if setType == "set" then
+		sources = {}
+		local sourceInfo = C_TransmogSets.GetSetPrimaryAppearances(setID)
+		for i, data in ipairs(sourceInfo) do
+			sources[data.appearanceID] = false
+
+		end
+
+	elseif setType == "extraset" then
+		sources = addon.GetSetsources(setID)
+	end
+
+	if not sources then return end
+
+	playerActor:Undress()
+	for i, d in pairs(sources)do
+		playerActor:TryOn(i)
+	end
+
+	import = true
+	--DressUpSources(sources)
+	import = false
+	addon:UpdateDressingRoom()
+end
 
 local function BetterWardrobeSetsCollectionScrollFrame_FavoriteDropDownInit(self)
 	if ( not self.baseSetID ) then
@@ -8449,6 +8503,5 @@ end
 function BetterWardrobeSetsDetailsItemUseabiltiyMixin:OnLeave()
 	GameTooltip:Hide()
 end
-
 
 

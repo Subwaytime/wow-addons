@@ -1,0 +1,6 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="Player_Vanilla.lua"/>
+	<Script file="Target_Vanilla.lua"/>
+	<Script file="Focus_Wrath.lua"/>
+	<Script file="Pet_Vanilla.lua"/>
+</Ui>

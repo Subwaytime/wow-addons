@@ -1731,6 +1731,8 @@ local function StartAutoCapture()
 		button.Label:SetTextColor(0.8, 0.8, 0.8);
 		button.isOn = true;
 		PauseAllModel(false);
+		FullSceenChromaKey:Hide();
+		FullSceenChromaKey:SetAlpha(0);
 		return;
 	else
 		NUM_UNCAPTURED_LAYERS = -1;
@@ -1746,7 +1748,78 @@ local function StartAutoCapture()
 	NUM_UNCAPTURED_LAYERS = NUM_UNCAPTURED_LAYERS - 1;
 end
 
+local function StartAutoCapture_SkipItems()
+	local model = ModelContainer;
+	local r1, g1, b1 = 0, 177/255, 64/255;
+	local r2, g2, b2 = 0, 71/255, 187/255;
 
+	if NUM_UNCAPTURED_LAYERS == 4 then
+		PauseAllModel(true);
+		Temps.TextOverlayVisibility = NarciTextOverlayContainer:IsShown();
+		NarciTextOverlayContainer:Hide();
+		Temps.HidePlayer = Narci_HidePlayerButton.isOn;
+		if not Temps.HidePlayer then
+			Narci_HidePlayerButton:Click();
+		end
+		Temps.Vignette = Narci_Model_VignetteSlider:GetValue();
+		Temps.Brightness = Narci_Model_DarknessSlider:GetValue();
+		Narci_Model_VignetteSlider:SetValue(0);
+		Narci_Model_DarknessSlider:SetValue(0);
+		Narci_Character:Hide();
+		model:Hide();
+	elseif NUM_UNCAPTURED_LAYERS == 3 then
+		model:Show();
+		FullSceenChromaKey:SetColorTexture(0, 0, 0);
+		FullSceenChromaKey:Show();
+		FullSceenChromaKey:SetAlpha(1);
+		LightsOut(true);
+	elseif NUM_UNCAPTURED_LAYERS == 2 then
+		LightsOut(false);
+		model:Show();
+		FullSceenChromaKey:SetColorTexture(r1, g1, b1);
+		FullSceenChromaKey:Show();
+		FullSceenChromaKey:SetAlpha(1);
+	elseif NUM_UNCAPTURED_LAYERS == 1 then
+		model:Show();
+		FullSceenChromaKey:SetColorTexture(r2, g2, b2);
+		FullSceenChromaKey:Show();
+		FullSceenChromaKey:SetAlpha(1);
+	elseif NUM_UNCAPTURED_LAYERS == 0 then
+		Narci_Model_VignetteSlider:SetValue(Temps.Vignette);
+		Narci_Model_DarknessSlider:SetValue(Temps.Brightness);
+		if Temps.TextOverlayVisibility then
+			 NarciTextOverlayContainer:Show();
+		end
+		model:Show();
+		FullScreenAlphaChannel:SetAlpha(0);
+		FullScreenAlphaChannel:Hide();
+		if not Temps.HidePlayer then
+			Narci_HidePlayerButton:Click();
+		end
+		NUM_UNCAPTURED_LAYERS = -1;
+		CaptureButton.Value:SetText(0);
+		CaptureButton:Enable();
+		local button = Narci_SlotLayerButton;
+		button:LockHighlight();
+		button.Label:SetTextColor(0.8, 0.8, 0.8);
+		button.isOn = true;
+		PauseAllModel(false);
+		FullSceenChromaKey:Hide();
+		FullSceenChromaKey:SetAlpha(0);
+		return;
+	else
+		NUM_UNCAPTURED_LAYERS = -1;
+		CaptureButton.Value:SetText(0);
+		CaptureButton:Enable();
+		PauseAllModel(false);
+		return;
+	end
+	After(1, function()
+		Screenshot();
+	end)
+	CaptureButton.Value:SetText(NUM_UNCAPTURED_LAYERS);
+	NUM_UNCAPTURED_LAYERS = NUM_UNCAPTURED_LAYERS - 1;
+end
 
 --[[
 -----------------
@@ -4360,7 +4433,7 @@ ScreenshotListener:SetScript("OnEvent",function(self,event,...)
 		SettingFrame:SetAlpha(Temps.Alpha2);
 		if NUM_UNCAPTURED_LAYERS >= 0 then
 			After(1.5, function()
-				StartAutoCapture();
+				StartAutoCapture_SkipItems();
 			end)
 		end
 		NarciAPI.UpdateScreenshotsCounter();
@@ -4570,7 +4643,7 @@ NarciPhotoModeCaptureButtonMixin = {};
 
 function NarciPhotoModeCaptureButtonMixin:OnLoad()
 	CaptureButton = self;
-	self.numCaptures = 6;
+	self.numCaptures = 4;
 	self.tooltipHeader = L["Save Layers"];
 	self.tooltipDescription = L["Save Layers Tooltip"];
 	self.tooltipImage = "SaveLayers";

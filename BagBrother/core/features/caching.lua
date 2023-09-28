@@ -108,11 +108,9 @@ function Cacher:BANK_CLOSE()
 	for i = FIRST_BANK_SLOT, LAST_BANK_SLOT do
 		self:SaveBag(i)
 	end
-
 	if REAGENTBANK_CONTAINER and IsReagentBankUnlocked() then
 		self:SaveBag(REAGENTBANK_CONTAINER)
 	end
-
 	self:SaveBag(BANK_CONTAINER)
 end
 

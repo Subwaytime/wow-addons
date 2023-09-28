@@ -24,7 +24,7 @@ do
 
         if C_ContentTracking.StopTracking then
             RemoveTrackedAchievement = function(id)
-                C_ContentTracking.StopTracking(TRACKING_TYPE_ACHV, id);
+                C_ContentTracking.StopTracking(TRACKING_TYPE_ACHV, id, Enum.ContentTrackingStopType.Manual);
             end
         end
 
