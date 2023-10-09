@@ -307,29 +307,34 @@ local function SetMouseOverAlpha(frame)
   end
 end
 
-local function SetMouseOverFading(barManager)
 
-  -- Have to do this for the single bars.
-  -- Otherwise the text does not pop up any more when hovering over the bars.
-  for _, frame in pairs(barManager.bars) do
-    if not frame.ludius_hooked then
-      frame:HookScript("OnEnter", function()
-        barManager.ludius_mouseOver = true
-        SetMouseOverAlpha(barManager)
-      end)
-      frame:HookScript("OnLeave", function()
-        barManager.ludius_mouseOver = false
-        SetMouseOverAlpha(barManager)
-      end)
-      frame.ludius_hooked = true
+
+if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+
+  local function SetMouseOverFading(barManager)
+    -- Have to do this for the single bars.
+    -- Otherwise the text does not pop up any more when hovering over the bars.
+    -- It seems that OnEnter of a parent prevents the OnEnter of children to be triggered.
+    -- But only the OnEnter of single bars shows the bar text.
+    for _, frame in pairs(barManager.bars) do
+      if not frame.ludius_hooked then
+        frame:HookScript("OnEnter", function()
+          StatusTrackingBarManager.ludius_mouseOver = true
+          SetMouseOverAlpha(StatusTrackingBarManager)
+        end)
+        frame:HookScript("OnLeave", function()
+          StatusTrackingBarManager.ludius_mouseOver = false
+          SetMouseOverAlpha(StatusTrackingBarManager)
+        end)
+        frame.ludius_hooked = true
+      end
     end
+
   end
-
+  SetMouseOverFading(MainStatusTrackingBarContainer)
+  SetMouseOverFading(SecondaryStatusTrackingBarContainer)
+  
 end
-
-
--- Not working any more since 10.1.0... Find another way, but there are more important problems right now.
--- hooksecurefunc(StatusTrackingBarManager, "AddBarFromTemplate", SetMouseOverFading)
 
 
 
@@ -862,6 +867,9 @@ Addon.HideUI = function(fadeOutTime, config)
 
   FadeOutFrame(GameTooltip, fadeOutTime, config.keepTooltip, config.keepTooltip and 1 or config.UIParentAlpha)
   C_Timer.After(fadeOutTime, function() hideGameTooltip = (config.keepTooltip == false) end)
+  local shoppingTooltip1, shoppingTooltip2 = unpack(GameTooltip.shoppingTooltips)
+  FadeOutFrame(shoppingTooltip1, fadeOutTime, config.keepTooltip, config.keepTooltip and 1 or config.UIParentAlpha)
+  FadeOutFrame(shoppingTooltip2, fadeOutTime, config.keepTooltip, config.keepTooltip and 1 or config.UIParentAlpha)
 
   FadeOutFrame(AceGUITooltip, fadeOutTime, config.keepTooltip, config.keepTooltip and 1 or config.UIParentAlpha)
   FadeOutFrame(AceConfigDialogTooltip, fadeOutTime, config.keepTooltip, config.keepTooltip and 1 or config.UIParentAlpha)
@@ -964,6 +972,9 @@ Addon.ShowUI = function(fadeInTime, enteringCombat)
 
   hideGameTooltip = false
   FadeInFrame(GameTooltip, fadeInTime, enteringCombat)
+  local shoppingTooltip1, shoppingTooltip2 = unpack(GameTooltip.shoppingTooltips)
+  FadeInFrame(shoppingTooltip1, fadeInTime, enteringCombat)
+  FadeInFrame(shoppingTooltip2, fadeInTime, enteringCombat)
 
   FadeInFrame(AceGUITooltip, fadeInTime, enteringCombat)
   FadeInFrame(AceConfigDialogTooltip, fadeInTime, enteringCombat)

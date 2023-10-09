@@ -14,6 +14,7 @@ local useCharacterSources = true
 local defaultWidth, defaultHeight = 450, 545
 local Buttons
 local Profile
+local itemhistory = {}
 
 -------Create Mogit List-------
 local newSet = {items = {}}
@@ -203,9 +204,10 @@ function BW_DressingRoomItemButtonMixin:OnEnter()
 	end
 
 	GameTooltip:Show()
-	ShoppingTooltip1:Hide()
-	ShoppingTooltip2:Hide()
-	if ShoppingTooltip3 then ShoppingTooltip3:Hide() end
+	--ShoppingTooltip1:Hide()
+	--ShoppingTooltip2:Hide()
+	--if ShoppingTooltip3 then ShoppingTooltip3:Hide() end
+	--GameTooltip_ClearMoney()
 end
 
 function BW_DressingRoomItemButtonMixin:OnLeave()
@@ -277,6 +279,7 @@ function BW_DressingRoomItemButtonMixin:OnMouseDown(button)
 end
 
 function DressingRoom:Update(...)
+
 	local viewedLink = ...
 	local frame = BW_DressingRoomFrame
 	if not BW_DressingRoomFrame then return end
@@ -292,7 +295,7 @@ function DressingRoom:Update(...)
 				return false
 			end
 
-			if not inspectView and (HideWeaponOnShow or HideTabardOnShow or HideShirtOnShow or HideArmorOnShow)  then 
+			if not inspectView and (HideWeaponOnShow or HideTabardOnShow or HideShirtOnShow or HideArmorOnShow)  then
 				for _, button in pairs(Buttons) do
 					local slot = button:GetID()
 					if ((HideWeaponOnShow and (slot == INVSLOT_MAINHAND or slot == INVSLOT_OFFHAND)) or
@@ -316,7 +319,6 @@ function DressingRoom:Update(...)
 
 			if viewedLink and viewedLink.sourceID and forceView then 
 				sharedActor:TryOn(viewedLink)
-				print("here")
 				forceView = false
 				DressingRoom:Update()
 			end
@@ -457,6 +459,9 @@ end
 
 
 function BW_DressingRoomFrameMixin:OnShow()
+	itemhistory = {}
+	BW_DressingRoomFrame.BW_DressingRoomUndoButton:Hide()
+	addon:StoreItems()
 	if not Profile.DR_OptionsEnable then return end
 
 	BW_DressingRoomFrame.PreviewButtonFrame:SetShown(addon.Profile.DR_ShowItemButtons)
@@ -681,6 +686,9 @@ function BW_DressingRoomButtonMixin:OnMouseDown()
 	elseif button == "Undress" then
 		BW_DressingRoomHideArmorButton_OnClick(self)
 
+	elseif button == "Undo" then
+		DressingRoom:Undo()
+
 	--elseif button == "Link" then
 		--DressUpModelFrameLinkButtonMixin:OnClick()
 	end
@@ -709,7 +717,8 @@ function BW_DressingRoomButtonMixin.OnEnter(self)
 
 	elseif button == "Undress" then
 		text = L["Undress"]
-
+	elseif button == "Undo" then
+		text = L["Undo"]
 	elseif button == "HideSlot" then
 		text = L["Hide Armor Slots"]
 
@@ -746,6 +755,36 @@ function BW_DressingRoomHideArmorButton_OnClick()
 	playerActor:Undress()
 	DressingRoom:Update()
 end
+
+
+
+
+function addon:StoreItems()
+	local playerActor = DressUpFrame.ModelScene:GetPlayerActor();
+	local itemTransmogInfoList = playerActor and playerActor:GetItemTransmogInfoList();
+	local slashCommand = itemTransmogInfoList and TransmogUtil.CreateOutfitSlashCommand(itemTransmogInfoList) or "";
+	slashCommand = string.gsub(slashCommand, "/outfit ", "")
+	tinsert(itemhistory, slashCommand)
+
+	if  #itemhistory > 1 then
+		BW_DressingRoomFrame.BW_DressingRoomUndoButton:Show()
+	end
+
+end
+
+function DressingRoom:Undo()
+	local msg = itemhistory[#itemhistory]
+	tremove(itemhistory, #itemhistory)
+	local itemTransmogInfoList = TransmogUtil.ParseOutfitSlashCommand(msg);
+	if itemTransmogInfoList then
+		local showOutfitDetails = true;
+		DressUpItemTransmogInfoList(itemTransmogInfoList, showOutfitDetails);
+	end
+	if  #itemhistory == 1 then
+		BW_DressingRoomFrame.BW_DressingRoomUndoButton:Hide()
+	end
+end
+
 
 --======
 BetterDressUpOutfitMixin = { }
@@ -814,3 +853,4 @@ end
 function addon:DressinRoomFormSwap()
 	DressingRoom:UpdateModel("player")
 end
+

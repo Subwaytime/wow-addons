@@ -1,11 +1,11 @@
 ## Interface: 100107
-## Version: 2.10.0
+## Version: 2.10.4
 ## Title: HealthBarColor
 ## Author: Slothpala
 ## SavedVariables: HealthBarColorDB
 ## AddonCompartmentFunc: HealthBarColor_AddOnCompartmentClick
 ## IconTexture: Interface\AddOns\HealthBarColor\Textures\Icon\Icon.tga
-## OptionalDeps: Ace3, LibDeflate, LibSharedMedia-3.0, LibDualSpec-1.0, LibDDI-1.0
+## OptionalDeps: Ace3, LibDeflate, LibSharedMedia-3.0, LibDualSpec-1.0, LibDDI-1.0, AceGUI-3.0-SharedMediaWidgets
 ## X-Curse-Project-ID: 682398
 
 #Embeds

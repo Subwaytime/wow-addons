@@ -3878,6 +3878,12 @@ do
 			end
 		end);
 	end
+
+	--local f = CreateFrame("Frame");
+	--f:RegisterEvent("EXECUTE_CHAT_LINE");
+	--f:SetScript("OnEvent", function(self, event, line)
+	--	print(line)
+	--end)
 end
 
 ----------------

@@ -4,7 +4,7 @@
 local _, addonTable = ...
 local HealthBarColor = addonTable.HealthBarColor
 local DarkFrames = HealthBarColor:NewModule("DarkFrames")
-local color = {r=0.2,g=0.2,b=0.2,a=1}
+local color = {r=0.33,g=0.33,b=0.33,a=1}
 
 local function recolorFrames(r,g,b,a,desaturation)
     local frameTextures = {

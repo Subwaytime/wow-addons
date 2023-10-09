@@ -463,8 +463,11 @@ RaceAtlas.fixedModelAtlasNames = {
     [129] = "dragonriding-barbershop-icon-pterrodax",
     [123] = "dragonriding-barbershop-icon-drake",
     [126] = "dragonriding-barbershop-icon-wyvernspirit",
-
-    [125] = "dragonriding-barbershop-icon-slitherdrake",  --10.1.0
+    --10.1.0
+    [125] = "dragonriding-barbershop-icon-slitherdrake",
+    --10.2.0
+    [149] = "dragonriding-barbershop-icon-netherwingdrake",
+    [188] = "dragonriding-barbershop-icon-faeriedragon",
 };
 
 function RaceAtlas:GetAtlas(raceName, gender, alternateForm)

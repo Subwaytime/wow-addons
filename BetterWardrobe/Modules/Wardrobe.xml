@@ -145,6 +145,27 @@
 			</Frame>
 			<Frame inherits="BetterWardrobeSetInfoTemplate"/>
 			<Frame inherits="BetterWardrobeIconsTemplate"/>
+			<Frame parentKey="AltItemtems" hidden="true" >
+				<Size x="25" y="25"/>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="TOPRIGHT" X='8' Y='-15'/>
+				</Anchors>
+					<Layers>
+						<Layer level="OVERLAY">		
+						<Texture parentKey="AltIconRight" file="Interface\FriendsFrame\UI-Toast-ChatInviteIcon" >
+							<Size x="25" y="25"/>
+							<Anchors>
+								<Anchor point="CENTER" X='0' Y='0'/>
+							</Anchors>
+
+						</Texture>
+					</Layer>
+
+					</Layers>
+				<Scripts>
+
+				</Scripts>
+			</Frame>
 		</Frames>
 		<Scripts>
 			<OnLoad method="OnLoad"/>
@@ -369,6 +390,8 @@
 					</Animations>
 				</Texture>
 
+
+
 			</Layer>
 		</Layers>
 		<Frames>
@@ -388,6 +411,37 @@
 					<OnLeave method="OnLeave"/>
 				</Scripts>
 			</Frame>
+
+			<Frame parentKey="AltItem" mixin = "BetterWardrobeSetsDetailsAltItemMixin" hidden="true">
+				<Size x="25" y="10"/>
+
+				<Anchors>
+					<Anchor point="BOTTOM" relativeKey="$parent" x="0" y = "-5"/>
+				</Anchors>
+					<Layers>
+						<Layer level="OVERLAY">
+							
+						<Texture parentKey="AltIconRight" file="Interface\BUTTONS\UI-SpellbookIcon-NextPage-Up" >
+							<Size x="15" y="15"/>
+							<Anchors>
+								<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" relativePoint="BOTTOMRIGHT" X='0' Y='-5'/>
+							</Anchors>
+
+						</Texture>
+							<Texture parentKey="AltIconLeft" file="Interface\BUTTONS\UI-SpellbookIcon-PrevPage-Up" >
+							<Size x="15" y="15"/>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativeKey="$parent.Icon" relativePoint="BOTTOMLEFT" X='0' Y='-5'/>
+							</Anchors>
+
+						</Texture>
+						</Layer>
+					</Layers>
+				<Scripts>
+					<OnMouseDown method="OnMouseDown"/>
+				</Scripts>
+			</Frame>
+
 			<Frame parentKey="Favorite" setAllPoints="true">
 				<Layers>
 					<Layer level="ARTWORK">
@@ -895,6 +949,30 @@
 					</Layer>
 				</Layers>
 				<Frames>
+					<CheckButton parentKey="ApplyOnClickCheckbox" mixin="BW_ApplyOnClickCheckboxMixin" hidden="false">
+						<Size x="30" y="30"/>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT" x="50" y="15"/>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+               						<FontString parentKey="Label" inherits="GameFontHighlightSmall" justifyH="LEFT" text="Apply On Click">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT" x="2" y="1"/>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnClick method="OnClick"/>
+							<OnLoad method="OnLoad"/>
+						</Scripts>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+					</CheckButton>
 					<Frame parentKey="PagingFrame" inherits="BW_CollectionsPagingFrameTemplate">
 						<Anchors>
 							<Anchor point="BOTTOM" x="22" y="38"/>

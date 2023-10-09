@@ -59,9 +59,9 @@ end
 
 local function restorePlayer() 
 	Player.FrameTexture:SetTexture("Interface\\TARGETINGFRAME\\UI-TargetingFrame.blp")
-	Player.FrameTexture:SetTexCoord(unpack(textures.Player["FrameTexture"].coords))
+	Player.FrameTexture:SetTexCoord(unpack(textures.Player.FrameTexture.coords))
 	Player.FrameFlash:SetTexture("Interface\\CHARACTERFRAME\\UI-Player-Status.blp")
-	Player.FrameFlash:SetTexCoord(unpack(textures.Player["FrameFlash"].coords))
+	Player.FrameFlash:SetTexCoord(unpack(textures.Player.FrameFlash.coords))
 	Player.HealthBar:SetPoint("TOPLEFT", Player.FrameTexture, "TOPLEFT", 106, -41)
 	Player.HealthBar:SetHeight(12.000005722046)
 end

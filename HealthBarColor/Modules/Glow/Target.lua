@@ -9,46 +9,52 @@ local HealthBarColor = addonTable.HealthBarColor
 
 local Glow_Target = HealthBarColor:NewModule("Glow_Target")
 local Target = HealthBarColor:GetUnit("Target")
-local hooked = nil
-local hook_callback = nil
+local hooked = {}
+local OnShow_Callback = nil
+local OnTargetChanged = nil
 
 function Glow_Target:OnEnable()
     if not HealthBarColor.db.profile.Settings.Modules.Glow then return end
-    if hooked and not HealthBarColor.db.profile.Modules.Glow.target == 3 then
-        Target.Glow:Show()
-    end
-    local OnTargetChanged
-    if HealthBarColor.db.profile.Modules.Glow.target == 1 then
-        OnTargetChanged = function()
-            if Target.isPlayer then
-                Target.Glow:SetVertexColor(Target.ClassColor:GetRGB())
-            else
-                Target.Glow:SetVertexColor(Target.ReactionColor:GetRGB())
+    local selected = HealthBarColor.db.profile.Modules.Glow.target
+    if selected == 1 or selected == 2 then
+        if selected == 1 then
+            OnTargetChanged = function()
+                if Target.isPlayer then
+                    Target.Glow:SetVertexColor(Target.ClassColor:GetRGB())
+                else
+                    Target.Glow:SetVertexColor(Target.ReactionColor:GetRGB())
+                end
+            end
+        else
+            local color = HealthBarColor.db.profile.Modules.Glow.target_static_color
+            OnTargetChanged = function()
+                Target.Glow:SetVertexColor(color.r,color.g,color.b)
             end
         end
         HealthBarColor:RegisterOnTargetChanged("Glow_Target",OnTargetChanged)
-    elseif HealthBarColor.db.profile.Modules.Glow.target == 2 then
-        local color = HealthBarColor.db.profile.Modules.Glow.target_static_color 
-        OnTargetChanged = function()
-            Target.Glow:SetVertexColor(color.r,color.g,color.b)
+        if not hooked["CheckFaction"] then
+            hooksecurefunc(TargetFrame, "CheckFaction", function()
+                OnTargetChanged()
+            end)
+            hooked["CheckFaction"] = true
         end
-        HealthBarColor:RegisterOnTargetChanged("Glow_Target",OnTargetChanged)
-    elseif HealthBarColor.db.profile.Modules.Glow.target == 3 then
-        hook_callback = function(self)
+        Target.Glow:Show()
+    else
+        OnShow_Callback = function(self)
             self:Hide()
         end
-        if not hooked then
-            Target.Glow:HookScript("OnShow",function(self) hook_callback(self) end)
-            hooked = true
+        if not hooked["OnShow"] then
+            Target.Glow:HookScript("OnShow",function(self) OnShow_Callback(self) end)
+            hooked["OnShow"] = true
         end
         Target.Glow:Hide()
     end
 end
 
 function Glow_Target:OnDisable()
-    if hooked then
-        hook_callback = function() end
-        Target.Glow:Show()
-    end
+    local function doNothing() end
+    OnShow_Callback = doNothing
+    OnTargetChanged = doNothing
+    Target.Glow:Show()
 end
 

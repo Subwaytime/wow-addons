@@ -1,6 +1,6 @@
 ## Interface: 100107
-## Title: BetterWardrobe (4.13)
-## Version: 4.13
+## Title: BetterWardrobe (4.14.4)
+## Version: 4.14.4
 ## Author: SLOKnightfall
 ## Notes: 
 ## OptionalDeps: MogIt, CanIMogIt, LegionWardrobe, WardrobeEnhanced, Rarity, TransmogOutfits, ExtendedSets, ElvUI
@@ -55,6 +55,7 @@ Data\LEATHER.lua
 Data\MAIL.lua
 Data\PLATE.lua
 Data\COSMETIC.lua
+Data\SetOverrides.lua
 
 
 #Modules

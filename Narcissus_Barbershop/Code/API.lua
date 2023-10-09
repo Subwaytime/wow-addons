@@ -70,11 +70,14 @@ end
 
 local CHR_MODEL_NAME = {
     --Dragonriding
+    --/dump GetMouseFocus().mountID
     [124] = {1589, GetMountNameByID},
     [129] = {1590, GetMountNameByID},
     [123] = {1563, GetMountNameByID},
     [126] = {1591, GetMountNameByID},
     [125] = {1588, GetMountNameByID},
+    [149] = {1744, GetMountNameByID},
+    [188] = {1830, GetMountNameByID},
 };
 
 local function GetChrModelName(chrModelID)
@@ -163,10 +166,12 @@ local CAMERA_DATA_FILEID = {
 
     --Dragonriding
     [4278602] = {-6.76, -1.98, -1.98, 0.61},    --Renewed Proto-drake   --{-20.58, -3.59, -4.9, 0.61}
-    [4281540] = {-20.58, -3.77, -6.32, 0.61},    --Windrborne Velocidrake
+    [4281540] = {-20.58, -3.77, -6.32, 0.61},   --Windrborne Velocidrake
     [4227968] = {-0.59, -1.86, -2.57, 0.44},    --Highland Drake
-    [4252337] = {0.26, -0.74, -1.2, 0.44},    --Cliffside Wylderdrake
-    [4252339] = {1.95, 5.96, -3.73, -0.79},    --Winding Slitherdrake
+    [4252337] = {0.26, -0.74, -1.2, 0.44},      --Cliffside Wylderdrake
+    [4252339] = {1.79, -5.96, -3.69, 0.78},     --Winding Slitherdrake   --{1.95, 5.96, -3.73, -0.79} --left face
+    [5143343] = {-0.59, -1.86, -2.57, 0.44},    --Grotto Netherwing Drake
+    [5228774] = {-0.24, -1.38, -2.56, 0.44},    --Flourishing Whimsydrake
 };
 
 CAMERA_DATA_FILEID[4675519] = CAMERA_DATA_FILEID[4278602];  --Storm-Easter Vault of the Incarnates
