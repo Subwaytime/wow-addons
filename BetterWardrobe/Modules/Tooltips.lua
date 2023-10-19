@@ -343,41 +343,45 @@ function preview:ShowPreview(itemLink, parent)
 	local learned_dupe = false
 	local found_tooltipinfo = false
 	local found_systemTooltip = false
-	for i = 1, GameTooltip:NumLines() do
-		local line = _G["GameTooltipTextLeft"..i]
 
-		local text = line:GetText() or " "
-		local text_lower = string.lower(line:GetText() or " " )
 
-		if string.find(text_lower, string.lower(TRANSMOGRIFY_TOOLTIP_APPEARANCE_KNOWN)) or
-			string.find(text_lower, "item id") then
-			learned_dupe = true
+	local tooltip =  GameTooltip;
+	local tooltipData = tooltip:GetPrimaryTooltipData();
+	if tooltipData then
+		for i, lineData in ipairs(tooltipData.lines) do
+			local text = lineData.leftText or " "
+			local text_lower = string.lower(lineData.leftText or " " )
+
+			if string.find(text_lower, string.lower(TRANSMOGRIFY_TOOLTIP_APPEARANCE_KNOWN)) or
+				string.find(text_lower, "item id") then
+				learned_dupe = true
+			end
+
+			if string.find(text_lower, string.lower(L["HEADERTEXT"])) then
+				found_tooltipinfo = true
+			end
+
+			if addon.Profile.ShowOwnedItemTooltips and string.find(text_lower, string.lower(TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN)) then
+				text  = "|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t "..text
+				found_systemTooltip = true
+			end
+
+			--Adds icon to TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN if found
+			if addon.Profile.ShowOwnedItemTooltips and string.find(text_lower, string.lower(TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN) ) then
+				text = "|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t "..text
+				found_systemTooltip = true
+			end
+
+			if addon.Profile.ShowItemIDTooltips and string.find(text_lower, string.lower(ITEM_LEVEL) ) then
+				text = text.."         "..L["Item ID"]..": |cffffffff"..id
+			end
+
 		end
-
-		if string.find(text_lower, string.lower(L["HEADERTEXT"])) then
-			found_tooltipinfo = true
-		end
-
-		if addon.Profile.ShowOwnedItemTooltips and string.find(text_lower, string.lower(TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN)) then
-			line:SetText("|TInterface\\RaidFrame\\ReadyCheck-NotReady:0|t "..text)
-			found_systemTooltip = true
-		end
-
-		--Adds icon to TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN if found
-		if addon.Profile.ShowOwnedItemTooltips and string.find(text_lower, string.lower(TRANSMOGRIFY_TOOLTIP_ITEM_UNKNOWN_APPEARANCE_KNOWN) ) then
-			line:SetText("|TInterface\\RaidFrame\\ReadyCheck-Ready:0|t "..text)
-			found_systemTooltip = true
-		end
-
-		if addon.Profile.ShowItemIDTooltips and string.find(text_lower, string.lower(ITEM_LEVEL) ) then
-			line:SetText(text.."         "..L["Item ID"]..": |cffffffff"..id)
-		end
-
 	end
-	
 	if addon.Profile.ShowItemIDTooltips  then
 			addDoubleLine(GameTooltip,L["Item Visual ID"]..": |cffffffff"..id, "")
 	end
+
 	if addon.Profile.ShowOwnedItemTooltips and not found_systemTooltip then
 		local apperanceKnownText, canTransmog
 		local itemID = GetItemInfoInstant(itemLink)

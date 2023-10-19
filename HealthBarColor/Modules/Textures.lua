@@ -69,8 +69,7 @@ function Textures:OnEnable()
         --ToT
         Focus,
         --ToF
-    })  
-     do 
+    }) do 
         if not hooked[hbc_unit.Frame] then
             hooksecurefunc(hbc_unit.Frame, "Update" ,function() Callbacks.applyHelthBarTexture(hbc_unit.HealthBar) end)
             hooked[hbc_unit.Frame] = true
@@ -95,8 +94,7 @@ function Textures:OnEnable()
         Boss3,
         Boss4,
         Boss5
-    })
-    do
+    }) do
         hbc_unit.HealthBar:SetStatusBarTexture(HealthBarTexture)    
         if not HealthBarColor.db.profile.Modules.Textures.excludep then
             hbc_unit.PowerBar:SetStatusBarTexture(PowerBarTexture)
@@ -117,8 +115,8 @@ function Textures:OnEnable()
         Boss3,
         Boss4,
         Boss5,
-    }) 
-        do HealthBarColor:assignLayers(unit.HealthBar)
+    }) do 
+        HealthBarColor:assignLayers(unit.HealthBar)
     end
 end
 
@@ -133,8 +131,7 @@ function Textures:OnDisable()
             Focus,
             ToF,
             Pet,
-        })
-        do
+        }) do
             UnitFrameManaBar_UpdateType(hbc_unit.PowerBar)
         end
     end
@@ -155,8 +152,7 @@ function Textures:OnDisable()
             Boss3,
             Boss4,
             Boss5
-        })
-        do
+        }) do
             v.HealthBar:GetStatusBarTexture():SetAtlas("UI-HUD-UnitFrame-Target-Boss-Small-PortraitOff-Bar-Health")
         end
     end

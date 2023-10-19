@@ -1,5 +1,5 @@
 ## Interface: 11404
-## Version: 2.4.6
+## Version: 2.5.0
 ## Title: DynamicCam
 ## Author: mpstark, LudiusMaximus
 ## Notes: A more dynamic camera.

@@ -135,53 +135,7 @@ HealthBarColor:SetDefaultModuleLibraries("AceConsole-3.0", "AceEvent-3.0")
 HealthBarColor:SetDefaultModuleState(false)
 local AC         = LibStub("AceConfig-3.0")
 local ACD        = LibStub("AceConfigDialog-3.0")
-local AceGUI     = LibStub("AceGUI-3.0")
 local LDS        = LibStub("LibDualSpec-1.0")
-
---GUI Shared xml template with AceGUI widgets 
-local OptionsFrame = CreateFrame("Frame", "HealthBarColorOptions", UIParent, "PortraitFrameTemplate")
-tinsert(UISpecialFrames, OptionsFrame:GetName())
-OptionsFrame:SetFrameStrata("DIALOG")
-OptionsFrame:SetSize(800,500)
-OptionsFrame:SetPoint("CENTER", UIparent, "CENTER")
-OptionsFrame:SetMovable(true)
-OptionsFrame:SetResizable(true)
-OptionsFrame:SetResizeBounds(800,200)
-OptionsFrame:SetClampedToScreen(true)
-OptionsFrame:SetClampRectInsets(200, -200, 0, 150)
-OptionsFrame:RegisterForDrag("LeftButton")
-OptionsFrame.TitleContainer:SetScript("OnMouseDown", function()
-    OptionsFrame:StartMoving()
-end)
-OptionsFrame.TitleContainer:SetScript("OnMouseUp", function()
-    OptionsFrame:StopMovingOrSizing()
-end)
-OptionsFrame:Hide()
-HealthBarColorOptionsPortrait:SetTexture("Interface\\AddOns\\HealthBarColor\\Textures\\Icon\\Icon.tga")
-HealthBarColorOptionsTitleText:SetText("HealthBarColor")
-
-local resizeButton = CreateFrame("Button", "HealthBarColorOptionsResizeButton", OptionsFrame)
-resizeButton:SetPoint("BOTTOMRIGHT", OptionsFrame)
-resizeButton:SetSize(22, 22)
-resizeButton:EnableMouse(true)
-resizeButton:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
-resizeButton:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
-resizeButton:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
-resizeButton:SetScript("OnMouseDown", function(_, button) 
-    if button == "LeftButton" then
-        OptionsFrame:StartSizing("BOTTOMRIGHT")
-    end
-end)
-resizeButton:SetScript("OnMouseUp", function()
-    OptionsFrame:StopMovingOrSizing()
-end)
-
-local container = AceGUI:Create("SimpleGroup")
-container.frame:SetParent(OptionsFrame)
-container.frame:SetPoint("TOPLEFT", OptionsFrame, "TOPLEFT", 18, -58)
-container.frame:SetPoint("BOTTOMRIGHT", OptionsFrame, "BOTTOMRIGHT", -18, 25)
-OptionsFrame.container = container
---
 
 function HealthBarColor:OnInitialize()
     --Initial work
@@ -241,11 +195,11 @@ function HealthBarColor:OnEnable()
 end
 
 function HealthBarColor:SlashCommand()
-    if OptionsFrame:IsShown() then
-        OptionsFrame:Hide()
+    local frame = HealthBarColor:GetOptionsFrame()
+    if not frame:IsShown() then
+        frame:Show()
     else
-        ACD:Open("HealthBarColor_options", OptionsFrame.container)
-        OptionsFrame:Show()
+        frame:Hide()
     end
 end
 

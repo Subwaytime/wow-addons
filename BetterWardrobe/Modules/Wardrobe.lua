@@ -1239,6 +1239,8 @@ function BetterWardrobeCollectionFrameMixin:SetTab(tabID)
 		self.SearchBox:ClearAllPoints()
 		self.SearchBox:SetPoint("TOPRIGHT", -107, -35)
 		self.SearchBox:SetWidth(115)
+				self.SearchBox:Show()
+
 		local enableSearchAndFilter = self.ItemsCollectionFrame.transmogLocation and self.ItemsCollectionFrame.transmogLocation:IsAppearance()
 		self.SearchBox:SetEnabled(enableSearchAndFilter)
 		self.FilterButton:Show()
@@ -1619,12 +1621,15 @@ function BetterWardrobeCollectionFrameMixin:OnKeyDown(key)
 end
 
 function BetterWardrobeCollectionFrameMixin:OpenTransmogLink(link)
+	local linkType, id = strsplit(":", link)
+
 	if ( not CollectionsJournal:IsVisible() or not self:IsVisible() ) then
 		--ToggleCollectionsJournal(5)
-		WardrobeCollectionFrame:OpenTransmogLink(addedLink)
+		TransmogUtil.OpenCollectionToItem(id);
+
+		--WardrobeCollectionFrame:OpenTransmogLink(addedLink)
 	end
 	C_Timer.After(0, function() 
-	local linkType, id = strsplit(":", link)
 
 	if ( linkType == "transmogappearance" ) then
 		local sourceID = tonumber(id)
@@ -4059,7 +4064,7 @@ end
 
 -- ***** FILTER
 
-local FILTER_SOURCES = {L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Set"], L["Recolor"], L["PvP"],L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Covenants"], L["Trading Post"], L["Holiday"], L["NOTE_119"],L["NOTE_120/fstqa"]}
+local FILTER_SOURCES = {L["MISC"], L["Classic Set"], L["Quest Set"], L["Dungeon Set"], L["Raid Set"], L["Recolor"], L["PvP"],L["Garrison"], L["Island Expedition"], L["Warfronts"], L["Covenants"], L["Trading Post"], L["Holiday"], L["NOTE_119"],L["NOTE_120"]}
 local EXPANSIONS = {EXPANSION_NAME0, EXPANSION_NAME1, EXPANSION_NAME2, EXPANSION_NAME3, EXPANSION_NAME4, EXPANSION_NAME5, EXPANSION_NAME6, EXPANSION_NAME7, EXPANSION_NAME8, EXPANSION_NAME9}
 
 
@@ -5075,6 +5080,7 @@ function BetterWardrobeSetsDataProviderMixin:GetSetSourceCounts(setID)
 end
 
 function BetterWardrobeSetsDataProviderMixin:GetBaseSetData(setID)
+	if not setID then return {} end
 	if ( not self.baseSetsData ) then
 		self.baseSetsData = { }
 	end
@@ -7022,9 +7028,11 @@ function BetterWardrobeSetsDetailsItemMixin:OnEnter()
 			addon.ClearSetNewSourcesForSlot(setID, transmogSlot)
 		end
 		local baseSetID = C_TransmogSets.GetBaseSetID(setID)
-		SetsDataProvider:ResetBaseSetNewStatus(baseSetID)
-		--BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh()
-		BetterWardrobeCollectionFrame.SetsCollectionFrame.ListContainer:ReinitializeButtonWithBaseSetID(baseSetID)
+		if baseSetID then 
+			SetsDataProvider:ResetBaseSetNewStatus(baseSetID)
+			--BetterWardrobeCollectionFrame.SetsCollectionFrame:Refresh()
+			BetterWardrobeCollectionFrame.SetsCollectionFrame.ListContainer:ReinitializeButtonWithBaseSetID(baseSetID)
+		end
 
 	end
 end
@@ -8544,6 +8552,9 @@ addon:SecureHook("SetItemRef", function(link, ...)
 		if not IsAddOnLoaded("Blizzard_Collections") then
 			LoadAddOn("Blizzard_Collections")
 		end
+
+
+
 
 		BetterWardrobeCollectionFrame:OpenTransmogLink(link)
 				
