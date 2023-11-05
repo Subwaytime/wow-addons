@@ -955,6 +955,22 @@ function addon.RefreshOutfitData()
 		--addon.RefreshSaveOutfitDropdown()
 	end
 
+--[[
+	local function CopyCharacterData(name)
+
+		--need to copy over default blizzard saved sets
+		--print(name)
+		--local profile = addon.setdb:GetCurrentProfile()
+
+		--addon.setdb.global.sets[profile] = CopyTable(addon.setdb.global.sets[name])
+--zx=addon.setdb.global.sets[name]
+		--addon.setdb:CopyProfile(addon.setdb.global.sets[name], silent)
+
+		--addon.RefreshOutfitData()
+		--addon.RefreshSaveOutfitDropdown()
+		--addon:RefreshConfig()
+	end
+]]--
 	local args = {}
 	local i = 1
 	for name, data in pairs(addon.setdb.global.sets) do
@@ -968,14 +984,26 @@ function addon.RefreshOutfitData()
 			disabled = false,
 		}
 
+		--args["CopyButton"..i] = {
+
+			--order = i + .2,
+			--name = L["Copy"],
+			--type = "execute",
+			--width = .5,
+			--func = function()  
+			--		return CopyCharacterData(name) end,
+	--	}
+
 		args["AddButton"..i] = {				
 			order = i + .2,
 			name = L["Remove"],
 			type = "execute",
 			width = .5,
 			func = function()  
-					return RemoveCharacterData(name) end,
+			return RemoveCharacterData(name) end,
 		}	
+
+
 
 		i = i + 1
 	end
@@ -1340,7 +1368,7 @@ function addon:OnEnable()
 	--addon.Init:BuildTooltips()
 	addon:InitTooltips()
 	C_Timer.After(0.5, function()
-		addon.RefreshSubItemData()
+		--addon.RefreshSubItemData()
 		addon.RefreshOutfitData()
 	end)
 		addPatrons()
@@ -1361,7 +1389,7 @@ end
 
 --Hides default collection window when at transmog vendor
 local function UpdateTransmogVendor()
-	WardrobeCollectionFrame:Hide()
+	--WardrobeCollectionFrame:Hide()
 	BetterWardrobeCollectionFrame:Show()
 	BetterWardrobeCollectionFrame:SetContainer(WardrobeFrame)
 end
@@ -1390,14 +1418,16 @@ function addon.Init:LoadModules()
 		-- don't touch the wardrobe frame if it's used by the transmogrifier
 		if (WardrobeCollectionFrame:GetParent() == self or not WardrobeCollectionFrame:GetParent():IsShown()) then
 			if selected == 5 then
-				HideUIPanel(WardrobeFrame)
-				WardrobeCollectionFrame:Hide()
+				--HideUIPanel(WardrobeFrame)
+				--WardrobeCollectionFrame:Hide()
+				--BetterWardrobeCollectionFrame:Show()
+
 				BetterWardrobeCollectionFrame:SetContainer(self)
 				if addon.ExtendedTransmogSwap then
 					addon.ExtendedTransmogSwap:Show()
 				end
 			else
-				WardrobeCollectionFrame:Hide()
+				--WardrobeCollectionFrame:Hide()
 				BetterWardrobeCollectionFrame:Hide()
 				if addon.ExtendedTransmogSwap then
 					addon.ExtendedTransmogSwap:Hide()
@@ -1419,27 +1449,36 @@ function addon.Init:LoadModules()
 	addon:SecureHook(WardrobeTransmogFrame, "GetSlotButton", function(self,...) BW_TransmogFrameMixin.GetSlotButton(self,...) end)
 	--addon:SecureHook(WardrobeTransmogFrame, "OnTransmogApplied", function(self,...) BW_TransmogFrameMixin.OnTransmogApplied(self,...) end)
 		
- 	addon.Init:initCollectionList()
- 	addon.Init:BuildCollectionList()
-	addon.Init:BuildTransmogVendorUI()
-	addon.Init.SortDropDown_Initialize()
-	addon:UpdateCanIMogIt()
-	addon:InitExtendedSetsSwap()
-	addon.Init.SavedSetsDropDown_Initialize()
+
+	C_Timer.After(0, function()
+		addon:UpdatePetTracker()
+		addon.Init:initCollectionList()
+	 	addon.Init:BuildCollectionList()
+		addon.Init:BuildTransmogVendorUI()
+		addon.Init.SortDropDown_Initialize()
+		addon:UpdateCanIMogIt()
+		addon:InitExtendedSetsSwap()
+		addon.Init.SavedSetsDropDown_Initialize()
+		BetterWardrobeCollectionFrame:Show()
+
+	end)
 end
 
 function addon:EventHandler(event, ...)
 	if event == "ADDON_LOADED" and ... == "Blizzard_Collections" then
-		addon.Init:LoadModules()
 		addon:SendMessage("BW_ADDON_LOADED")
 		addon:UnregisterEvent("ADDON_LOADED")
-		
-		C_Timer.After(0.5, function()
+
+		C_Timer.After(0, function()
+			addon.Init:LoadModules()
+
 			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox.Label:ClearAllPoints()
 			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:ClearAllPoints()
 			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox.Label:SetPoint("RIGHT", BetterWardrobeCollectionFrame.ItemsCollectionFrame.PagingFrame.PageText, "LEFT", -30, 0)
 			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetPoint("RIGHT", WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox.Label, "LEFT", 0, 0)
+			WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetFrameLevel(CollectionsJournal.TitleContainer:GetFrameLevel()+200);
 		 end)
+
 
 	elseif (event == "PLAYER_ENTERING_WORLD") then
 		addon:SendMessage("BW_OnPlayerEnterWorld")

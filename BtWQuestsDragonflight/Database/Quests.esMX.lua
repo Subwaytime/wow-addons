@@ -2598,6 +2598,48 @@ BtWQuestsDatabase:UpdateQuestsTable({
     [72833] = {
         name = "Romper el ciclo",
     },
+    [72854] = {
+        name = "Nuestros enemigos abundan",
+    },
+    [72855] = {
+        name = "Hacia el Sepulcro",
+    },
+    [72856] = {
+        name = "Nada como un clásico",
+    },
+    [72857] = {
+        name = "Hierba explosiva",
+    },
+    [72858] = {
+        name = "El ácido le gana al papel",
+    },
+    [72859] = {
+        name = "Un disfraz apropiado",
+    },
+    [72860] = {
+        name = "El miedo es nuestra arma",
+    },
+    [72861] = {
+        name = "Espía escarlata",
+    },
+    [72862] = {
+        name = "Infiltrado",
+    },
+    [72863] = {
+        name = "El vuelo del alma en pena",
+    },
+    [72864] = {
+        name = "Muerte a los vivos",
+    },
+    [72865] = {
+        name = "Es el momento de los Renegados",
+    },
+    [72866] = {
+        name = "Regreso a Lordaeron",
+    },
+    [72867] = {
+        name = "Soy Renegado",
+    },
     [72872] = {
         name = "Un azote para los rocaazotes",
     },
@@ -3096,6 +3138,27 @@ BtWQuestsDatabase:UpdateQuestsTable({
     [75507] = {
         name = "Poniéndose al día con los amigos",
     },
+    [75632] = {
+        name = "Un disco dislocado",
+    },
+    [75633] = {
+        name = "Tenemos la tecnología",
+    },
+    [75634] = {
+        name = "La reconstrucción de la Guardia de Tyr",
+    },
+    [75635] = {
+        name = "¡Por Tyr!",
+    },
+    [75636] = {
+        name = "Tyrangulación",
+    },
+    [75637] = {
+        name = "El último faro",
+    },
+    [75638] = {
+        name = "Disco dislocado localizado",
+    },
     [75643] = {
         name = "Orientación: Olfatopos de Loamm",
     },
@@ -3110,6 +3173,42 @@ BtWQuestsDatabase:UpdateQuestsTable({
     },
     [75885] = {
         name = "Ganancia en abundancia",
+    },
+    [75890] = {
+        name = "El llamamiento a la acción",
+    },
+    [75891] = {
+        name = "Maldiciones ancestrales",
+    },
+    [75918] = {
+        name = "Temporada de fuego",
+    },
+    [75919] = {
+        name = "Sofocando los resguardos",
+    },
+    [75920] = {
+        name = "Ojos de fuego",
+    },
+    [75921] = {
+        name = "A través de las llamas",
+    },
+    [75922] = {
+        name = "Información provocadora",
+    },
+    [75923] = {
+        name = "Suena la alarma",
+    },
+    [75950] = {
+        name = "Un ejemplo de justicia: Hadwin",
+    },
+    [75951] = {
+        name = "Un ejemplo de orden: Talthis",
+    },
+    [75952] = {
+        name = "Un ejemplo de sacrificio: Nolaki",
+    },
+    [75953] = {
+        name = "Un ejemplo de compasión: Valunei",
     },
     [75985] = {
         name = "Descansa, guerrero",
@@ -3134,6 +3233,87 @@ BtWQuestsDatabase:UpdateQuestsTable({
     },
     [76145] = {
         name = "¿Y esa Cromi?",
+    },
+    [76171] = {
+        name = "En el camino de Tyr",
+    },
+    [76176] = {
+        name = "Primeros pasos",
+    },
+    [76194] = {
+        name = "Un portento lúgubre",
+    },
+    [76195] = {
+        name = "Contrarrestar corrupción",
+    },
+    [76196] = {
+        name = "Piedad o miseria",
+    },
+    [76197] = {
+        name = "Un destello de terror",
+    },
+    [76203] = {
+        name = "Adentrándose en las sombras",
+    },
+    [76205] = {
+        name = "Equilibrar la balanza",
+    },
+    [76206] = {
+        name = "El fondo del asunto",
+    },
+    [76207] = {
+        name = "Furia de los celadores",
+    },
+    [76212] = {
+        name = "Una marca para un protector",
+    },
+    [76213] = {
+        name = "Honor de la diosa",
+    },
+    [76407] = {
+        name = "Hoy no será el día, destino",
+    },
+    [76419] = {
+        name = "La violencia lo resuelve todo",
+    },
+    [76420] = {
+        name = "Efecto mariposa",
+    },
+    [76421] = {
+        name = "El destino que nosotros forjamos",
+    },
+    [76422] = {
+        name = "Al infinito y más allá",
+    },
+    [76423] = {
+        name = "Sin límites",
+    },
+    [76530] = {
+        name = "Invocaciones sin vida",
+    },
+    [76592] = {
+        name = "Con una sola ala",
+    },
+    [76593] = {
+        name = "La mejor de las intenciones",
+    },
+    [76594] = {
+        name = "La caída del dracthyr",
+    },
+    [76595] = {
+        name = "Fuga urgente",
+    },
+    [76597] = {
+        name = "Con nuevas alas",
+    },
+    [77098] = {
+        name = "Llegar a tierra",
+    },
+    [77163] = {
+        name = "Entrando en razón",
+    },
+    [77417] = {
+        name = "La esencia de un infinito",
     },
 })
 ]])()

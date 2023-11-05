@@ -139,12 +139,11 @@ function UI:CreateButtons()
 	local BW_TransmogOptionsDropDown= CreateFrame("Frame", "BW_TransmogOptionsDropDown", BetterWardrobeCollectionFrame, "BW_UIDropDownMenuTemplate")
 	BW_TransmogOptionsDropDown = BW_TransmogOptionsDropDown
 ----	BetterWardrobeCollectionFrame.OptionsDropDown = BW_TransmogOptionsDropDown
-BetterWardrobeTransmogVendorOptionsDropDown_OnLoad(BW_TransmogOptionsDropDown)
-
+	BetterWardrobeTransmogVendorOptionsDropDown_OnLoad(BW_TransmogOptionsDropDown)
 
 	local f = CreateFrame("Frame", "BW_AltIcon1", WardrobeTransmogFrame.HeadButton, "AltItemtemplate")
-	local f = CreateFrame("Frame", "BW_AltIcon15", WardrobeTransmogFrame.ShoulderButton, "AltItemtemplate")
-	local f = CreateFrame("Frame", "BW_AltIcon1", WardrobeTransmogFrame.BackButton, "AltItemtemplate")
+	local f = CreateFrame("Frame", "BW_AltIcon3", WardrobeTransmogFrame.ShoulderButton, "AltItemtemplate")
+	local f = CreateFrame("Frame", "BW_AltIcon15", WardrobeTransmogFrame.BackButton, "AltItemtemplate")
 	local f = CreateFrame("Frame", "BW_AltIcon5", WardrobeTransmogFrame.ChestButton, "AltItemtemplate")
 	local f = CreateFrame("Frame", "BW_AltIcon9", WardrobeTransmogFrame.WristButton, "AltItemtemplate")
 	local f = CreateFrame("Frame", "BW_AltIcon10", WardrobeTransmogFrame.HandsButton, "AltItemtemplate")
@@ -467,9 +466,13 @@ function UI.ExtendTransmogView(reset)
 		
 		WardrobeTransmogFrame.Inset.BG:SetAllPoints()
 		WardrobeTransmogFrame.HeadButton:ClearAllPoints()
-		WardrobeTransmogFrame.HeadButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", math.ceil(frameWidth * -0.3), -41) -- -320
+		
+		--WardrobeTransmogFrame.HeadButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", math.ceil(frameWidth * -0.3), -41) -- -320
+		WardrobeTransmogFrame.HeadButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", math.ceil(frameWidth * -0.35625), -41) -- -320
+
 		WardrobeTransmogFrame.HandsButton:ClearAllPoints()
-		WardrobeTransmogFrame.HandsButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", math.floor(frameWidth * 0.3), -118) --325
+		--WardrobeTransmogFrame.HandsButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", math.floor(frameWidth * 0.3), -118) --325
+		WardrobeTransmogFrame.HandsButton:SetPoint("TOP", WardrobeTransmogFrame.ModelScene, "TOP", math.floor(frameWidth * 0.35625), -118) --325
 
 		WardrobeTransmogFrame.MainHandButton:ClearAllPoints()
 		WardrobeTransmogFrame.MainHandButton:SetPoint("BOTTOM", WardrobeTransmogFrame.ModelScene, "BOTTOM", -26, 15)
@@ -480,8 +483,8 @@ function UI.ExtendTransmogView(reset)
 		WardrobeTransmogFrame.SecondaryHandEnchantButton:ClearAllPoints()
 		WardrobeTransmogFrame.SecondaryHandEnchantButton:SetPoint("BOTTOM", WardrobeTransmogFrame.SecondaryHandButton, "BOTTOM", 0, -20)
 
-        WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:ClearAllPoints();
-        WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetPoint("BOTTOM", WardrobeTransmogFrame, "BOTTOMLEFT", 20, 10)
+        --WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:ClearAllPoints();
+        --WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox:SetPoint("BOTTOM", WardrobeTransmogFrame, "BOTTOM", 0, 70)
 
 		WardrobeTransmogFrame.ModelScene.ClearAllPendingButton:SetPoint("TOPRIGHT", WardrobeTransmogFrame, -20, -20)
 		WardrobeTransmogFrame.ModelScene.ControlFrame:SetPoint("TOP", WardrobeTransmogFrame, "TOP", 0, -4)

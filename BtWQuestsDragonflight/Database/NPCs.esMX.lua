@@ -228,6 +228,24 @@ BtWQuestsDatabase:UpdateNPCsTable({
     [199532] = {
         name = "Dracomandante Brasathal",
     },
+    [199761] = {
+        name = "Comandante Mortacechador Belmont",
+    },
+    [199767] = {
+        name = "Maestro boticario Faranell",
+    },
+    [199768] = {
+        name = "Forestal oscura Velonara",
+    },
+    [199806] = {
+        name = "Intendente Newlem",
+    },
+    [199879] = {
+        name = "Forestal oscura Velonara",
+    },
+    [199885] = {
+        name = "Comandante Mortacechador Belmont",
+    },
     [199965] = {
         name = "Ebisio",
     },
@@ -264,11 +282,32 @@ BtWQuestsDatabase:UpdateNPCsTable({
     [202656] = {
         name = "Mayla Altamontaña",
     },
+    [202700] = {
+        name = "Lysander Sombraestelar",
+    },
+    [202701] = {
+        name = "Arko'narin Sombraestelar",
+    },
+    [202702] = {
+        name = "Maiev Cantosombrío",
+    },
     [202995] = {
         name = "Ebisio",
     },
     [203965] = {
         name = "Ebisio",
+    },
+    [205067] = {
+        name = "Shandris Plumaluna",
+    },
+    [205068] = {
+        name = "Shandris Plumaluna",
+    },
+    [205134] = {
+        name = "Shandris Plumaluna",
+    },
+    [205142] = {
+        name = "Shandris Plumaluna",
     },
     [205706] = {
         name = "Cromi futura",
@@ -276,8 +315,29 @@ BtWQuestsDatabase:UpdateNPCsTable({
     [205707] = {
         name = "Cromi",
     },
+    [205892] = {
+        name = "Exploradora kaldorei",
+    },
     [206149] = {
         name = "Cromi",
+    },
+    [207353] = {
+        name = "Arko'narin Sombraestelar",
+    },
+    [207790] = {
+        name = "Dracomandante Brasathal",
+    },
+    [207820] = {
+        name = "Dracomandante Brasathal",
+    },
+    [208035] = {
+        name = "Cromi",
+    },
+    [208151] = {
+        name = "Maiev Cantosombrío",
+    },
+    [209140] = {
+        name = "Maiev Cantosombrío",
     },
 })
 ]])()

@@ -1,14 +1,30 @@
-# 2.32.0
+# v2.33.2
+
+- Added The Coalition of Flames questline
+- Added the Reconciliation questline
+- Added the Bronze Reconciliation questline
+- Added Reforging the Tyr's Guard questline
+
+# v2.33.1
+
+- Added Forsaken heritage armor questline
+- Added Night Elf heritage armor questline
+
+# v2.33.0
+
+- Updated for 10.1.7
+
+# v2.32.0
 
 - Added Dawn of the Infinite questline
 - Updated for 10.1.5
 
-# 2.31.0
+# v2.31.0
 
 - Added questlines The Veiled Ossuary, United Again, Revel Resurgence, and Tyr's Fall
 - Updated some localizations
 
-# 2.30.0
+# v2.30.0
 
 - Added missing 10.1.0 quest line Agrulculture
 - Added addon list icon and addon compartment button

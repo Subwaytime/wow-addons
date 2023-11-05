@@ -2169,6 +2169,9 @@ BtWQuestsDatabase:UpdateQuestsTable({
     [70932] = {
         name = "Una vita speziata",
     },
+    [70934] = {
+        name = "Abbraccio della salamantera",
+    },
     [70937] = {
         name = "Ciò che fu Valthrux",
     },
@@ -2591,6 +2594,48 @@ BtWQuestsDatabase:UpdateQuestsTable({
     },
     [72833] = {
         name = "Spezzare il ciclo",
+    },
+    [72854] = {
+        name = "I nemici abbondano",
+    },
+    [72855] = {
+        name = "A Mausolea",
+    },
+    [72856] = {
+        name = "Un grande classico imbattibile",
+    },
+    [72857] = {
+        name = "Erba Esplosiva",
+    },
+    [72858] = {
+        name = "Acido batte carta",
+    },
+    [72859] = {
+        name = "Un travestimento appropriato",
+    },
+    [72860] = {
+        name = "La paura è la nostra arma",
+    },
+    [72861] = {
+        name = "La spia Scarlatta",
+    },
+    [72862] = {
+        name = "Sono in mezzo a noi",
+    },
+    [72863] = {
+        name = "Il volo della Banshee",
+    },
+    [72864] = {
+        name = "Morte ai vivi",
+    },
+    [72865] = {
+        name = "Questa è l'ora dei Reietti",
+    },
+    [72866] = {
+        name = "Ritorno a Lordaeron",
+    },
+    [72867] = {
+        name = "Essere Reietti",
     },
     [72872] = {
         name = "Ripulire le profondità",
@@ -3090,6 +3135,27 @@ BtWQuestsDatabase:UpdateQuestsTable({
     [75507] = {
         name = "Meglio non restare indietro",
     },
+    [75632] = {
+        name = "Un disco dislocato",
+    },
+    [75633] = {
+        name = "Abbiamo la tecnologia",
+    },
+    [75634] = {
+        name = "Riforgiare la Guardia di Tyr",
+    },
+    [75635] = {
+        name = "Per Tyr!",
+    },
+    [75636] = {
+        name = "Tyrangolazione",
+    },
+    [75637] = {
+        name = "L'ultimo Segnalatore",
+    },
+    [75638] = {
+        name = "Localizzare il Disco Dislocato",
+    },
     [75643] = {
         name = "Orientamento: Niffen di Loamm",
     },
@@ -3104,6 +3170,42 @@ BtWQuestsDatabase:UpdateQuestsTable({
     },
     [75885] = {
         name = "Soldi facili",
+    },
+    [75890] = {
+        name = "Il richiamo all'azione",
+    },
+    [75891] = {
+        name = "Maledizioni antiche",
+    },
+    [75918] = {
+        name = "La stagione del fuoco",
+    },
+    [75919] = {
+        name = "Spegnere le protezioni",
+    },
+    [75920] = {
+        name = "Occhi di fuoco",
+    },
+    [75921] = {
+        name = "In mezzo alle fiamme",
+    },
+    [75922] = {
+        name = "Informazioni infiammabili",
+    },
+    [75923] = {
+        name = "Suonare l'allarme",
+    },
+    [75950] = {
+        name = "Un modello di giustizia: Hadwin",
+    },
+    [75951] = {
+        name = "Un modello di ordine: Talthis",
+    },
+    [75952] = {
+        name = "Un modello di sacrificio: Nolaki",
+    },
+    [75953] = {
+        name = "Un modello di compassione: Valunei",
     },
     [75985] = {
         name = "Riposa in pace, guerriero",
@@ -3128,6 +3230,87 @@ BtWQuestsDatabase:UpdateQuestsTable({
     },
     [76145] = {
         name = "Che Cromie è quella?",
+    },
+    [76171] = {
+        name = "Seguire il sentiero di Tyr",
+    },
+    [76176] = {
+        name = "Primi Passi",
+    },
+    [76194] = {
+        name = "Un portento tetro",
+    },
+    [76195] = {
+        name = "Contrastare la corruzione",
+    },
+    [76196] = {
+        name = "Pietà o sofferenza",
+    },
+    [76197] = {
+        name = "Un assaggio di terrore",
+    },
+    [76203] = {
+        name = "Attraversare le ombre",
+    },
+    [76205] = {
+        name = "Riportare l'equilibrio",
+    },
+    [76206] = {
+        name = "Il cuore del problema",
+    },
+    [76207] = {
+        name = "L'ira delle Custodi",
+    },
+    [76212] = {
+        name = "Un marchio per un protettore",
+    },
+    [76213] = {
+        name = "Onore della Dea",
+    },
+    [76407] = {
+        name = "Non oggi, destino",
+    },
+    [76419] = {
+        name = "La violenza risolve tutto",
+    },
+    [76420] = {
+        name = "Gli effetti farfalla",
+    },
+    [76421] = {
+        name = "Il destino che creiamo",
+    },
+    [76422] = {
+        name = "Verso l'infinito e oltre",
+    },
+    [76423] = {
+        name = "Nessun limite",
+    },
+    [76530] = {
+        name = "Convocazione non morta",
+    },
+    [76592] = {
+        name = "Un'ala sola",
+    },
+    [76593] = {
+        name = "Le migliori intenzioni",
+    },
+    [76594] = {
+        name = "Dracthyr a terra",
+    },
+    [76595] = {
+        name = "Esfiltrazione urgente",
+    },
+    [76597] = {
+        name = "Su nuove ali",
+    },
+    [77098] = {
+        name = "Lontani da occhi indiscreti",
+    },
+    [77163] = {
+        name = "Tentare di ragionare",
+    },
+    [77417] = {
+        name = "Come si diventa Infiniti",
     },
 })
 ]])()

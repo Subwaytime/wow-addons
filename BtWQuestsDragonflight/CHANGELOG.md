@@ -1,3 +1,19 @@
+# v5.3
+
+- Added The Coalition of Flames questline
+- Added the Reconciliation questline
+- Added the Bronze Reconciliation questline
+- Added Reforging the Tyr's Guard questline
+
+# v5.2
+
+- Added Forsaken heritage armor questline
+- Added Night Elf heritage armor questline
+
+# v5.1
+
+- Updated for 10.1.7
+
 # v5.0
 
 - Added Dawn of the Infinite questline

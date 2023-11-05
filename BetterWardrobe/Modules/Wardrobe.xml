@@ -940,7 +940,7 @@
 				</KeyValues>
 				<Layers>
 					<Layer level="ARTWORK">
-						<FontString parentKey="NoValidItemsLabel" inherits="GameFontNormalMed2" text="TRANSMOG_NO_VALID_ITEMS_EQUIPPED">
+						<FontString parentKey="NoValidItemsLabel" inherits="GameFontNormalMed2" text="TRANSMOG_NO_VALID_ITEMS_EQUIPPED" hidden="true">
 							<Anchors>
 								<Anchor point="CENTER" y="15"/>
 							</Anchors>
@@ -1446,7 +1446,7 @@
 									</OnEnter>
 									<OnLeave function="GameTooltip_Hide"/>
 									<OnClick>
-										self:GetParent():GetParent():LinkSetInChat(self.setID)
+										self:GetParent():GetParent():LinkSet(self.setID)
 									</OnClick>
 								</Scripts>
 							</Button>
@@ -1775,6 +1775,16 @@
 				</Anchors>
 			</Frame>
 		</Frames>
+		<Layers>
+			<Layer level="BACKGROUND" textureSubLevel="-6">
+				<Texture name="$parentBg" file="Interface\FrameGeneral\UI-Background-Rock" horizTile="true" vertTile="true" parentKey="Bg">
+					<Anchors>
+						<Anchor point="TOPLEFT" x="2" y="-21"/>
+						<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
 		<Scripts>
 			<OnLoad method="OnLoad"/>
 			<OnEvent method="OnEvent"/>

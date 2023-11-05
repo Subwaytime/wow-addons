@@ -24,55 +24,79 @@
 
 --]]
 local Addon, Private =  ...
-local Module = Bagnon:NewModule("Bagnon_Garbage")
+local Module = Bagnon:NewModule("Bagnon_Uncollected")
 local cache = {}
+
+-- Lua API
+local _G = _G
+local string_find = string.find
+
+-- WoW API
+local PlayerHasTransmog = C_TransmogCollection.PlayerHasTransmog
+
+local tooltip = Private.tooltip
+local tooltipName = Private.tooltipName
+
+-- Search patterns
+local s_transmog1 = TRANSMOGRIFY_STYLE_UNCOLLECTED
+local s_transmog2 = TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN
 
 Private.cache[Module] = cache
 Private.AddUpdater(Module, function(self)
 
-	if (self.hasItem and BagnonItemInfo_DB.enableGarbage and self.info.quality == 0 and not self.info.locked) then
+	local show
+
+	if (self.hasItem and BagnonItemInfo_DB.enableUncollected) then
+
+		local id, quality = self.info.id or self.info.itemID, self.info.quality
+
+		if (quality and quality > 1 and not PlayerHasTransmog(id --[[, itemAppearanceModID ]])) then
+
+			if (not tooltip.owner or not tooltip.bag or not tooltip.slot) then
+				tooltip.owner, tooltip.bag,tooltip.slot = self, self:GetBag(), self:GetID()
+				tooltip:SetOwner(tooltip.owner, "ANCHOR_NONE")
+				tooltip:SetBagItem(tooltip.bag, tooltip.slot)
+			end
+
+			for i = tooltip:NumLines(),2,-1 do
+				local line = _G[tooltipName.."TextLeft"..i]
+				if (not line) then
+					break
+				end
+
+				local msg = line:GetText() or ""
+				if (string_find(msg, s_transmog1) or string_find(msg, s_transmog2)) then
+					show = true
+					break
+				end
+			end
+
+		end
+
+	end
+
+	if (show) then
 
 		local overlay = cache[self]
 		if (not overlay) then
 			overlay = self:CreateTexture()
 			overlay.icon = self.icon or _G[self:GetName().."IconTexture"]
 			overlay:Hide()
-			overlay:SetDrawLayer("ARTWORK")
-			overlay:SetAllPoints(overlay.icon)
-			overlay:SetColorTexture(.04, .013333333, .004705882, .6)
+			overlay:SetDrawLayer("OVERLAY")
+			overlay:SetPoint("CENTER", 0, 0)
+			overlay:SetSize(24, 24)
+			overlay:SetTexture([[Interface\Transmogrify\Transmogrify]])
+			overlay:SetTexCoord(.804688, .875, .171875, .230469)
 			cache[self] = overlay
 		end
 
 		overlay:Show()
-		SetItemButtonDesaturated(self, true)
 
 	else
 		local overlay = cache[self]
 		if (overlay) then
 			overlay:Hide()
-			SetItemButtonDesaturated(self, self.info.locked)
 		end
 	end
 
 end)
-
--- Also need to hook this to locked updates
-local item = Bagnon.ItemSlot or Bagnon.Item
-local method = item.SetLocked and "SetLocked" or item.UpdateLocked and "UpdateLocked"
-
-hooksecurefunc(item, method, Private.updatesByModule[Module])
-
-local groupMethod = Bagnon.ContainerItemGroup and Bagnon.ContainerItemGroup.ITEM_LOCK_CHANGED
-if (groupMethod) then
-	local groupUpdate = function(self,_,bag,slot)
-		if (not self:Delaying("Layout")) then
-			bag = self.buttons[bag]
-			slot = bag and bag[slot]
-			if (slot) then
-				Private.updatesByModule[Module](slot)
-				--slot:UpdateLocked()
-			end
-		end
-	end
-	hooksecurefunc(Bagnon.ContainerItemGroup, "ITEM_LOCK_CHANGED", groupUpdate)
-end

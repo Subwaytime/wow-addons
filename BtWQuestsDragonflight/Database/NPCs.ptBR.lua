@@ -228,6 +228,24 @@ BtWQuestsDatabase:UpdateNPCsTable({
     [199532] = {
         name = "Comandante-de-escama Brasathal",
     },
+    [199761] = {
+        name = "Comandante Sicário Belmonte",
+    },
+    [199767] = {
+        name = "Mestre-boticário Faranello",
+    },
+    [199768] = {
+        name = "Patrulheira Sombria Velonara",
+    },
+    [199806] = {
+        name = "Intendente Newlem",
+    },
+    [199879] = {
+        name = "Patrulheira Sombria Velonara",
+    },
+    [199885] = {
+        name = "Comandante Sicário Belmonte",
+    },
     [200054] = {
         name = "Anciã Pelomel",
     },
@@ -255,11 +273,32 @@ BtWQuestsDatabase:UpdateNPCsTable({
     [202656] = {
         name = "Mayla Alta Montanha",
     },
+    [202700] = {
+        name = "Lysandre Estelumbra",
+    },
+    [202701] = {
+        name = "Arko'narin Estelumbra",
+    },
+    [202702] = {
+        name = "Maiev Cantonegro",
+    },
     [202788] = {
         name = "Khazar",
     },
     [204522] = {
         name = "Aurântia",
+    },
+    [205067] = {
+        name = "Shandris Plumaluna",
+    },
+    [205068] = {
+        name = "Shandris Plumaluna",
+    },
+    [205134] = {
+        name = "Shandris Plumaluna",
+    },
+    [205142] = {
+        name = "Shandris Plumaluna",
     },
     [205706] = {
         name = "Crona do Futuro",
@@ -267,8 +306,35 @@ BtWQuestsDatabase:UpdateNPCsTable({
     [205707] = {
         name = "Crona",
     },
+    [205892] = {
+        name = "Batedora Kaldorei",
+    },
     [206149] = {
         name = "Crona",
+    },
+    [207353] = {
+        name = "Arko'narin Estelumbra",
+    },
+    [207790] = {
+        name = "Comandante-de-escama Brasathal",
+    },
+    [207819] = {
+        name = "Amythera",
+    },
+    [207820] = {
+        name = "Comandante-de-escama Brasathal",
+    },
+    [208035] = {
+        name = "Crona",
+    },
+    [208151] = {
+        name = "Maiev Cantonegro",
+    },
+    [208236] = {
+        name = "Amythera",
+    },
+    [209140] = {
+        name = "Maiev Cantonegro",
     },
 })
 ]])()

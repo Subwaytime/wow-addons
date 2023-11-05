@@ -17598,6 +17598,22 @@ BtWQuestsDatabase:AddQuestsTable({
         },
     },
     [70037] = {
+        contentTuningID = 2475,
+        rewards = {
+            {
+                type = "experience",
+                amounts = {
+                    9050, 9200, 9350, 9500, 9650, 9800, 9950, 10100, 10250, 10400, 
+                },
+                minLevel = 60,
+                maxLevel = 69,
+            },
+            {
+                type = "reputation",
+                id = 2507,
+                amount = 200,
+            },
+        },
     },
     [70040] = {
         name = "Tumbling Through Time",
@@ -20058,6 +20074,16 @@ BtWQuestsDatabase:AddQuestsTable({
                 },
             },
         },
+        rewards = {
+            {
+                type = "experience",
+                amounts = {
+                    13600, 13850, 14050, 14300, 14500, 14750, 14950, 15200, 15400, 15650, 
+                },
+                minLevel = 60,
+                maxLevel = 69,
+            },
+        },
     },
     [70784] = {
         name = "The Abandoned Outpost",
@@ -20711,7 +20737,23 @@ BtWQuestsDatabase:AddQuestsTable({
         },
     },
     [70934] = {
+        name = "Salamanther's Embrace",
         contentTuningID = 2437,
+        rewards = {
+            {
+                type = "experience",
+                amounts = {
+                    9050, 9200, 9350, 9500, 9650, 9800, 9950, 10100, 10250, 10400, 
+                },
+                minLevel = 60,
+                maxLevel = 69,
+            },
+            {
+                type = "reputation",
+                id = 2511,
+                amount = 150,
+            },
+        },
     },
     [70937] = {
         name = "What Valthrux Once Was",
@@ -21862,6 +21904,16 @@ BtWQuestsDatabase:AddQuestsTable({
             type = "npc",
             id = 196499,
         },
+        rewards = {
+            {
+                type = "experience",
+                amounts = {
+                    13600, 13850, 14050, 14300, 14500, 14750, 14950, 15200, 15400, 15650, 
+                },
+                minLevel = 60,
+                maxLevel = 69,
+            },
+        },
     },
     [72122] = {
         name = "Erstwhile Ecologists",
@@ -22183,14 +22235,44 @@ BtWQuestsDatabase:AddQuestsTable({
     [72373] = {
         name = "Aiding the Accord: The Hunt is On",
         contentTuningID = 2437,
+        rewards = {
+            {
+                type = "experience",
+                amounts = {
+                    13600, 13850, 14050, 14300, 14500, 14750, 14950, 15200, 15400, 15650, 
+                },
+                minLevel = 60,
+                maxLevel = 69,
+            },
+        },
     },
     [72374] = {
         name = "Aiding the Accord: Dragonbane Keep",
         contentTuningID = 2437,
+        rewards = {
+            {
+                type = "experience",
+                amounts = {
+                    13600, 13850, 14050, 14300, 14500, 14750, 14950, 15200, 15400, 15650, 
+                },
+                minLevel = 60,
+                maxLevel = 69,
+            },
+        },
     },
     [72375] = {
         name = "Aiding the Accord: The Isles Call",
         contentTuningID = 2437,
+        rewards = {
+            {
+                type = "experience",
+                amounts = {
+                    13600, 13850, 14050, 14300, 14500, 14750, 14950, 15200, 15400, 15650, 
+                },
+                minLevel = 60,
+                maxLevel = 69,
+            },
+        },
     },
     [72380] = {
         name = "Together We Are Unstoppable",
@@ -23427,6 +23509,14 @@ BtWQuestsDatabase:AddQuestsTable({
         source = {
             type = "npc",
             id = 199532,
+            locations = {
+                [2151] = {
+                    {
+                        x = 0.325643,
+                        y = 0.60574,
+                    },
+                },
+            },
         },
         rewards = {
             {
@@ -23715,6 +23805,230 @@ BtWQuestsDatabase:AddQuestsTable({
             {
                 type = "currency",
                 id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [72854] = {
+        name = "Our Enemies Abound",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 186091,
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 10,
+            },
+        },
+    },
+    [72855] = {
+        name = "To the Sepulcher",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 199761,
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 10,
+            },
+        },
+    },
+    [72856] = {
+        name = "Nothing Like the Classic",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 199767,
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 75,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [72857] = {
+        name = "Boom Weed",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 199767,
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 75,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [72858] = {
+        name = "Acid Beats Paper",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 199768,
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 75,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [72859] = {
+        name = "A Proper Disguise",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 199793,
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 95,
+            },
+        },
+    },
+    [72860] = {
+        name = "Fear is Our Weapon",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 199792,
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 75,
+            },
+        },
+    },
+    [72861] = {
+        name = "The Scarlet Spy",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 199792,
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 10,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [72862] = {
+        name = "Among Us",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 199806,
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 75,
+            },
+        },
+    },
+    [72863] = {
+        name = "The Flight of the Banshee",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 199879,
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 10,
+            },
+        },
+    },
+    [72864] = {
+        name = "Death to the Living",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 199885,
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 75,
+            },
+        },
+    },
+    [72865] = {
+        name = "This is the Hour of the Forsaken",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 199893,
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 95,
+            },
+        },
+    },
+    [72866] = {
+        name = "Return to Lordaeron",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 199893,
+            locations = {
+                [21] = {
+                    {
+                        x = 0.656175,
+                        y = 0.237948,
+                    },
+                },
+            },
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 10,
+            },
+        },
+    },
+    [72867] = {
+        name = "I Am Forsaken",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 199922,
+        },
+        rewards = {
+            {
+                type = "experience",
                 amount = 10,
             },
         },
@@ -27116,6 +27430,139 @@ BtWQuestsDatabase:AddQuestsTable({
             id = 203404,
         },
     },
+    [75632] = {
+        name = "A Dislocated Disc",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 187669,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 28090,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [75633] = {
+        name = "We Have the Technology",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 204574,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 140450,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [75634] = {
+        name = "Reforging the Tyr's Guard",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 204577,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 70225,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [75635] = {
+        name = "For Tyr!",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 206221,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 280900,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [75636] = {
+        name = "Tyrangulation",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 204667,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 561800,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [75637] = {
+        name = "The Final Beacon",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 206682,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 842700,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [75638] = {
+        name = "Dislocated Disc Located",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 204605,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 280900,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
     [75643] = {
         name = "Orientation: Loamm Niffen",
         contentTuningID = 2588,
@@ -27208,6 +27655,224 @@ BtWQuestsDatabase:AddQuestsTable({
         source = {
             type = "npc",
             id = 204693,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 280900,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [75890] = {
+        name = "The Clarion Call",
+        contentTuningID = 1281,
+        source = {
+            type = "object",
+            id = 405958,
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 10,
+            },
+        },
+    },
+    [75891] = {
+        name = "Ancient Curses",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 207353,
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 10,
+            },
+        },
+    },
+    [75918] = {
+        name = "Fire Season",
+        contentTuningID = 2688,
+        source = {
+            type = "npc",
+            id = 205067,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 28090,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [75919] = {
+        name = "Dousing the Wards",
+        contentTuningID = 2688,
+        source = {
+            type = "npc",
+            id = 205068,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 280900,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [75920] = {
+        name = "Eyes of Fire",
+        contentTuningID = 2688,
+        source = {
+            type = "npc",
+            id = 205068,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 280900,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [75921] = {
+        name = "Through the Flames",
+        contentTuningID = 2688,
+        source = {
+            type = "npc",
+            id = 205892,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 280900,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [75922] = {
+        name = "Inflammatory Information",
+        contentTuningID = 2688,
+        source = {
+            type = "npc",
+            id = 205134,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 561800,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [75923] = {
+        name = "Raise the Alarm",
+        contentTuningID = 2688,
+        source = {
+            type = "npc",
+            id = 205142,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 28090,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 15,
+            },
+        },
+    },
+    [75950] = {
+        name = "An Exemplar of Justice: Hadwin",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 204590,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 280900,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [75951] = {
+        name = "An Exemplar of Order: Talthis",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 204593,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 280900,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [75952] = {
+        name = "An Exemplar of Sacrifice: Nolaki",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 204592,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 280900,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [75953] = {
+        name = "An Exemplar of Compassion: Valunei",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 204591,
         },
         rewards = {
             {
@@ -27338,6 +28003,547 @@ BtWQuestsDatabase:AddQuestsTable({
             {
                 type = "money",
                 amount = 140450,
+            },
+        },
+    },
+    [76171] = {
+        name = "Walking the Path of Tyr",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 206221,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 280900,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [76176] = {
+        name = "First Steps",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 208968,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 28090,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [76194] = {
+        name = "A Grim Portent",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 202702,
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 40,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [76195] = {
+        name = "Countering Corruption",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 202700,
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 75,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [76196] = {
+        name = "Mercy or Misery",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 202701,
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 75,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [76197] = {
+        name = "A Glimpse of Terror",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 202702,
+            locations = {
+                [77] = {
+                    {
+                        x = 0.380561,
+                        y = 0.536688,
+                    },
+                },
+            },
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 75,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [76203] = {
+        name = "Stepping into the Shadows",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 202702,
+            locations = {
+                [77] = {
+                    {
+                        x = 0.36147,
+                        y = 0.578896,
+                    },
+                },
+            },
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 75,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [76205] = {
+        name = "Balancing the Scales",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 202702,
+            locations = {
+                [77] = {
+                    {
+                        x = 0.367104,
+                        y = 0.515932,
+                    },
+                },
+            },
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 75,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [76206] = {
+        name = "Heart of the Issue",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 202700,
+            locations = {
+                [77] = {
+                    {
+                        x = 0.366774,
+                        y = 0.516491,
+                    },
+                },
+            },
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 75,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [76207] = {
+        name = "Wardens' Wrath",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 202701,
+            locations = {
+                [77] = {
+                    {
+                        x = 0.379217,
+                        y = 0.462482,
+                    },
+                },
+            },
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 95,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [76212] = {
+        name = "A Mark For A Protector",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 208151,
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 75,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [76213] = {
+        name = "Honor of the Goddess",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 209140,
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 75,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 15,
+            },
+        },
+    },
+    [76407] = {
+        name = "Not Today, Fate",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 207106,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 280900,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [76419] = {
+        name = "Violence Will Solve It",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 207634,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 280900,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [76420] = {
+        name = "Butterfly Effects",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 207634,
+            locations = {
+                [71] = {
+                    {
+                        x = 0.379072,
+                        y = 0.832165,
+                    },
+                },
+            },
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 280900,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [76421] = {
+        name = "The Fate We Make",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 207634,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 280900,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 15,
+            },
+        },
+    },
+    [76422] = {
+        name = "Infinity and Beyond",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 206971,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 140450,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 15,
+            },
+        },
+    },
+    [76423] = {
+        name = "No Limits",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 208035,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 28090,
+            },
+        },
+    },
+    [76530] = {
+        name = "Unliving Summons",
+        contentTuningID = 1281,
+        source = {
+            type = "npc",
+            id = 186091,
+        },
+        rewards = {
+            {
+                type = "experience",
+                amount = 10,
+            },
+        },
+    },
+    [76592] = {
+        name = "A Single Wing",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 207790,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 140450,
+            },
+        },
+    },
+    [76593] = {
+        name = "The Best Intentions",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 207819,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 280900,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [76594] = {
+        name = "Dracthyr Down",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 207819,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 280900,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [76595] = {
+        name = "Urgent Exfiltration",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 207820,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 280900,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 15,
+            },
+        },
+    },
+    [76597] = {
+        name = "On New Wings",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 207820,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 280900,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 15,
+            },
+        },
+    },
+    [77098] = {
+        name = "Getting to Ground",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 208236,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 210675,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [77163] = {
+        name = "Seeing Reason",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 207820,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 280900,
+            },
+            {
+                type = "currency",
+                id = 2245,
+                amount = 10,
+            },
+        },
+    },
+    [77417] = {
+        name = "What Makes an Infinite",
+        contentTuningID = 2707,
+        source = {
+            type = "npc",
+            id = 207106,
+        },
+        rewards = {
+            {
+                type = "money",
+                amount = 70225,
             },
         },
     },

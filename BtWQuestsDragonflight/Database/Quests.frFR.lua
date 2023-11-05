@@ -2190,6 +2190,9 @@ BtWQuestsDatabase:UpdateQuestsTable({
     [70932] = {
         name = "Le piment de la vie",
     },
+    [70934] = {
+        name = "Étreinte de la dracamandre",
+    },
     [70937] = {
         name = "Ce qu’était autrefois le Valthrux",
     },
@@ -2612,6 +2615,48 @@ BtWQuestsDatabase:UpdateQuestsTable({
     },
     [72833] = {
         name = "Briser la spirale",
+    },
+    [72854] = {
+        name = "Nos ennemis sont légion",
+    },
+    [72855] = {
+        name = "Vers le Sépulcre",
+    },
+    [72856] = {
+        name = "Rien de tel que les classiques",
+    },
+    [72857] = {
+        name = "Herbe explosive",
+    },
+    [72858] = {
+        name = "L’acide bat le papier",
+    },
+    [72859] = {
+        name = "Un bon déguisement",
+    },
+    [72860] = {
+        name = "La peur est notre arme",
+    },
+    [72861] = {
+        name = "L’espion écarlate",
+    },
+    [72862] = {
+        name = "Parmi nous",
+    },
+    [72863] = {
+        name = "Le vol de la banshee",
+    },
+    [72864] = {
+        name = "Mort aux vivants",
+    },
+    [72865] = {
+        name = "Voici l’heure des Réprouvés",
+    },
+    [72866] = {
+        name = "Retour à Lordaeron",
+    },
+    [72867] = {
+        name = "Je suis Réprouvé",
     },
     [72872] = {
         name = "Régulation des profondeurs",
@@ -3108,6 +3153,24 @@ BtWQuestsDatabase:UpdateQuestsTable({
     [75507] = {
         name = "Retrouvailles entre amis",
     },
+    [75632] = {
+        name = "Un disque disloqué",
+    },
+    [75633] = {
+        name = "À nous la technologie",
+    },
+    [75634] = {
+        name = "Reforger la Garde de Tyr",
+    },
+    [75635] = {
+        name = "Pour Tyr !",
+    },
+    [75637] = {
+        name = "La dernière balise",
+    },
+    [75638] = {
+        name = "Disque disloqué trouvé",
+    },
     [75643] = {
         name = "Orientation : Flairans de Terreau",
     },
@@ -3122,6 +3185,42 @@ BtWQuestsDatabase:UpdateQuestsTable({
     },
     [75885] = {
         name = "Faire fortune rapidement",
+    },
+    [75890] = {
+        name = "L’appel cristallin",
+    },
+    [75891] = {
+        name = "Malédictions ancestrales",
+    },
+    [75918] = {
+        name = "La saison du feu",
+    },
+    [75919] = {
+        name = "Doucher leurs ardeurs",
+    },
+    [75920] = {
+        name = "Des yeux de feu",
+    },
+    [75921] = {
+        name = "À travers les flammes",
+    },
+    [75922] = {
+        name = "Des informations inflammables",
+    },
+    [75923] = {
+        name = "Donner l’alarme",
+    },
+    [75950] = {
+        name = "La justice incarnée : Hadwin",
+    },
+    [75951] = {
+        name = "L’ordre incarné : Talthis",
+    },
+    [75952] = {
+        name = "Le sacrifice incarné : Nolaki",
+    },
+    [75953] = {
+        name = "La compassion incarnée : Valuneï",
     },
     [75985] = {
         name = "Repose en paix, guerrier",
@@ -3146,6 +3245,87 @@ BtWQuestsDatabase:UpdateQuestsTable({
     },
     [76145] = {
         name = "Qui qui qui sont les Chromie ?",
+    },
+    [76171] = {
+        name = "Suivre la voie de Tyr",
+    },
+    [76176] = {
+        name = "Premiers pas",
+    },
+    [76194] = {
+        name = "Un sombre présage",
+    },
+    [76195] = {
+        name = "Contrer la corruption",
+    },
+    [76196] = {
+        name = "Clémence ou misère",
+    },
+    [76197] = {
+        name = "Un aperçu de la terreur",
+    },
+    [76203] = {
+        name = "Entrer dans les ombres",
+    },
+    [76205] = {
+        name = "Rétablir l’équilibre",
+    },
+    [76206] = {
+        name = "Le cœur du problème",
+    },
+    [76207] = {
+        name = "Courroux du gardien",
+    },
+    [76212] = {
+        name = "Une marque pour un protecteur",
+    },
+    [76213] = {
+        name = "Honneur de la déesse",
+    },
+    [76407] = {
+        name = "Pas aujourd’hui, ô Destin",
+    },
+    [76419] = {
+        name = "La violence peut résoudre ça",
+    },
+    [76420] = {
+        name = "L’effet papillon",
+    },
+    [76421] = {
+        name = "Le destin que l’on forge",
+    },
+    [76422] = {
+        name = "Vers l’infini et au-delà",
+    },
+    [76423] = {
+        name = "Aucune limite",
+    },
+    [76530] = {
+        name = "Invocations de mort-vivant",
+    },
+    [76592] = {
+        name = "Une seule aile",
+    },
+    [76593] = {
+        name = "Les meilleures intentions",
+    },
+    [76594] = {
+        name = "Dracthyr à terre",
+    },
+    [76595] = {
+        name = "Exfiltration d’urgence",
+    },
+    [76597] = {
+        name = "Des ailes neuves",
+    },
+    [77098] = {
+        name = "Recherche d’une cachette",
+    },
+    [77163] = {
+        name = "Retour à la raison",
+    },
+    [77417] = {
+        name = "L’essence d’un Infini",
     },
 })
 ]])()

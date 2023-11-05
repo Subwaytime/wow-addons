@@ -2604,6 +2604,48 @@ BtWQuestsDatabase:UpdateQuestsTable({
     [72833] = {
         name = "Rompendo o ciclo",
     },
+    [72854] = {
+        name = "Nossos inimigos abundam",
+    },
+    [72855] = {
+        name = "Rumo ao Sepulcro",
+    },
+    [72856] = {
+        name = "Nada como um clássico",
+    },
+    [72857] = {
+        name = "Erva Estrondosa",
+    },
+    [72858] = {
+        name = "Ácido ganha de papel",
+    },
+    [72859] = {
+        name = "O disfarce perfeito",
+    },
+    [72860] = {
+        name = "O medo é a melhor arma",
+    },
+    [72861] = {
+        name = "O espião escarlate",
+    },
+    [72862] = {
+        name = "Cá entre nós",
+    },
+    [72863] = {
+        name = "O voo da banshee",
+    },
+    [72864] = {
+        name = "Morte aos vivos",
+    },
+    [72865] = {
+        name = "A hora dos Renegados",
+    },
+    [72866] = {
+        name = "De volta para Lordaeron",
+    },
+    [72867] = {
+        name = "Sou Renegado",
+    },
     [72872] = {
         name = "Esvaziando as profundezas",
     },
@@ -3102,6 +3144,27 @@ BtWQuestsDatabase:UpdateQuestsTable({
     [75507] = {
         name = "Resenha com os amigos",
     },
+    [75632] = {
+        name = "Um disco deslocado",
+    },
+    [75633] = {
+        name = "Nós detemos a tecnologia",
+    },
+    [75634] = {
+        name = "Reforjando a Guarda de Tyr",
+    },
+    [75635] = {
+        name = "Por Tyr!",
+    },
+    [75636] = {
+        name = "Triangulação",
+    },
+    [75637] = {
+        name = "O último sinalizador",
+    },
+    [75638] = {
+        name = "Disco deslocado encontrado",
+    },
     [75643] = {
         name = "Orientação: Farins de Argília",
     },
@@ -3116,6 +3179,42 @@ BtWQuestsDatabase:UpdateQuestsTable({
     },
     [75885] = {
         name = "Enricar já",
+    },
+    [75890] = {
+        name = "O toque do clarim",
+    },
+    [75891] = {
+        name = "Maldições antigas",
+    },
+    [75918] = {
+        name = "Temporada de fogo",
+    },
+    [75919] = {
+        name = "Extinguindo as proteções",
+    },
+    [75920] = {
+        name = "Olhos de fogo",
+    },
+    [75921] = {
+        name = "Por entre as chamas",
+    },
+    [75922] = {
+        name = "Informações inflamatórias",
+    },
+    [75923] = {
+        name = "Soem o alarme",
+    },
+    [75950] = {
+        name = "Exemplo de justiça: Hadwin",
+    },
+    [75951] = {
+        name = "Exemplo de ordem: Talthis",
+    },
+    [75952] = {
+        name = "Exemplo de sacrifício: Nolaki",
+    },
+    [75953] = {
+        name = "Exemplo de compaixão: Valunei",
     },
     [75985] = {
         name = "Descanse em paz, guerreiro",
@@ -3140,6 +3239,87 @@ BtWQuestsDatabase:UpdateQuestsTable({
     },
     [76145] = {
         name = "Quem é essa Crona?",
+    },
+    [76171] = {
+        name = "Trilhando a senda de Tyr",
+    },
+    [76176] = {
+        name = "Primeiros passos",
+    },
+    [76194] = {
+        name = "Um augúrio temível",
+    },
+    [76195] = {
+        name = "Combatendo a corrupção",
+    },
+    [76196] = {
+        name = "Misericórdia ou sofrimento",
+    },
+    [76197] = {
+        name = "Visão do terror",
+    },
+    [76203] = {
+        name = "Penetrando nas sombras",
+    },
+    [76205] = {
+        name = "Equilibrando a balança",
+    },
+    [76206] = {
+        name = "O cerne da questão",
+    },
+    [76207] = {
+        name = "A ira dos guardiões",
+    },
+    [76212] = {
+        name = "A marca do protetor",
+    },
+    [76213] = {
+        name = "Honra à deusa",
+    },
+    [76407] = {
+        name = "Hoje não",
+    },
+    [76419] = {
+        name = "Violência é a solução",
+    },
+    [76420] = {
+        name = "Efeitos borboleta",
+    },
+    [76421] = {
+        name = "O futuro que criamos",
+    },
+    [76422] = {
+        name = "Ao Infinito e Além",
+    },
+    [76423] = {
+        name = "Sem limites",
+    },
+    [76530] = {
+        name = "Evocações de vivos-mortos",
+    },
+    [76592] = {
+        name = "Uma asa solitária",
+    },
+    [76593] = {
+        name = "As melhores intenções",
+    },
+    [76594] = {
+        name = "Dracthyr caído",
+    },
+    [76595] = {
+        name = "Exfiltração urgente",
+    },
+    [76597] = {
+        name = "Asas renovadas",
+    },
+    [77098] = {
+        name = "Sujando as mãos",
+    },
+    [77163] = {
+        name = "Caindo em si",
+    },
+    [77417] = {
+        name = "De que é feito um Infinito",
     },
 })
 ]])()
