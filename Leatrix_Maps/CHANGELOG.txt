@@ -1,3 +1,7 @@
+10.2.00 - 7th November 2023
+- Preliminary update for game patch 10.2.0.
+- Added Leatrix Maps to the minimap addon compartment menu.
+
 10.1.28 - 1st November 2023
 - PTR (10.2.0): Added map reveal data for 'Emerald Dream'.
 

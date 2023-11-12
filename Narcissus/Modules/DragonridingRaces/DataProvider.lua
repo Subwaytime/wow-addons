@@ -640,9 +640,8 @@ function DataProvider:GetActiveTournamentInfo()
     end
 
     if eventEndTime then
-        local dayOffset, minuteOffset = NarciAPI.GetCalendarTimeDifferenceInDays(currentCalendarTime, eventEndTime);
+        remainingSeconds = NarciAPI.GetCalendarTimeDifference(currentCalendarTime, eventEndTime);
         local presentTime = time();
-        remainingSeconds = minuteOffset * 60;
         self.endTime = presentTime + remainingSeconds;
     end
 

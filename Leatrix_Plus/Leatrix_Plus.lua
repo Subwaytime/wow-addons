@@ -1,5 +1,5 @@
 ﻿----------------------------------------------------------------------
--- 	Leatrix Plus 10.1.28 (1st November 2023)
+-- 	Leatrix Plus 10.2.00 (7th November 2023)
 ----------------------------------------------------------------------
 
 --	01:Functns, 02:Locks, 03:Restart, 20:Live, 30:Isolated, 40:Player
@@ -18,7 +18,7 @@
 	local void
 
 	-- Version
-	LeaPlusLC["AddonVer"] = "10.1.28"
+	LeaPlusLC["AddonVer"] = "10.2.00"
 
 	-- Get locale table
 	local void, Leatrix_Plus = ...
@@ -66,13 +66,8 @@
 	_G.BINDING_NAME_LEATRIX_PLUS_GLOBAL_RARE = L["Announce rare"]
 	_G.BINDING_NAME_LEATRIX_PLUS_GLOBAL_MOUNTSPECIAL = L["Mount special"]
 
-	-- Minimap compartment button
-	-- LibDBIcon will be updated in future with a better replacement for Blizzard's compartment menu
-	-- Using stuff that Blizzard make like this is always prone to breaking addons so better to use LibDBIcon
-
 	-- Disable bag automation
-	-- Open vendor and close vendor again.
-	-- Open vendor again.
+	-- Open vendor, close vendor, open vendor
 	-- Click the bag icon to switch bag mode (either from single to combined or combined to single).
 	-- Buy alcohol if you don't have it already (if you do, skip this step) (tested with Bottle of Dalaran Noir).
 	-- Drink alcohol from bags.
@@ -4324,6 +4319,11 @@
 				end
 			end)
 
+			-- Hide ping system errors (LeaPlusLC.NewPatch)
+			if UIParent:IsEventRegistered("PING_SYSTEM_ERROR") then -- Remove check after 10.2.0
+				UIParent:UnregisterEvent("PING_SYSTEM_ERROR")
+			end
+
 		end
 
 		-- Release memory
@@ -6851,12 +6851,12 @@
 		do
 
 			-- Minimap button click function
-			local function MiniBtnClickFunc(arg1)
+			local function MiniBtnClickFunc(arg1, arg2)
 
 				-- Prevent options panel from showing if Blizzard Store is showing
 				if StoreFrame and StoreFrame:GetAttribute("isshown") then return end
 				-- Left button down
-				if arg1 == "LeftButton" then
+				if arg1 == "LeftButton" or arg2 and arg2 == "LeftButton" then
 
 					-- Control key toggles target tracking
 					if IsControlKeyDown() and not IsShiftKeyDown() and not IsAltKeyDown() then
@@ -6925,7 +6925,7 @@
 				end
 
 				-- Right button down
-				if arg1 == "RightButton" then
+				if arg1 == "RightButton" or arg2 and arg2 == "RightButton" then
 
 					-- No modifier key toggles the options panel
 					if LeaPlusLC:IsPlusShowing() then
@@ -6940,6 +6940,9 @@
 				end
 
 			end
+
+			-- Assign global scope for function (it's used in TOC)
+			_G.LeaPlusGlobalMiniBtnClickFunc = MiniBtnClickFunc
 
 			-- Create minimap button using LibDBIcon
 			local miniButton = LibStub("LibDataBroker-1.1"):NewDataObject("Leatrix_Plus", {
@@ -6972,15 +6975,6 @@
 			-- Set LibDBIcon when option is clicked and on startup
 			LeaPlusCB["ShowMinimapIcon"]:HookScript("OnClick", SetLibDBIconFunc)
 			SetLibDBIconFunc()
-
-			-- Add Leatrix Plus to addon compartment frame (not used for the moment)
-			--[[AddonCompartmentFrame:RegisterAddon({
-				text = L["Leatrix Plus"],
-				icon = "Interface\\HELPFRAME\\ReportLagIcon-Movement",
-				func = function(self, void, void, void, btn)
-					MiniBtnClickFunc(btn)
-				end,
-			})]]
 
 		end
 
@@ -8558,6 +8552,9 @@
 
 				-- Nameplate tooltip
 				if NamePlateTooltip then NamePlateTooltip:SetScale(LeaPlusLC["LeaPlusTipSize"]) end
+
+				-- Game settings panel tooltip
+				if SettingsTooltip then SettingsTooltip:SetScale(LeaPlusLC["LeaPlusTipSize"]) end
 
 				-- LibDBIcon
 				if LibDBIconTooltip then LibDBIconTooltip:SetScale(LeaPlusLC["LeaPlusTipSize"]) end

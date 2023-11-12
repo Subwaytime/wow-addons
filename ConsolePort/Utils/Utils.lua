@@ -107,6 +107,15 @@ function CPAPI.CreateFrame(...)
 	return Mixin(CreateFrame(...), CPAPI.DisplayMixin)
 end
 
+function CPAPI.DisableFrame(frame, ignoreAlpha)
+	frame:SetSize(0, 0)
+	frame:EnableMouse(false)
+	frame:EnableKeyboard(false)
+	frame:SetAlpha(ignoreAlpha and frame:GetAlpha() or 0)
+	frame:ClearAllPoints()
+	ConsolePort:ForbidInterfaceCursorFrame(frame)
+end
+
 function CPAPI.CreateEventHandler(args, events, ...)
 	local handler = db.table.mixin(CreateFrame(unpack(args)), ...)
 	return CPAPI.EventHandler(handler, events)
@@ -179,6 +188,20 @@ do local function ModifyMetatable(owner, key, value)
 
 	function CPAPI.Callable(owner, func)
 		return ModifyMetatable(owner, '__call', func)
+	end
+end
+
+do local sort, head = 0;
+	function CPAPI.Define(value, startIndex)
+		if ( type(value) == 'string' ) then
+			head, sort = value, startIndex or 0;
+		else
+			assert(type(value) == 'table', 'Invalid value type.')
+			sort = sort + 1;
+			value.sort = sort;
+			value.head = head;
+			return value;
+		end
 	end
 end
 

@@ -1189,7 +1189,7 @@ end
 
 function NarciItemButtonSharedMixin:AnchorAlertFrame()
 	self:RegisterErrorEvent();
-	Narci_AlertFrame_Autohide:SetAnchor(self, -24, true);
+	Narci_AlertFrame_Autohide:SetAnchor(self, -12, true);
 end
 
 function NarciItemButtonSharedMixin:PlayGamePadAnimation()
@@ -1834,7 +1834,7 @@ function NarciEquipmentSlotMixin:OnLoad()
 	self:SetAttribute("type2", "item");
 	self:SetAttribute("item", slotID);
 	self:RegisterForDrag("LeftButton");
-	self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+	self:RegisterForClicks("LeftButtonUp", "RightButtonDown", "RightButtonUp");
 	if self:GetParent() then
 		if not self:GetParent().slotTable then
 			self:GetParent().slotTable = {}
@@ -1974,9 +1974,7 @@ function NarciEquipmentSlotMixin:OnHide()
 end
 
 function NarciEquipmentSlotMixin:PreClick(button)
-	if button == "RightButton" then
-		NarciAPI.SecureActionButtonPreClick();
-	end
+
 end
 
 function NarciEquipmentSlotMixin:PostClick(button)

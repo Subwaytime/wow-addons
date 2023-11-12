@@ -1,8 +1,9 @@
-## Interface: 100107
-## Version: 1.0.13
+## Interface: 100200
+## Version: 1.1.1
 ## Title: MiniMapLine
 ## Author: Peter Wooley <peterwooley@gmail.com>
 ## Notes: Adds a line to your minimap pointing in your current direction.
+## IconTexture: Interface\AddOns\MiniMapLine\icon.png
 ## SavedVariables: MiniMapLineDB
 ## OptionalDeps: Ace3
 ## X-Embeds: Ace3

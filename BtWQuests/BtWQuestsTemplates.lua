@@ -307,6 +307,7 @@ end
 
 BtWQuestsChainViewMixin = {}
 function BtWQuestsChainViewMixin:OnLoad()
+    self.noScrollBar = true
     ScrollFrame_OnLoad(self)
     self.itemPool = CreateFramePool("BUTTON", self.Child, "BtWQuestsChainViewItemTemplate", BtWQuestsChainItemPool_HideAndClearAnchors);
     self:RegisterForDrag("LeftButton")

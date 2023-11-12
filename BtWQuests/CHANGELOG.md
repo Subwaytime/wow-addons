@@ -1,3 +1,8 @@
+# v2.34.0
+
+- Added most 10.2 questlines
+- Fixed double scrollbar for chain view 
+
 # v2.33.2
 
 - Added The Coalition of Flames questline

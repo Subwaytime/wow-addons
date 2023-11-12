@@ -93,13 +93,65 @@ function ConsolePort:GetKeyboardFocus()
 end
 
 ---------------------------------------------------------------
+-- Interface cursor API
+---------------------------------------------------------------
+-- The interface cursor has three major components:
+--  Cursor: The cursor object itself, which is a frame
+--  Stack: The stack of frames that the cursor can interact with
+--  Hooks: The hooking process that allows custom interactions
+---------------------------------------------------------------
+local CURSOR_ADDON_NAME = 'ConsolePort_Cursor';
+
+---------------------------------------------------------------
 -- Add a new frame to the interface cursor stack
 ---------------------------------------------------------------
 function ConsolePort:AddInterfaceCursorFrame(frame)
 	local object = C_Widget.IsFrameWidget(frame) and frame or _G[frame];
 	if object then
-		local result = db.Stack:AddFrame(object)
-		db.Stack:UpdateFrames()
-		return result;
+		EventUtil.ContinueOnAddOnLoaded(CURSOR_ADDON_NAME, function()
+			if db.Stack:AddFrame(object) then
+				db.Stack:UpdateFrames()
+			end
+		end)
+		return true;
 	end
+end
+
+---------------------------------------------------------------
+-- Forbid a frame from being used by the interface cursor stack
+---------------------------------------------------------------
+function ConsolePort:ForbidInterfaceCursorFrame(frame)
+	local object = C_Widget.IsFrameWidget(frame) and frame or _G[frame];
+	if object then
+		EventUtil.ContinueOnAddOnLoaded(CURSOR_ADDON_NAME, function()
+			db.Stack:ForbidFrame(object)
+		end)
+		return true;
+	end
+end
+
+---------------------------------------------------------------
+-- Notify the hooks process that a click event occurred
+---------------------------------------------------------------
+function ConsolePort:ProcessInterfaceClickEvent(...)
+	if db.Hooks then
+		return db.Hooks:ProcessInterfaceClickEvent(...)
+	end
+end
+
+---------------------------------------------------------------
+-- Directly mapped functions for manipulating the cursor
+---------------------------------------------------------------
+do local map = function(func)
+		return function(_, ...)
+			if db.Cursor then
+				return db.Cursor[func](db.Cursor, ...)
+			end
+		end
+	end
+
+	ConsolePort.SetCursorNode         = map 'SetCurrentNode'
+	ConsolePort.IsCursorNode          = map 'IsCurrentNode'
+	ConsolePort.GetCursorNode         = map 'GetCurrentNode'
+	ConsolePort.SetCursorNodeIfActive = map 'SetCurrentNodeIfActive'
 end

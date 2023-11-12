@@ -185,6 +185,7 @@
 			<OnEditFocusGained method="OnEditFocusGained"/>
 			<OnEditFocusLost method="OnEditFocusLost"/>
 			<OnEscapePressed method="OnEscapePressed"/>
+			<OnTextChanged method="OnTextChanged"/>
 		</Scripts>
 	</EditBox>
 
@@ -1050,7 +1051,7 @@
 		</Scripts>
 	</Button>
 
-	<!--Frame name="NarciDevToolPortraitFrame" mixin="NarciDevToolPortraitMixin" hidden="true">
+	<!--Frame name="NarciDevToolPortraitFrame" mixin="NarciDevToolPortraitMixin" hidden="false">
 		<Size x="56" y="56"/>
 		<Anchors>
 			<Anchor point="CENTER" relativeTo="UIParent" relativePoint="CENTER" x="0" y="0"/>

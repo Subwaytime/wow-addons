@@ -305,6 +305,39 @@
 			</Layer>
 		</Layers>
 		<Frames>
+
+			<Frame parentKey="Variants" mixin = "BetterWardrobeSetsDetailsAltItemMixin" hidden="false">
+				<Size x="20" y="35"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeKey="$parent" x="5" y = "5"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon" file="Interface\CHATFRAME\UI-InChatFriendsArrow">
+							<Size x="15" y="15"/>
+							<Anchors>
+								<Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" x="0" y="3"/>
+							</Anchors>
+						</Texture>
+						<FontString parentKey="Count" inherits="GameFontDisableSmallLeft" justifyH="CENTER" maxLines="1" text="0">
+							<Size x="20" y="20"/>
+							<Anchors>
+								<Anchor point="RIGHT" relativeKey="$parent.Icon" relativePoint="LEFT"  x="7" y="1"/>
+							</Anchors>
+						</FontString>	
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+						GameTooltip:SetText(self:GetParent().variantInfo);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip_Hide();
+					</OnLeave>
+
+				</Scripts>
+			</Frame>
 			<Frame inherits="BetterWardrobeIconsTemplate" />
 			<Button parentKey="EditButton" inherits="BetterWardrobeOutfitButtonButtonTemplate">
 				<KeyValues>
@@ -928,6 +961,9 @@
 					<OnEnter>
 						BW_DressingRoomButtonMixin.OnEnter(self)  
 					</OnEnter>
+					<OnLeave>
+						BW_DressingRoomButtonMixin.OnLeave()
+					</OnLeave>
 					<OnClick>
 						BW_JournalHideSlotMenu_OnClick(self)
 					</OnClick>

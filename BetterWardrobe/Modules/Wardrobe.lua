@@ -1556,7 +1556,7 @@ function BetterWardrobeCollectionFrameMixin:OnShow()
 
 	local selectedtab;
 	local isAtTransmogNPC = C_Transmog.IsAtTransmogNPC();
-	self.InfoButton:SetShown(not isAtTransmogNPC);
+	self.InfoButton:SetShown(false);
 	if isAtTransmogNPC then
 		self:SetTab(self.selectedTransmogTab);
 	else
@@ -3872,7 +3872,7 @@ end
 BetterWardrobeCollectionTutorialMixin = { }
 
 function BetterWardrobeCollectionTutorialMixin:OnLoad()
-
+--[[
 	self.helpTipInfo = {
 		text = WARDROBE_SHORTCUTS_TUTORIAL_1,
 		buttonStyle = HelpTip.ButtonStyle.None,
@@ -3883,30 +3883,32 @@ function BetterWardrobeCollectionTutorialMixin:OnLoad()
 		appendFrame = BW_TrackingInterfaceShortcutsFrame,
 		appendFrameYOffset = 15,
 	};
+	]]
+	self:Hide()
 
 end
 
 function BetterWardrobeCollectionTutorialMixin:OnEnter()
-	HelpTip:Show(self, self.helpTipInfo);
-	BW_TrackingInterfaceShortcutsFrame.NewAlert:ValidateIsShown();
+	--HelpTip:Show(self, self.helpTipInfo);
+	--BW_TrackingInterfaceShortcutsFrame.NewAlert:ValidateIsShown();
 end
 
 function BetterWardrobeCollectionTutorialMixin:OnLeave()
-	HelpTip:Hide(self, WARDROBE_SHORTCUTS_TUTORIAL_1);
-	BW_TrackingInterfaceShortcutsFrame.NewAlert:ClearAlert();
+	--HelpTip:Hide(self, WARDROBE_SHORTCUTS_TUTORIAL_1);
+	--BW_TrackingInterfaceShortcutsFrame.NewAlert:ClearAlert();
 end
 
 
-BW_AlertTrackingFeatureMixin = CreateFromMixins(NewFeatureLabelMixin);
+BW_AlertTrackingFeatureMixin = {}--CreateFromMixins(NewFeatureLabelMixin);
 
 function BW_AlertTrackingFeatureMixin:ClearAlert()
-	BW_AlertTrackingFeatureMixin.ClearAlert(self);
-	SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_WARDROBE_TRACKING_INTERFACE, true);
-	CollectionsMicroButton_SetAlertShown(false);
+	--AlertTrackingFeatureMixin.ClearAlert(self);
+	--SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_WARDROBE_TRACKING_INTERFACE, true);
+	--CollectionsMicroButton_SetAlertShown(false);
 end
 
 function BW_AlertTrackingFeatureMixin:ValidateIsShown()
-	self:SetShown(not GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_WARDROBE_TRACKING_INTERFACE));
+	--self:SetShown(not GetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_WARDROBE_TRACKING_INTERFACE));
 end
 
 -- ***** WEAPON DROPDOWN
@@ -5002,7 +5004,7 @@ function BetterWardrobeSetsDataProviderMixin:GetVariantSets(baseSetID)
 	end
 
 	local variantSets = self.variantSets[baseSetID]
-	if ( not variantSets ) then
+	if ( not variantSets and baseSetID) then
 		variantSets = C_TransmogSets.GetVariantSets(baseSetID) or {}
 		self.variantSets[baseSetID] = variantSets;
 		if ( #variantSets > 0 ) then
@@ -5618,10 +5620,8 @@ end
 
 function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 	if not setID then return end
-	setInfo = addon.C_TransmogSets.GetSetInfo(setID) 
-	local buildID = (select(4, GetBuildInfo()))
-
-					or nil;
+	local setInfo = addon.C_TransmogSets.GetSetInfo(setID) 
+	local buildID = (select(4, GetBuildInfo())) or nil;
 	if ( not setInfo ) then
 		self.DetailsFrame:Hide()
 		self.Model:Hide()
@@ -5844,9 +5844,12 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 		if isAvailableItem(itemFrame.sourceID, setInfo.setID) then  
 			--itemFrame.unavailable:Hide()
 			--itemFrame.Icon:SetColorTexture(1,0,0,.5)
-		else 
+			itemFrame.itemCollectionStatus = nil
+		else
+			--We don't care if item is collected
+		  if not sortedSources[i].collected then 
 			itemFrame.itemCollectionStatus = "NotCollectedUnavailable"
-
+		end
 		--itemFrame.unavailable:Show()
 
 			--itemFrame.Icon:SetColorTexture(0,0,0,.5)
@@ -5910,7 +5913,7 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 
 
 
-	if BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then 
+	--if BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then 
 	-- variant sets
 		local showVariantSetsButton = false;
 		local baseSetID = C_TransmogSets.GetBaseSetID(setID)
@@ -5930,12 +5933,12 @@ function BetterWardrobeSetsCollectionMixin:DisplaySet(setID)
 		else
 			self.DetailsFrame.VariantSetsButton:Hide()
 		end
-	elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then
-		self.DetailsFrame.VariantSetsButton:Hide()
-		self.DetailsFrame.VariantSetsButton:SetText(setInfo.description)
+	--elseif BetterWardrobeCollectionFrame.selectedCollectionTab == 3 then
+	--	self.DetailsFrame.VariantSetsButton:Hide()
+		--self.DetailsFrame.VariantSetsButton:SetText(setInfo.description)
 
 		addon:SendMessage("BW_TRANSMOG_EXTRASETSHOWN")
-	end
+	--end
 end
 ----TODO:CHECK;
 function BetterWardrobeSetsCollectionMixin:DisplaySavedSet(setID)
@@ -6154,7 +6157,6 @@ function BetterWardrobeSetsCollectionMixin:SetItemUseability(itemFrame)
 		itemFrame.CanUse.Icon:SetAlpha(0.5)
 		--itemFrame.New:Hide()
   
-
 	elseif itemCollectionStatus == "NotCollectedCharCantGet" then
 		itemFrame.CanUse:Show()
 		---itemFrame.Icon:SetDesaturated(true)
@@ -6177,11 +6179,6 @@ function BetterWardrobeSetsCollectionMixin:SetItemUseability(itemFrame)
 		itemFrame.CanUse:Hide()
 	end
 end
-
-
-
-
-
 
 function BetterWardrobeSetsCollectionMixin:OnSearchUpdate()
 	if ( self.init ) then
@@ -6727,20 +6724,44 @@ function BetterWardrobeSetsCollectionMixin:GetSelectedSavedSetID()
 end
 
 
+local function variantsTooltip(elementData, variantSets)
+	if not elementData.description then return "" end
+
+	local ratioText = elementData.description..": " 
+	local have, total = addon.SetsDataProvider:GetSetSourceCounts(elementData.setID)
+	ratioText = ratioText..have .. "/" .. total.."\n"
+
+	for i, setdata in ipairs(variantSets)do
+		local have, total = addon.SetsDataProvider:GetSetSourceCounts(setdata.setID)
+		 ratioText =  ratioText..setdata.description..": ".. have .. "/" .. total.."\n"
+	end
+
+	return ratioText
+end
+
 BetterWardrobeSetsScrollFrameButtonMixin = {}
 
 function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
-	----print("init")
 	local displayData = elementData;
+	if not displayData then return end
 	-- if the base set is hiddenUntilCollected and not collected, it's showing up because one of its variant sets is collected
 	-- in that case use any variant set to populate the info in the list
+	local variantSets = C_TransmogSets.GetVariantSets(elementData.setID) or {}
 	if elementData.hiddenUntilCollected and not elementData.collected and BetterWardrobeCollectionFrame.selectedCollectionTab == 2 then
-		local variantSets = C_TransmogSets.GetVariantSets(elementData.setID)
+		--local variantSets = C_TransmogSets.GetVariantSets(elementData.setID)
 		if variantSets then
 			-- variant sets are already filtered for visibility (won't get a hiddenUntilCollected one unless it's collected)
 			-- any set will do so just picking first one
 			displayData = variantSets[1]
 		end
+	end
+
+	if #variantSets == 0  or IsAddOnLoaded("CanIMogIt") then
+		self.Variants:Hide()
+		self.Variants.Count:SetText(0)
+	else
+		self.Variants:Show()
+		self.Variants.Count:SetText(#variantSets + 1)
 	end
 	--self.Name:SetText(displayData.name)
 	self.Name:SetText(displayData.name..((displayData.className) and " ("..displayData.className..")" or "") )
@@ -6764,6 +6785,7 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	self.Favorite:SetShown(displayData.favoriteSetID)
 	self.New:SetShown(addon.SetHasNewSources(displayData.setID))
 	self.setID = displayData.setID;
+	self.variantInfo = variantsTooltip(elementData, variantSets)
 
 	local setInfo = addon.GetSetInfo(displayData.setID)
 	local isFavorite = 	C_TransmogSets.GetIsFavorite(displayData.setID)
@@ -6788,8 +6810,7 @@ function BetterWardrobeSetsScrollFrameButtonMixin:Init(elementData)
 	self.CollectionListVisual.Collection.Collected_Icon:SetShown(isInList and setCollected)
 
 
-	self.EditButton:SetShown((BetterWardrobeCollectionFrame:CheckTab(4) and self.setID < 50000) or (self.setID >=70000 or IsAddOnLoaded("MogIt")))
-
+	self.EditButton:SetShown((BetterWardrobeCollectionFrame:CheckTab(4) and (self.setID < 50000 or self.setID >=70000 or IsAddOnLoaded("MogIt"))))
 
 	if ( topSourcesCollected == 0 or setCollected ) then
 		self.ProgressBar:Hide()
@@ -8554,14 +8575,14 @@ addon:SecureHook("SetItemRef", function(link, ...)
 		end
 
 
-		if ( not CollectionsJournal or not CollectionsJournal:IsVisible() or not self:IsVisible() ) then
+		--if ( not CollectionsJournal or not CollectionsJournal:IsVisible() or not self:IsVisible() ) then
 			local _, sourceID = strsplit(":", addedLink);
 			--ToggleCollectionsJournal(5)
 			--print(addedLink)
 			TransmogUtil.OpenCollectionToItem(sourceID);
 			--WardrobeCollectionFrame:OpenTransmogLink(sourceID)
 
-		end
+		--end
 
 			C_Timer.After(0.1, function() BetterWardrobeCollectionFrame:OpenTransmogLink(link) end)
 				

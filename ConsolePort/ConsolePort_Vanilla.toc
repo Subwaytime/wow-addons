@@ -3,7 +3,7 @@
 ## Title: Console Port
 ## Notes: Game controller addon
 ## AddonCompartmentFunc: ConsolePort
-## Version: 2.7.2
+## Version: 2.7.4
 
 ## Author: Sebastian Lindfors
 ## X-Website: https://github.com/seblindfors/ConsolePort
@@ -12,12 +12,14 @@
 ## X-WoWI-ID: 23536
 ## X-Wago-ID: LvNAYjNo
 
-## SavedVariables: ConsolePortSettings, ConsolePortDevices, ConsolePortUIStack, ConsolePortShared, ConsolePortBindingIcons
+## SavedVariables: ConsolePortSettings, ConsolePortDevices, ConsolePortShared, ConsolePortBindingIcons
 ## SavedVariablesPerCharacter: ConsolePortCharacterSettings, ConsolePortUtility
 
 
 Libs\__manifest.xml
 XML\__manifest.xml
+
+API.lua
 
 Utils\__manifest.xml
 Model\__manifest.xml
@@ -25,5 +27,3 @@ Locale\__manifest.xml
 Controller\__manifest.xml
 Widget\__manifest.xml
 View\__manifest.xml
-
-API.lua

@@ -1,3 +1,10 @@
+10.2.00 - 7th November 2023
+- Preliminary update for game patch 10.2.0.
+- For 'Mute game sounds' ('System'), the 'Arena' setting now includes Nokhudon Proving Grounds.
+- For 'Enhance tooltip' ('Interface'), the scale slider now applies to the game settings panel tooltips.
+- For 'Hide error messages' ('Text'), ping system errors will now be hidden.
+- Added Leatrix Plus to the minimap addon compartment menu.
+
 10.1.28 - 1st November 2023
 - For 'Manage widget top' ('Frames'), the configuration panel will now show a warning if Titan Panel is installed and frame adjustment widget top is enabled.
 - Fixed two situational Lua errors when clicking the editboxes of 'Enhance dressup' (share outfit online) and 'Show pet save button' ('Interface').

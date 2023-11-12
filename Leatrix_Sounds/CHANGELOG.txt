@@ -1,3 +1,9 @@
+10.2.00 - 7th November 2023
+- Preliminary update for game patch 10.2.0.
+- Updated sounds to game version 10.2.0.52068 (Nov 6 2023) (100200).
+- Added Leatrix Sounds to the minimap addon compartment menu.
+- Fixed an issue which caused a Lua error when playing a track during combat.
+
 10.1.28 - 1st November 2023
 - Updated sounds to game version 10.1.7.51972 (Oct 30 2023) (100107).
 

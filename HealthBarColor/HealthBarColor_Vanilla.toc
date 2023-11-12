@@ -1,5 +1,5 @@
 ## Interface: 11404
-## Version: 2.11.4
+## Version: 2.11.5
 ## Title: HealthBarColor
 ## Author: Slothpala
 ## SavedVariables: HealthBarColorDB

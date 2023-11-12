@@ -1,16 +1,10 @@
-lightweight tag ae73a2f37a5ddc4b47fe0ccda1f1db20587d1045 4.0.18-release
-Author:	GitHub <noreply@github.com>
-Date:	Thu Dec 8 11:44:02 2022 +0000
+lightweight tag 12f39550e69eef4bf8a52c3184201e85bd9254a2 4.0.20-release
+Author:	André Pereira <pereirasmandre@gmail.com>
+Date:	Wed Nov 8 18:31:08 2023 +0000
 
-commit ae73a2f37a5ddc4b47fe0ccda1f1db20587d1045
-Author: pereira-a <pereirasmandre@gmail.com>
-Date:   Thu Dec 8 11:44:02 2022 +0000
+commit 12f39550e69eef4bf8a52c3184201e85bd9254a2
+Author: André Pereira <pereirasmandre@gmail.com>
+Date:   Wed Nov 8 18:31:08 2023 +0000
 
-    increase version
-
-commit 386ce79895a423d2cc899e78bcea89ba209a91c0
-Author: pereira-a <pereirasmandre@gmail.com>
-Date:   Thu Dec 8 11:43:35 2022 +0000
-
-    add QueueStatusButton to ignore list
+    interface version 100200
 

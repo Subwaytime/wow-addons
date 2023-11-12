@@ -1,11 +1,12 @@
-## Interface: 100107
+## Interface: 100200
 
 ## Title: Leatrix Sounds
 ## Notes: Massive collection of game sounds.
 
-## Version: 10.1.28
+## Version: 10.2.00
 ## Author: Leatrix
 ## SavedVariables: LeaSoundsDB
+## AddonCompartmentFunc:LeaSoundsGlobalSlashFunc
 
 ## IconTexture: Interface\HELPFRAME\HelpIcon-CharacterStuck
 

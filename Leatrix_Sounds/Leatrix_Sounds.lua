@@ -1,6 +1,6 @@
 ﻿
 	----------------------------------------------------------------------
-	-- Leatrix Sounds 10.1.28 (1st November 2023)
+	-- Leatrix Sounds 10.2.00 (7th November 2023)
 	----------------------------------------------------------------------
 
 	--  Create global table
@@ -10,7 +10,7 @@
 	local LeaSoundsLC, LeaSoundsCB = {}, {}
 
 	-- Version
-	LeaSoundsLC["AddonVer"] = "10.1.28"
+	LeaSoundsLC["AddonVer"] = "10.2.00"
 
 	-- Get locale table
 	local void, Leatrix_Sounds = ...
@@ -276,22 +276,6 @@
 			-- Save panel position
 			LeaSoundsLC["MainPanelA"], void, LeaSoundsLC["MainPanelR"], LeaSoundsLC["MainPanelX"], LeaSoundsLC["MainPanelY"] = PageF:GetPoint()
 		end)
-
-		-- Add button to addon compartment frame (not used for the time being)
-		--[[AddonCompartmentFrame:RegisterAddon({
-			text = L["Leatrix Sounds"],
-			icon = "Interface\\HELPFRAME\\HelpIcon-Suggestion",
-			func = function(self, void, void, void, btn)
-				-- Prevent panel from showing if Blizzard Store is showing
-				if StoreFrame and StoreFrame:GetAttribute("isshown") then return end
-				-- Toggle the main panel
-				if PageF:IsShown() then
-					PageF:Hide()
-				else
-					PageF:Show()
-				end
-			end,
-		})]]
 
 		-- Add background color
 		PageF.t = PageF:CreateTexture(nil, "BACKGROUND")
@@ -831,11 +815,6 @@
 
 		end)
 
-		-- Set keyboard when stop button status changes and on startup
-		stopBtn:HookScript("OnEnable", function() PageF:SetPropagateKeyboardInput(false) end)
-		stopBtn:HookScript("OnDisable", function() PageF:SetPropagateKeyboardInput(true) end)
-		PageF:SetPropagateKeyboardInput(true)
-
 		-- Release memory
 		LeaSoundsLC.Player = nil
 
@@ -887,6 +866,7 @@
 	-- Slash command function
 	local function SlashFunc(str)
 		local str = string.lower(str)
+		if str and str == "leatrix_sounds" then str = "" end -- Compartment menu
 		if str and str ~= "" then
 			-- Traverse parameters
 			if str == "ver" then
@@ -935,6 +915,9 @@
 		-- Run slash command function
 		SlashFunc(self)
 	end
+
+	-- Add to compartment menu
+	_G.LeaSoundsGlobalSlashFunc = SlashFunc
 
 	----------------------------------------------------------------------
 	-- Create panel in game options panel
