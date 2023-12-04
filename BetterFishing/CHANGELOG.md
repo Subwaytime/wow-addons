@@ -1,3 +1,6 @@
+### 1.1.19
+- Version Update
+
 ### 1.1.18
 - Fix C_UnitAuras error on classic
 

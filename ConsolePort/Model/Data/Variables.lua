@@ -7,7 +7,7 @@ local BINDINGS_OPT = KEY_BINDINGS_MAC or 'Bindings';
 
 -- Helpers
 local BLUE = GenerateClosure(ColorMixin.WrapTextInColorCode, BLUE_FONT_COLOR)
-local unpack, _, db = unpack, ...; _ = CPAPI.Define; db('Data')();
+local unpack, _, db = unpack, ...; _ = CPAPI.Define; db.Data();
 ------------------------------------------------------------------------------------------------------------
 -- Default cvar data (global)
 ------------------------------------------------------------------------------------------------------------
@@ -346,6 +346,10 @@ db:Register('Variables', {
 		desc = 'Disables quick assign for unbound combinations when using the gamepad action bar.';
 		note = 'Requires reload.';
 		advd = true;
+	};
+	bindingShowSpellMenuGrid = _{Bool(true);
+		name = 'Show Action Bar Grid on Spell Pickup';
+		desc = 'Display the action bar grid when picking up a spell on the cursor.';
 	};
 	disableHotkeyRendering = _{Bool(false);
 		name = 'Disable Hotkey Rendering';

@@ -10,6 +10,10 @@ V =
       "%d |4misión:misiones; disponibles", "%d |4misión:misiones; completadas", "%d |4misión:misiones; en progreso", "%d |4misión:misiones; restantes...", "%d |4grupo:grupos; restantes...", "Coste de misión base: %s", "Recompensa extra", "Limpiar todos los grupos tentativos", "Clic para completar", "Completar Todas",
       "Completada hace %s", "Expira en:", "Gran éxito", "En el Grupo Tentativo:", "Misión fallida", "Histórico de Misión", "Éxito en la misión", "No hay grupos viables.", "Los resultados de las misiones completadas se guardaran y se mostrarán aquí.", "Enviar Grupos Tentativos",
     }
+    or C == "esMX" and { -- 17/20 (85%)
+      "%d |4misión:misión; disponible", "%d |4misión:misión; completada", "%d |4misión:misión; en progreso", "%d |4misión:misión; restantes...", "%d |4grupo:grupos; pendiente...", "Coste base de misión: %s", "Recompensa de bonus", z, "Click para completar", "Completar todas",
+      "Completada hace %s ", "Termina en:", "Gran éxito", z, "Misión Fallida", "Historial de Misión", "Éxito de Misión", "No hay grupos adecuados", "Los resultados de las misiones completadas serán grabadas y mostradas aquí.", z,
+    }
     or C == "frFR" and { -- 20/20 (100%)
       "%d |4mission:missions; |4disponible:disponibles", "%d |4mission:missions; |4terminée:terminées", "%d |4mission:missions; en cours", "%d |4mission:missions; |4restante:restantes ...", "%d |4groupe:groupes; |4restant:restants ...", "Coût de la mission: %s", "Récompense Bonus", "Effacer la sélection en cours", "Cliquer pour terminer", "Tout Terminer",
       "Terminé il y a %s", "Expire dans:", "Succès Total", "En Groupe:", "Mission Échouée", "Historique des Missions", "Mission Accomplie", "Aucun groupe adapté.", "L'historique des précédentes missions terminées sera enregistré et affiché ici.", "Envoyer en mission",

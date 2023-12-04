@@ -58,13 +58,13 @@ function ItemMenu:FixHeight()
 end
 
 function ItemMenu:RedirectCursor()
-	self.returnToNode = self.returnToNode or ConsolePortCursor:GetCurrentNode()
-	ConsolePortCursor:SetCurrentNode(self:GetObjectByIndex(1))
+	self.returnToNode = self.returnToNode or ConsolePort:GetCursorNode()
+	ConsolePort:SetCursorNode(self:GetObjectByIndex(1))
 end
 
 function ItemMenu:ReturnCursor()
 	if self.returnToNode then
-		ConsolePortCursor:SetCurrentNode(self.returnToNode)
+		ConsolePort:SetCursorNode(self.returnToNode)
 		self.returnToNode = nil
 	end
 end
@@ -104,6 +104,16 @@ function ItemMenu:GetEquipCommand(invSlot, i, numSlots)
 				or EQUIPSET_EQUIP;
 		data = invSlot;
 		free = not link;
+		handlers = {
+			OnEnter = function(self)
+				GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMRIGHT')
+				GameTooltip:SetInventoryItem('player', invSlot)
+				GameTooltip:Show()
+			end;
+			OnLeave = function(self)
+				GameTooltip:Hide()
+			end;
+		};
 	}
 end
 
@@ -123,7 +133,7 @@ function ItemMenu:AddEquipCommands()
 	end
 	-- add in order (make sure 'Equip' comes first)
 	for i, command in ipairs(commands) do
-		self:AddCommand(command.text, 'Equip', command.data)
+		self:AddCommand(command.text, 'Equip', command.data, command.handlers)
 	end
 end
 
@@ -135,26 +145,25 @@ function ItemMenu:AddUtilityRingCommand()
 		link = link;
 	};
 
-	if db.Utility:SetPendingAction(1, action) then
-		self:AddCommand(L'Add to Utility Ring', 'RingBind')
-	else
-		local _, existingIndex = db.Utility:IsUniqueAction(1, action)
-		if existingIndex then
-			db.Utility:SetPendingRemove(1, action)
-			self:AddCommand(L'Remove from Utility Ring', 'RingClear')
+	for key in db.table.spairs(db.Utility.Data) do
+		local isUniqueAction, existingIndex = db.Utility:IsUniqueAction(key, action)
+		if isUniqueAction then
+			self:AddCommand(L('Add to %s', db.Utility:ConvertSetIDToDisplayName(key)), 'RingBind', {key, action})
+		elseif existingIndex then
+			self:AddCommand(L('Remove from %s', db.Utility:ConvertSetIDToDisplayName(key)), 'RingClear', {key, action})
 		end
 	end
 end
 
-function ItemMenu:AddCommand(text, command, data)
+function ItemMenu:AddCommand(text, command, data, handlers)
 	local widget, newObj = self:Acquire(self:GetNumActive() + 1)
 	local anchor = self:GetObjectByIndex(self:GetNumActive() - 1)
 
 	if newObj then
 		widget:SetScript('OnClick', widget.OnClick)
 	end
-	
-	widget:SetCommand(text, command, data)
+
+	widget:SetCommand(text, command, data, handlers)
 	widget:SetPoint('TOPLEFT', anchor or self.Tooltip, 'BOTTOMLEFT', anchor and 0 or 8, anchor and 0 or -16)
 	widget:Show()
 end
@@ -172,6 +181,7 @@ function ItemMenu:SetTooltip()
 	tooltip:Show()
 	tooltip:ClearAllPoints()
 	tooltip:SetPoint('TOPLEFT', 80, -16)
+	db.Alpha.FadeIn(self.Tooltip, 0.25, 0, 1)
 end
 
 function ItemMenu:ClearTooltip()
@@ -271,15 +281,21 @@ function ItemMenu:SplitStack(count)
 	self:Hide()
 end
 
-function ItemMenu:RingBind()
-	if db.Utility:HasPendingAction() then
+function ItemMenu:RingBind(data)
+	local setID, action = unpack(data)
+	if db.Utility:SetPendingAction(setID, action) then
 		db.Utility:PostPendingAction()
 	end
 	self:Hide()
 end
 
-ItemMenu.RingClear = ItemMenu.RingBind;
-
+function ItemMenu:RingClear(data)
+	local setID, action = unpack(data)
+	if db.Utility:SetPendingRemove(setID, action) then
+		db.Utility:PostPendingAction()
+	end
+	self:Hide()
+end
 
 ---------------------------------------------------------------
 -- Handlers and init
@@ -308,6 +324,7 @@ end
 
 ---------------------------------------------------------------
 ItemMenu:SetScript('OnHide', ItemMenu.OnHide)
+ItemMenu:SetAttribute('nodepass', true)
 Mixin(ItemMenu, CPIndexPoolMixin):OnLoad()
 ItemMenu:CreateFramePool('Button', 'CPPopupButtonTemplate', db.PopupMenuButton)
 ConsolePort:AddInterfaceCursorFrame(ItemMenu)

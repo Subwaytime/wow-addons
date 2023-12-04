@@ -1,3 +1,3 @@
-# 11.1.30 (2023-11-09)
+# 11.1.32 (2023-11-27)
 
-* Updated TOC version for Patch 10.2.0 for WoW Mainline.
+* Fixed a bug with Arena widget where the arena number was not updated or shown at all after the last update [GH-486].

@@ -1,3 +1,16 @@
+10.2.03 - 29th November 2023
+- For 'Enhance minimap' ('Interface'), fixed an issue which caused a button to be created for SexyMap (if installed).
+
+10.2.02 - 22nd November 2023
+- Fixed the /ltp con command (launches the developer console with a large font).
+- PTR (10.2.5): Fixed 'Hide portrait numbers' ('Text') (Lua error).
+- PTR (10.2.5): Fixed 'Enhance tooltip' ('Interface') (hypen added to same-realm unit names).
+
+10.2.01 - 15th November 2023
+- Code updates.
+- For 'Enhance tooltip' ('Interface'), the scale slider now applies to the character customisation screen (barbershop, dragonriding customisation, etc).
+- For 'Mute game sounds' ('System'), 'Dragonriding') now includes Algarian Stormrider, Anu'relos and Grotto Netherwing Drake.
+
 10.2.00 - 7th November 2023
 - Preliminary update for game patch 10.2.0.
 - For 'Mute game sounds' ('System'), the 'Arena' setting now includes Nokhudon Proving Grounds.

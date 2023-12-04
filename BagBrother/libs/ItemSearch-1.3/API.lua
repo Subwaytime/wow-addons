@@ -84,7 +84,7 @@ end
 
 --[[ Equipment Sets ]]--
 
-if IsAddOnLoaded('ItemRack') then
+if C.Addons.IsAddOnLoaded('ItemRack') then
 	function Lib:BelongsToSet(id, search)
 		if IsEquippableItem(id) then
 			for name, set in pairs(ItemRackUser.Sets) do

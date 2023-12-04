@@ -41,6 +41,9 @@ L["Overabsorb"] = true
 --DarkFrames
 L["Dark Frames"] = true
 L["dark_frames_desc"] = "Use dark unit frame textures."
+--Minimap
+L["Minimap Icon"] = true
+L["minimap_icon_desc"] = "show a minimap icon to quickly access the add-on settings"
 --Settings/Module Selection
 L["Enabled Modules"] = true
 L["Modules"] = true

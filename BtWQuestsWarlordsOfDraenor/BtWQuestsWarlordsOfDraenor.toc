@@ -1,6 +1,6 @@
-## Interface: 100002
+## Interface: 100200
 ## Title: BtWQuests: Warlords of Draenor
-## Version: 3.7
+## Version: 3.8
 ## Notes: Warlords of Draenor quest data for BtWQuests
 ## Author: Breen
 ## Dependencies: BtWQuests

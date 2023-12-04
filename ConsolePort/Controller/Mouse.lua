@@ -242,6 +242,7 @@ do local FreeCursorOnPickup = {
 
 	function Mouse:CURSOR_CHANGED(isDefault, cursorType, oldCursorType)
 		if not db('mouseAutoControlPickup') then return end
+		
 		if isDefault then
 			if ( oldCursorType == self.hasCursorItem ) then
 				self:SetCameraControl()
@@ -251,6 +252,8 @@ do local FreeCursorOnPickup = {
 			self.hasCursorItem = cursorType;
 			self:SetFreeCursor()
 		end
+
+		db:TriggerEvent('OnCursorChanged', isDefault, cursorType, oldCursorType)
 	end
 end
 
@@ -446,8 +449,8 @@ function Mouse:OnVariableChanged()
 	showMouseOverTooltip = db('mouseShowCenterTooltip')
 end
 
-function Mouse:OnHintsFocus()
-	if db('mouseHandlingEnabled') then
+function Mouse:OnHintsFocus(_, disableMouseHandling)
+	if db('mouseHandlingEnabled') and not disableMouseHandling then
 		self:SetCameraControl()
 	end
 end

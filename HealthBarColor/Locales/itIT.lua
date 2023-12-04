@@ -90,6 +90,10 @@ L["MAGE"] = "Mage"
 --[[Translation missing --]]
 L["Magic"] = "Magic"
 --[[Translation missing --]]
+L["Minimap Icon"] = "Minimap Icon"
+--[[Translation missing --]]
+L["minimap_icon_desc"] = "show a minimap icon to quickly access the add-on settings"
+--[[Translation missing --]]
 L["Module Settings"] = "Module Settings"
 --[[Translation missing --]]
 L["Modules"] = "Modules"

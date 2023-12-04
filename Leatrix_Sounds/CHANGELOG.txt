@@ -1,3 +1,10 @@
+10.2.02 - 22nd November 2023
+- Fixed an issue which caused keypresses to be intercepted when a track wasn't playing.
+- Updated sounds to game version 10.2.0.52188 (Nov 14 2023) (100200).
+
+10.2.01 - 15th November 2023
+- Updated sounds to game version 10.2.0.52148 (Nov 10 2023) (100200).
+
 10.2.00 - 7th November 2023
 - Preliminary update for game patch 10.2.0.
 - Updated sounds to game version 10.2.0.52068 (Nov 6 2023) (100200).

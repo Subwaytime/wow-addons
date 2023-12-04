@@ -45,6 +45,10 @@ L["ignore_magic_desc"] = "ignoriere magische Schwächungszuaber."
 L["ignore_magic_name"] = "Magie ignorieren"
 L["MAGE"] = "Magier"
 L["Magic"] = "Magie"
+--[[Translation missing --]]
+L["Minimap Icon"] = "Minimap Icon"
+--[[Translation missing --]]
+L["minimap_icon_desc"] = "show a minimap icon to quickly access the add-on settings"
 L["Module Settings"] = "Modul Einstellungen"
 L["Modules"] = "Module"
 L["MONK"] = "Mönch"

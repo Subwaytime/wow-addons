@@ -1,3 +1,7 @@
+# v2.34.1
+
+- Updated for 10.2
+
 # v2.34.0
 
 - Added most 10.2 questlines

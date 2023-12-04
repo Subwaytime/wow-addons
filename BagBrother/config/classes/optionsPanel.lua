@@ -13,7 +13,7 @@ local Panel = Addon:NewModule('OptionsPanel', LibStub('Sushi-3.1').OptionsGroup:
 
 function Panel:New(id, icons)
 	local parent = self ~= Panel and self
-	local f = Addon:NewModule(id, Panel:Super(Panel):New(parent or (icons .. ' ' .. ADDON), parent and (L[id] .. ' ' .. icons)))
+	local f = Addon:NewModule(id, Panel:Super(Panel):New(parent or (icons .. ' ' .. ADDON), parent and (L[id] .. '  ' .. icons)))
 	f:SetFooter('Copyright 2006-2023 João Cardoso and Jason Greer')
 	f:SetSubtitle(L[id .. 'Desc']:format(ADDON))
 	f:SetChildren(function() f:Populate() end)

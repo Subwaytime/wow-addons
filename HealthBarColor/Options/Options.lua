@@ -17,7 +17,7 @@ local options = {
     args = {
         Version = {
             order = 0,
-            name = "2.11.5",
+            name = "2.11.6",
             type = "group",
             disabled = true,
             args = {},
@@ -830,6 +830,15 @@ local options = {
                             type = "toggle",
                             get = "GetStatus",
                             set = "SetStatus",
+                        },
+                        MinimapIcon = {
+                            order = 11,
+                            name = L["Minimap Icon"],
+                            desc = L["minimap_icon_desc"],
+                            type = "toggle",
+                            get = "GetStatus",
+                            set = "SetStatus",
+                            guiHidden = HealthBarColor.isRetail,
                         },
                     },
                 },

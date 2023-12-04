@@ -27,10 +27,25 @@ function MenuButton:SpecialClick()
 	self:OnClick()
 end
 
-function MenuButton:SetCommand(text, command, data)
+function MenuButton:OnEnter()
+	if not GameTooltip:IsOwned(self) then
+		GameTooltip:Hide()
+	end
+end
+
+function MenuButton:OnLeave()
+	if GameTooltip:IsOwned(self) then
+		GameTooltip:Hide()
+	end
+end
+
+function MenuButton:SetCommand(text, command, data, handlers)
 	self.data = data
 	self.command = command
 	self.Icon:SetTexture(COMMAND_OPT_ICON[command] or COMMAND_OPT_ICON.Default)
+	self:SetAttribute('nohooks', true)
+	self:SetScript('OnEnter', handlers and handlers.OnEnter or self.OnEnter)
+	self:SetScript('OnLeave', handlers and handlers.OnLeave or self.OnLeave)
 	self:SetText(text)
 end
 
@@ -103,19 +118,23 @@ function MapActionButton:OnSpecialClick(...)
 end
 
 function MapActionButton:OnClick(button)
+	local actionID, bindingID = self:GetID(), self.bindingID;
+	local isUnbound = not self:GetAttribute('slug');
+
 	local parent = self:GetParent()
 	if ( button == 'RightButton' ) then
-		if not GetActionInfo(self:GetID()) then
-			parent:ReportClearBinding(self.bindingID)
+		if not GetActionInfo(actionID) then
+			parent:ReportClearBinding(bindingID)
 		end
-		PickupAction(self:GetID())
+		PickupAction(actionID)
 		self:Update()
 		return ClearCursor()
 	end
-
+	ClearCursor()
+	
 	local spellID = parent:GetSpellID()
 	PickupSpell(spellID)
-	PlaceAction(self:GetID())
+	PlaceAction(actionID)
 	self:Update()
 
 	local type, _, _, cursorSpellID = GetCursorInfo()
@@ -123,8 +142,8 @@ function MapActionButton:OnClick(button)
 		parent:SetSpellID(cursorSpellID)
 		parent:MapActionBar()
 	else
-		if self.bindingID and not self:GetAttribute('slug') then
-			parent:ReportNoBinding(self, self.bindingID, self:GetID())
+		if bindingID and isUnbound then
+			parent:ReportNoBinding(self, bindingID, actionID)
 		else
 			parent:Hide()
 		end

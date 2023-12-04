@@ -1,4 +1,4 @@
-## Interface: 11404
+## Interface: 11500
 ## IconTexture: Interface\AddOns\ConsolePort\Assets\Textures\Logo\CP_Thumb
 ## Title: Console Port |cff69ccf0Cursor|r
 ## Notes: Interface cursor module
@@ -18,6 +18,8 @@ Database.lua
 
 Controller\Stack.lua
 Controller\Hooks.lua
+Controller\Mods.lua
+Controller\Scripts.lua
 
 View\Cursor.xml
 View\Cursor.lua

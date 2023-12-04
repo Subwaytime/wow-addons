@@ -64,22 +64,47 @@ HealthBarColor:SetDefaultModuleLibraries("AceConsole-3.0", "AceEvent-3.0")
 HealthBarColor:SetDefaultModuleState(false)
 local AC = LibStub("AceConfig-3.0")
 local ACD = LibStub("AceConfigDialog-3.0")
-local Icon = LibStub("LibDBIcon-1.0")
-local IconObj = LibStub("LibDataBroker-1.1"):NewDataObject("HealthBarColor", {
-    type = "launcher",
-    label = "HealthBarColor",
-    icon = "Interface\\AddOns\\HealthBarColor\\Textures\\Icon\\Icon.tga",
-    OnClick = function() 
-        HealthBarColor:SlashCommand() 
-    end,
-    OnTooltipShow = function(tooltip)
-        tooltip:AddLine("HealthBarColor")
-    end,
-})
+
+local Icon = nil
+local IconObj = nil
+function HealthBarColor:MinimapIcon()
+    if not self.db.profile.Settings.Modules.MinimapIcon then 
+        self.db.profile.MinimapIcon.hide = true
+        if Icon then
+            Icon:Hide("HealthBarColor")
+        end
+        return
+    end
+    if not Icon then 
+        Icon = LibStub("LibDBIcon-1.0")
+        IconObj = LibStub("LibDataBroker-1.1"):NewDataObject("HealthBarColor", {
+            type = "launcher",
+            label = "HealthBarColor",
+            icon = "Interface\\AddOns\\HealthBarColor\\Textures\\Icon\\Icon.tga",
+            OnClick = function(self, button) 
+                if button == "LeftButton" then
+                    HealthBarColor:SlashCommand() 
+                elseif button == "MiddleButton" then
+                    Icon:Hide("HealthBarColor")
+                    HealthBarColor.db.profile.Settings.Modules.MinimapIcon = false
+                end
+            end,
+            OnTooltipShow = function(tooltip)
+                tooltip:AddLine("HealthBarColor")
+                tooltip:AddLine("Left click: Open add-on settings")
+                tooltip:AddLine("Middle click: Hide icon")
+            end,
+        })
+        Icon:Register("HealthBarColor", IconObj, HealthBarColor.db.profile.MinimapIcon)
+        Icon:Show("HealthBarColor")
+    else
+        self.db.profile.MinimapIcon.hide = false
+        Icon:Show("HealthBarColor")
+    end
+end
 
 function HealthBarColor:OnEnable()
     self:LoadDataBase()
-    Icon:Register("HealthBarColor", IconObj, HealthBarColor.db.profile.MinimapIcon)
     --load own options table
     local options = self:GetOptionsTable()
     --create option table based on database structure and add them to options
@@ -104,6 +129,7 @@ function HealthBarColor:SlashCommand()
 end
 
 function HealthBarColor:LoadConfig()  
+    self:MinimapIcon()
     self:CreateColors()
     self:GetColorOverwrites()
     self:GetUnitInformation(Player, "player")

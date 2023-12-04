@@ -5,7 +5,7 @@
 
 local _, env, db = ...; db = env.db;
 local L = db.Locale;
-local Hooks = db:Register('Hooks', {}, true)
+local Hooks = db:Register('Hooks', {}, true); env.Hooks = Hooks;
 local Hooknode = {};
 
 function Hooks:OnNodeLeave()
@@ -19,15 +19,16 @@ end
 
 function Hooks:ProcessInterfaceCursorEvent(button, down, node)
 	if (down == false) then
-		if node and node:IsObjectType('EditBox') then
+		local specialClickHandler = self:GetSpecialClickHandler(node)
+		if specialClickHandler then
+			specialClickHandler(node, button, down)
+			return true;
+		elseif node and node:IsObjectType('EditBox') then
 			if node:HasFocus() then
 				node:ClearFocus()
 			else
 				node:SetFocus()
 			end
-		elseif node and node.OnSpecialClick then
-			node:OnSpecialClick(button)
-			return true;
 		elseif self.inventorySlotID then
 			Hooknode.OnInventoryButtonModifiedClick(node, 'LeftButton')
 			return true;
@@ -69,6 +70,10 @@ function Hooks:IsModifiedClick()
 	return next(db.Gamepad:GetModifiersHeld()) ~= nil;
 end
 
+function Hooks:GetSpecialClickHandler(node)
+	return node and (node.OnSpecialClick or node:GetAttribute(env.Attributes.SpecialClick));
+end
+
 
 ---------------------------------------------------------------
 -- Special handling for container item buttons
@@ -101,6 +106,10 @@ end
 ---------------------------------------------------------------
 -- Prompts
 ---------------------------------------------------------------
+function Hooks:IsPromptProcessingValid(node)
+	return not InCombatLockdown() and db.Cursor:IsCurrentNode(node) and not node:GetAttribute('nohooks')
+end
+
 function Hooks:GetSpecialActionPrompt(text)
 	local device = db('Gamepad/Active')
 	return device and device:GetTooltipButtonPrompt(
@@ -215,7 +224,9 @@ end
 do -- Tooltip hooking
 	local function OnTooltipSetItem(self)
 		local owner = self:GetOwner()
-		if not InCombatLockdown() and db.Cursor:IsCurrentNode(owner) then
+		if Hooks:IsPromptProcessingValid(owner) then
+			if Hooks:GetSpecialClickHandler(owner) then return end;
+
 			local itemLocation = Hooks:GetItemLocationFromNode(owner)
 			if itemLocation then
 				if CPAPI.IsMerchantAvailable then
@@ -250,8 +261,8 @@ do -- Tooltip hooking
 
 	local function OnTooltipSetSpell(self)
 		local owner = self:GetOwner()
-		if not InCombatLockdown() and db.Cursor:IsCurrentNode(owner) then
-			if owner.OnSpecialClick then return end;
+		if Hooks:IsPromptProcessingValid(owner) then
+			if Hooks:GetSpecialClickHandler(owner) then return end;
 			
 			local name, spellID = self:GetSpell()
 			if spellID and not IsPassiveSpell(spellID) then
@@ -279,7 +290,7 @@ do -- Tooltip hooking
 
 	local function OnTooltipSetToy(self, info)
 		local owner = self:GetOwner()
-		if not InCombatLockdown() and db.Cursor:IsCurrentNode(owner) then
+		if Hooks:IsPromptProcessingValid(owner) then
 			local itemID = type(info) == 'table' and info.id;
 			if itemID and CPAPI.PlayerHasToy(itemID) then
 				local itemInfo = CPAPI.GetItemInfo(itemID)

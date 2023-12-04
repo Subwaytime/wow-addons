@@ -153,7 +153,7 @@ local defaults = {
             },
         },
         MinimapIcon = {
-
+            hide = false, 
         },
     },
 }

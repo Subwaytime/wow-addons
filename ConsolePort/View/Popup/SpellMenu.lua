@@ -51,13 +51,13 @@ function SpellMenu:FixHeight()
 end
 
 function SpellMenu:RedirectCursor()
-	self.returnToNode = self.returnToNode or ConsolePortCursor:GetCurrentNode()
-	ConsolePortCursor:SetCurrentNode(self:GetObjectByIndex(1))
+	self.returnToNode = self.returnToNode or ConsolePort:GetCursorNode()
+	ConsolePort:SetCursorNode(self:GetObjectByIndex(1))
 end
 
 function SpellMenu:ReturnCursor()
 	if self.returnToNode then
-		ConsolePortCursor:SetCurrentNode(self.returnToNode)
+		ConsolePort:SetCursorNode(self.returnToNode)
 		self.returnToNode = nil
 	end
 end
@@ -89,25 +89,31 @@ function SpellMenu:AddUtilityRingCommand()
 		link  = link;
 	};
 
-	if db.Utility:SetPendingAction(1, action) then
-		self:AddCommand(L'Add to Utility Ring', 'RingBind')
-	else
-		local _, existingIndex = db.Utility:IsUniqueAction(1, action)
-		if existingIndex then
-			db.Utility:SetPendingRemove(1, action)
-			self:AddCommand(L'Remove from Utility Ring', 'RingClear')
+	for key in db.table.spairs(db.Utility.Data) do
+		local isUniqueAction, existingIndex = db.Utility:IsUniqueAction(key, action)
+		if isUniqueAction then
+			self:AddCommand(L('Add to %s', db.Utility:ConvertSetIDToDisplayName(key)), 'RingBind', {key, action})
+		elseif existingIndex then
+			self:AddCommand(L('Remove from %s', db.Utility:ConvertSetIDToDisplayName(key)), 'RingClear', {key, action})
 		end
 	end
 end
 
-function SpellMenu:RingBind()
-	if db.Utility:HasPendingAction() then
+function SpellMenu:RingBind(data)
+	local setID, action = unpack(data)
+	if db.Utility:SetPendingAction(setID, action) then
 		db.Utility:PostPendingAction()
 	end
 	self:Hide()
 end
 
-SpellMenu.RingClear = SpellMenu.RingBind;
+function SpellMenu:RingClear(data)
+	local setID, action = unpack(data)
+	if db.Utility:SetPendingRemove(setID, action) then
+		db.Utility:PostPendingAction()
+	end
+	self:Hide()
+end
 
 function SpellMenu:MapActionBar()
 	self:SetDisplaySpell(self:GetSpellID())
@@ -153,14 +159,14 @@ function SpellMenu:MapActionBar()
 	end
 	self:SetHeight(drawnBars * 40 + 100)
 	if targetWidget or firstWidget then
-		ConsolePortCursor:SetCurrentNode(targetWidget or firstWidget)
+		ConsolePort:SetCursorNode(targetWidget or firstWidget)
 	end
 
 	local handle = db.UIHandle;
 	local leftClick, rightClick, specialClick =
 		db('UICursorLeftClick'), db('UICursorRightClick'), db('UICursorSpecial')
 
-	handle:SetHintFocus(self)
+	handle:SetHintFocus(self, IsGamePadCursorControlEnabled())
 	if leftClick then
 		handle:AddHint(leftClick, L'Place in slot')
 	end
@@ -305,6 +311,19 @@ function SpellMenu:OnHide()
 	handle:ClearHintsForFrame(self)
 end
 
+function SpellMenu:OnCursorChanged(isDefault, cursorType, oldCursorType)
+	if not db('bindingShowSpellMenuGrid') then return end;
+	if ConsolePortConfig and ConsolePortConfig:IsShown() then return end;
+
+	if ( isDefault and oldCursorType == Enum.UICursorType.Spell ) then
+		return self:Hide()
+	elseif ( cursorType == Enum.UICursorType.Spell ) then
+		local _, _, _, spellID = GetCursorInfo()
+		self:SetSpell(spellID)
+		self:MapActionBar()
+	end
+end
+
 function SpellMenu:PLAYER_REGEN_DISABLED()
 	self:Hide()
 end
@@ -317,8 +336,10 @@ end
 
 ---------------------------------------------------------------
 SpellMenu:SetScript('OnHide', SpellMenu.OnHide)
+SpellMenu:SetAttribute('nodepass', true)
 Mixin(SpellMenu, CPIndexPoolMixin):OnLoad()
 SpellMenu:CreateFramePool('Button', 'CPPopupButtonTemplate', db.PopupMenuButton)
 SpellMenu.ActionButtons = CreateFramePool('IndexButton', SpellMenu, 'CPIndexButtonBindingActionButtonTemplate')
 SpellMenu.ActionBarText = CreateFontStringPool(SpellMenu, 'ARTWORK', nil, 'CPSmallFont')
 ConsolePort:AddInterfaceCursorFrame(SpellMenu)
+db:RegisterCallback('OnCursorChanged', SpellMenu.OnCursorChanged, SpellMenu)
