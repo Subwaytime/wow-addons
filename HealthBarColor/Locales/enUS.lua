@@ -44,6 +44,9 @@ L["dark_frames_desc"] = "Use dark unit frame textures."
 --Minimap
 L["Minimap Icon"] = true
 L["minimap_icon_desc"] = "show a minimap icon to quickly access the add-on settings"
+--BetterBossFrames
+L["Better Boss Frames"] = true
+L["better_boss_frames_desc"] = "removes some artwork around the boss frames for better visual clarity"
 --Settings/Module Selection
 L["Enabled Modules"] = true
 L["Modules"] = true

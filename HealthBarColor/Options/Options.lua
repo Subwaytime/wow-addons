@@ -17,7 +17,7 @@ local options = {
     args = {
         Version = {
             order = 0,
-            name = "2.11.6",
+            name = "2.12.1",
             type = "group",
             disabled = true,
             args = {},
@@ -839,6 +839,15 @@ local options = {
                             get = "GetStatus",
                             set = "SetStatus",
                             guiHidden = HealthBarColor.isRetail,
+                        },
+                        BetterBossFrames = {
+                            order = 12,
+                            name = L["Better Boss Frames"],
+                            desc = L["better_boss_frames_desc"],
+                            type = "toggle",
+                            get = "GetStatus",
+                            set = "SetStatus",
+                            guiHidden = not HealthBarColor.isRetail,
                         },
                     },
                 },

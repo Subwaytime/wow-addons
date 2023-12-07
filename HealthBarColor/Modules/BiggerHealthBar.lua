@@ -36,6 +36,10 @@ local textures = {
 } 
 
 local function toPlayerArt() 
+	if InCombatLockdown() then
+		HealthBarColor:DelayUntilAfterCombat(toPlayerArt)
+		return
+	end
 	local isAlterntePowerFrame = PlayerFrame.activeAlternatePowerBar
 	local frameTexture = isAlterntePowerFrame and Player.frameContainer.AlternatePowerFrameTexture or Player.frameContainer.FrameTexture
 	if isAlterntePowerFrame then

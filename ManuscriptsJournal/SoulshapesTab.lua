@@ -42,8 +42,8 @@ local function SetDefaultFilters()
     crittershapeSoulshapeFilter = true
     SoulshapesJournalFiltersDB.collected = true
     SoulshapesJournalFiltersDB.uncollected = true
-    SoulshapesJournalFiltersDB.soulshape = false
-    SoulshapesJournalFiltersDB.crittershape = false
+    SoulshapesJournalFiltersDB.soulshape = true
+    SoulshapesJournalFiltersDB.crittershape = true
     SetAllSourceFilters(true)
     SetAllAvailableFilters(true)
 end
@@ -234,7 +234,7 @@ do
 		end
 	end
 	function SoulshapesJournalCollectedFilterDropDown_OnLoad(self)
-		UIDropDownMenu_Initialize(self, OpenCollectedFilterDropDown, "MENU");
+		LibDD:UIDropDownMenu_Initialize(self, OpenCollectedFilterDropDown, "MENU");
 		SoulshapesJournal:UpdateResetFiltersButtonVisibility();
 	end
 end
@@ -482,7 +482,7 @@ end
 
 function SoulshapesMixin:SetCrittershapeSoulshapeFilter(checked)
     assert(type(checked) == "boolean")
-    critterSoulshapeFilter = checked
+    crittershapeSoulshapeFilter = checked
     SoulshapesJournalFiltersDB.crittershape = checked
     self:FullRefreshIfVisible()
 end
@@ -559,28 +559,6 @@ function SoulshapesJournalSearchBox_OnTextChanged(self)
 	SoulshapesJournal:FullRefreshIfVisible();
 end
 
-function SoulshapesJournalProgressBar_OnClick(self, barID)
-    DRAKE_SORT_ORDER = {
-        addon.Enum.Drakes.WindingSlitherdrake,
-        addon.Enum.Drakes.RenewedProtoDrake,
-        addon.Enum.Drakes.WindborneVelocidrake,
-        addon.Enum.Drakes.HighlandDrake,
-        addon.Enum.Drakes.CliffsideWylderdrake,
-        addon.Enum.Drakes.GrottoNetherwingDrake,
-        addon.Enum.Drakes.FlourishingWhimsydrake,
-        addon.Enum.Drakes.All,
-    }
-    
-    if barID ~= 0 then
-        DRAKE_SORT_ORDER = {
-            DRAKE_SORT_ORDER[barID]
-        }
-    end
-    
-    selectedBarID = barID
-    SoulshapesJournal:FullRefreshIfVisible()
-end
-
 function SoulshapesMixin:UpdateButton(button)
     if button.soulshapeData then
         local data = button.soulshapeData
@@ -614,3 +592,22 @@ function SoulshapesMixin:UpdateButton(button)
       	end
     end
 end
+
+EventUtil.ContinueOnAddOnLoaded(addonName, function()
+    local loaded, finished = IsAddOnLoaded(addonName)
+    if not finished then return end
+    
+    if not SoulshapesJournalFiltersDB then SoulshapesJournalFiltersDB = {} end
+    
+    if SoulshapesJournalFiltersDB.collected == nil then SoulshapesJournalFiltersDB.collected = true end
+    collectedSoulshapeFilter = SoulshapesJournalFiltersDB.collected
+    
+    if SoulshapesJournalFiltersDB.uncollected == nil then SoulshapesJournalFiltersDB.uncollected = true end
+    uncollectedSoulshapeFilter = SoulshapesJournalFiltersDB.uncollected
+
+    if SoulshapesJournalFiltersDB.soulshape == nil then SoulshapesJournalFiltersDB.soulshape = true end
+    soulshapeSoulshapeFilter = SoulshapesJournalFiltersDB.soulshape
+
+    if SoulshapesJournalFiltersDB.crittershape == nil then SoulshapesJournalFiltersDB.crittershape = true end
+    crittershapeSoulshapeFilter = SoulshapesJournalFiltersDB.crittershape
+end)

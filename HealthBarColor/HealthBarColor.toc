@@ -1,5 +1,5 @@
 ## Interface: 100200
-## Version: 2.11.6
+## Version: 2.12.1
 ## Title: HealthBarColor
 ## Author: Slothpala
 ## SavedVariables: HealthBarColorDB
@@ -18,7 +18,10 @@ DB\DB_Defaults.lua
 Options\Options.lua
 Options\OptionsFrame.lua
 ProfileSharing.lua
+HookRegistry.lua
 
+#Utils
+Utils\CombatLockdown.lua
 
 #Modules
 include_modules.xml

@@ -44,6 +44,18 @@ function BackgroundTextures:OnEnable()
         Player.BackgroundTexture:RemoveMaskTexture(Player.BackgroundTexture:GetMaskTexture(1))
         Player.Background:SetHeight(31)
     end
+    if HealthBarColor.db.profile.Settings.Modules.BetterBossFrames then 
+        for _,unit in pairs ({
+            Boss1,
+            Boss2,
+            Boss3,
+            Boss4,
+            Boss5
+        }) do
+            unit.BackgroundTexture:RemoveMaskTexture(unit.BackgroundTexture:GetMaskTexture(1))
+            unit.Background:SetHeight(22)
+        end
+    end
 end
 
 function BackgroundTextures:OnDisable()

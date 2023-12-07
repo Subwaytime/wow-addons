@@ -101,6 +101,7 @@ local defaults = {
                 BiggerHealthBar    = false,
                 Overabsorb         = false,
                 DarkFrames         = false,
+                BetterBossFrames   = false,
                 ['*']              = true,
             },
             ClassColorOverwrites = {

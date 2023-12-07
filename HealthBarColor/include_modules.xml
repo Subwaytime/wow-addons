@@ -10,4 +10,5 @@
   <Script file="Modules\BiggerHealthBar.lua"/>
   <Script file="Modules\Overabsorb.lua"/>
   <Script file="Modules\DarkFrames.lua"/>
+  <Script file="Modules\BetterBossFrames.lua"/>
 </Ui>

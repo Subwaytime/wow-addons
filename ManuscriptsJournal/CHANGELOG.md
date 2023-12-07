@@ -1,9 +1,7 @@
 # Manuscripts Journal
 
-## [10.2-010](https://github.com/TLDRMissions/ManuscriptsJournal/tree/10.2-010) (2023-11-28)
-[Full Changelog](https://github.com/TLDRMissions/ManuscriptsJournal/compare/10.2-009...10.2-010) [Previous Releases](https://github.com/TLDRMissions/ManuscriptsJournal/releases)
+## [10.2-012](https://github.com/TLDRMissions/ManuscriptsJournal/tree/10.2-012) (2023-12-02)
+[Full Changelog](https://github.com/TLDRMissions/ManuscriptsJournal/compare/10.2-011...10.2-012) [Previous Releases](https://github.com/TLDRMissions/ManuscriptsJournal/releases)
 
-- Fix demon tome tracking  
-    Closes: https://github.com/TLDRMissions/ManuscriptsJournal/issues/29  
-- Fix title name in some situations  
-    Closes: https://github.com/TLDRMissions/ManuscriptsJournal/issues/28  
+- Fix issue with getting the localised name for "Polymorph" and "Hex" spreading taint to the spellbook  
+- Fix issue with LibUIDropDownMenu not being used completely  

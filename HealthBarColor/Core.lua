@@ -82,6 +82,12 @@ Boss1.PowerBar      = _G.Boss1TargetFrame.TargetFrameContent.TargetFrameContentM
 Boss1.LeftText      = _G.Boss1TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.LeftText  
 Boss1.RightText     = _G.Boss1TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.RightText
 Boss1.MiddleText    = _G.Boss1TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.TextString
+Boss1.Glow          = _G.Boss1TargetFrame.TargetFrameContent.TargetFrameContentMain.ReputationColor
+Boss1.Skull         = _G.Boss1TargetFrame.TargetFrameContent.TargetFrameContentContextual.HighLevelTexture
+Boss1.FrameFlash    = _G.Boss1TargetFrame.threatIndicator
+Boss1.FrameTexture  = _G.Boss1TargetFrame.TargetFrameContainer.FrameTexture
+Boss1.Name          = _G.Boss1TargetFrame.TargetFrameContent.TargetFrameContentMain.Name
+Boss1.LevelText     = _G.Boss1TargetFrame.TargetFrameContent.TargetFrameContentMain.LevelText
 --2
 local Boss2         = {}
 Boss2.HealthBar     = _G.Boss2TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar
@@ -89,6 +95,12 @@ Boss2.PowerBar      = _G.Boss2TargetFrame.TargetFrameContent.TargetFrameContentM
 Boss2.LeftText      = _G.Boss2TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.LeftText  
 Boss2.RightText     = _G.Boss2TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.RightText
 Boss2.MiddleText    = _G.Boss2TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.TextString
+Boss2.Glow          = _G.Boss2TargetFrame.TargetFrameContent.TargetFrameContentMain.ReputationColor
+Boss2.Skull         = _G.Boss2TargetFrame.TargetFrameContent.TargetFrameContentContextual.HighLevelTexture
+Boss2.FrameFlash    = _G.Boss2TargetFrame.threatIndicator
+Boss2.FrameTexture  = _G.Boss2TargetFrame.TargetFrameContainer.FrameTexture
+Boss2.Name          = _G.Boss2TargetFrame.TargetFrameContent.TargetFrameContentMain.Name
+Boss2.LevelText     = _G.Boss2TargetFrame.TargetFrameContent.TargetFrameContentMain.LevelText
 --3
 local Boss3         = {}
 Boss3.HealthBar     = _G.Boss3TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar
@@ -96,6 +108,12 @@ Boss3.PowerBar      = _G.Boss3TargetFrame.TargetFrameContent.TargetFrameContentM
 Boss3.LeftText      = _G.Boss3TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.LeftText  
 Boss3.RightText     = _G.Boss3TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.RightText
 Boss3.MiddleText    = _G.Boss3TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.TextString
+Boss3.Glow          = _G.Boss3TargetFrame.TargetFrameContent.TargetFrameContentMain.ReputationColor
+Boss3.Skull         = _G.Boss3TargetFrame.TargetFrameContent.TargetFrameContentContextual.HighLevelTexture
+Boss3.FrameFlash    = _G.Boss3TargetFrame.threatIndicator
+Boss3.FrameTexture  = _G.Boss3TargetFrame.TargetFrameContainer.FrameTexture
+Boss3.Name          = _G.Boss3TargetFrame.TargetFrameContent.TargetFrameContentMain.Name
+Boss3.LevelText     = _G.Boss3TargetFrame.TargetFrameContent.TargetFrameContentMain.LevelText
 --4
 local Boss4         = {}
 Boss4.HealthBar     = _G.Boss4TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar
@@ -103,6 +121,12 @@ Boss4.PowerBar      = _G.Boss4TargetFrame.TargetFrameContent.TargetFrameContentM
 Boss4.LeftText      = _G.Boss4TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.LeftText  
 Boss4.RightText     = _G.Boss4TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.RightText
 Boss4.MiddleText    = _G.Boss4TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.TextString
+Boss4.Glow          = _G.Boss4TargetFrame.TargetFrameContent.TargetFrameContentMain.ReputationColor
+Boss4.Skull         = _G.Boss4TargetFrame.TargetFrameContent.TargetFrameContentContextual.HighLevelTexture
+Boss4.FrameFlash    = _G.Boss4TargetFrame.threatIndicator
+Boss4.FrameTexture  = _G.Boss4TargetFrame.TargetFrameContainer.FrameTexture
+Boss4.Name          = _G.Boss4TargetFrame.TargetFrameContent.TargetFrameContentMain.Name
+Boss4.LevelText     = _G.Boss4TargetFrame.TargetFrameContent.TargetFrameContentMain.LevelText
 --5
 local Boss5         = {}
 Boss5.HealthBar     = _G.Boss5TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar
@@ -110,6 +134,12 @@ Boss5.PowerBar      = _G.Boss5TargetFrame.TargetFrameContent.TargetFrameContentM
 Boss5.LeftText      = _G.Boss5TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.LeftText  
 Boss5.RightText     = _G.Boss5TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.RightText
 Boss5.MiddleText    = _G.Boss5TargetFrame.TargetFrameContent.TargetFrameContentMain.HealthBar.TextString
+Boss5.Glow          = _G.Boss5TargetFrame.TargetFrameContent.TargetFrameContentMain.ReputationColor
+Boss5.Skull         = _G.Boss5TargetFrame.TargetFrameContent.TargetFrameContentContextual.HighLevelTexture
+Boss5.FrameFlash    = _G.Boss5TargetFrame.threatIndicator
+Boss5.FrameTexture  = _G.Boss5TargetFrame.TargetFrameContainer.FrameTexture
+Boss5.Name          = _G.Boss5TargetFrame.TargetFrameContent.TargetFrameContentMain.Name
+Boss5.LevelText     = _G.Boss5TargetFrame.TargetFrameContent.TargetFrameContentMain.LevelText
 --Colors
 --class colors
 local ClassColor = {}

@@ -1,3 +1,3 @@
-# 11.1.32 (2023-11-27)
+# 11.1.33 (2023-12-01)
 
-* Fixed a bug with Arena widget where the arena number was not updated or shown at all after the last update [GH-486].
+* Updated TOC version for Classic Patch 1.15.0.
