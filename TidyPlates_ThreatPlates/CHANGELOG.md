@@ -1,3 +1,3 @@
-# 11.1.33 (2023-12-01)
+# 11.1.35 (2023-12-11)
 
-* Updated TOC version for Classic Patch 1.15.0.
+* Fixed a bug with abbreviation for unit names where initiales where shown as empty squares when UTF-8 fonts were used [GH-489].

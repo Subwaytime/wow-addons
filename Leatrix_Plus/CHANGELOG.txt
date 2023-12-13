@@ -1,3 +1,6 @@
+10.2.05
+- For 'Enhance minimap' ('Interface'), fixed an issue which caused some minimap addon buttons to not be placed correctly.
+
 10.2.04 - 6th December 2023
 - For 'Enhance minimap' ('Interface'), fixed an issue with 'Combine addon buttons' and the BtWQuests minimap button (if installed).
 

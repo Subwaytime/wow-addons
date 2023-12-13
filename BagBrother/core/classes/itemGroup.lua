@@ -1,6 +1,6 @@
 --[[
-	itemGroup.lua
-		A frame that organizes item buttons in a grid and manages updating them
+	A frame that organizes item buttons in a grid and manages updating them.
+	All Rights Reserved
 --]]
 
 local ADDON, Addon = ...
