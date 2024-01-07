@@ -1,4 +1,12 @@
-10.2.05
+10.2.08 - 3rd January 2023
+- Updated 'Automate gossip' ('Automation') for soft targeting.
+- For the minimap button, holding CTRL and SHIFT will now toggle windowed mode.  Holding CTRL and ALT will toggle the Zygor addon (if installed).
+- For 'Media', added 'Emerald Dream' zone music to 'Zones'.
+
+10.2.07 - 27th December 2023
+- Updated 'Automate quests' ('Automation') for soft targeting.
+
+10.2.05 - 13th December 2023
 - For 'Enhance minimap' ('Interface'), fixed an issue which caused some minimap addon buttons to not be placed correctly.
 
 10.2.04 - 6th December 2023

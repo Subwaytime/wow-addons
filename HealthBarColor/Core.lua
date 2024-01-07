@@ -150,17 +150,6 @@ local addonName, addonTable = ...
 --create addon and get libraries
 addonTable.HealthBarColor = LibStub("AceAddon-3.0"):NewAddon("HealthBarColor", "AceConsole-3.0", "AceEvent-3.0", "AceSerializer-3.0")
 local HealthBarColor = addonTable.HealthBarColor
-HealthBarColor.isClassic = false
-HealthBarColor.isWrath = false
-HealthBarColor.isRetail = false
-local tocversion = select(4,GetBuildInfo())
-if tocversion < 30000 then
-    HealthBarColor.isClassic = true
-elseif tocversion > 30000 and tocversion < 100000 then
-    HealthBarColor.isWrath = true
-else
-    HealthBarColor.isRetail = true
-end
 HealthBarColor:SetDefaultModuleLibraries("AceConsole-3.0", "AceEvent-3.0")
 HealthBarColor:SetDefaultModuleState(false)
 local AC         = LibStub("AceConfig-3.0")

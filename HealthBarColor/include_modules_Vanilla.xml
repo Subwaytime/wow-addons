@@ -3,4 +3,5 @@
     <Include file="Modules\Fonts\_classic_\load_fonts_Vanilla.xml"/>
     <Script file="Modules\DarkFrames_classic.lua"/>
     <Script file="Modules\BiggerHealthBar_classic.lua"/>
+    <Script file="Modules\Textures_classic.lua"/>
 </Ui>

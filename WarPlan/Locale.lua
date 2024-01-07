@@ -11,7 +11,7 @@ V =
       "Completada hace %s", "Expira en:", "Gran éxito", "En el Grupo Tentativo:", "Misión fallida", "Histórico de Misión", "Éxito en la misión", "No hay grupos viables.", "Los resultados de las misiones completadas se guardaran y se mostrarán aquí.", "Enviar Grupos Tentativos",
     }
     or C == "esMX" and { -- 17/20 (85%)
-      "%d |4misión:misión; disponible", "%d |4misión:misión; completada", "%d |4misión:misión; en progreso", "%d |4misión:misión; restantes...", "%d |4grupo:grupos; pendiente...", "Coste base de misión: %s", "Recompensa de bonus", z, "Click para completar", "Completar todas",
+      "%d |4misión:misión; disponible", "%d |4misión:misiones; completadas", "%d |4misión:misiones; en progreso", "%d |4misión:misiones; restantes...", "%d |4grupo:grupos; pendientes...", "Coste base de misión: %s", "Recompensa de bonus", z, "Click para completar", "Completar todas",
       "Completada hace %s ", "Termina en:", "Gran éxito", z, "Misión Fallida", "Historial de Misión", "Éxito de Misión", "No hay grupos adecuados", "Los resultados de las misiones completadas serán grabadas y mostradas aquí.", z,
     }
     or C == "frFR" and { -- 20/20 (100%)

@@ -1,6 +1,6 @@
 # BetterWardrobe (@project-version@)
 
-## [4.16.8](https://github.com/SLOKnightfall/BetterWardrobe/tree/4.16.8) (2023-11-09)
-[Full Changelog](https://github.com/SLOKnightfall/BetterWardrobe/compare/4.16.7...4.16.8) [Previous Releases](https://github.com/SLOKnightfall/BetterWardrobe/releases)
+## [4.17.1](https://github.com/SLOKnightfall/BetterWardrobe/tree/4.17.1) (2023-12-18)
+[Full Changelog](https://github.com/SLOKnightfall/BetterWardrobe/compare/4.17...4.17.1) [Previous Releases](https://github.com/SLOKnightfall/BetterWardrobe/releases)
 
-- -Fixed issue where appearance frames were showing on initialization over other tab's frames  
+- -Removed un needed libToast reference  

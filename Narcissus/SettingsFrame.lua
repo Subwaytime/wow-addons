@@ -767,6 +767,10 @@ local function DressingRoomToggle_OnValueChanged(self, state)
     end
 end
 
+local function LFRWingDetails_OnValueChanged(self, state)
+    SettingFunctions.EnableGossipFrameSoloQueueLFRDetails(state);
+end
+
 local function PaperDollWidgetToggle_OnValueChanged(self, state)
     SettingFunctions.EnablePaperDollWidget(state);
 end
@@ -847,7 +851,7 @@ end
 
 
 function CreditList:CreateList(parent, anchorTo, fromOffsetY)
-    local active = {"Albator S.", "Lala.Marie", "Erik Shafer", "Celierra&Darvian", "Pierre-Yves Bertolus", "Terradon", "Miroslav Kovac", "Ryan Zerbin", "Helene Rigo"};
+    local active = {"Albator S.", "Lala.Marie", "Erik Shafer", "Celierra&Darvian", "Pierre-Yves Bertolus", "Terradon", "Miroslav Kovac", "Ryan Zerbin", "Helene Rigo", "Kit M"};
     local inactive = {"Alex Boehm", "Solanya", "Elexys", "Ben Ashley", "Knightlord", "Brian Haberer", "Andrew Phoenix", "Nantangitan", "Blastflight", "Lars Norberg", "Valnoressa", "Nimrodan", "Brux",
         "Karl", "Webb", "acein", "Christian Williamson", "Tzutzu", "Anthony Cordeiro", "Nina Recchia", "heiteo", "Psyloken", "Jesse Blick", "Victor Torres", "Nisutec", "Tezenari", "Gina"};
     local special = {"Marlamin | WoW.tools", "Keyboardturner | Avid Bug Finder(Generator)", "Meorawr | Wondrous Wisdomball", "Ghost | Real Person", "Hubbotu | Translator - Russian", "Romanv | Translator - Spanish", "Onizenos | Translator - Portuguese"};
@@ -2055,6 +2059,7 @@ local Categories = {
             {type = "header", level = 0, text = L["Extensions"]},
             {type = "checkbox", level = 1, key = "GemManager", text = L["Gem Manager"], onValueChangedFunc = GemManagerToggle_OnValueChanged, description = L["Gemma Description"]},
             {type = "checkbox", level = 1, key = "DressingRoom", text = L["Dressing Room"], onValueChangedFunc = DressingRoomToggle_OnValueChanged, description = L["Dressing Room Description"]},
+            {type = "checkbox", level = 1, key = "SoloQueueLFRDetails", text = L["LFR Wing Details"], onValueChangedFunc = LFRWingDetails_OnValueChanged, description = L["LFR Wing Details Description"]},
             {type = "subheader", level = 1, text = L["Expansion Features"], extraTopPadding = 1},
             {type = "checkbox", level = 1, key = "PaperDollWidget", text = L["Paperdoll Widget"], onValueChangedFunc = PaperDollWidgetToggle_OnValueChanged, showFeaturePreview = true, onEnterFunc = FeaturePreview.ShowPreview, onLeaveFunc = FeaturePreview.HidePreview},
             --{type = "checkbox", level = 1, key = "ConduitTooltip", text = L["Conduit Tooltip"], onValueChangedFunc = ConduitTooltipToggle_OnValueChanged, showFeaturePreview = true, onEnterFunc = FeaturePreview.ShowPreview, onLeaveFunc = FeaturePreview.HidePreview},

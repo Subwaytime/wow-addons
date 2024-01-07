@@ -1,6 +1,7 @@
 --[[
     Created by Slothpala 
 --]]
+local addonName, addonTable = ...
 --HeealthBarColor Units
 local HBC_Unit = {}
 function HBC_Unit:SetStatusBarClassColored()
@@ -13,53 +14,50 @@ local metatable = {__index = HBC_Unit}
 --player
 local Player        = setmetatable({},metatable)
 Player.HealthBar    = _G.PlayerFrameHealthBar
+Player.PowerBar     = _G.PlayerFrameManaBar
 Player.Name         = _G.PlayerName
 Player.HealthText   = {_G.PlayerFrameHealthBarTextLeft, _G.PlayerFrameHealthBarTextRight, _G.PlayerFrameHealthBarText}
 Player.PowerText    = {_G.PlayerFrameManaBarTextLeft,_G.PlayerFrameManaBarTextRight,_G.PlayerFrameManaBarText}
 --target
 local Target        = setmetatable({},metatable)
 Target.HealthBar    = _G.TargetFrameHealthBar
+Target.PowerBar     = _G.TargetFrameManaBar
 Target.Name         = _G.TargetFrameTextureFrameName
 Target.HealthText   = {_G.TargetFrameTextureFrame.HealthBarTextLeft,_G.TargetFrameTextureFrame.HealthBarTextRight,_G.TargetFrameTextureFrame.HealthBarText}
 Target.PowerText    = {_G.TargetFrameTextureFrame.ManaBarTextLeft,_G.TargetFrameTextureFrame.ManaBarTextRight,_G.TargetFrameTextureFrame.ManaBarText}
 --targettarget
 local ToT           = setmetatable({},metatable)
 ToT.HealthBar       = _G.TargetFrameToTHealthBar
+ToT.PowerBar        = _G.TargetFrameToTManaBar
 ToT.Name            = _G.TargetFrameToTTextureFrameName
 --focus
 local Focus        = setmetatable({},metatable)
+if addonTable.isWrath then
+    Focus.HealthBar    = _G.FocusFrameHealthBar
+    Focus.PowerBar     = _G.FocusFrameManaBar
+    Focus.Name         = _G.FocusFrameTextureFrameName
+    Focus.HealthText   = {_G.FocusFrameTextureFrame.HealthBarTextLeft,_G.FocusFrameTextureFrame.HealthBarTextRight,_G.FocusFrameTextureFrame.HealthBarText}
+    Focus.PowerText    = {_G.FocusFrameTextureFrame.ManaBarTextLeft,_G.FocusFrameTextureFrame.ManaBarTextRight,_G.FocusFrameTextureFrame.ManaBarText}
+end
 --focustarget
 local ToF           = setmetatable({},metatable)
+if addonTable.isWrath then
+    ToF.HealthBar       = _G.FocusFrameToTHealthBar
+    ToF.PowerBar        = _G.FocusFrameToTManaBar
+    ToF.Name            = _G.FocusFrameToTTextureFrameName
+end
 --pet
 local Pet           = {}
 Pet.HealthBar       = _G.PetFrameHealthBar
+Pet.PowerBar        = _G.PetFrameManaBar
 Pet.Name            = _G.PetName
 Pet.HealthText      = {_G.PetFrameHealthBarTextLeft, _G.PetFrameHealthBarTextRight, _G.PetFrameHealthBarText}
 Pet.PowerText       = {_G.PetFrameManaBarText, _G.PetFrameManaBarTextLeft, _G.PetFrameManaBarTextRight}
 --AddOn
-local addonName, addonTable = ...
+
 --create addon and get libraries
 addonTable.HealthBarColor = LibStub("AceAddon-3.0"):NewAddon("HealthBarColor", "AceConsole-3.0", "AceEvent-3.0", "AceSerializer-3.0")
 local HealthBarColor = addonTable.HealthBarColor
-HealthBarColor.isClassic = false
-HealthBarColor.isWrath = false
-HealthBarColor.isRetail = false
-local tocversion = select(4,GetBuildInfo())
-if tocversion < 30000 then
-    HealthBarColor.isClassic = true
-elseif tocversion > 30000 and tocversion < 100000 then
-    HealthBarColor.isWrath = true
-    --focus
-    Focus.HealthBar    = _G.FocusFrameHealthBar
-    Focus.Name         = _G.FocusFrameTextureFrameName
-    Focus.HealthText   = {_G.FocusFrameTextureFrame.HealthBarTextLeft,_G.FocusFrameTextureFrame.HealthBarTextRight,_G.FocusFrameTextureFrame.HealthBarText}
-    Focus.PowerText    = {_G.FocusFrameTextureFrame.ManaBarTextLeft,_G.FocusFrameTextureFrame.ManaBarTextRight,_G.FocusFrameTextureFrame.ManaBarText}
-    --tof
-    ToF.HealthBar       = _G.FocusFrameToTHealthBar
-    ToF.Name            = _G.FocusFrameToTTextureFrameName
-else
-    HealthBarColor.isRetail = true
-end
 HealthBarColor:SetDefaultModuleLibraries("AceConsole-3.0", "AceEvent-3.0")
 HealthBarColor:SetDefaultModuleState(false)
 local AC = LibStub("AceConfig-3.0")

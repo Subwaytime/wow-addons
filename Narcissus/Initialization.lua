@@ -1,7 +1,7 @@
-local NARCI_VERSION_INFO = "1.4.7 b";
+local NARCI_VERSION_INFO = "1.4.9";
 
-local VERSION_DATE = 1701004539;
-local CURRENT_VERSION = 10407;
+local VERSION_DATE = 1703003824;
+local CURRENT_VERSION = 10409;
 local PREVIOUS_VERSION = CURRENT_VERSION;
 local TIME_SINCE_LAST_UPDATE = 0;
 
@@ -81,6 +81,7 @@ local DefaultValues = {
     OnlyShowOwnedUpgradeItem = true,            --Filter for gems/enchant scrolls
     ConduitTooltip = false,                     --Show conduit effects of higher ranks
     PaperDollWidget = true,                     --Show Domination/Class Set indicator on the Blizzard character pane
+    SoloQueueLFRDetails = true,                 --Show LFR boss names and lockouts on GossipFrame 
 
     -- Talent Tree --
     TalentTreeForInspection = true,

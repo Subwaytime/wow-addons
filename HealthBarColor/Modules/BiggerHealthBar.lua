@@ -5,10 +5,8 @@ local _, addonTable = ...
 local HealthBarColor = addonTable.HealthBarColor
 
 local BiggerHealthBar = HealthBarColor:NewModule("BiggerHealthBar")
---hook stuff
-local hooked = {}
-local callbacks = {}
-local donothing = function() end
+Mixin(BiggerHealthBar, addonTable.hooks)
+
 local Player = HealthBarColor:GetUnit("Player")
 Player.frameContainer = PlayerFrame.PlayerFrameContainer
 --left, right, top, bottom
@@ -36,29 +34,23 @@ local textures = {
 } 
 
 local function toPlayerArt() 
-	if InCombatLockdown() then
+	if InCombatLockdown() then --since the release of 10.2 StatusBar:SetHeight() causes taint this gets hopefully fixed with 10.2.5 until then this will at least not break the UI
 		HealthBarColor:DelayUntilAfterCombat(toPlayerArt)
 		return
 	end
 	local isAlterntePowerFrame = PlayerFrame.activeAlternatePowerBar
 	local frameTexture = isAlterntePowerFrame and Player.frameContainer.AlternatePowerFrameTexture or Player.frameContainer.FrameTexture
+	local texture = "FrameTexture"
+	frameTexture:SetTexture(textures["FrameTexture"].path)
 	if isAlterntePowerFrame then
-		frameTexture:SetTexture(textures["AlternateFrameTexture"].path)
-		frameTexture:SetTexCoord(unpack(textures["AlternateFrameTexture"].coords))
-		Player.frameContainer.FrameFlash:SetTexture(textures["AlternateFrameFlash"].path)
-		Player.frameContainer.FrameFlash:SetTexCoord(unpack(textures["AlternateFrameFlash"].coords))
-		Player.HealthBar.HealthBarMask:SetAtlas("UI-HUD-UnitFrame-Player-PortraitOn-Bar-Health-Mask")
-		Player.HealthBar.HealthBarMask:SetPoint("TOPLEFT",Player.HealthBar,-2,10)
-		Player.HealthBar.HealthBarMask:SetPoint("BOTTOMRIGHT",Player.HealthBar,2,-10)
-	else
-		frameTexture:SetTexture(textures["FrameTexture"].path)
-		frameTexture:SetTexCoord(unpack(textures["FrameTexture"].coords))
-		Player.frameContainer.FrameFlash:SetTexture(textures["FrameFlash"].path)
-		Player.frameContainer.FrameFlash:SetTexCoord(unpack(textures["FrameFlash"].coords))
-		Player.HealthBar.HealthBarMask:SetTexture(textures["Mask"].path)
-		Player.HealthBar.HealthBarMask:SetPoint("TOPLEFT",Player.HealthBar,-3,7)
-		Player.HealthBar.HealthBarMask:SetPoint("BOTTOMRIGHT",Player.HealthBar,2,-12)
+		texture = "AlternateFrameTexture"
 	end
+	frameTexture:SetTexCoord(unpack(textures[texture].coords))
+	Player.frameContainer.FrameFlash:SetTexture(textures["FrameFlash"].path)
+	Player.frameContainer.FrameFlash:SetTexCoord(unpack(textures["FrameFlash"].coords))
+	Player.HealthBar.HealthBarMask:SetTexture(textures["Mask"].path)
+	Player.HealthBar.HealthBarMask:SetPoint("TOPLEFT",Player.HealthBar,-3,7)
+	Player.HealthBar.HealthBarMask:SetPoint("BOTTOMRIGHT",Player.HealthBar,2,-12)
 	Player.HealthBar:SetHeight(31)
 end
 
@@ -66,27 +58,28 @@ local function toVehicelArt()
 	Player.frameContainer.FrameFlash:SetTexCoord(0,1,0,1)
 end
 
+local resourceBars = {
+	Player.PowerBar,
+	InsanityBarFrame,
+	AlternatePowerBar,
+	MonkStaggerBar,
+}
 
 function BiggerHealthBar:OnEnable()
 	HealthBarColor:RegisterOnToPlayerArt(toPlayerArt)
 	HealthBarColor:RegisterOnToVehicleArt(toVehicelArt)
     toPlayerArt()
-    for _,resourcebar in pairs({
-        Player.PowerBar,
-        InsanityBarFrame,
-    }) do
-        callbacks[resourcebar] = function() 
-			resourcebar:SetAlpha(0)
-		end
-        if not hooked[resourcebar] then
-            resourcebar:HookScript("OnShow",function() callbacks[resourcebar]() end)
-			hooked[resourcebar] = true
-        end
-        resourcebar:SetAlpha(0)
-    end
+	for i=1, #resourceBars do
+		local statusBar = resourceBars[i]
+		statusBar:SetAlpha(0)
+		self:HookScript(statusBar, "OnShow", function()
+			statusBar:SetAlpha(0)
+		end)
+	end
 end
 
 function BiggerHealthBar:OnDisable()
+	self:DisableHooks()
 	local isAlterntePowerFrame = PlayerFrame.activeAlternatePowerBar
 	local frameTexture = isAlterntePowerFrame and Player.frameContainer.AlternatePowerFrameTexture or Player.frameContainer.FrameTexture
     if isAlterntePowerFrame then
@@ -102,12 +95,8 @@ function BiggerHealthBar:OnDisable()
 	end
     Player.HealthBar.HealthBarMask:SetAtlas("UI-HUD-UnitFrame-Player-PortraitOn-Bar-Health-Mask")
 	Player.HealthBar:SetHeight(20)
-    for _,resourcebar in pairs({
-        Player.PowerBar,
-        InsanityBarFrame,
-    }) do
-        callbacks[resourcebar] = donothing
-		resourcebar:SetAlpha(1)
-    end
+	for i=1, #resourceBars do
+		resourceBars[i]:SetAlpha(1)
+	end
 end
 

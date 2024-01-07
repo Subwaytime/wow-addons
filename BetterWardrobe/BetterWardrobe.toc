@@ -1,9 +1,9 @@
 ## Interface: 100200
-## Title: BetterWardrobe (4.16.8)
-## Version: 4.16.8
+## Title: BetterWardrobe (4.17.1)
+## Version: 4.17.1
 ## Author: SLOKnightfall
 ## Notes: 
-## OptionalDeps: MogIt, CanIMogIt, LegionWardrobe, WardrobeEnhanced, Rarity, TransmogOutfits, ExtendedSets, ElvUI, PetTracker
+## OptionalDeps: MogIt, CanIMogIt, LegionWardrobe, WardrobeEnhanced, Rarity, TransmogOutfits, ExtendedSets, ElvUI, PetTracker, PetTrackerJournal
 ## SavedVariables: BetterWardrobe_Options, BetterWardrobe_CharacterData, BetterWardrobe_SavedSetData, BetterWardrobe_SubstituteItemData, BetterWardrobe_ListData, BetterWardrobe_Mogitdata, BetterWardrobe_Updates, BTT
 ## X-Curse-Project-ID: 401253
 ## X-Wago-ID: 0mKOzk6x
@@ -40,7 +40,7 @@ Data\Globals.lua
 Modules\CollectionTemplates.xml
 Modules\Templates.xml
 Modules\Core.lua
-
+#Modules\Celebrate.xml
 #Data files
 #Data\ColorData.lua
 Data\CameraData.lua

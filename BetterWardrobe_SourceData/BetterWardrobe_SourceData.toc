@@ -1,6 +1,6 @@
 ## Interface: 100200
-## Title: BetterWardrobe_SourceData (4.16.8)
-## Version: 4.16.8
+## Title: BetterWardrobe_SourceData (4.17.1)
+## Version: 4.17.1
 ## Author: SLOKnightfall
 ## Notes: 
 ## LoadOnDemand: 1

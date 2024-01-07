@@ -1,10 +1,10 @@
-lightweight tag 1895291b5f239de6bf2024939a2a4ae2d01c0beb 4.0.22-release
+lightweight tag b106845d043843c5021b0a7f9efff9e39dd72cc6 4.0.23-release
 Author:	André Pereira <pereirasmandre@gmail.com>
-Date:	Wed Nov 29 12:41:51 2023 +0000
+Date:	Sat Dec 16 21:17:33 2023 +0000
 
-commit 1895291b5f239de6bf2024939a2a4ae2d01c0beb
+commit b106845d043843c5021b0a7f9efff9e39dd72cc6
 Author: André Pereira <pereirasmandre@gmail.com>
-Date:   Wed Nov 29 12:41:51 2023 +0000
+Date:   Sat Dec 16 21:17:33 2023 +0000
 
-    version 4.0.22
+    4.0.23
 

@@ -40,6 +40,7 @@ L.Money = 'Money'
 L.Sort = 'Sort Button'
 L.Search = 'Search Toggle'
 L.Options = 'Options Button'
+L.Reagents = 'Reagents Button'
 L.LeftTabs = 'Rulesets on Left'
 L.LeftTabsTip = [[
 If enabled, the side tabs will be
@@ -48,13 +49,15 @@ displayed on the left side of the panel.]]
 L.Appearance = 'Appearance'
 L.Layer = 'Layer'
 L.BagBreak = 'Bag Break'
+L.ByType = 'By Type'
 L.ReverseBags = 'Reverse Bag Order'
 L.ReverseSlots = 'Reverse Slot Order'
 
 L.Color = 'Background Color'
 L.BorderColor = 'Border Color'
 
-L.Strata = 'Frame Layer'
+L.Strata = 'Layer'
+L.Skin = 'Skin'
 L.Columns = 'Columns'
 L.Scale = 'Scale'
 L.ItemScale = 'Item Scale'
@@ -62,7 +65,7 @@ L.Spacing = 'Spacing'
 L.Alpha = 'Opacity'
 
 -- auto display
-L.DisplayOptions = 'Automatic Display'
+L.DisplayOptions = 'Display Events'
 L.DisplayOptionsDescription = 'These settings allow you to configure when your inventory automatically opens or closes due to game events.'
 
 L.DisplayInventory = 'Display Inventory'
@@ -134,6 +137,9 @@ L.FAQ = {
 
   'Something is wrong! Item levels aren\'t showing over the slots.',
   'Bagnon does not natively display item levels. You must be using a third party plugin, such as |cffffd200Bagnon ItemLevel|r or |cffffd200Bagnon ItemInfo|r. Try to update the plugins you are using, most common cause is being out of date.|n|nPlease note that any issue with plugins should be reported to their authors, not with Jaliborc.',
+
+  'Bagnon is hiding one of my bags.',
+  'You probably hid it accidentally. Click on the bag slots button to see your bags. You can then click on any bag to toggle their visibility.',
 
   'How to toggle Bagnon for Bank, VoidStorage, etc?',
   'Go to Bagnon -> Frame Settings. You are looking for the two options at the very top of the panel. Choose the "Frame" you wish to toggle and then click "Enable Frame"'

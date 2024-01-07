@@ -1,5 +1,5 @@
 ## Interface: 100200
-## Version: 2.12.1
+## Version: 2.12.2
 ## Title: HealthBarColor
 ## Author: Slothpala
 ## SavedVariables: HealthBarColorDB
@@ -7,6 +7,8 @@
 ## IconTexture: Interface\AddOns\HealthBarColor\Textures\Icon\Icon.tga
 ## OptionalDeps: Ace3, LibDeflate, LibSharedMedia-3.0, LibDualSpec-1.0, LibDDI-1.0, AceGUI-3.0-SharedMediaWidgets
 ## X-Curse-Project-ID: 682398
+
+Init.lua
 
 #Embeds
 embeds.xml
@@ -18,10 +20,11 @@ DB\DB_Defaults.lua
 Options\Options.lua
 Options\OptionsFrame.lua
 ProfileSharing.lua
-HookRegistry.lua
+
 
 #Utils
 Utils\CombatLockdown.lua
+Utils\HookRegistry.lua
 
 #Modules
 include_modules.xml

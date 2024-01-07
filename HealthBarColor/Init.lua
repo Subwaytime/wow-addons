@@ -1,0 +1,3 @@
+local _, addonTable = ...
+
+addonTable.isRetail = true

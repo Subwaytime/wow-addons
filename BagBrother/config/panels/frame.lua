@@ -31,8 +31,9 @@ function Frames:Populate()
 		self:Add('Header', DISPLAY, 'GameFontHighlight', true)
 		self:AddRow(Config.displayRowHeight, function()
 			if Config.components then
-				if self.frame ~= 'guild' then
+				if self.frame == 'inventory' or self.frame == 'bank' then
 					self:AddCheck('bagToggle')
+          self:AddCheck('reagents')
 				end
 
         self:AddCheck('sort')
@@ -57,31 +58,41 @@ function Frames:Populate()
 
 		-- Appearance
 		self:Add('Header', L.Appearance, 'GameFontHighlight', true)
-		self:AddRow(70, function()
-			if Config.colors then
-				self:AddColor('color')
-				self:AddColor('borderColor')
+    self:AddRow(300, function()
+      if Config.skins then
+        local skins = {arg = 'skin'}
+        for i, skin in Addon.Skins:Iterate() do
+          skins[i] = {key = skin.id, text = skin.title, tip = skin.tooltip}
+        end
+        self:AddChoice(skins).bottom = 5
+
+        local current = Addon.Skins:Get(self.sets.skin)
+        if current then
+          if current.centerColor then
+				    self:AddColor('color'):SetSmall(true):SetKeys{left = 25, top = -5}
+          end
+          if current.borderColor then
+				    self:AddColor('borderColor'):SetSmall(true):SetKeys{left = 25, top = -5}
+          end
+        end
 			end
 
-			self:AddCheck('reverseBags')
-			self:AddCheck('reverseSlots')
-			self:AddCheck('bagBreak')
-
-			if REAGENTBANK_CONTAINER and self.frame == 'bank' then
-				self:AddCheck('exclusiveReagent')
-			end
-		end)
-
-    self:AddRow(150, function()
-      self:AddChoice {arg = 'strata', {key = 'LOW', text = LOW}, {key = 'MEDIUM', text = AUCTION_TIME_LEFT2}, {key = 'HIGH', text = HIGH}}
-      self:AddPercentage('alpha')
+      self:AddChoice{arg = 'strata', {key = 'LOW', text = LOW}, {key = 'MEDIUM', text = AUCTION_TIME_LEFT2}, {key = 'HIGH', text = HIGH}}
       self:AddPercentage('scale', 20, 300)
+      self:AddPercentage('alpha')
+
+      self:AddBreak()
+      self:AddChoice{arg = 'bagBreak', {key = 0, text = NONE}, {key = 1, text = L.ByType}, {key = 2, text = ALWAYS}}
       self:AddPercentage('itemScale', 20, 200)
       self:AddSlider('spacing', -15, 15)
-
+  
       if Config.columns then
         self:AddSlider('columns', 1, 50)
       end
+
+      self:AddBreak()
+      self:AddCheck('reverseBags')
+			self:AddCheck('reverseSlots')
     end)
   end
 end
