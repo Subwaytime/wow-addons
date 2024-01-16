@@ -66,8 +66,21 @@ function Font_Player:OnDisable()
     end
 end
 
+local i = 0
 function Font_Player:SetFonts()
-    Player.Name:SetFont(name_font, name_size, name_outline)
+    local success = Player.Name:SetFont(name_font, name_size, name_outline)
+    --[[
+        Hacky method to fix a problem where the PlayerName would just ignore SetFont on the first start of the game (prior to reloading or logging onto another character), even on repeat calls.
+        Things I have tried without success:
+        -timer after x 
+        -repeatedly calling the function any numbers of times
+        I don't fully understand why this is, and I assume it's a bug in the game itself.
+    ]]
+    if not success and i < 10 then
+        i = i + 1
+        name_font = Media:Fetch("font", "") --defaults to Fonts\\FRIZQT__.TTF 
+        self:SetFonts()
+    end
     Player.Name:SetTextColor(name_color.r,name_color.g,name_color.b)
     for _,text in pairs (Player.HealthText) do
         text:SetFont(healthbar_font, healthbar_size, healthbar_outline)

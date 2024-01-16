@@ -1,6 +1,8 @@
 # Console Port
 
-## [2.7.18](https://github.com/seblindfors/ConsolePort/tree/2.7.18) (2024-01-06)
-[Full Changelog](https://github.com/seblindfors/ConsolePort/compare/2.7.17...2.7.18) [Previous Releases](https://github.com/seblindfors/ConsolePort/releases)
+## [2.7.21](https://github.com/seblindfors/ConsolePort/tree/2.7.21) (2024-01-13)
+[Full Changelog](https://github.com/seblindfors/ConsolePort/compare/2.7.20...2.7.21) [Previous Releases](https://github.com/seblindfors/ConsolePort/releases)
 
-- Fix bug where cursors don't show attention grabbing animation  
+- Add fix for the pvp results frame causing cursor flickering  
+- Fix issue where group loot frames can become inaccessible to the cursor  
+- Remove unnecessary code in node calculations  

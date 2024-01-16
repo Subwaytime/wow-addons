@@ -1,3 +1,6 @@
+10.2.09 - 10th January 2023
+- Added a new command '/ltp quest wipe' which will clear the quest log.
+
 10.2.08 - 3rd January 2023
 - Updated 'Automate gossip' ('Automation') for soft targeting.
 - For the minimap button, holding CTRL and SHIFT will now toggle windowed mode.  Holding CTRL and ALT will toggle the Zygor addon (if installed).

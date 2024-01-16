@@ -11,6 +11,7 @@ local fonts = Media:List("font")
 local L = LibStub("AceLocale-3.0"):GetLocale("HealthBarColor")
 local lastEntry = 6
 local selectedWidth, colorWidth, statusBarWidth = 1, 0.4, 1.8
+
 local options = {
     name = "HealthBarColor",
     handler = HealthBarColor,
@@ -18,7 +19,7 @@ local options = {
     args = {
         Version = {
             order = 0,
-            name = "2.12.2",
+            name = "2.12.3",
             type = "group",
             disabled = true,
             args = {},
@@ -284,29 +285,50 @@ local options = {
                         name = {
                             order = 1,
                             type = "select",
-                            dialogControl = "LSM30_Font", 
                             name = L["Name"],
-                            values = Media:HashTable("font"), 
-                            get = "GetStatus",
-                            set = "SetStatus",
+                            values = fonts,
+                            get = function()
+                                for i, v in next, fonts do
+                                    if v == HealthBarColor.db.profile.Fonts.General.name then return i end
+                                end
+                            end,
+                            set = function(_, value)
+                                HealthBarColor.db.profile.Fonts.General.name = fonts[value]
+                                HealthBarColor:ReloadConfig()
+                            end,
+                          itemControl = "DDI-Font",
                         },
                         healthbar = {
                             order = 2,
                             type = "select",
-                            dialogControl = "LSM30_Font", 
                             name = L["Health Bar"],
-                            values = Media:HashTable("font"), 
-                            get = "GetStatus",
-                            set = "SetStatus",
+                            values = fonts,
+                            get = function()
+                                for i, v in next, fonts do
+                                    if v == HealthBarColor.db.profile.Fonts.General.healthbar then return i end
+                                end
+                            end,
+                            set = function(_, value)
+                                HealthBarColor.db.profile.Fonts.General.healthbar = fonts[value]
+                                HealthBarColor:ReloadConfig()
+                            end,
+                          itemControl = "DDI-Font",
                         },
                         powerbar = {
                             order = 3,
                             type = "select",
-                            dialogControl = "LSM30_Font", 
                             name = L["Power Bar"],
-                            values = Media:HashTable("font"), 
-                            get = "GetStatus",
-                            set = "SetStatus",
+                            values = fonts,
+                            get = function()
+                                for i, v in next, fonts do
+                                    if v == HealthBarColor.db.profile.Fonts.General.powerbar then return i end
+                                end
+                            end,
+                            set = function(_, value)
+                                HealthBarColor.db.profile.Fonts.General.powerbar = fonts[value]
+                                HealthBarColor:ReloadConfig()
+                            end,
+                          itemControl = "DDI-Font",
                         },
                         newline = {
                             order = 4,

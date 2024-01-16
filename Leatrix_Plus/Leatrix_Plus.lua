@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------
--- 	Leatrix Plus 10.2.08 (3rd January 2024)
+-- 	Leatrix Plus 10.2.09 (10th January 2024)
 ----------------------------------------------------------------------
 
 --	01:Functns, 02:Locks, 03:Restart, 20:Live, 30:Isolated, 40:Player
@@ -18,7 +18,7 @@
 	local void
 
 	-- Version
-	LeaPlusLC["AddonVer"] = "10.2.08"
+	LeaPlusLC["AddonVer"] = "10.2.09"
 
 	-- Get locale table
 	local void, Leatrix_Plus = ...
@@ -12000,7 +12000,17 @@
 			elseif str == "quest" then
 				-- Show quest completed status
 				if arg1 and arg1 ~= "" then
-					if tonumber(arg1) and tonumber(arg1) < 999999999 then
+					if arg1 == "wipe" then
+						-- Wipe quest log
+						for i = 1, C_QuestLog.GetNumQuestLogEntries() do
+							C_QuestLog.SetSelectedQuest(C_QuestLog.GetInfo(i).questID)
+							C_QuestLog.SetAbandonQuest()
+							C_QuestLog.AbandonQuest()
+						end
+						LeaPlusLC:Print(L["Quest log wiped."])
+						return
+					elseif tonumber(arg1) and tonumber(arg1) < 999999999 then
+						-- Show quest information
 						LeaPlusLC.LoadQuestEventFrame = LeaPlusLC.LoadQuestEventFrame or CreateFrame("FRAME")
 						LeaPlusLC.LoadQuestEventFrame:SetScript("OnEvent", function(self, event, questID, success)
 							if tonumber(questID) == tonumber(arg1) then
@@ -12999,7 +13009,7 @@
 				-- Help panel
 				if not LeaPlusLC.HelpFrame then
 					local frame = CreateFrame("FRAME", nil, UIParent)
-					frame:SetSize(570, 380); frame:SetFrameStrata("FULLSCREEN_DIALOG"); frame:SetFrameLevel(100)
+					frame:SetSize(570, 400); frame:SetFrameStrata("FULLSCREEN_DIALOG"); frame:SetFrameLevel(100)
 					frame.tex = frame:CreateTexture(nil, "BACKGROUND"); frame.tex:SetAllPoints(); frame.tex:SetColorTexture(0.05, 0.05, 0.05, 0.9)
 					frame.close = LeaPlusLC:CreateCloseButton(frame, 30, 30, "TOPRIGHT", 0, 0)
 					frame.close:SetScript("OnClick", function() frame:Hide() end)
@@ -13012,7 +13022,7 @@
 					frame:SetScript("OnDragStart", frame.StartMoving)
 					frame:SetScript("OnDragStop", function() frame:StopMovingOrSizing() frame:SetUserPlaced(false) end)
 					frame:Hide()
-					LeaPlusLC:CreateBar("HelpPanelMainTexture", frame, 570, 380, "TOPRIGHT", 0.7, 0.7, 0.7, 0.7,  "Interface\\ACHIEVEMENTFRAME\\UI-GuildAchievement-Parchment-Horizontal-Desaturated.png")
+					LeaPlusLC:CreateBar("HelpPanelMainTexture", frame, 570, 400, "TOPRIGHT", 0.7, 0.7, 0.7, 0.7,  "Interface\\ACHIEVEMENTFRAME\\UI-GuildAchievement-Parchment-Horizontal-Desaturated.png")
 					-- Panel contents
 					local col1, col2, color1 = 10, 120, "|cffffffaa"
 					LeaPlusLC:MakeTx(frame, "Leatrix Plus Help", col1, -10)
@@ -13028,28 +13038,30 @@
 					LeaPlusLC:MakeWD(frame, "Show number of rested XP bubbles remaining.", col2, -110)
 					LeaPlusLC:MakeWD(frame, color1 .. "/ltp quest <id>", col1, -130)
 					LeaPlusLC:MakeWD(frame, "Show quest completion status for <quest id>.", col2, -130)
-					LeaPlusLC:MakeWD(frame, color1 .. "/ltp hk", col1, -150)
-					LeaPlusLC:MakeWD(frame, "Show your lifetime honorable kills.", col2, -150)
-					LeaPlusLC:MakeWD(frame, color1 .. "/ltp grid", col1, -170)
-					LeaPlusLC:MakeWD(frame, "Toggle a frame alignment grid.", col2, -170)
-					LeaPlusLC:MakeWD(frame, color1 .. "/ltp id", col1, -190)
-					LeaPlusLC:MakeWD(frame, "Show a web link for whatever the pointer is over.", col2, -190)
-					LeaPlusLC:MakeWD(frame, color1 .. "/ltp zygor", col1, -210)
-					LeaPlusLC:MakeWD(frame, "Toggle the Zygor addon (reloads UI).", col2, -210)
-					LeaPlusLC:MakeWD(frame, color1 .. "/ltp movie <id>", col1, -230)
-					LeaPlusLC:MakeWD(frame, "Play a movie by its ID.", col2, -230)
-					LeaPlusLC:MakeWD(frame, color1 .. "/ltp enigma", col1, -250)
-					LeaPlusLC:MakeWD(frame, "Toggle the Enigmatic quest solver.", col2, -250)
-					LeaPlusLC:MakeWD(frame, color1 .. "/ltp marker", col1, -270)
-					LeaPlusLC:MakeWD(frame, "Block target markers (toggle) (requires assistant or leader in raid).", col2, -270)
-					LeaPlusLC:MakeWD(frame, color1 .. "/ltp rsnd", col1, -290)
-					LeaPlusLC:MakeWD(frame, "Restart the sound system.", col2, -290)
-					LeaPlusLC:MakeWD(frame, color1 .. "/ltp ra", col1, -310)
-					LeaPlusLC:MakeWD(frame, "Announce target in General chat channel (useful for rares).", col2, -310)
-					LeaPlusLC:MakeWD(frame, color1 .. "/ltp con", col1, -330)
-					LeaPlusLC:MakeWD(frame, "Launch the developer console with a large font.", col2, -330)
-					LeaPlusLC:MakeWD(frame, color1 .. "/rl", col1, -350)
-					LeaPlusLC:MakeWD(frame, "Reload the UI.", col2, -350)
+					LeaPlusLC:MakeWD(frame, color1 .. "/ltp quest wipe", col1, -150)
+					LeaPlusLC:MakeWD(frame, "Wipe your quest log.", col2, -150)
+					LeaPlusLC:MakeWD(frame, color1 .. "/ltp hk", col1, -170)
+					LeaPlusLC:MakeWD(frame, "Show your lifetime honorable kills.", col2, -170)
+					LeaPlusLC:MakeWD(frame, color1 .. "/ltp grid", col1, -190)
+					LeaPlusLC:MakeWD(frame, "Toggle a frame alignment grid.", col2, -190)
+					LeaPlusLC:MakeWD(frame, color1 .. "/ltp id", col1, -210)
+					LeaPlusLC:MakeWD(frame, "Show a web link for whatever the pointer is over.", col2, -210)
+					LeaPlusLC:MakeWD(frame, color1 .. "/ltp zygor", col1, -230)
+					LeaPlusLC:MakeWD(frame, "Toggle the Zygor addon (reloads UI).", col2, -230)
+					LeaPlusLC:MakeWD(frame, color1 .. "/ltp movie <id>", col1, -250)
+					LeaPlusLC:MakeWD(frame, "Play a movie by its ID.", col2, -250)
+					LeaPlusLC:MakeWD(frame, color1 .. "/ltp enigma", col1, -270)
+					LeaPlusLC:MakeWD(frame, "Toggle the Enigmatic quest solver.", col2, -270)
+					LeaPlusLC:MakeWD(frame, color1 .. "/ltp marker", col1, -290)
+					LeaPlusLC:MakeWD(frame, "Block target markers (toggle) (requires assistant or leader in raid).", col2, -290)
+					LeaPlusLC:MakeWD(frame, color1 .. "/ltp rsnd", col1, -310)
+					LeaPlusLC:MakeWD(frame, "Restart the sound system.", col2, -310)
+					LeaPlusLC:MakeWD(frame, color1 .. "/ltp ra", col1, -330)
+					LeaPlusLC:MakeWD(frame, "Announce target in General chat channel (useful for rares).", col2, -330)
+					LeaPlusLC:MakeWD(frame, color1 .. "/ltp con", col1, -350)
+					LeaPlusLC:MakeWD(frame, "Launch the developer console with a large font.", col2, -350)
+					LeaPlusLC:MakeWD(frame, color1 .. "/rl", col1, -370)
+					LeaPlusLC:MakeWD(frame, "Reload the UI.", col2, -370)
 					LeaPlusLC.HelpFrame = frame
 					_G["LeaPlusGlobalHelpPanel"] = frame
 					table.insert(UISpecialFrames, "LeaPlusGlobalHelpPanel")
