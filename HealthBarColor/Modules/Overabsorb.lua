@@ -18,6 +18,7 @@ local function anchorGlowToOverlay(HBC_Unit)
 end
 
 function Overabsorb:OnEnable()
+	--[[
 	Player = HealthBarColor:GetUnit("Player")
 	Target = HealthBarColor:GetUnit("Target")
 	Focus = HealthBarColor:GetUnit("Focus")
@@ -75,9 +76,11 @@ function Overabsorb:OnEnable()
 		end)
 		hooked = true
 	end
+	]]
 end
 
 function Overabsorb:OnDisable()
+	--[[
 	local function restore(HBC_Unit)
 		HBC_Unit.TotalAbsorbBarOverlay:ClearAllPoints()
 		HBC_Unit.TotalAbsorbBarOverlay:SetAllPoints(HBC_Unit.TotalAbsorbBar)
@@ -93,5 +96,6 @@ function Overabsorb:OnDisable()
 	end
 	UnitFrame_Update_Callback = donothing
 	UnitFrameHealPredictionBars_Update_Callback = donothing
+	]]
 end
 

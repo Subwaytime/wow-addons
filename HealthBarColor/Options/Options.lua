@@ -19,7 +19,7 @@ local options = {
     args = {
         Version = {
             order = 0,
-            name = "2.12.3",
+            name = "2.12.5",
             type = "group",
             disabled = true,
             args = {},
@@ -837,6 +837,7 @@ local options = {
                            -- guiHidden = not isRetail,
                         },
                         Overabsorb = {
+                            disabled = true,
                             order = 9,
                             name = L["Overabsorb"],
                             desc = L["overabsorb_desc"],

@@ -1,5 +1,5 @@
-----------------------------------------------------------------------
--- 	Leatrix Plus 10.2.09 (10th January 2024)
+﻿----------------------------------------------------------------------
+-- 	Leatrix Plus 10.2.10 (16th January 2024)
 ----------------------------------------------------------------------
 
 --	01:Functns, 02:Locks, 03:Restart, 20:Live, 30:Isolated, 40:Player
@@ -18,7 +18,7 @@
 	local void
 
 	-- Version
-	LeaPlusLC["AddonVer"] = "10.2.09"
+	LeaPlusLC["AddonVer"] = "10.2.10"
 
 	-- Get locale table
 	local void, Leatrix_Plus = ...
@@ -40,11 +40,11 @@
 	end
 
 	-- Check for addons
-	if IsAddOnLoaded("ElvUI") then LeaPlusLC.ElvUI = unpack(ElvUI) end
-	if IsAddOnLoaded("Glass") then LeaPlusLC.Glass = true end
-	if IsAddOnLoaded("Titan") then LeaPlusLC.Titan = true end
-	if IsAddOnLoaded("Leatrix_Maps") then LeaPlusLC.Leatrix_Maps = true end
-	if IsAddOnLoaded("totalRP3") then LeaPlusLC.totalRP3 = true end
+	if C_AddOns.IsAddOnLoaded("ElvUI") then LeaPlusLC.ElvUI = unpack(ElvUI) end
+	if C_AddOns.IsAddOnLoaded("Glass") then LeaPlusLC.Glass = true end
+	if C_AddOns.IsAddOnLoaded("Titan") then LeaPlusLC.Titan = true end
+	if C_AddOns.IsAddOnLoaded("Leatrix_Maps") then LeaPlusLC.Leatrix_Maps = true end
+	if C_AddOns.IsAddOnLoaded("totalRP3") then LeaPlusLC.totalRP3 = true end
 
 ----------------------------------------------------------------------
 --	L00: Leatrix Plus
@@ -371,16 +371,16 @@
 
 	-- Toggle Zygor addon
 	function LeaPlusLC:ZygorToggle()
-		if select(2, GetAddOnInfo("ZygorGuidesViewer")) then
-			if not IsAddOnLoaded("ZygorGuidesViewer") then
+		if select(2, C_AddOns.GetAddOnInfo("ZygorGuidesViewer")) then
+			if not C_AddOns.IsAddOnLoaded("ZygorGuidesViewer") then
 				if LeaPlusLC:PlayerInCombat() then
 					return
 				else
-					EnableAddOn("ZygorGuidesViewer")
+					C_AddOns.EnableAddOn("ZygorGuidesViewer")
 					ReloadUI();
 				end
 			else
-				DisableAddOn("ZygorGuidesViewer")
+				C_AddOns.DisableAddOn("ZygorGuidesViewer")
 				ReloadUI();
 			end
 		else
@@ -1348,7 +1348,7 @@
 			end
 
 			-- Run function when achievement UI is loaded
-			if IsAddOnLoaded("Blizzard_AchievementUI") then
+			if C_AddOns.IsAddOnLoaded("Blizzard_AchievementUI") then
 				DoWowheadAchievementFunc()
 			else
 				local waitAchievementsFrame = CreateFrame("FRAME")
@@ -2151,7 +2151,7 @@
 
 			end
 
-			if IsAddOnLoaded("Blizzard_Collections") then
+			if C_AddOns.IsAddOnLoaded("Blizzard_Collections") then
 				DoBlizzardCollectionsFunc()
 			else
 				local waitFrame = CreateFrame("FRAME")
@@ -2170,7 +2170,7 @@
 				InspectModelFrameControlFrame:HookScript("OnShow", InspectModelFrameControlFrame.Hide)
 			end
 
-			if IsAddOnLoaded("Blizzard_InspectUI") then
+			if C_AddOns.IsAddOnLoaded("Blizzard_InspectUI") then
 				DoInspectSystemFunc()
 			else
 				local waitFrame = CreateFrame("FRAME")
@@ -2268,7 +2268,7 @@
 			end
 
 			-- Run function when Blizzard addon has loaded
-			if IsAddOnLoaded("Blizzard_OrderHallUI") then
+			if C_AddOns.IsAddOnLoaded("Blizzard_OrderHallUI") then
 				HideCommandBar()
 			else
 				local waitFrame = CreateFrame("FRAME")
@@ -2422,7 +2422,7 @@
 			end
 
 			-- Run system function when pet journal loads
-			if IsAddOnLoaded("Blizzard_Collections") then
+			if C_AddOns.IsAddOnLoaded("Blizzard_Collections") then
 				MakePetSystem()
 			else
 				local waitFrame = CreateFrame("FRAME")
@@ -2745,9 +2745,7 @@
 			-- Function to check if a required item is account-bound
 			local function IsItemAccountBound(itemID)
 				local tooltipData = C_TooltipInfo.GetItemByID(itemID)
-				TooltipUtil.SurfaceArgs(tooltipData)
 				for row, line in ipairs(tooltipData.lines) do
-				   TooltipUtil.SurfaceArgs(line)
 					if tooltipData.lines[row] and tooltipData.lines[row].leftText and (tooltipData.lines[row].leftText == ITEM_BNETACCOUNTBOUND or tooltipData.lines[row].leftText == ITEM_BIND_TO_BNETACCOUNT or tooltipData.lines[row].leftText == ITEM_BIND_TO_ACCOUNT or tooltipData.lines[row].leftText == ITEM_ACCOUNTBOUND) then
 						return true
 					end
@@ -3241,19 +3239,22 @@
 			})
 			eb:SetBackdropBorderColor(1.0, 0.85, 0.0, 0.5)
 
-			eb.scroll = CreateFrame("ScrollFrame", nil, eb, "UIPanelScrollFrameTemplate")
+			eb.scroll = CreateFrame("ScrollFrame", nil, eb, "LeaPlusSellJunkScrollFrameTemplate")
 			eb.scroll:SetPoint("TOPLEFT", eb, 12, -10)
 			eb.scroll:SetPoint("BOTTOMRIGHT", eb, -30, 10)
+			eb.scroll:SetPanExtent(16)
 
-			eb.Text = CreateFrame("EditBox", nil, eb)
-			eb.Text:SetMultiLine(true)
+			-- Create character count
+			eb.scroll.CharCount = eb.scroll:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
+			eb.scroll.CharCount:Hide()
+
+			eb.Text = eb.scroll.EditBox
 			eb.Text:SetWidth(150)
 			eb.Text:SetPoint("TOPLEFT", eb.scroll)
 			eb.Text:SetPoint("BOTTOMRIGHT", eb.scroll)
 			eb.Text:SetMaxLetters(2000)
 			eb.Text:SetFontObject(GameFontNormalLarge)
 			eb.Text:SetAutoFocus(false)
-			eb.Text:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
 			eb.scroll:SetScrollChild(eb.Text)
 
 			-- Set focus on the editbox text when clicking the editbox
@@ -4369,12 +4370,16 @@
 			})
 			eb:SetBackdropBorderColor(1.0, 0.85, 0.0, 0.5)
 
-			eb.scroll = CreateFrame("ScrollFrame", nil, eb, "UIPanelScrollFrameTemplate")
+			eb.scroll = CreateFrame("ScrollFrame", nil, eb, "LeaPlusMuteCustomSoundsScrollFrameTemplate")
 			eb.scroll:SetPoint("TOPLEFT", eb, 12, -10)
 			eb.scroll:SetPoint("BOTTOMRIGHT", eb, -30, 10)
+			eb.scroll:SetPanExtent(16)
 
-			eb.Text = CreateFrame("EditBox", nil, eb)
-			eb.Text:SetMultiLine(true)
+			-- Create character count
+			eb.scroll.CharCount = eb.scroll:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
+			eb.scroll.CharCount:Hide()
+
+			eb.Text = eb.scroll.EditBox
 			eb.Text:SetWidth(494)
 			eb.Text:SetHeight(230)
 			eb.Text:SetPoint("TOPLEFT", eb.scroll)
@@ -4382,7 +4387,6 @@
 			eb.Text:SetMaxLetters(2000)
 			eb.Text:SetFontObject(GameFontNormalLarge)
 			eb.Text:SetAutoFocus(false)
-			eb.Text:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
 			eb.scroll:SetScrollChild(eb.Text)
 
 			-- Set focus on the editbox text when clicking the editbox
@@ -4905,12 +4909,16 @@
 				})
 				eb:SetBackdropBorderColor(1.0, 0.85, 0.0, 0.5)
 
-				eb.scroll = CreateFrame("ScrollFrame", nil, eb, "UIPanelScrollFrameTemplate")
+				eb.scroll = CreateFrame("ScrollFrame", nil, eb, "LeaPlusEnhanceMinimapExcludeButtonsScrollFrameTemplate")
 				eb.scroll:SetPoint("TOPLEFT", eb, 12, -10)
 				eb.scroll:SetPoint("BOTTOMRIGHT", eb, -30, 10)
+				eb.scroll:SetPanExtent(16)
 
-				eb.Text = CreateFrame("EditBox", nil, eb)
-				eb.Text:SetMultiLine(true)
+				-- Create character count
+				eb.scroll.CharCount = eb.scroll:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
+				eb.scroll.CharCount:Hide()
+
+				eb.Text = eb.scroll.EditBox
 				eb.Text:SetWidth(494)
 				eb.Text:SetHeight(230)
 				eb.Text:SetPoint("TOPLEFT", eb.scroll)
@@ -4918,7 +4926,6 @@
 				eb.Text:SetMaxLetters(1200)
 				eb.Text:SetFontObject(GameFontNormalLarge)
 				eb.Text:SetAutoFocus(false)
-				eb.Text:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
 				eb.scroll:SetScrollChild(eb.Text)
 
 				-- Set focus on the editbox text when clicking the editbox
@@ -4985,10 +4992,10 @@
 				-- Function to make tooltip string with list of addons
 				local function MakeAddonString()
 					local msg = ""
-					local numAddons = GetNumAddOns()
+					local numAddons = C_AddOns.GetNumAddOns()
 					for i = 1, numAddons do
-						if IsAddOnLoaded(i) then
-							local name = GetAddOnInfo(i)
+						if C_AddOns.IsAddOnLoaded(i) then
+							local name = C_AddOns.GetAddOnInfo(i)
 							if name and _G["LibDBIcon10_" .. name] then -- Only list LibDBIcon buttons
 								msg = msg .. name .. ", "
 							end
@@ -5404,7 +5411,7 @@
 				end
 
 				-- Run function when Blizzard addon is loaded
-				if IsAddOnLoaded("Blizzard_HybridMinimap") then
+				if C_AddOns.IsAddOnLoaded("Blizzard_HybridMinimap") then
 					SetHybridMap()
 				else
 					local waitFrame = CreateFrame("FRAME")
@@ -6151,7 +6158,7 @@
 			end
 
 			-- Run function when Trainer UI has loaded
-			if IsAddOnLoaded("Blizzard_TrainerUI") then
+			if C_AddOns.IsAddOnLoaded("Blizzard_TrainerUI") then
 				TrainerFunc()
 			else
 				local waitFrame = CreateFrame("FRAME")
@@ -7508,7 +7515,8 @@
 				_G[chtfrm .. "Tab"].newglow:SetPoint("BOTTOMLEFT", _G[chtfrm .. "Tab"], "BOTTOMLEFT", 0, 0)
 				_G[chtfrm .. "Tab"].newglow:SetTexture("Interface\\ChatFrame\\ChatFrameTab-NewMessage")
 				_G[chtfrm .. "Tab"].newglow:SetWidth(_G[chtfrm .. "Tab"]:GetWidth())
-				_G[chtfrm .. "Tab"].newglow:SetVertexColor(0.6, 0.6, 1, 1)
+				_G[chtfrm .. "Tab"].newglow:SetVertexColor(0.6, 0.6, 1, 0.7)
+				_G[chtfrm .. "Tab"].newglow:SetBlendMode("ADD")
 				_G[chtfrm .. "Tab"].newglow:Hide()
 
 				-- Show new bottom button when old one glows
@@ -7671,7 +7679,7 @@
 		if LeaPlusLC["RecentChatWindow"] == "On" and not LeaLockList["RecentChatWindow"] then
 
 			-- Create recent chat frame
-			local editFrame = CreateFrame("ScrollFrame", nil, UIParent, "InputScrollFrameTemplate")
+			local editFrame = CreateFrame("ScrollFrame", nil, UIParent, "LeaPlusRecentChatScrollFrameTemplate")
 
 			-- Set frame parameters
 			editFrame:ClearAllPoints()
@@ -7680,37 +7688,23 @@
 			editFrame:SetFrameStrata("MEDIUM")
 			editFrame:SetToplevel(true)
 			editFrame:Hide()
-			editFrame.CharCount:Hide()
 
 			-- Add background color
 			editFrame.t = editFrame:CreateTexture(nil, "BACKGROUND")
 			editFrame.t:SetAllPoints()
 			editFrame.t:SetColorTexture(0.00, 0.00, 0.0, 0.6)
 
-			-- Set textures
-			editFrame.LeftTex:SetTexture(editFrame.RightTex:GetTexture()); editFrame.LeftTex:SetTexCoord(1, 0, 0, 1)
-			editFrame.BottomTex:SetTexture(editFrame.TopTex:GetTexture()); editFrame.BottomTex:SetTexCoord(0, 1, 1, 0)
-			editFrame.BottomRightTex:SetTexture(editFrame.TopRightTex:GetTexture()); editFrame.BottomRightTex:SetTexCoord(0, 1, 1, 0)
-			editFrame.BottomLeftTex:SetTexture(editFrame.TopRightTex:GetTexture()); editFrame.BottomLeftTex:SetTexCoord(1, 0, 1, 0)
-			editFrame.TopLeftTex:SetTexture(editFrame.TopRightTex:GetTexture()); editFrame.TopLeftTex:SetTexCoord(1, 0, 0, 1)
-
 			-- Create title bar
-			local titleFrame = CreateFrame("ScrollFrame", nil, editFrame, "InputScrollFrameTemplate")
+			local titleFrame = CreateFrame("Frame", nil, editFrame)
 			titleFrame:ClearAllPoints()
-			titleFrame:SetPoint("TOP", 0, 32)
+			titleFrame:SetPoint("TOP", 0, 24)
 			titleFrame:SetSize(600, 24)
 			titleFrame:SetFrameStrata("MEDIUM")
 			titleFrame:SetToplevel(true)
 			titleFrame:SetHitRectInsets(-6, -6, -6, -6)
-			titleFrame.CharCount:Hide()
 			titleFrame.t = titleFrame:CreateTexture(nil, "BACKGROUND")
 			titleFrame.t:SetAllPoints()
-			titleFrame.t:SetColorTexture(0.00, 0.00, 0.0, 0.6)
-			titleFrame.LeftTex:SetTexture(titleFrame.RightTex:GetTexture()); titleFrame.LeftTex:SetTexCoord(1, 0, 0, 1)
-			titleFrame.BottomTex:SetTexture(titleFrame.TopTex:GetTexture()); titleFrame.BottomTex:SetTexCoord(0, 1, 1, 0)
-			titleFrame.BottomRightTex:SetTexture(titleFrame.TopRightTex:GetTexture()); titleFrame.BottomRightTex:SetTexCoord(0, 1, 1, 0)
-			titleFrame.BottomLeftTex:SetTexture(titleFrame.TopRightTex:GetTexture()); titleFrame.BottomLeftTex:SetTexCoord(1, 0, 1, 0)
-			titleFrame.TopLeftTex:SetTexture(titleFrame.TopRightTex:GetTexture()); titleFrame.TopLeftTex:SetTexCoord(1, 0, 0, 1)
+			titleFrame.t:SetColorTexture(0.00, 0.00, 0.0, 0.8)
 
 			-- Add message count
 			titleFrame.m = titleFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
@@ -7726,10 +7720,6 @@
 			titleFrame.x:SetWidth(600 - titleFrame.m:GetStringWidth() - 30)
 			titleFrame.x:SetWordWrap(false)
 			titleFrame.x:SetJustifyH("RIGHT")
-
-			local titleBox = titleFrame.EditBox
-			titleBox:Hide()
-			titleBox:SetEnabled(false)
 
 			-- Drag to resize
 			editFrame:SetResizable(true)
@@ -7753,6 +7743,10 @@
 				end
 			end)
 
+			-- Create character count
+			editFrame.CharCount = editFrame:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
+			editFrame.CharCount:Hide()
+
 			-- Create editbox
 			local editBox = editFrame.EditBox
 			editBox:SetAltArrowKeyMode(false)
@@ -7760,6 +7754,8 @@
 			editBox:SetWidth(editFrame:GetWidth() - 30)
 			editBox:SetSecurityDisablePaste()
 			editBox:SetMaxLetters(0)
+
+			editFrame:SetScrollChild(editBox)
 
 			-- Manage focus
 			editBox:HookScript("OnEditFocusLost", function()
@@ -7790,18 +7786,6 @@
 			-- Disable text changes while still allowing editing controls to work
 			editBox:EnableKeyboard(false)
 			editBox:SetScript("OnKeyDown", function() end)
-
-			--- Clear highlighted text if escape key is pressed
-			editBox:HookScript("OnEscapePressed", function()
-				editBox:HighlightText(0, 0)
-				editBox:ClearFocus()
-			end)
-
-			-- Clear highlighted text and clear focus if enter key is pressed
-			editBox:SetScript("OnEnterPressed", function()
-				editBox:HighlightText(0, 0)
-				editBox:ClearFocus()
-			end)
 
 			-- Populate recent chat frame with chat messages
 			local function ShowChatbox(chtfrm)
@@ -8564,7 +8548,7 @@
 			end
 
 			-- Run function when Blizzard addon has loaded
-			if IsAddOnLoaded("Blizzard_CharacterCustomize") then
+			if C_AddOns.IsAddOnLoaded("Blizzard_CharacterCustomize") then
 				CharCustomiseFunc()
 			else
 				local waitFrame = CreateFrame("FRAME")
@@ -8595,7 +8579,7 @@
 			end
 
 			-- Run function when Blizzard addon has loaded
-			if IsAddOnLoaded("Blizzard_Contribution") then
+			if C_AddOns.IsAddOnLoaded("Blizzard_Contribution") then
 				ContributionTipFunc()
 			else
 				local waitFrame = CreateFrame("FRAME")
@@ -8626,7 +8610,7 @@
 			end
 
 			-- Run function when Blizzard addon has loaded
-			if IsAddOnLoaded("Blizzard_Collections") then
+			if C_AddOns.IsAddOnLoaded("Blizzard_Collections") then
 				PetJournalTipFunc()
 			else
 				local waitFrame = CreateFrame("FRAME")
@@ -8657,7 +8641,7 @@
 			end
 
 			-- Run function when Blizzard addon has loaded
-			if IsAddOnLoaded("Blizzard_EncounterJournal") then
+			if C_AddOns.IsAddOnLoaded("Blizzard_EncounterJournal") then
 				EncounterJournalTipFunc()
 			else
 				local waitFrame = CreateFrame("FRAME")
@@ -8682,7 +8666,7 @@
 			end
 
 			-- Run function when Blizzard addon has loaded
-			if IsAddOnLoaded("Blizzard_PerksProgram") then
+			if C_AddOns.IsAddOnLoaded("Blizzard_PerksProgram") then
 				PerksProgramTipFunc()
 			else
 				local waitFrame = CreateFrame("FRAME")
@@ -8707,7 +8691,7 @@
 			end
 
 			-- Run function when Blizzard addon has loaded
-			if IsAddOnLoaded("Blizzard_DeathRecap") then
+			if C_AddOns.IsAddOnLoaded("Blizzard_DeathRecap") then
 				DeathRecapFrameFunc()
 			else
 				local waitFrame = CreateFrame("FRAME")
@@ -8745,7 +8729,7 @@
 			end
 
 			-- Run function when Blizzard addon has loaded
-			if IsAddOnLoaded("Blizzard_GarrisonUI") then
+			if C_AddOns.IsAddOnLoaded("Blizzard_GarrisonUI") then
 				GarrisonFunc()
 			else
 				local waitFrame = CreateFrame("FRAME")
@@ -10944,7 +10928,7 @@
 
 						end
 
-						EnableAddOn("Leatrix_Plus")
+						C_AddOns.EnableAddOn("Leatrix_Plus")
 					end
 
 				end
@@ -11430,30 +11414,14 @@
 			Side.backFrame:SetBackdropColor(0, 0, 1, 0.5)
 
 			-- Create scroll frame
-			Side.scrollFrame = CreateFrame("ScrollFrame", "LeaPlusGlobal" .. globref .. "ScrollFrame", Side.backFrame, "UIPanelScrollFrameTemplate")
+			Side.scrollFrame = CreateFrame("ScrollFrame", "LeaPlusGlobal" .. globref .. "ScrollFrame", Side.backFrame, "LeaPlusConfigurationPanelScrollFrameTemplate")
 			Side.scrollChild = CreateFrame("Frame", nil, Side.scrollFrame)
 
 			Side.scrollChild:SetSize(1, 1)
 			Side.scrollFrame:SetScrollChild(Side.scrollChild)
 			Side.scrollFrame:SetPoint("TOPLEFT", -8, -6)
 			Side.scrollFrame:SetPoint("BOTTOMRIGHT", -29, 6)
-
-			-- Scroll handlers
-			Side.scrollFrame:SetScript("OnMouseWheel", function(self, delta)
-				if delta == 1 then
-					_G["LeaPlusGlobal" .. globref .. "ScrollFrameScrollBar"]:SetValue(_G["LeaPlusGlobal" .. globref .. "ScrollFrameScrollBar"]:GetValue() - 20)
-				else
-					_G["LeaPlusGlobal" .. globref .. "ScrollFrameScrollBar"]:SetValue(_G["LeaPlusGlobal" .. globref .. "ScrollFrameScrollBar"]:GetValue() + 20)
-				end
-			end)
-
-			_G["LeaPlusGlobal" .. globref .. "ScrollFrameScrollBarScrollDownButton"]:SetScript("OnClick", function(self)
-				_G["LeaPlusGlobal" .. globref .. "ScrollFrameScrollBar"]:SetValue(_G["LeaPlusGlobal" .. globref .. "ScrollFrameScrollBar"]:GetValue() + 20)
-			end)
-
-			_G["LeaPlusGlobal" .. globref .. "ScrollFrameScrollBarScrollUpButton"]:SetScript("OnClick", function(self)
-				_G["LeaPlusGlobal" .. globref .. "ScrollFrameScrollBar"]:SetValue(_G["LeaPlusGlobal" .. globref .. "ScrollFrameScrollBar"]:GetValue() - 20)
-			end)
+			Side.scrollFrame:SetPanExtent(20)
 
 			-- Set scroll list to top when shown
 			Side.scrollFrame:HookScript("OnShow", function()
@@ -13716,7 +13684,7 @@
 				return
 			elseif str == "traits" then
 				-- Set dragonriding traits
-				if IsAddOnLoaded("Blizzard_GenericTraitUI") and GenericTraitFrame:IsShown() then
+				if C_AddOns.IsAddOnLoaded("Blizzard_GenericTraitUI") and GenericTraitFrame:IsShown() then
 					local c = C_Traits.GetConfigIDBySystemID(1)
 					for count = 1, 10 do
 						for i, n in ipairs(C_Traits.GetTreeNodes(672)) do

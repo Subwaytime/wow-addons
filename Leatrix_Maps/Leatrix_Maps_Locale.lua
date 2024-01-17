@@ -1,4 +1,4 @@
-----------------------------------------------------------------------
+﻿----------------------------------------------------------------------
 -- 	Leatrix Maps Locale
 ----------------------------------------------------------------------
 
@@ -1508,7 +1508,7 @@ end
 
 -- deDE: German
 if GameLocale == "deDE" then
-L["/ltm help - Show this information."] = "/ltm help - Zeigt diese Informationen"
+	L["/ltm help - Show this information."] = "/ltm help - Zeigt diese Informationen"
 L["/ltm reset - Reset the panel position."] = "/ltm reset - Setzt die Menü Position zurück"
 L["/ltm wipe - Wipe all settings and reload."] = "/ltm wipe - löscht alle Einstellungen und lädt neu"
 L["Algeth'ar Academy"] = "Akademie von Algeth'ar"

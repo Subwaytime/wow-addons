@@ -1,12 +1,18 @@
-tag 955aa8b1a6bc655749ed035ca3912a718a74f3ff 1.1.1
+tag 17fa9ffe1f488d4cabd852eb6100fb15e3e4734e 1.1.2
 Author:	Peter Wooley <peterwooley@gmail.com>
-Date:	Thu Nov 9 13:38:56 2023 -0800
+Date:	Tue Jan 16 09:40:51 2024 -0800
 
-Bump version: 1.1.0 → 1.1.1
+Bump version: 1.1.1 → 1.1.2
 
-commit 409f0c8bff915d2d71cc28036a3c0d6cbc50a82b
+commit e864fb74915de03a17bced08c8a2128f8037bf20
 Author: Peter Wooley <peterwooley@gmail.com>
-Date:   Thu Nov 9 13:38:56 2023 -0800
+Date:   Tue Jan 16 09:40:51 2024 -0800
 
-    Bump version: 1.1.0 → 1.1.1
+    Bump version: 1.1.1 → 1.1.2
+
+commit cea324d636d15b594191e6814d26f5bab71517b1
+Author: Peter Wooley <peterwooley@gmail.com>
+Date:   Tue Jan 16 09:40:45 2024 -0800
+
+    Bumped supported WoW version to 10.2.5.
 

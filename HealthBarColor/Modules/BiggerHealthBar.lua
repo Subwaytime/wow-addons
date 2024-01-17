@@ -66,6 +66,7 @@ local resourceBars = {
 }
 
 function BiggerHealthBar:OnEnable()
+	--PlayerFrame:UnregisterEvent("UPDATE_SHAPESHIFT_FORM")
 	HealthBarColor:RegisterOnToPlayerArt(toPlayerArt)
 	HealthBarColor:RegisterOnToVehicleArt(toVehicelArt)
     toPlayerArt()

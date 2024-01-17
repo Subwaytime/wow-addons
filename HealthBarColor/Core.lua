@@ -192,7 +192,7 @@ end
 function HealthBarColor:assignLayers(layered_statusbar)
     local layer, sublevel = layered_statusbar:GetStatusBarTexture():GetDrawLayer()
     layered_statusbar.OverAbsorbGlow:SetDrawLayer(layer,sublevel+1)
-    layered_statusbar.TotalAbsorbBarOverlay:SetDrawLayer(layer,sublevel+1)
+    --layered_statusbar.TotalAbsorbBarOverlay:SetDrawLayer(layer,sublevel+1)
 end
 
 function HealthBarColor:OnEnable()
