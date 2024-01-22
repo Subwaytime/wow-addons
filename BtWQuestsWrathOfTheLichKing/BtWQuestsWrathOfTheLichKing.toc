@@ -1,6 +1,6 @@
-## Interface: 100200
+## Interface: 100205
 ## Title: BtWQuests: Wrath of the Lich King
-## Version: 1.14
+## Version: 1.15
 ## Notes: Wrath of the Lich King quest data for BtWQuests
 ## Author: Breen
 ## Dependencies: BtWQuests

@@ -107,6 +107,7 @@ DynamicCam.defaults = {
     -- Global settings.
 
     zoomRestoreSetting = "adaptive",
+    reactiveZoomEnhancedMinZoom = false,
     settingsPanelIgnoreParentAlpha = true,
 
     -- Standard settings (for when no situation is overriding them).

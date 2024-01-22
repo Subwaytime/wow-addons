@@ -16,8 +16,7 @@ local FrameDefaults = {
 	money = true, broker = true,
 	bagToggle = true, sort = true, search = true, options = true,
 
-	strata = 'HIGH', skin = ADDON, alpha = 1,
-	scale = Addon.FrameScale or 1,
+	strata = 'HIGH', alpha = 1, scale = Addon.FrameScale or 1,
 	color = {0, 0, 0, 0.5},
 	x = 0, y = 0,
 
@@ -112,16 +111,24 @@ function Settings:OnEnable()
 			self:SetDefaults(profile, ProfileDefaults)
 			
 			for frame, options in pairs(profile) do
-				if type(options) == 'table' and options.bagBreak == true then
-					options.bagBreak = 2
+				if type(options) == 'table' then
+					if options.bagBreak == true then
+						options.bagBreak = 2
+					elseif not options.bagBreak then
+						options.bagBreak = nil
+					end
 				end
 			end
 		end
 	end
 
 	for frame, options in pairs(Addon.sets.global) do
-		if type(options) == 'table' and options.bagBreak == true then
-			options.bagBreak = 2
+		if type(options) == 'table' then
+			if options.bagBreak == true then
+				options.bagBreak = 2
+			elseif not options.bagBreak then
+				options.bagBreak = nil
+			end
 		end
 	end
 
