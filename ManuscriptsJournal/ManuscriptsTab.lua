@@ -30,10 +30,9 @@ local function SetManuscriptSourceFilter(source, checked)
 end
 
 local function GetManuscriptSourceFilter(source)
-    if source == nil then
-        return (sourceFilter[addon.Enum.Sources.Unknown] ~= false) -- treat 'nil' as 'true' for initial values
+    if sourceFilter[source] == nil then
+        return true
     end
-    if sourceFilter[source] == nil then return true end
     return sourceFilter[source]
 end
 
@@ -54,7 +53,14 @@ local function SetDefaultFilters()
 end
 
 local function IsUsingDefaultFilters()
-    return collectedManuscriptFilter and uncollectedManuscriptFilter and (not unusableManuscriptFilter)
+    if not (collectedManuscriptFilter and uncollectedManuscriptFilter and (not unusableManuscriptFilter)) then return false end
+    
+    for i = 1, 99 do
+        if sourceFilter[i] == false then
+             return false
+        end
+    end
+    return true
 end
 
 local function GetCollectedManuscriptFilter()
@@ -574,6 +580,10 @@ function ManuscriptsMixin:SetCollectedManuscriptFilter(checked)
 	self:FullRefreshIfVisible();
 end
 
+function ManuscriptsMixin:GetCollectedManuscriptFilter()
+    return GetCollectedManuscriptFilter()
+end
+
 function ManuscriptsMixin:SetUncollectedManuscriptFilter(checked)
     assert(type(checked) == "boolean")
     uncollectedManuscriptFilter = checked
@@ -615,7 +625,9 @@ function ManuscriptsMixin:ResetFilters()
 end
 
 function ManuscriptsMixin:UpdateResetFiltersButtonVisibility()
-	self.FilterButton.ResetButton:SetShown(not IsUsingDefaultFilters());
+    RunNextFrame(function()
+        self.FilterButton.ResetButton:SetShown(not IsUsingDefaultFilters());
+    end)
 end
 
 function ManuscriptsMixin:OpenCollectedFilterDropDown(level)

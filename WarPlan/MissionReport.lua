@@ -107,7 +107,7 @@ end
 function EV:I_LOAD_HOOKS()
 	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, Tooltip_OnSetUnit)
 	GarrisonLandingPageMinimapButton:HookScript("OnEnter", Tooltip_OnLandingEnter)
-	if IsAddOnLoaded("MasterPlanA") then
+	if C_AddOns.IsAddOnLoaded("MasterPlanA") then
 		return
 	end
 	local followerTabNames = {[2]=GARRISON_FOLLOWERS, [3]=FOLLOWERLIST_LABEL_CHAMPIONS, [9]=FOLLOWERLIST_LABEL_CHAMPIONS, [111]=COVENANT_MISSIONS_FOLLOWERS}

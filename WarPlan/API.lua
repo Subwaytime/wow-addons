@@ -1124,11 +1124,11 @@ function EV:ADDON_LOADED(addon)
 			end
 		end
 		EV("I_LOAD_HOOKS")
-		if IsAddOnLoaded("Blizzard_GarrisonUI") then
+		if C_AddOns.IsAddOnLoaded("Blizzard_GarrisonUI") then
 			EV("I_LOAD_MAINUI")
 			return "remove"
 		end
-	elseif addon == "Blizzard_GarrisonUI" and select(2, IsAddOnLoaded(ADDON)) then
+	elseif addon == "Blizzard_GarrisonUI" and select(2, C_AddOns.IsAddOnLoaded(ADDON)) then
 		EV("I_LOAD_MAINUI")
 		return "remove"
 	end

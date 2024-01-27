@@ -92,9 +92,28 @@ local function CommonLinkable_OnClick(self)
 		ChatEdit_InsertLink(C_CurrencyInfo.GetCurrencyLink(self.currencyID, self.currencyAmount or 0))
 	end
 end
+local function Button_EatKeyboardInputThisFrame(self)
+	if InCombatLockdown() then return end -- Blizzard-sponsored failure.
+	self:SetPropagateKeyboardInput(false)
+	local pendingRelease = true
+	local function OnEnterCombat()
+		if pendingRelease then
+			self:SetPropagateKeyboardInput(true)
+			pendingRelease = false
+		end
+		return "remove"
+	end
+	EV.PLAYER_REGEN_DISABLED = OnEnterCombat
+	C_Timer.After(0, function()
+		if pendingRelease then
+			self:SetPropagateKeyboardInput(true)
+			EV.UnregisterEvent("PLAYER_REGEN_DISABLED", OnEnterCombat)
+		end
+	end)
+end
 local function Button_ClickWithSpace(self, button)
-	self:SetPropagateKeyboardInput(button ~= "SPACE")
 	if button == "SPACE" then
+		Button_EatKeyboardInputThisFrame(self)
 		self:Click()
 	end
 end
@@ -450,7 +469,7 @@ local function MissionTable_SpawnMissionButton(arr, i)
 	if type(prev) == "table" then
 		local cf = CreateObject("MissionButton", prev:GetParent())
 		arr[i] = cf
-		cf:SetPoint("TOPLEFT", 222*(((i-1)%4)+1)-220, math.floor((i-1)/4) *- 282)
+		cf:SetPoint("TOPLEFT", 247*(((i-1)%4)+1)-245, math.floor((i-1)/4) *- 282)
 		return cf
 	end
 end
@@ -593,7 +612,7 @@ local function ChampionList_EnableStaticAnchors(self)
 	local listContainer = self:GetParent()
 	local cl = listContainer:GetParent().Champions
 	for i=1,#cl do
-		cl[i]:SetPoint("LEFT", 182*i-182, 0)
+		cl[i]:SetPoint("LEFT", 185*(i-1), 0)
 	end
 	listContainer:SetScript("OnUpdate", nil)
 end
@@ -608,8 +627,8 @@ local function ChampionList_AnimateDynamicAnchors(listContainer, elapsed)
 	if listContainer:IsMouseOver() then
 		local x, s, l, _b, w = GetCursorPosition(), listContainer:GetEffectiveScale(), listContainer:GetRect()
 		x = (x/s-l)/w
-		if (x < 0.188 or x > 0.62) and (listContainer.goalView ~= (x > 0.62)) then
-			listContainer.goalView, aLeft = x > 0.62, elapsed and 0.2 or nil
+		if (x < 0.088 or x > 0.73) and (listContainer.goalView ~= (x > 0.73)) then
+			listContainer.goalView, aLeft = x > 0.73, elapsed and 0.2 or nil
 			listContainer.animLeft = aLeft
 		end
 	end
@@ -622,8 +641,8 @@ local function ChampionList_AnimateDynamicAnchors(listContainer, elapsed)
 	for i=1,#cl do
 		local cf = cl[i]
 		cf:SetPoint("LEFT", left1*p+left2*q, 0)
-		left1 = left1 + (i < 3 and 88 or 183)
-		left2 = left2 + (i > 3 and 88 or 183)
+		left1 = left1 + (i < 2 and 88 or 184.5)
+		left2 = left2 + (i > 4 and 88 or 184.5)
 	end
 end
 local function ChampionList_EnableDynamicAnchors(self)
@@ -945,11 +964,11 @@ end
 function Factory.GroupButton(parent)
 	local gr = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
 	local t = gr:CreateFontString(nil, "OVERLAY", "GameFontBlack")
-	t:SetWidth(52)
+	t:SetWidth(57)
 	t:SetPoint("BOTTOM", gr, "TOP", 0, 1)
 	gr.Features = t
 	gr:SetText("^")
-	gr:SetSize(45, 22)
+	gr:SetSize(50, 22)
 	gr:SetScript("OnEnter", GroupButton_OnEnter)
 	gr:SetScript("OnLeave", GroupButton_OnLeave)
 	gr:SetScript("OnClick", GroupButton_OnClick)
@@ -1067,7 +1086,7 @@ function Factory.CountdownText(widget, textWidget)
 end
 function Factory.MissionButton(parent)
 	local cf, t = CreateFrame("Button", nil, parent)
-	cf:SetSize(220, 280)
+	cf:SetSize(245, 280)
 	cf:SetScript("OnClick", Mission_OnClick)
 	t = cf:CreateTexture(nil, "BACKGROUND", nil, -2)
 	t:SetAtlas("warboard-parchment")
@@ -1083,19 +1102,19 @@ function Factory.MissionButton(parent)
 	t, cf.Veil = cf:CreateFontString(nil, "BACKGROUND", "GameFontHighlightLarge"), t
 	t:SetText("Goats' Goat Goat")
 	t:SetPoint("TOP", 0, -54)
-	t:SetWidth(210)
+	t:SetWidth(231)
 	t, cf.Name = cf:CreateTexture(nil, "BACKGROUND", nil, 2), t
 	t:SetTexture("Interface/EncounterJournal/UI-EncounterJournalTextures")
 	t:SetTexCoord(0.359375, 0.99609375, 0.8525390625,0.880859375)
-	t:SetWidth(220)
+	t:SetWidth(245)
 	t:SetPoint("TOP", cf.Name, 0, 8)
 	t:SetPoint("BOTTOM", cf.Name, "BOTTOM", 0, -3)
 	t = cf:CreateFontString(nil, "OVERLAY", "GameFontBlack")
-	t:SetWidth(204)
+	t:SetWidth(229)
 	t:SetPoint("TOP", cf.Name, "BOTTOM", 0, -6)
 	t:SetText("There is no cow level. Our forces, however, have discovered a goat level. Perhaps there's even epic goat loot? You should go rescue the goats. Who knows what would happen if the Horde got there first.")
 	t, cf.Description = cf:CreateFontString(nil, "BACKGROUND", "GameFontNormal"), t
-	t:SetPoint("LEFT", cf, "TOPLEFT", 10, -34)
+	t:SetPoint("LEFT", cf, "TOPLEFT", 14, -36)
 	t:SetText(-math.random(1,45)*100 .. " XP")
 	t, cf.XPReward = cf:CreateFontString(nil, "OVERLAY", "GameFontBlack"), t
 	t:SetPoint("BOTTOM", cf, 0, 9)
@@ -1113,7 +1132,7 @@ function Factory.MissionButton(parent)
 		cf.Rewards[j] = rew
 	end
 	t = CreateObject("AchievementRewardIcon", cf)
-		t:SetPoint("LEFT", cf, "TOP", 64, -24)
+		t:SetPoint("LEFT", cf, "TOP", 70, -24)
 		cf.AchievementReward = t
 	
 	t = CreateFrame("Frame", nil, cf)
@@ -1129,7 +1148,7 @@ function Factory.MissionButton(parent)
 	cf.Groups = {}
 	for j=1,4 do
 		local g = CreateObject("GroupButton", cf)
-		g:SetPoint("TOPLEFT", j*50-40, -234)
+		g:SetPoint("TOPLEFT", j*55-42, -234)
 		cf.Groups[j] = g
 	end
 	t = cf:CreateFontString(nil, "OVERLAY", "QuestFont")
@@ -1274,8 +1293,8 @@ end
 function Factory.MissionTable(name)
 	local frame = CreateFrame("Frame", name, UIParent)
 	frame:Hide()
-	frame:SetSize(962, 662)
-	frame:SetPoint("CENTER", 0, -20)
+	frame:SetSize(1062, 702)
+	frame:SetPoint("CENTER", 0, 40)
 	frame:SetFrameStrata("MEDIUM")
 	frame:SetToplevel(true)
 	frame:EnableMouseWheel(true)
@@ -1295,10 +1314,6 @@ function Factory.MissionTable(name)
 	end)
 	mover:SetScript("OnMouseUp", function()
 		frame:StopMovingOrSizing()
-	end)
-	mover:SetScript("OnShow", function()
-		frame:ClearAllPoints()
-		frame:SetPoint("CENTER", 0, -20)
 	end)
 	mover:SetScript("OnEnter", function()
 		SetCursor("Interface/CURSOR/UI-Cursor-Move.crosshair")
@@ -1357,10 +1372,15 @@ function Factory.MissionTable(name)
 		mf.HistoryButton = t
 		
 		local missionList = CreateFrame("ScrollFrame", nil, mf)
-		missionList:SetSize(892, 405)
-		missionList:SetPoint("BOTTOM", 0, 180)
+		missionList:SetPoint("BOTTOMRIGHT", -35, 180)
+		missionList:SetPoint("TOPLEFT", 35, -77)
 		missionList:EnableMouseWheel(true)
 		missionList.ScrollToward = MissionList_ScrollToward
+		t = missionList:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
+		t:SetPoint("CENTER")
+		t:SetText(GARRISON_EMPTY_MISSION_LIST)
+		t:Hide()
+		mf.NoMissionsLabel = t
 		CreateObject("MissionBaseBackground", missionList, 6, 10)
 		mf.List = missionList
 		do -- missionList:OnMouseWheel
@@ -1418,11 +1438,11 @@ function Factory.MissionTable(name)
 		for i=1,6 do
 			local cf = CreateObject("MissionButton", scrollChild)
 			mf.Missions[i] = cf
-			cf:SetPoint("TOPLEFT", 222*(((i-1)%4)+1)-220, math.floor(i/5) *- 282)
+			cf:SetPoint("TOPLEFT", 247*(((i-1)%4)+1)-245, math.floor(i/5) *- 282)
 		end
 		
 		local championList = CreateFrame("Frame", nil, mf)
-		championList:SetSize(908, 135)
+		championList:SetSize(1008, 135)
 		championList:SetPoint("BOTTOM", 0, 30)
 		championList:SetScript("OnShow", ChampionList_UpdateEquipmentGlow)
 		championList:SetScript("OnEvent", ChampionList_UpdateEquipmentGlow)

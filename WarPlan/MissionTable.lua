@@ -423,6 +423,7 @@ local function syncUI()
 		cn = cn + 1
 	end
 	TaskBoard.List.numMissions = cn-1
+	TaskBoard.NoMissionsLabel:SetShown(cn == 1)
 	for i=cn,#Missions do
 		Missions[i]:Hide()
 	end
@@ -485,9 +486,11 @@ function EV:I_LOAD_MAINUI()
 	local frame = CreateObject("MissionTable", "WarPlanFrame")
 	frame:RegisterEvent("GARRISON_MISSION_LIST_UPDATE")
 	frame:RegisterEvent("GARRISON_MISSION_FINISHED")
-	frame:SetScript("OnShow", function()
+	frame:SetScript("OnShow", function(self)
 		BFAMissionFrame:Hide()
 		PlaySound(SOUNDKIT.UI_GARRISON_COMMAND_TABLE_OPEN)
+		local sw, pw = self:GetWidth(), UIParent:GetWidth()
+		self:SetScale(sw > pw and pw/sw or 1)
 		syncUI()
 	end)
 	frame:SetScript("OnHide", function(self)

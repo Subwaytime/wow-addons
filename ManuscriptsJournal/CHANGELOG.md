@@ -1,6 +1,10 @@
 # Manuscripts Journal
 
-## [10.2-015](https://github.com/TLDRMissions/ManuscriptsJournal/tree/10.2-015) (2024-01-17)
-[Full Changelog](https://github.com/TLDRMissions/ManuscriptsJournal/compare/10.2-014...10.2-015) [Previous Releases](https://github.com/TLDRMissions/ManuscriptsJournal/releases)
+## [10.2-016](https://github.com/TLDRMissions/ManuscriptsJournal/tree/10.2-016) (2024-01-23)
+[Full Changelog](https://github.com/TLDRMissions/ManuscriptsJournal/compare/10.2-015...10.2-016) [Previous Releases](https://github.com/TLDRMissions/ManuscriptsJournal/releases)
 
-- Add new manuscripts: love armor and lunar festival armor  
+- Update ui.lua  
+- Update ManuscriptsTab.lua  
+- Change to using a secure action button for the tab to prevent addon blocked errors  
+- Fix issues with source filter  
+- Fix default filters check  

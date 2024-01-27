@@ -1,3 +1,6 @@
+10.2.11 - 24th January 2024
+- Updated sounds to game version 10.2.5.53040 (Jan 22 2024) (100205)
+
 10.2.10 - 16th January 2024
 - Preliminary update for game patch 10.2.5.
 - Updated sounds to game version 10.2.5.52902 (Jan 11 2024) (100205) (PTR).
