@@ -3,7 +3,7 @@
 ## Author: Jaliborc (João Cardoso)
 
 ## Dependencies: Bagnon
-## Interface: 30403
+## Interface: undefined
 ## LoadOnDemand: 1
 
 ..\BagBrother\frames\guild\guild.xml

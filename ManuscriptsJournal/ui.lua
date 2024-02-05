@@ -26,7 +26,7 @@ function ParentMixin:OnLoad()
         
         secureTabButton:HookScript("OnClick", function()
             tab:Click()
-            if selectedTab ~= 1 then
+            if selectedTab ~= ManuscriptsSkillLineManuscriptsTab:GetID() then
                 ManuscriptsJournal:Hide()
             end
         end)
@@ -47,39 +47,21 @@ function ParentMixin:OnLoad()
             end
             
             if (selectedTab == 2) and (class == "DRUID") then
-                RunNextFrame(function()
-                    ManuscriptsJournal:Hide()
-                end)
                 ShapeshiftsJournal:Show()
                 ShapeshiftsJournal:EnableMouse(true)
             elseif selectedTab == 3 then
-                RunNextFrame(function()
-                    ManuscriptsJournal:Hide()
-                end)
                 SoulshapesJournal:Show()
                 SoulshapesJournal:EnableMouse(true)
             elseif (selectedTab == 4) and (class == "SHAMAN") then
-                RunNextFrame(function()
-                    ManuscriptsJournal:Hide()
-                end)
                 HexTomesJournal:Show()
                 HexTomesJournal:EnableMouse(true)
             elseif (selectedTab == 5) and (class == "MAGE") then
-                RunNextFrame(function()
-                    ManuscriptsJournal:Hide()
-                end)
                 PolymorphsJournal:Show()
                 PolymorphsJournal:EnableMouse(true)
             elseif (selectedTab == 6) and (class == "WARLOCK") then
-                RunNextFrame(function()
-                    ManuscriptsJournal:Hide()
-                end)
                 GrimoiresJournal:Show()
                 GrimoiresJournal:EnableMouse(true)
             elseif (selectedTab == 7) and (class == "HUNTER") then
-                RunNextFrame(function()
-                    ManuscriptsJournal:Hide()
-                end)
                 TameTomesJournal:Show()
                 TameTomesJournal:EnableMouse(true)
             end

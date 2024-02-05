@@ -86,7 +86,7 @@ Private.AddUpdater(Module, function(self)
 	if (self.hasItem and db.enableItemBind) then
 
 		local quality, bind = self.info.quality, self.info.bind
-		if (not bind) then
+		if (not bind and self.info.hyperlink) then
 			_,_,_,_,_,_,_,_,_,_,_,_,_, bind = GetItemInfo(self.info.hyperlink)
 		end
 
@@ -97,11 +97,10 @@ Private.AddUpdater(Module, function(self)
 			local show = true
 			local bag, slot = self:GetBag(), self:GetID()
 
-			if (retail or wrath) then
-				local containerInfo = C_Container.GetContainerItemInfo(bag,slot)
-				if (containerInfo and containerInfo.isBound) then
-					show = nil
-				end
+			-- This has been added to the classics too now.
+			local containerInfo = C_Container and C_Container.GetContainerItemInfo(bag,slot)
+			if (containerInfo and containerInfo.isBound) then
+				show = nil
 			end
 
 			-- Scan the tooltip to see if the item is bound.

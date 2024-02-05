@@ -4,7 +4,7 @@
 ## Author: Jaliborc (João Cardoso)
 
 ## Dependencies: Bagnon
-## Interface: 100200
+## Interface: undefined
 ## LoadOnDemand: 1
 
 ..\BagBrother\frames\vault\vault.xml
