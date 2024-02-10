@@ -1,5 +1,5 @@
 ﻿----------------------------------------------------------------------
--- 	Leatrix Plus 10.2.13 (3rd February 2024)
+-- 	Leatrix Plus 10.2.14 (7th February 2024)
 ----------------------------------------------------------------------
 
 --	01:Functns, 02:Locks, 03:Restart, 20:Live, 30:Isolated, 40:Player
@@ -18,7 +18,7 @@
 	local void
 
 	-- Version
-	LeaPlusLC["AddonVer"] = "10.2.13"
+	LeaPlusLC["AddonVer"] = "10.2.14"
 
 	-- Get locale table
 	local void, Leatrix_Plus = ...
@@ -5547,11 +5547,12 @@
 							_G["WIM3MinimapButton"]:GetScript("OnLeave")()
 							GameTooltip:Hide()
 						end)
-					elseif name == "BtWQuestsMinimapButton"
-						or name == "TomCats-MinimapButton"
+					elseif name == "BtWQuestsMinimapButton"				-- BtWQuests
+						or name == "TomCats-MinimapButton"				-- TomCat's Tours
 						or name == "TomCats-LoveIsInTheAirMinimapButton2023"
 						or name == "TomCats-LunarFestivalMinimapButton2023"
-						or name == "LibDBIcon10_MethodRaidTools"
+						or name == "LibDBIcon10_MethodRaidTools"		-- Method Raid Tools
+						or name == "wlMinimapButton"					-- Wowhead Looter (part of Wowhead client)
 						then
 						local myButton = LibStub("LibDBIcon-1.0"):GetMinimapButton("LeaPlusCustomIcon_" .. name)
 						myButton:HookScript("OnEnter", function()
@@ -5614,7 +5615,7 @@
 				end
 
 				-- Run the function a few times on startup
-				C_Timer.NewTicker(2, MakeButtons, 3)
+				C_Timer.NewTicker(2, MakeButtons, 8)
 				C_Timer.After(0.1, MakeButtons)
 
 			end
@@ -7934,6 +7935,7 @@
 					_G["ChatFrame" .. i .. "Tab"]:HookScript("OnClick", function()
 						if IsControlKeyDown() then
 							editBox:SetFont(_G["ChatFrame" .. i]:GetFont())
+							editFrame:SetPanExtent(select(2, _G["ChatFrame" .. i]:GetFont()))
 							ShowChatbox(_G["ChatFrame" .. i])
 						end
 					end)
@@ -7947,6 +7949,7 @@
 					_G[cf .. "Tab"]:HookScript("OnClick", function()
 						if IsControlKeyDown() then
 							editBox:SetFont(_G[cf]:GetFont())
+							editFrame:SetPanExtent(select(2, _G[cf]:GetFont()))
 							ShowChatbox(_G[cf])
 						end
 					end)
