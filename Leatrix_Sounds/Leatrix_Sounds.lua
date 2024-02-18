@@ -1,6 +1,6 @@
 ﻿
 	----------------------------------------------------------------------
-	-- Leatrix Sounds 10.2.14 (7th February 2024)
+	-- Leatrix Sounds 10.2.15 (14th February 2024)
 	----------------------------------------------------------------------
 
 	--  Create global table
@@ -10,7 +10,7 @@
 	local LeaSoundsLC, LeaSoundsCB = {}, {}
 
 	-- Version
-	LeaSoundsLC["AddonVer"] = "10.2.14"
+	LeaSoundsLC["AddonVer"] = "10.2.15"
 
 	-- Get locale table
 	local void, Leatrix_Sounds = ...
@@ -338,14 +338,12 @@
 				tinsert(ListData, 4, "|cffffd800" .. L["Sound Files"])
 			end
 			-- Update buttons
-			FauxScrollFrame_Update(scrollFrame, #ListData, numButtons, 16)
-			for index = 1, numButtons do
-				local offset = index + FauxScrollFrame_GetOffset(scrollFrame)
-				local button = scrollFrame.buttons[index]
-				button.index = offset
-				if offset <= #ListData then
+			local offset = max(0, floor(scrollFrame:GetVerticalScroll() + 0.5))
+			for i, button in ipairs(scrollFrame.buttons) do
+				local index = offset + i
+				if index <= #ListData then
 					-- Show track listing
-					button:SetText(ListData[offset])
+					button:SetText(ListData[index])
 					-- Set width of highlight texture
 					if button:GetTextWidth() > frameWidth - 60 then
 						button.t:SetSize(frameWidth - 60, 16)
@@ -378,18 +376,23 @@
 					button:GetFontString():SetWidth(frameWidth - 60)
 					button:GetFontString():SetWordWrap(false)
 				else
+					button:SetText("---")
 					button:Hide()
 				end
+				scrollFrame.child:SetSize(200, #ListData + (14*15) - 1) --++ LeaSoundsLC.NewPatch
 			end
 		end
 
 		-- Create scroll frame
-		scrollFrame = CreateFrame("ScrollFrame", "LeaSoundsScrollFrame", LeaSoundsLC["PageF"], "FauxScrollFrameTemplate")
+		scrollFrame = CreateFrame("ScrollFrame", "LeaSoundsScrollFrame", LeaSoundsLC["PageF"], "ScrollFrameTemplate")
 		scrollFrame:SetPoint("TOPLEFT", 0, -32)
 		scrollFrame:SetPoint("BOTTOMRIGHT", -30, 52)
-		scrollFrame:SetScript("OnVerticalScroll", function(self, offset)
-			FauxScrollFrame_OnVerticalScroll(self, offset, 16, UpdateList)
-		end)
+		scrollFrame:SetPanExtent(1)
+		scrollFrame:SetScript("OnVerticalScroll", UpdateList)
+
+		-- Create the scroll child
+		scrollFrame.child = CreateFrame("Frame", nil, scrollFrame)
+		scrollFrame:SetScrollChild(scrollFrame.child)
 
 		-- Give scroll frame file level scope
 		LeaSoundsLC.scrollFrame = scrollFrame
@@ -570,6 +573,10 @@
 			-- Update listing buttons
 			UpdateList()
 
+			-- Set list to top and stop any playing track
+			scrollFrame:SetVerticalScroll(0)
+			stopBtn:Click()
+
 		end
 
 		LeaSoundsCB["SoundMusic"]:HookScript("OnClick", function() playScroll = nil; C_Timer.After(0.001, SetListingFunc) end)
@@ -656,7 +663,7 @@
 							void, musicHandle = PlaySoundFile(soundID, "Master")
 						end
 						-- Remember scroll frame position
-						playScroll = LeaSoundsLC.scrollFrame:GetVerticalScroll()
+						playScroll = LeaSoundsLC.scrollFrame.ScrollBar:GetScrollPercentage()
 						-- Show static highlight bar
 						for index = 1, numButtons do
 							local button = scrollFrame.buttons[index]
@@ -774,13 +781,22 @@
 
 			-- Set scroll frame to last played position
 			if not playScroll then return end
-			scrollFrame:SetVerticalScroll(playScroll)
 
 			-- Get currently selected track
 			local playingTrack = 0
 			for i = 1, numButtons do
 				if scrollFrame.buttons[i].s:IsShown() then
 					playingTrack = i
+				end
+			end
+
+			-- If playing track exists but is not visible, jump to playing track
+			if playingTrack == 0 then
+				scrollFrame.ScrollBar:SetScrollPercentage(playScroll)
+				for i = 1, numButtons do
+					if scrollFrame.buttons[i].s:IsShown() then
+						playingTrack = i
+					end
 				end
 			end
 
@@ -795,24 +811,25 @@
 				if key == "S" then
 					-- If last track is selected, do nothing
 					if scrollFrame.buttons[playingTrack]:GetText() == ListData[#ListData] then return end
-
-					-- Scroll forwards if last visible track is selected with more tracks available
-					if playingTrack == 15 and #ListData > numButtons then
-						LeaSoundsScrollFrameScrollBar:SetValue(LeaSoundsScrollFrameScrollBar:GetValue() + jumpList * 16) -- 16 is row height
-						playingTrack = playingTrack - jumpList
-					end
-
 					-- Play next track
-					scrollFrame.buttons[playingTrack + 1]:Click("LeftButton")
+					if playingTrack == 15 then
+						LeaSoundsLC.scrollFrame.ScrollBar:ScrollStepInDirection(1)
+						playingTrack = playingTrack - 1
+						scrollFrame.buttons[playingTrack + 1]:Click("LeftButton")
+					else
+						scrollFrame.buttons[playingTrack + 1]:Click("LeftButton")
+					end
 				end
 
 				if key == "W" then
 					-- Play previous track
 					if playingTrack == 1 then
-						LeaSoundsScrollFrameScrollBar:SetValue(LeaSoundsScrollFrameScrollBar:GetValue() - jumpList * 16) -- 16 is row height
-						playingTrack = playingTrack + jumpList
+						LeaSoundsLC.scrollFrame.ScrollBar:ScrollStepInDirection(-1)
+						playingTrack = playingTrack + 1
+						scrollFrame.buttons[playingTrack - 1]:Click("LeftButton")
+					else
+						scrollFrame.buttons[playingTrack - 1]:Click("LeftButton")
 					end
-					scrollFrame.buttons[playingTrack - 1]:Click("LeftButton")
 				end
 
 			end

@@ -1,5 +1,5 @@
 --- Kaliel's Tracker
---- Copyright (c) 2012-2023, Marouan Sabbagh <mar.sabbagh@gmail.com>
+--- Copyright (c) 2012-2024, Marouan Sabbagh <mar.sabbagh@gmail.com>
 --- All Rights Reserved.
 ---
 --- This file is part of addon Kaliel's Tracker.
@@ -95,13 +95,15 @@ local function SetWaypointTag(button, show)
 		if button.KTtomtom then
 			button.KTtomtom:Show()
 		else
-			button.KTtomtom = button.Display:CreateTexture(nil, "OVERLAY")
-			button.KTtomtom:SetTexture(mediaPath.."KT-TomTomTag")
-			button.KTtomtom:SetPoint("CENTER")
+			if button.Display then
+				button.KTtomtom = button.Display:CreateTexture(nil, "OVERLAY")
+				button.KTtomtom:SetTexture(mediaPath.."KT-TomTomTag")
+				button.KTtomtom:SetPoint("CENTER")
+			end
 		end
 
 		-- Set Waypoint Tag size, but not for WQ
-		if button.pinScale then
+		if button.KTtomtom and button.pinScale then
 			local scale = button.KTtomtom:GetParent():GetPinScale()
 			button.KTtomtom:SetSize(scale * 32, scale * 32)
 		end
@@ -256,7 +258,7 @@ local function SetHooks()
 		end
 	end)
 
-	hooksecurefunc(QuestUtil, "SetupWorldQuestButton", function(button, worldQuestType, rarity, isElite, tradeskillLineIndex, inProgress, selected, isCriteria, isSpellTarget, isEffectivelyTracked)
+	hooksecurefunc(QuestUtil, "SetupWorldQuestButton", function(button, info, inProgress, selected, isCriteria, isSpellTarget, isEffectivelyTracked)
 		SetWaypointTag(button, questWaypoints[button.questID])
 	end)
 
@@ -302,7 +304,7 @@ end
 function M:OnInitialize()
 	_DBG("|cffffff00Init|r - "..self:GetName(), true)
 	db = KT.db.profile
-	self.isLoaded = (KT:CheckAddOn("TomTom", "v3.5.1-release") and db.addonTomTom)
+	self.isLoaded = (KT:CheckAddOn("TomTom", "v3.5.5-release") and db.addonTomTom)
 
 	if self.isLoaded then
 		KT:Alert_IncompatibleAddon("TomTom", "v3.5.1-release")
